@@ -5,7 +5,7 @@ import bloodmatch.domain.shared.entity.DomainObject;
 
 public abstract class PartyRole<T extends Party> extends DomainObject {
 
-  protected T party;
+  private T party;
 
   protected PartyRole(T party) {
 
@@ -16,7 +16,7 @@ public abstract class PartyRole<T extends Party> extends DomainObject {
     this.id = party.getId();
   }
 
-  public T getParty() {
+  protected T getParty() {
     return party;
   }
 

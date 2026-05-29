@@ -8,15 +8,16 @@ import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 
 public abstract class Party extends DomainObject {
 
-    protected String name;
-    protected Email email;
-    protected PhoneNumber phoneNumber;
-    protected Address address;
+    private String name;
+    private Email email;
+    private PhoneNumber phoneNumber;
+    private Address address;
 
     protected Party(String name) {
 
-        if (name == null || name.isBlank())
+        if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Name cannot be empty");
+        }
 
         this.id = DomainID.generate();
         this.name = name;

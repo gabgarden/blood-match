@@ -7,21 +7,19 @@ import bloodmatch.domain.shared.valueObjects.CPF;
 
 public class Person extends Party {
 
-    protected CPF cpf;
+    private CPF cpf;
+    private LocalDate birthDate;
 
-    protected LocalDate birthDate;
-
-    public Person(
-            String name,
-            CPF cpf,
-            LocalDate birthDate) {
-
+    public Person(String name, CPF cpf, LocalDate birthDate) {
         super(name);
-        if (cpf == null)
-            throw new IllegalArgumentException("CPF cannot be null");
-        if (birthDate == null)
-            throw new IllegalArgumentException("Birth date cannot be null");
 
+        if (cpf == null) {
+            throw new IllegalArgumentException("CPF cannot be null");
+        }
+        if (birthDate == null){
+            throw new IllegalArgumentException("Birth date cannot be null");
+        }
+        
         this.cpf = cpf;
         this.birthDate = birthDate;
     }

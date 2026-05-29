@@ -6,10 +6,9 @@ public class Organization extends Party {
 
     private CNPJ cnpj;
 
-    public Organization(
-            String name,
-            CNPJ cnpj) {
+    public Organization(String name, CNPJ cnpj) {
         super(name);
+        
         if (cnpj == null) {
             throw new IllegalArgumentException("CNPJ cannot be null");
 

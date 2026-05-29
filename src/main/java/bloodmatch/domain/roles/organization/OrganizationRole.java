@@ -10,7 +10,7 @@ public abstract class OrganizationRole extends PartyRole<Organization> {
   }
 
   public Organization getOrganization() {
-    return party;
+    return getParty;
   }
 
 }
