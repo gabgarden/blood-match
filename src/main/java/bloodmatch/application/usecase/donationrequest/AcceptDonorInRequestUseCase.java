@@ -49,19 +49,15 @@ public class AcceptDonorInRequestUseCase {
     if (currentDate == null)
       throw new IllegalArgumentException("Current date cannot be null");
 
-    // 1. Busca a DonationRequest do repositório (reconstitui domínio)
     DonationRequest request = donationRequestRepository.findById(requestId)
         .orElseThrow(() -> new IllegalArgumentException("Donation request not found"));
 
-    // 2. Busca o Donor do repositório
     Donor donor = donorRepository.findByPartyId(donorId)
         .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
 
-    // 3. Muta o domínio (aceita o donor na request)
     request.acceptBy(donor, currentDate);
 
-    // 4. PERSISTÊNCIA EXPLÍCITA: Salva a mutação no MongoDB
-    // Importante: sem este save(), a mudança fica só em memória
+
     donationRequestRepository.save(request);
   }
 }
