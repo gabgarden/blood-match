@@ -75,10 +75,16 @@ public class Address {
     public int hashCode() {
         return Objects.hash(street, city, state, zipCode, latitude, longitude);
     }
-    
-    // formatar o texto para envio a API do Google
-    public String getFullAddressAsString() {
-        return String.format("%s, %s, %s", street, city, state);
-    }
 
+
+    
+   public String getFullAddressAsString() {
+    return String.format(
+            "%s, %s, %s, %s, Brasil",
+            street,
+            city,
+            state,
+            zipCode
+    );
+}
 }
