@@ -1,4 +1,4 @@
-package main.java.bloodmatch.domain.services;
+package bloodmatch.domain.services;
 
 import bloodmatch.domain.shared.valueObjects.Address;
 

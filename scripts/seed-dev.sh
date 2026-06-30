@@ -53,9 +53,9 @@ require_command jq
 
 echo "Seeding via API: $API_URL"
 
-DONORS_DATA=$'Ana Silva|12345678901|1998-05-10|ana.silva@blood.local|O-|78.0\nBruno Santos|98765432100|1997-08-21|bruno.santos@blood.local|O+|82.0\nCarla Oliveira|11122233344|1996-04-14|carla.oliveira@blood.local|A-|74.0\nDaniel Costa|22233344455|1999-09-02|daniel.costa@blood.local|A+|68.5\nFernanda Lima|33344455566|1995-12-18|fernanda.lima@blood.local|B-|80.0\nGabriel Almeida|44455566677|2000-03-23|gabriel.almeida@blood.local|B+|71.5\nHelena Rocha|55566677788|1997-07-11|helena.rocha@blood.local|AB-|76.0\nIgor Pereira|66677788899|1998-11-30|igor.pereira@blood.local|AB+|69.0\nJuliana Martins|77788899900|2001-01-19|juliana.martins@blood.local|O+|77.0\nLucas Ferreira|88899900011|2002-06-27|lucas.ferreira@blood.local|A+|66.0'
+DONORS_DATA=$'Ana Silva|12345678901|1998-05-10|ana.silva@blood.local|O-|78.0|Rua das Flores 123|São Paulo|SP|01001-000\nBruno Santos|98765432100|1997-08-21|bruno.santos@blood.local|O+|82.0|Avenida Brasil 456|São Paulo|SP|01002-000\nCarla Oliveira|11122233344|1996-04-14|carla.oliveira@blood.local|A-|74.0|Rua Augusta 789|São Paulo|SP|01003-000\nDaniel Costa|22233344455|1999-09-02|daniel.costa@blood.local|A+|68.5|Rua da Consolação 12|São Paulo|SP|01004-000\nFernanda Lima|33344455566|1995-12-18|fernanda.lima@blood.local|B-|80.0|Rua Haddock Lobo 34|São Paulo|SP|01005-000\nGabriel Almeida|44455566677|2000-03-23|gabriel.almeida@blood.local|B+|71.5|Rua dos Pinheiros 56|São Paulo|SP|01006-000\nHelena Rocha|55566677788|1997-07-11|helena.rocha@blood.local|AB-|76.0|Rua Verde 78|São Paulo|SP|01007-000\nIgor Pereira|66677788899|1998-11-30|igor.pereira@blood.local|AB+|69.0|Rua Azul 90|São Paulo|SP|01008-000\nJuliana Martins|77788899900|2001-01-19|juliana.martins@blood.local|O+|77.0|Avenida Paulista 101|São Paulo|SP|01009-000\nLucas Ferreira|88899900011|2002-06-27|lucas.ferreira@blood.local|A+|66.0|Rua do Limoeiro 202|São Paulo|SP|01010-000'
 
-ORGS_DATA=$'Hemocentro Central|12345678000100|hemo1@blood.local\nHemocentro Norte|12345678000101|hemo2@blood.local\nHospital São Lucas|12345678000102|hemo3@blood.local\nHemocentro Sul|12345678000103|hemo4@blood.local\nHospital Vida|12345678000104|hemo5@blood.local\nHemocentro Leste|12345678000105|hemo6@blood.local\nHemocentro Oeste|12345678000106|hemo7@blood.local\nHospital Santa Cruz|12345678000107|hemo8@blood.local\nHemocentro Vale|12345678000108|hemo9@blood.local\nHospital Esperança|12345678000109|hemo10@blood.local'
+ORGS_DATA=$'Hemocentro Central|12345678000100|hemo1@blood.local|Rua dos Jacarandás 100|São Paulo|SP|01100-000\nHemocentro Norte|12345678000101|hemo2@blood.local|Avenida Norte 200|São Paulo|SP|01101-000\nHospital São Lucas|12345678000102|hemo3@blood.local|Rua São Lucas 300|São Paulo|SP|01102-000\nHemocentro Sul|12345678000103|hemo4@blood.local|Rua do Sul 400|São Paulo|SP|01103-000\nHospital Vida|12345678000104|hemo5@blood.local|Avenida Vida 500|São Paulo|SP|01104-000\nHemocentro Leste|12345678000105|hemo6@blood.local|Rua Leste 600|São Paulo|SP|01105-000\nHemocentro Oeste|12345678000106|hemo7@blood.local|Avenida Oeste 700|São Paulo|SP|01106-000\nHospital Santa Cruz|12345678000107|hemo8@blood.local|Praça Santa Cruz 800|São Paulo|SP|01107-000\nHemocentro Vale|12345678000108|hemo9@blood.local|Rua do Vale 900|São Paulo|SP|01108-000\nHospital Esperança|12345678000109|hemo10@blood.local|Avenida Esperança 1000|São Paulo|SP|01109-000'
 
 DONOR_PERSON_IDS=()
 DONOR_TOKENS=()
@@ -63,12 +63,12 @@ DONOR_BLOOD_TYPES=()
 ORG_IDS=()
 ORG_TOKENS=()
 
-while IFS='|' read -r name cpf birth_date email blood_type weight; do
+while IFS='|' read -r name cpf birth_date email blood_type weight street city state zip_code; do
   [[ -z "$name" ]] && continue
 
   person_id=$(
     post /parties/persons "" \
-      "{\"name\":\"$name\",\"cpf\":\"$cpf\",\"birthDate\":\"$birth_date\",\"email\":\"$email\",\"password\":\"$SEED_PASSWORD\",\"passwordConfirmation\":\"$SEED_PASSWORD\"}" \
+      "{\"name\":\"$name\",\"cpf\":\"$cpf\",\"birthDate\":\"$birth_date\",\"email\":\"$email\",\"password\":\"$SEED_PASSWORD\",\"passwordConfirmation\":\"$SEED_PASSWORD\",\"street\":\"$street\",\"city\":\"$city\",\"state\":\"$state\",\"zipCode\":\"$zip_code\"}" \
       | jq -r '.id'
   )
 
@@ -90,12 +90,12 @@ while IFS='|' read -r name cpf birth_date email blood_type weight; do
 
 done <<< "$DONORS_DATA"
 
-while IFS='|' read -r name cnpj email; do
+while IFS='|' read -r name cnpj email street city state zip_code; do
   [[ -z "$name" ]] && continue
 
   org_id=$(
     post /parties/organizations "" \
-      "{\"name\":\"$name\",\"cnpj\":\"$cnpj\",\"email\":\"$email\",\"password\":\"$SEED_PASSWORD\",\"passwordConfirmation\":\"$SEED_PASSWORD\"}" \
+      "{\"name\":\"$name\",\"cnpj\":\"$cnpj\",\"email\":\"$email\",\"password\":\"$SEED_PASSWORD\",\"passwordConfirmation\":\"$SEED_PASSWORD\",\"street\":\"$street\",\"city\":\"$city\",\"state\":\"$state\",\"zipCode\":\"$zip_code\"}" \
       | jq -r '.id'
   )
 

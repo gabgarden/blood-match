@@ -16,7 +16,7 @@ public abstract class PartyRole<T extends Party> extends DomainObject {
     this.id = party.getId();
   }
 
-  protected T getParty() {
+  public T getParty() {
     return party;
   }
 

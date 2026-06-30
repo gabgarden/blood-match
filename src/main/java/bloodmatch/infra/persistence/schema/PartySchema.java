@@ -3,6 +3,7 @@ package bloodmatch.infra.persistence.schema;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Party;
 import bloodmatch.domain.party.Person;
+import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -33,6 +34,12 @@ public class PartySchema {
   private String cpf;
   private LocalDate birthDate;
   private String cnpj;
+  private String street;
+  private String city;
+  private String state;
+  private String zipCode;
+  private Double latitude;
+  private Double longitude;
 
   public PartySchema(Party party) {
     if (party == null)
@@ -46,6 +53,14 @@ public class PartySchema {
       this.cpf = person.getCpf().getValue();
       this.birthDate = person.getBirthDate();
       this.cnpj = null;
+      if (person.getAddress() != null) {
+        this.street = person.getAddress().getStreet();
+        this.city = person.getAddress().getCity();
+        this.state = person.getAddress().getState();
+        this.zipCode = person.getAddress().getZipCode();
+        this.latitude = person.getAddress().getLatitude();
+        this.longitude = person.getAddress().getLongitude();
+      }
       return;
     }
 
@@ -54,6 +69,14 @@ public class PartySchema {
       this.cnpj = organization.getCnpj().getValue();
       this.cpf = null;
       this.birthDate = null;
+      if (organization.getAddress() != null) {
+        this.street = organization.getAddress().getStreet();
+        this.city = organization.getAddress().getCity();
+        this.state = organization.getAddress().getState();
+        this.zipCode = organization.getAddress().getZipCode();
+        this.latitude = organization.getAddress().getLatitude();
+        this.longitude = organization.getAddress().getLongitude();
+      }
       return;
     }
 
@@ -64,11 +87,19 @@ public class PartySchema {
     DomainID partyId = new DomainID(UUID.fromString(this.id));
 
     if (TYPE_PERSON.equals(this.partyType)) {
-      return new PersistedPerson(partyId, this.name, new CPF(this.cpf), this.birthDate);
+      Person person = new PersistedPerson(partyId, this.name, new CPF(this.cpf), this.birthDate);
+      if (street != null && city != null && state != null) {
+        person.changeAddress(new Address(street, city, state, zipCode, latitude, longitude));
+      }
+      return person;
     }
 
     if (TYPE_ORGANIZATION.equals(this.partyType)) {
-      return new PersistedOrganization(partyId, this.name, new CNPJ(this.cnpj));
+      Organization organization = new PersistedOrganization(partyId, this.name, new CNPJ(this.cnpj));
+      if (street != null && city != null && state != null) {
+        organization.changeAddress(new Address(street, city, state, zipCode, latitude, longitude));
+      }
+      return organization;
     }
 
     throw new IllegalStateException("Unsupported party type: " + this.partyType);

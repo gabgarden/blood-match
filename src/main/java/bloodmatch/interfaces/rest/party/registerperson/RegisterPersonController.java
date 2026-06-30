@@ -41,13 +41,21 @@ public class RegisterPersonController {
       if (isBlank(payload.passwordConfirmation()))
         throw new IllegalArgumentException("passwordConfirmation cannot be blank");
 
+      if ((payload.street() != null || payload.city() != null || payload.state() != null || payload.zipCode() != null) &&
+          (isBlank(payload.street()) || isBlank(payload.city()) || isBlank(payload.state()) || isBlank(payload.zipCode())))
+        throw new IllegalArgumentException("All address fields must be provided together");
+
       Person person = registerPartyUseCase.registerPerson(
           payload.name(),
           payload.cpf(),
           payload.birthDate(),
           payload.email(),
           payload.password(),
-          payload.passwordConfirmation());
+          payload.passwordConfirmation(),
+          payload.street(),
+          payload.city(),
+          payload.state(),
+          payload.zipCode());
 
       return ResponseEntity.status(HttpStatus.CREATED)
           .body(Map.of(

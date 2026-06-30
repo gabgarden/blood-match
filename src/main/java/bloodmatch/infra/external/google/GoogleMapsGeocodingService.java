@@ -1,4 +1,4 @@
-package main.java.bloodmatch.infra.external.google;
+package bloodmatch.infra.external.google;
 
 import bloodmatch.domain.services.GeocodingServiceInterface;
 import bloodmatch.domain.shared.valueObjects.Address;

@@ -5,5 +5,9 @@ public record RegisterOrganizationDto(
     String cnpj,
     String email,
     String password,
-    String passwordConfirmation) {
+    String passwordConfirmation,
+    String street,
+    String city,
+    String state,
+    String zipCode) {
 }

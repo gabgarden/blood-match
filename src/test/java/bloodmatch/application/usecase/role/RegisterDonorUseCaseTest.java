@@ -11,6 +11,7 @@ import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.Email;
 import org.junit.jupiter.api.Test;
+import bloodmatch.domain.services.GeocodingServiceInterface;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -27,11 +28,13 @@ class RegisterDonorUseCaseTest {
   private final DonorRepositoryInterface donorRepository = mock(DonorRepositoryInterface.class);
   private final PersonRepositoryInterface personRepository = mock(PersonRepositoryInterface.class);
   private final UserAccountRepositoryInterface userAccountRepository = mock(UserAccountRepositoryInterface.class);
+  private final GeocodingServiceInterface geocodingService = mock(GeocodingServiceInterface.class);
 
   private final RegisterDonorUseCase useCase = new RegisterDonorUseCase(
       donorRepository,
       personRepository,
-      userAccountRepository);
+      userAccountRepository,
+      geocodingService);
 
   @Test
   void shouldAddDonorRoleToUserAccountWhenRegisteringDonor() {

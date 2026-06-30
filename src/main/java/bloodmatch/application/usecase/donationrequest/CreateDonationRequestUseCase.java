@@ -7,6 +7,7 @@ import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
+import bloodmatch.domain.services.GeocodingServiceInterface;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -20,11 +21,13 @@ public class CreateDonationRequestUseCase {
 
   private final DonationRequestRepositoryInterface donationRequestRepository;
   private final RequesterRepositoryInterface requesterRepository;
-    private final PartyRepositoryInterface partyRepository;
+  private final PartyRepositoryInterface partyRepository;
+  private final GeocodingServiceInterface geocodingService;
 
   public CreateDonationRequestUseCase(DonationRequestRepositoryInterface donationRequestRepository,
       RequesterRepositoryInterface requesterRepository,
-      PartyRepositoryInterface partyRepository) {
+      PartyRepositoryInterface partyRepository,
+      GeocodingServiceInterface geocodingService) {
     if (donationRequestRepository == null) {
       throw new IllegalArgumentException("DonationRequestRepository cannot be null");
     }
@@ -34,9 +37,13 @@ public class CreateDonationRequestUseCase {
     if (partyRepository == null) {
       throw new IllegalArgumentException("PartyRepository cannot be null");
     }
+    if (geocodingService == null) {
+      throw new IllegalArgumentException("GeocodingService cannot be null");
+    }
     this.donationRequestRepository = donationRequestRepository;
     this.requesterRepository = requesterRepository;
     this.partyRepository = partyRepository;
+    this.geocodingService = geocodingService;
   }
 
   public DonationRequest execute(
@@ -84,6 +91,11 @@ public class CreateDonationRequestUseCase {
       .filter(Organization.class::isInstance)
       .map(Organization.class::cast)
       .orElseThrow(() -> new IllegalArgumentException("Blood center organization not found"));
+
+    if (organization.getAddress() != null && !organization.getAddress().hasCoordinates()) {
+      organization.changeAddress(geocodingService.getCoordinatesFromAddress(organization.getAddress()));
+      partyRepository.save(organization);
+    }
 
     BloodCenter bloodCenter = new BloodCenter(organization);
 

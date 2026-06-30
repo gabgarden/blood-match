@@ -4,6 +4,7 @@ import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.PersonRepositoryInterface;
+import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.repositories.UserAccountRepositoryInterface;
 import bloodmatch.domain.security.UserAccount;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
@@ -53,13 +54,20 @@ public class RegisterPartyUseCase {
       LocalDate birthDate,
       String email,
       String password,
-      String passwordConfirmation) {
+      String passwordConfirmation,
+      String street,
+      String city,
+      String state,
+      String zipCode) {
 
     validateCredentials(email, password, passwordConfirmation);
     Email userEmail = new Email(email);
     ensureEmailIsAvailable(userEmail);
 
     Person person = new Person(name, new CPF(cpf), birthDate);
+    if (street != null && city != null && state != null && zipCode != null) {
+      person.changeAddress(new Address(street, city, state, zipCode));
+    }
     personRepository.save(person);
 
     UserAccount userAccount = new UserAccount(
@@ -78,13 +86,20 @@ public class RegisterPartyUseCase {
       String cnpj,
       String email,
       String password,
-      String passwordConfirmation) {
+      String passwordConfirmation,
+      String street,
+      String city,
+      String state,
+      String zipCode) {
 
     validateCredentials(email, password, passwordConfirmation);
     Email userEmail = new Email(email);
     ensureEmailIsAvailable(userEmail);
 
     Organization organization = new Organization(name, new CNPJ(cnpj));
+    if (street != null && city != null && state != null && zipCode != null) {
+      organization.changeAddress(new Address(street, city, state, zipCode));
+    }
     partyRepository.save(organization);
 
     UserAccount userAccount = new UserAccount(
