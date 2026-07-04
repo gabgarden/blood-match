@@ -131,8 +131,8 @@ for i in "${!DONOR_PERSON_IDS[@]}"; do
   requester_id="${DONOR_PERSON_IDS[$i]}"
   blood_center_id="${ORG_IDS[$((i % ${#ORG_IDS[@]}))]}"
 
-  # requests entre HOJE e +9 dias
-  request_limit=$(date -d "+$((i)) days" +%F)
+  # requests com prazo entre amanhã e +10 dias (garante não vencidas)
+  request_limit=$(date -d "+$((i + 1)) days" +%F)
 
   request_body="{\"requesterId\":\"$requester_id\",\"bloodCenterId\":\"$blood_center_id\",\"bloodTypeNeeded\":\"${donor_request_types[$i]}\",\"dateLimit\":\"$request_limit\",\"urgency\":\"${donor_urgencies[$i]}\"}"
 

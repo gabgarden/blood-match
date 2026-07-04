@@ -1,16 +1,13 @@
 package bloodmatch.domain.donationrequest;
 
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
-import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.entity.DomainObject;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 
 public class DonationRequest extends DomainObject {
 
@@ -19,8 +16,13 @@ public class DonationRequest extends DomainObject {
   private BloodType bloodTypeNeeded;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
-  private boolean active;
-  private List<Donor> acceptedDonors = new ArrayList<>();
+  private boolean isActive;
+
+
+
+
+
+
   private Urgency urgency;
 
   private DonationRequest(
@@ -36,7 +38,7 @@ public class DonationRequest extends DomainObject {
     this.bloodTypeNeeded = bloodTypeNeeded;
     this.dateRequested = currentDate;
     this.dateLimit = dateLimit;
-    this.active = true;
+    this.isActive = true;
     this.urgency = urgency;
   }
 
@@ -92,8 +94,7 @@ public class DonationRequest extends DomainObject {
       BloodType bloodTypeNeeded,
       LocalDate dateRequested,
       LocalDate dateLimit,
-      boolean active,
-      List<Donor> acceptedDonors,
+      boolean isActive,
       Urgency urgency) {
 
     if (id == null)
@@ -108,8 +109,6 @@ public class DonationRequest extends DomainObject {
       throw new IllegalArgumentException("Requested date cannot be null");
     if (dateLimit == null)
       throw new IllegalArgumentException("Limit date cannot be null");
-    if (acceptedDonors == null)
-      throw new IllegalArgumentException("Accepted donors cannot be null");
     if (urgency == null)
       throw new IllegalArgumentException("Urgency cannot be null");
 
@@ -123,20 +122,20 @@ public class DonationRequest extends DomainObject {
 
     request.setId(id);
     request.dateRequested = dateRequested;
-    request.active = active;
-    request.acceptedDonors = new ArrayList<>(acceptedDonors);
+    request.isActive = isActive;
+
     return request;
   }
 
   public void close() {
-    if (!active)
+    if (!isActive)
       throw new IllegalStateException("Request already closed");
 
-    this.active = false;
+    this.isActive = false;
   }
 
   public boolean isActive() {
-    return active;
+    return isActive;
   }
 
   public boolean isExpired() {
@@ -164,7 +163,7 @@ public class DonationRequest extends DomainObject {
     if (currentDate == null)
       throw new IllegalArgumentException("Current date cannot be null");
 
-    if (!active)
+    if (!isActive())
       return false;
 
     if (isExpired(currentDate))
@@ -173,33 +172,7 @@ public class DonationRequest extends DomainObject {
     return candidateBloodType.canDonateTo(bloodTypeNeeded);
   }
 
-  public void acceptBy(Donor donor) {
-    acceptBy(donor, LocalDate.now());
-  }
-
-  public void acceptBy(Donor donor, LocalDate currentDate) {
-
-    if (donor == null)
-      throw new IllegalArgumentException("Donor cannot be null");
-
-    if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
-
-    if (!isActive())
-      throw new IllegalStateException("Request is not active");
-
-    if (!canBeFulfilledBy(donor.getBloodType(), currentDate))
-      throw new IllegalArgumentException("Donor blood type incompatible");
-
-    if (!donor.isEligibleToDonate(currentDate))
-      throw new IllegalStateException("Donor not eligible to donate");
-
-    if (acceptedDonors.contains(donor))
-      throw new IllegalStateException("Donor already accepted this request");
-
-    acceptedDonors.add(donor);
-  }
-
+  
   public BloodType getBloodTypeNeeded() {
     return bloodTypeNeeded;
   }
@@ -218,10 +191,6 @@ public class DonationRequest extends DomainObject {
 
   public Requester getRequester() {
     return requester;
-  }
-
-  public List<Donor> getAcceptedDonors() {
-    return Collections.unmodifiableList(acceptedDonors);
   }
 
   public Urgency getUrgency() {

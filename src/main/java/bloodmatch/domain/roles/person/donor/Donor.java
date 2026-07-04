@@ -12,6 +12,10 @@ public class Donor extends PersonRole {
     private LocalDate lastDonationDate;
     private double weight;
 
+    //metodo estatico private para alterar os campos estaticos com os numeros minimo possivel para a doação ser realizada novamente por um doador
+    // permite ser configuravel 
+    
+
     public Donor(Person person, BloodType bloodType, double weight) {
         super(person);
 

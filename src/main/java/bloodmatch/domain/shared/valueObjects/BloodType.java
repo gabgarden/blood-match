@@ -21,6 +21,8 @@ public class BloodType {
                 this.type = type;
         }
 
+
+        //private   
         public static BloodType of(String type) {
 
                 if (type == null)
@@ -72,5 +74,10 @@ public class BloodType {
                                 throw new IllegalStateException("Unexpected blood type");
                 };
         }
+
+
+        //add equal e hash code
+
+
 
 }

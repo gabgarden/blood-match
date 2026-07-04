@@ -1,4 +1,4 @@
-package bloodmatch.domain.donation;
+/* package bloodmatch.domain.donation;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+
+
+
+// passar tudo isso para a donation, use case chamar direto os facthory methods e eliminar essa classe.
 @Component
 public class DonationFactory {
 
@@ -64,6 +68,11 @@ public class DonationFactory {
     return Donation.scheduleFromRequest(donor, request, expectedDate, currentDate);
   }
 
+
+
+
+
+
   public Donation completePendingDonation(
       Donation pendingDonation,
       LocalDate completionDate) {
@@ -98,4 +107,4 @@ public class DonationFactory {
     pendingDonation.cancel();
     return pendingDonation;
   }
-}
+} */
