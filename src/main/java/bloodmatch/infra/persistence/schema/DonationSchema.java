@@ -32,7 +32,9 @@ public class DonationSchema {
   private String requestId;
   private String bloodCenterId;
   private LocalDate donationDate;
-  private String status;
+  private boolean isCompleted;
+  private boolean isPending;
+  private boolean isCancelled;
 
   public DonationSchema(Donation donation) {
     if (donation == null)
@@ -45,7 +47,9 @@ public class DonationSchema {
         : null;
     this.bloodCenterId = donation.getBloodCenter().getOrganization().getId().getValue().toString();
     this.donationDate = donation.getDonationDate();
-    this.status = donation.getStatus().name();
+    this.isCompleted = donation.isCompleted();
+    this.isPending = donation.isPending();
+    this.isCancelled = donation.isCancelled();
   }
 
   public Donation toDomain(
@@ -73,11 +77,13 @@ public class DonationSchema {
     }
 
     return Donation.reconstitute(
-        new DomainID(UUID.fromString(this.id)),
-        donor,
-        request,
-        this.donationDate,
-        bloodCenter,
-        Donation.DonationStatus.valueOf(this.status));
+      new DomainID(UUID.fromString(this.id)),
+      donor,
+      request,
+      this.donationDate,
+      bloodCenter,
+      this.isCompleted,
+      this.isPending,
+      this.isCancelled);
   }
 }

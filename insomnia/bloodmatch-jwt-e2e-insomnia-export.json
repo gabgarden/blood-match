@@ -484,7 +484,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"requesterId\": \"{{ _.requester_id }}\",\n  \"bloodCenterId\": \"{{ _.blood_center_id }}\",\n  \"bloodTypeNeeded\": \"A+\",\n  \"dateLimit\": \"2026-12-31\"\n}"
+         "text": "{\n  \"requesterId\": \"{{ _.requester_id }}\",\n  \"bloodCenterId\": \"{{ _.blood_center_id }}\",\n  \"bloodTypeNeeded\": \"A+\",\n  \"urgency\": \"MEDIUM\",\n  \"dateLimit\": \"2026-12-31\"\n}"
       },
       "parameters": [],
       "headers": [

@@ -1,7 +1,6 @@
 package bloodmatch.application.usecase.donation.acceptandcreatependingfromrequest;
 
 import bloodmatch.application.usecase.donation.creatependingfromrequest.CreatePendingDonationFromRequestUseCase;
-import bloodmatch.application.usecase.donationrequest.AcceptDonorInRequestUseCase;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
@@ -12,13 +11,10 @@ import java.time.LocalDate;
 @Service
 public class AcceptDonorAndCreatePendingDonationFromRequestUseCase {
 
-  private final AcceptDonorInRequestUseCase acceptDonorInRequestUseCase;
   private final CreatePendingDonationFromRequestUseCase createPendingDonationFromRequestUseCase;
 
   public AcceptDonorAndCreatePendingDonationFromRequestUseCase(
-      AcceptDonorInRequestUseCase acceptDonorInRequestUseCase,
       CreatePendingDonationFromRequestUseCase createPendingDonationFromRequestUseCase) {
-    this.acceptDonorInRequestUseCase = acceptDonorInRequestUseCase;
     this.createPendingDonationFromRequestUseCase = createPendingDonationFromRequestUseCase;
   }
 
@@ -47,7 +43,6 @@ public class AcceptDonorAndCreatePendingDonationFromRequestUseCase {
     if (currentDate == null)
       throw new IllegalArgumentException("Current date cannot be null");
 
-    acceptDonorInRequestUseCase.execute(requestId, donorId, currentDate);
 
     return createPendingDonationFromRequestUseCase.execute(
         donorId,

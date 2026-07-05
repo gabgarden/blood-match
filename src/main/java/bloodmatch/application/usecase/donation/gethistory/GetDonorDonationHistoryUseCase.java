@@ -27,15 +27,13 @@ public class GetDonorDonationHistoryUseCase {
         .map(donation -> new OutputItem(
             donation.getId().getValue().toString(),
             donation.getDonationDate(),
-            donation.getBloodCenter().getOrganization().getName(),
-            donation.getStatus().name()))
+            donation.getBloodCenter().getOrganization().getName()))
         .toList();
   }
 
   public record OutputItem(
       String donationId,
       java.time.LocalDate date,
-      String location,
-      String status) {
+      String location) {
   }
 }

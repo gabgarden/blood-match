@@ -38,10 +38,12 @@ public class CompleteDonationFromRequestController {
 
       Donation donation = useCase.execute(donationId, payload.completionDate());
 
-      return ResponseEntity.ok(Map.of(
+        String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
+
+        return ResponseEntity.ok(Map.of(
           "id", donation.getId().getValue().toString(),
-          "status", donation.getStatus().name(),
-          "completionDate", donation.getDonationDate().toString()));
+          "completionDate", donation.getDonationDate().toString(),
+          "status", status));
 
     } catch (IllegalArgumentException | IllegalStateException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

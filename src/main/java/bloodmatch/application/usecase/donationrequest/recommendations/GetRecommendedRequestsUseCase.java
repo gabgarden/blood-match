@@ -2,6 +2,7 @@ package bloodmatch.application.usecase.donationrequest.recommendations;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
+import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
@@ -17,10 +18,15 @@ public class GetRecommendedRequestsUseCase {
 
   private final DonorRepositoryInterface donorRepository;
   private final DonationRequestRepositoryInterface donationRequestRepository;
+  private final DonationRepositoryInterface donationRepository;
 
-  public GetRecommendedRequestsUseCase(DonorRepositoryInterface donorRepository, DonationRequestRepositoryInterface donationRequestRepository) {
+  public GetRecommendedRequestsUseCase(
+      DonorRepositoryInterface donorRepository,
+      DonationRequestRepositoryInterface donationRequestRepository,
+      DonationRepositoryInterface donationRepository) {
     this.donorRepository = donorRepository;
     this.donationRequestRepository = donationRequestRepository;
+    this.donationRepository = donationRepository;
   }
 
   public List<OutputItem> execute(DomainID donorId) {
@@ -38,7 +44,7 @@ public class GetRecommendedRequestsUseCase {
         .stream()
         .filter(request -> donor.isEligibleToDonate(currentDate))
         .filter(request -> request.canBeFulfilledBy(donor.getBloodType(), currentDate))
-        .filter(request -> !request.getAcceptedDonors().contains(donor))
+        .filter(request -> !donationRepository.existsByDonorIdAndRequestId(donor.getPerson().getId(), request.getId()))
         .map(request -> toOutput(request, donor))
 
         // Ordena primeiro pela distância (mais perto) e depois pela data limite

@@ -1,7 +1,6 @@
 package bloodmatch.application.usecase.donation.creatependingfromrequest;
 
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.donation.DonationFactory;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
@@ -15,17 +14,14 @@ import java.time.LocalDate;
 @Service
 public class CreatePendingDonationFromRequestUseCase {
 
-  private final DonationFactory donationFactory;
   private final DonorRepositoryInterface donorRepository;
   private final DonationRequestRepositoryInterface donationRequestRepository;
   private final DonationRepositoryInterface donationRepository;
 
   public CreatePendingDonationFromRequestUseCase(
-      DonationFactory donationFactory,
       DonorRepositoryInterface donorRepository,
       DonationRequestRepositoryInterface donationRequestRepository,
       DonationRepositoryInterface donationRepository) {
-    this.donationFactory = donationFactory;
     this.donorRepository = donorRepository;
     this.donationRequestRepository = donationRequestRepository;
     this.donationRepository = donationRepository;
@@ -60,7 +56,7 @@ public class CreatePendingDonationFromRequestUseCase {
     DonationRequest request = donationRequestRepository.findById(requestId)
         .orElseThrow(() -> new IllegalArgumentException("Donation request not found"));
 
-    Donation donation = donationFactory.createPendingDonationFromRequest(donor, request, expectedDate, currentDate);
+    Donation donation = Donation.createFromRequest(donor, request, expectedDate, currentDate);
     donationRepository.save(donation);
 
     return donation;

@@ -10,8 +10,6 @@ import java.time.LocalDate;
 
 public class Donation extends DomainObject {
 
- 
-
   private Donor donor;
   private DonationRequest request;
   private LocalDate donationDate;
@@ -19,33 +17,20 @@ public class Donation extends DomainObject {
   private boolean isCancelled;
   private boolean isCompleted;
   private boolean isPending;
-  
-
-  private Donation(
-      DomainID id,
-      Donor donor,
-      DonationRequest request,
-      LocalDate donationDate,
-      BloodCenter bloodCenter
-       ) {
-    this.id = id;
-    this.donor = donor;
-    this.request = request;
-    this.donationDate = donationDate;
-    this.bloodCenter = bloodCenter;
-  }
 
   private Donation(
       Donor donor,
       DonationRequest request,
       LocalDate donationDate,
       BloodCenter bloodCenter) {
-    this(DomainID.generate(), donor, request, donationDate, bloodCenter);
+    this.id = DomainID.generate();
+    this.donor = donor;
+    this.request = request;
+    this.donationDate = donationDate;
+    this.bloodCenter = bloodCenter;
   }
 
-  //  factory methods 
-
-  static Donation scheduleFromRequest(
+  public static Donation createFromRequest(
       Donor donor,
       DonationRequest request,
       LocalDate expectedDate,
@@ -61,24 +46,29 @@ public class Donation extends DomainObject {
       throw new IllegalArgumentException("Current date cannot be null");
     if (!request.isActive())
       throw new IllegalStateException("Request is not active");
+    if (request.isExpired(currentDate))
+      throw new IllegalStateException("Request has expired");
     if (!donor.getBloodType().canDonateTo(request.getBloodTypeNeeded()))
       throw new IllegalStateException("Incompatible blood type");
     if (expectedDate.isBefore(currentDate))
       throw new IllegalArgumentException("Expected date cannot be in the past");
+    if (expectedDate.isAfter(request.getDateLimit()))
+      throw new IllegalArgumentException("Expected date cannot be after the request deadline");
 
-    Donation donation  = new Donation(
+    Donation donation = new Donation(
         donor,
         request,
         expectedDate,
         request.getBloodCenter());
 
     donation.isPending = true;
-    
-    return donation;
+    donation.isCompleted = false;
+    donation.isCancelled = false;
 
+    return donation;
   }
 
-  static Donation registerExternalDonation(
+  public static Donation registerExternalDonation(
       Donor donor,
       LocalDate donationDate,
       BloodCenter bloodCenter,
@@ -97,6 +87,9 @@ public class Donation extends DomainObject {
 
     Donation donation = new Donation(donor, null, donationDate, bloodCenter);
     donation.isCompleted = true;
+    donation.isPending = false;
+    donation.isCancelled = false;
+
     return donation;
   }
 
@@ -105,7 +98,10 @@ public class Donation extends DomainObject {
       Donor donor,
       DonationRequest request,
       LocalDate donationDate,
-      BloodCenter bloodCenter) {
+      BloodCenter bloodCenter,
+      boolean isCompleted,
+      boolean isPending,
+      boolean isCancelled) {
 
     if (id == null)
       throw new IllegalArgumentException("Donation id cannot be null");
@@ -116,31 +112,34 @@ public class Donation extends DomainObject {
     if (bloodCenter == null)
       throw new IllegalArgumentException("Blood center cannot be null");
 
-    Donation donation = new Donation(id, donor, request, donationDate, bloodCenter);
+    validateStatusFlags(isCompleted, isPending, isCancelled);
 
-    if (donationDate.isBefore(LocalDate.now())) {
-      donation.isCompleted = true;
-    }
+    Donation donation = new Donation(donor, request, donationDate, bloodCenter);
 
-    if (donationDate.isAfter(LocalDate.now())) {
-      donation.isPending = true;
-    }
-    
+    donation.setId(id);
+    donation.isCompleted = isCompleted;
+    donation.isPending = isPending;
+    donation.isCancelled = isCancelled;
 
     return donation;
   }
 
-  
+  private static void validateStatusFlags(
+      boolean isCompleted,
+      boolean isPending,
+      boolean isCancelled) {
+    int activeStates = 0;
+    if (isCompleted) activeStates++;
+    if (isPending) activeStates++;
+    if (isCancelled) activeStates++;
 
-
-
-
-
-
+    if (activeStates != 1) {
+      throw new IllegalArgumentException(
+          "Donation status must be exactly one of completed, pending or cancelled");
+    }
+  }
 
   // behavior
-
-
 
   public void complete(LocalDate completionDate, LocalDate currentDate) {
     if (completionDate == null)
@@ -160,16 +159,12 @@ public class Donation extends DomainObject {
   public void cancel() {
     if (!isPending())
       throw new IllegalStateException("Only pending donations can be cancelled");
+
     this.isCancelled = true;
     this.isPending = false;
   }
 
-
-
-
-
-  
-  //  queries 
+  // queries
 
   public boolean isFromRequest() {
     return request != null;
@@ -187,8 +182,19 @@ public class Donation extends DomainObject {
     return isCancelled;
   }
 
-  public Donor getDonor() { return donor; }
-  public LocalDate getDonationDate() { return donationDate; }
-  public DonationRequest getRequest() { return request; }
-  public BloodCenter getBloodCenter() { return bloodCenter; }
+  public Donor getDonor() {
+    return donor;
+  }
+
+  public LocalDate getDonationDate() {
+    return donationDate;
+  }
+
+  public DonationRequest getRequest() {
+    return request;
+  }
+
+  public BloodCenter getBloodCenter() {
+    return bloodCenter;
+  }
 }

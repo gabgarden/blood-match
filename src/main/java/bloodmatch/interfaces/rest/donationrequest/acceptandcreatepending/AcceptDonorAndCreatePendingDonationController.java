@@ -42,11 +42,13 @@ public class AcceptDonorAndCreatePendingDonationController {
 
       Donation donation = useCase.execute(requestId, donorId, payload.expectedDate());
 
-      return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+        String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
           "id", donation.getId().getValue().toString(),
-          "status", donation.getStatus().name(),
           "expectedDate", donation.getDonationDate().toString(),
-          "requestId", donation.getRequest().getId().getValue().toString()));
+          "requestId", donation.getRequest().getId().getValue().toString(),
+          "status", status));
 
     } catch (IllegalArgumentException | IllegalStateException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

@@ -42,10 +42,12 @@ public class CreateExternalDonationController {
 
       Donation donation = useCase.execute(donorId, bloodCenterId, payload.donationDate());
 
-      return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+        String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
           "id", donation.getId().getValue().toString(),
-          "status", donation.getStatus().name(),
-          "donationDate", donation.getDonationDate().toString()));
+          "donationDate", donation.getDonationDate().toString(),
+          "status", status));
 
     } catch (IllegalArgumentException | IllegalStateException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

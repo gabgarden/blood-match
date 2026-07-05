@@ -7,7 +7,6 @@ import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
-import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -19,7 +18,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,8 +35,7 @@ public class DonationRequestSchema {
   private String bloodTypeNeeded;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
-  private boolean active;
-  private List<String> acceptedDonorsIds;
+  private boolean isActive;
   private String urgency;
 
   public DonationRequestSchema(DonationRequest donationRequest) {
@@ -51,12 +48,9 @@ public class DonationRequestSchema {
     this.bloodTypeNeeded = donationRequest.getBloodTypeNeeded().getType();
     this.dateRequested = donationRequest.getDateRequested();
     this.dateLimit = donationRequest.getDateLimit();
-    this.active = donationRequest.isActive();
+    this.isActive = donationRequest.isActive();
     this.urgency = donationRequest.getUrgency().name();
-    this.acceptedDonorsIds = donationRequest.getAcceptedDonors()
-        .stream()
-        .map(donor -> donor.getPerson().getId().getValue().toString())
-        .toList();
+ 
   }
 
   public DonationRequest toDomain(
@@ -76,15 +70,9 @@ public class DonationRequestSchema {
 
     BloodCenter bloodCenter = new BloodCenter(organization);
 
-    List<Donor> acceptedDonors = new ArrayList<>();
-    if (acceptedDonorsIds != null) {
-      for (String donorIdValue : acceptedDonorsIds) {
-        DomainID donorId = new DomainID(UUID.fromString(donorIdValue));
-        Donor donor = donorRepository.findByPartyId(donorId)
-            .orElseThrow(() -> new IllegalArgumentException("Donor role not found: " + donorIdValue));
-        acceptedDonors.add(donor);
-      }
-    }
+    
+  
+    
 
     return DonationRequest.reconstitute(
         new DomainID(UUID.fromString(this.id)),
@@ -93,8 +81,7 @@ public class DonationRequestSchema {
         BloodType.of(this.bloodTypeNeeded),
         this.dateRequested,
         this.dateLimit,
-        this.active,
-        acceptedDonors,
+        this.isActive,
         Urgency.valueOf(this.urgency));
   }
 }

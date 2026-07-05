@@ -1,7 +1,6 @@
 package bloodmatch.application.usecase.donation.createexternal;
 
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.donation.DonationFactory;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
@@ -16,17 +15,14 @@ import java.time.LocalDate;
 @Service
 public class CreateExternalDonationUseCase {
 
-  private final DonationFactory donationFactory;
   private final DonorRepositoryInterface donorRepository;
   private final PartyRepositoryInterface partyRepository;
   private final DonationRepositoryInterface donationRepository;
 
   public CreateExternalDonationUseCase(
-      DonationFactory donationFactory,
       DonorRepositoryInterface donorRepository,
       PartyRepositoryInterface partyRepository,
       DonationRepositoryInterface donationRepository) {
-    this.donationFactory = donationFactory;
     this.donorRepository = donorRepository;
     this.partyRepository = partyRepository;
     this.donationRepository = donationRepository;
@@ -54,7 +50,8 @@ public class CreateExternalDonationUseCase {
 
     BloodCenter bloodCenter = new BloodCenter(organization);
 
-    Donation donation = donationFactory.createExternalDonation(donor, bloodCenter, donationDate);
+    Donation donation = Donation.registerExternalDonation(donor, donationDate, bloodCenter, LocalDate.now());
+    donor.registerDonation(donationDate, LocalDate.now());
     donorRepository.save(donor);
     donationRepository.save(donation);
 

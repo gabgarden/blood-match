@@ -11,5 +11,7 @@ public interface DonationMongoRepository extends MongoRepository<DonationSchema,
 
   List<DonationSchema> findByDonorPersonId(String donorPersonId);
 
+  boolean existsByDonorPersonIdAndRequestId(String donorPersonId, String requestId);
+
   long countByDonorPersonId(String donorPersonId);
 }

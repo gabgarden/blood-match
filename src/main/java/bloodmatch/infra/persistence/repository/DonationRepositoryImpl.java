@@ -61,6 +61,18 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
   }
 
   @Override
+  public boolean existsByDonorIdAndRequestId(DomainID donorId, DomainID requestId) {
+    if (donorId == null)
+      throw new IllegalArgumentException("Donor id cannot be null");
+    if (requestId == null)
+      throw new IllegalArgumentException("Request id cannot be null");
+
+    return mongoRepository.existsByDonorPersonIdAndRequestId(
+        donorId.getValue().toString(),
+        requestId.getValue().toString());
+  }
+
+  @Override
   public long countByDonorId(DomainID donorId) {
     if (donorId == null)
       throw new IllegalArgumentException("Donor id cannot be null");

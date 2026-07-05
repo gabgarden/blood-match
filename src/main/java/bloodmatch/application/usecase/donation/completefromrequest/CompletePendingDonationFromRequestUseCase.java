@@ -1,7 +1,6 @@
 package bloodmatch.application.usecase.donation.completefromrequest;
 
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.donation.DonationFactory;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -12,15 +11,12 @@ import java.time.LocalDate;
 @Service
 public class CompletePendingDonationFromRequestUseCase {
 
-  private final DonationFactory donationFactory;
   private final DonationRepositoryInterface donationRepository;
   private final DonorRepositoryInterface donorRepository;
 
   public CompletePendingDonationFromRequestUseCase(
-      DonationFactory donationFactory,
       DonationRepositoryInterface donationRepository,
       DonorRepositoryInterface donorRepository) {
-    this.donationFactory = donationFactory;
     this.donationRepository = donationRepository;
     this.donorRepository = donorRepository;
   }
@@ -34,11 +30,12 @@ public class CompletePendingDonationFromRequestUseCase {
     Donation donation = donationRepository.findById(donationId)
         .orElseThrow(() -> new IllegalArgumentException("Donation not found"));
 
-    Donation completedDonation = donationFactory.completePendingDonation(donation, completionDate);
+    donation.complete(completionDate, LocalDate.now());
+    donation.getDonor().registerDonation(completionDate, LocalDate.now());
 
-    donorRepository.save(completedDonation.getDonor());
-    donationRepository.save(completedDonation);
+    donorRepository.save(donation.getDonor());
+    donationRepository.save(donation);
 
-    return completedDonation;
+    return donation;
   }
 }
