@@ -2,6 +2,7 @@ package bloodmatch.domain.shared.valueObjects;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.Objects;
 
 public class BloodType {
 
@@ -74,10 +75,21 @@ public class BloodType {
                                 throw new IllegalStateException("Unexpected blood type");
                 };
         }
+        
+        @Override
+        public boolean equals(Object o) {
+                if (this == o) {
+                        return true;
+                }
+                if (!(o instanceof BloodType)) {
+                        return false;
+                }
+                BloodType bloodType = (BloodType) o;
+                return Objects.equals(type, bloodType.type);
+        }
 
-
-        //add equal e hash code
-
-
-
+        @Override
+        public int hashCode() {
+                return Objects.hash(type);
+        }
 }
