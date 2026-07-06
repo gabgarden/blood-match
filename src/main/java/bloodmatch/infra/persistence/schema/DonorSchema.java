@@ -56,11 +56,7 @@ public class DonorSchema {
     Person person = personRepository.findById(personId)
         .orElseThrow(() -> new IllegalArgumentException("Person not found"));
 
-    Donor donor = new Donor(person, BloodType.of(bloodType), weight);
-    if (lastDonationDate != null) {
-      donor.registerDonation(lastDonationDate, lastDonationDate);
-    }
-
-    return donor;
+    DomainID donorId = new DomainID(UUID.fromString(this.id));
+    return Donor.reconstitute(person, BloodType.of(bloodType), weight, lastDonationDate, donorId);
   }
 }

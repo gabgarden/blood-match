@@ -3,6 +3,7 @@ package bloodmatch.domain.roles.person.donor;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.roles.person.PersonRole;
 import bloodmatch.domain.shared.valueObjects.BloodType;
+import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
 
@@ -30,11 +31,29 @@ public class Donor extends PersonRole {
         this.weight = weight;
     }
 
-    public boolean canDonateTo(BloodType requestedType) {
+  protected Donor(Person person, BloodType bloodType, double weight, DomainID id) {
+    super(person, id);
 
-        if (requestedType == null) {
-            throw new IllegalArgumentException("Requested blood type cannot be null");
-        }
+    if (bloodType == null) {
+      throw new IllegalArgumentException("Blood type cannot be null");
+    }
+    if (weight < 50) {
+      throw new IllegalArgumentException("Minimum weight is 50kg");
+    }
+
+    this.bloodType = bloodType;
+    this.weight = weight;
+  }
+
+  public static Donor reconstitute(Person person, BloodType bloodType, double weight, LocalDate lastDonationDate, DomainID id) {
+    Donor donor = new Donor(person, bloodType, weight, id);
+    if (lastDonationDate != null) {
+      donor.registerDonation(lastDonationDate, lastDonationDate);
+    }
+    return donor;
+  }
+
+  public boolean canDonateTo(BloodType requestedType) {
 
         return bloodType.canDonateTo(requestedType);
     }
