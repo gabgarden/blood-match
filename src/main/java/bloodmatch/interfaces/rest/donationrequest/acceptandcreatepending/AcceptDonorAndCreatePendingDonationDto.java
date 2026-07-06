@@ -4,6 +4,6 @@ import java.time.LocalDate;
 
 public record AcceptDonorAndCreatePendingDonationDto(
     String requestId,
-    String donorId,
+    String personId,
     LocalDate expectedDate) {
 }

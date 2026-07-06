@@ -1,7 +1,7 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2026-04-20T17:40:00.000Z",
+  "__export_date": "2026-07-06T00:00:00.000Z",
   "__export_source": "insomnia.desktop.app:v10",
   "resources": [
     {
@@ -347,12 +347,47 @@
       "settingFollowRedirects": "global"
     },
     {
+      "_id": "req_register_blood_center",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "modified": 1776706800000,
+      "created": 1776706800000,
+      "url": "{{ _.base_url }}/blood-centers",
+      "name": "POST Register Blood Center",
+      "description": "AUTHENTICATED - Registra BloodCenter role para uma Organization",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"organizationId\": \"{{ _.organization_id }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -650,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
       "_id": "req_get_donor_summary",
       "_type": "request",
       "parentId": "fld_auth",
       "modified": 1776706800000,
       "created": 1776706800000,
-      "url": "{{ _.base_url }}/donors/{{ _.donor_id }}/summary",
+      "url": "{{ _.base_url }}/donors/{{ _.person_id }}/summary",
       "name": "GET Donor Summary",
       "description": "AUTHENTICATED",
       "method": "GET",
@@ -380,7 +415,7 @@
       "parentId": "fld_auth",
       "modified": 1776706800000,
       "created": 1776706800000,
-      "url": "{{ _.base_url }}/donors/{{ _.donor_id }}/donations",
+      "url": "{{ _.base_url }}/donors/{{ _.person_id }}/donations",
       "name": "GET Donor Donation History",
       "description": "AUTHENTICATED",
       "method": "GET",
@@ -416,8 +451,8 @@
       "body": {},
       "parameters": [
         {
-          "name": "donorId",
-          "value": "{{ _.donor_id }}"
+          "name": "personId",
+          "value": "{{ _.person_id }}"
         }
       ],
       "headers": [
@@ -448,7 +483,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"requestId\": \"{{ _.request_id }}\",\n  \"donorId\": \"{{ _.donor_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
+        "text": "{\n  \"requestId\": \"{{ _.request_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -484,7 +519,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-         "text": "{\n  \"requesterId\": \"{{ _.requester_id }}\",\n  \"bloodCenterId\": \"{{ _.blood_center_id }}\",\n  \"bloodTypeNeeded\": \"A+\",\n  \"urgency\": \"MEDIUM\",\n  \"dateLimit\": \"2026-12-31\"\n}"
+        "text": "{\n  \"partyId\": \"{{ _.party_id }}\",\n  \"bloodCenterId\": \"{{ _.blood_center_id }}\",\n  \"bloodTypeNeeded\": \"A+\",\n  \"urgency\": \"MEDIUM\",\n  \"dateLimit\": \"2026-12-31\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -520,7 +555,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"donorId\": \"{{ _.donor_id }}\",\n  \"bloodCenterId\": \"{{ _.blood_center_id }}\",\n  \"donationDate\": \"2026-12-15\"\n}"
+        "text": "{\n  \"personId\": \"{{ _.person_id }}\",\n  \"bloodCenterId\": \"{{ _.blood_center_id }}\",\n  \"donationDate\": \"2026-12-15\"\n}"
       },
       "parameters": [],
       "headers": [

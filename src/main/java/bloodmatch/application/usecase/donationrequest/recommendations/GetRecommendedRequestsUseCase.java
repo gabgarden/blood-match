@@ -29,15 +29,15 @@ public class GetRecommendedRequestsUseCase {
     this.donationRepository = donationRepository;
   }
 
-  public List<OutputItem> execute(DomainID donorId) {
-    return execute(donorId, LocalDate.now());
+  public List<OutputItem> execute(DomainID personId) {
+    return execute(personId, LocalDate.now());
   }
 
-  public List<OutputItem> execute(DomainID donorId, LocalDate currentDate) {
-    if (donorId == null) throw new IllegalArgumentException("Donor id cannot be null");
+  public List<OutputItem> execute(DomainID personId, LocalDate currentDate) {
+    if (personId == null) throw new IllegalArgumentException("Person id cannot be null");
     if (currentDate == null) throw new IllegalArgumentException("Current date cannot be null");
 
-    Donor donor = donorRepository.findByPartyId(donorId)
+    Donor donor = donorRepository.findByPartyId(personId)
         .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
 
     return donationRequestRepository.findActiveRequests()

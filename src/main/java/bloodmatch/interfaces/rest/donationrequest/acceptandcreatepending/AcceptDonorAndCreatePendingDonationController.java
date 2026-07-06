@@ -32,15 +32,15 @@ public class AcceptDonorAndCreatePendingDonationController {
         throw new IllegalArgumentException("Request body cannot be null");
       if (isBlank(payload.requestId()))
         throw new IllegalArgumentException("requestId cannot be blank");
-      if (isBlank(payload.donorId()))
-        throw new IllegalArgumentException("donorId cannot be blank");
+      if (isBlank(payload.personId()))
+        throw new IllegalArgumentException("personId cannot be blank");
       if (payload.expectedDate() == null)
         throw new IllegalArgumentException("expectedDate cannot be null");
 
       DomainID requestId = parseDomainId(payload.requestId(), "requestId");
-      DomainID donorId = parseDomainId(payload.donorId(), "donorId");
+      DomainID personId = parseDomainId(payload.personId(), "personId");
 
-      Donation donation = useCase.execute(requestId, donorId, payload.expectedDate());
+      Donation donation = useCase.execute(requestId, personId, payload.expectedDate());
 
         String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
 

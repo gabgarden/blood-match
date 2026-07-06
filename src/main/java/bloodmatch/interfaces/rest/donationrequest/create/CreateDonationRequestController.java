@@ -32,7 +32,7 @@ public class CreateDonationRequestController {
     try {
       validatePayload(payload);
 
-      DomainID requesterDomainId = parseDomainId(payload.requesterId(), "requesterId");
+      DomainID requesterDomainId = parseDomainId(payload.partyId(), "partyId");
       DomainID bloodCenterDomainId = parseDomainId(payload.bloodCenterId(), "bloodCenterId");
       BloodType bloodTypeNeeded = BloodType.of(payload.bloodTypeNeeded());
       Urgency urgency = Urgency.valueOf(payload.urgency().toUpperCase());
@@ -59,8 +59,8 @@ public class CreateDonationRequestController {
     if (payload == null)
       throw new IllegalArgumentException("Request body cannot be null");
 
-    if (isBlank(payload.requesterId()))
-      throw new IllegalArgumentException("requesterId cannot be blank");
+    if (isBlank(payload.partyId()))
+      throw new IllegalArgumentException("partyId cannot be blank");
 
     if (isBlank(payload.bloodCenterId()))
       throw new IllegalArgumentException("bloodCenterId cannot be blank");

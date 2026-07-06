@@ -23,21 +23,21 @@ public class GetDonorSummaryController {
     this.useCase = useCase;
   }
 
-  @GetMapping("/{donorId}/summary")
-  public ResponseEntity<?> get(@PathVariable String donorId) {
-    return execute(donorId);
+  @GetMapping("/{personId}/summary")
+  public ResponseEntity<?> get(@PathVariable String personId) {
+    return execute(personId);
   }
 
-  private ResponseEntity<?> execute(String donorIdValue) {
+  private ResponseEntity<?> execute(String personIdValue) {
     try {
-      if (isBlank(donorIdValue))
-        throw new IllegalArgumentException("donorId cannot be blank");
+      if (isBlank(personIdValue))
+        throw new IllegalArgumentException("personId cannot be blank");
 
-      DomainID donorId = parseDomainId(donorIdValue, "donorId");
-      GetDonorSummaryUseCase.Output output = useCase.execute(donorId);
+      DomainID personId = parseDomainId(personIdValue, "personId");
+      GetDonorSummaryUseCase.Output output = useCase.execute(personId);
 
       return ResponseEntity.ok(Map.of(
-          "donorId", output.donorId(),
+          "personId", output.personId(),
           "donorName", output.donorName(),
           "bloodType", output.bloodType(),
           "lastDonationDate", String.valueOf(output.lastDonationDate()),

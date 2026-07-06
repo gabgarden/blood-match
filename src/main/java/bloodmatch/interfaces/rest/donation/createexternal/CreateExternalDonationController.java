@@ -30,17 +30,17 @@ public class CreateExternalDonationController {
     try {
       if (payload == null)
         throw new IllegalArgumentException("Request body cannot be null");
-      if (isBlank(payload.donorId()))
-        throw new IllegalArgumentException("donorId cannot be blank");
+      if (isBlank(payload.personId()))
+        throw new IllegalArgumentException("personId cannot be blank");
       if (isBlank(payload.bloodCenterId()))
         throw new IllegalArgumentException("bloodCenterId cannot be blank");
       if (payload.donationDate() == null)
         throw new IllegalArgumentException("donationDate cannot be null");
 
-      DomainID donorId = parseDomainId(payload.donorId(), "donorId");
+      DomainID personId = parseDomainId(payload.personId(), "personId");
       DomainID bloodCenterId = parseDomainId(payload.bloodCenterId(), "bloodCenterId");
 
-      Donation donation = useCase.execute(donorId, bloodCenterId, payload.donationDate());
+      Donation donation = useCase.execute(personId, bloodCenterId, payload.donationDate());
 
         String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
 

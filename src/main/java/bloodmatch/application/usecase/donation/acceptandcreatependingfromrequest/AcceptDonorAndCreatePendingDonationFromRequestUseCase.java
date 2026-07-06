@@ -21,23 +21,23 @@ public class AcceptDonorAndCreatePendingDonationFromRequestUseCase {
   @Transactional
   public Donation execute(
       DomainID requestId,
-      DomainID donorId,
+      DomainID personId,
       LocalDate expectedDate) {
 
-    return execute(requestId, donorId, expectedDate, LocalDate.now());
+    return execute(requestId, personId, expectedDate, LocalDate.now());
   }
 
   @Transactional
   public Donation execute(
       DomainID requestId,
-      DomainID donorId,
+      DomainID personId,
       LocalDate expectedDate,
       LocalDate currentDate) {
 
     if (requestId == null)
       throw new IllegalArgumentException("Request id cannot be null");
-    if (donorId == null)
-      throw new IllegalArgumentException("Donor id cannot be null");
+    if (personId == null)
+      throw new IllegalArgumentException("Person id cannot be null");
     if (expectedDate == null)
       throw new IllegalArgumentException("Expected date cannot be null");
     if (currentDate == null)
@@ -45,7 +45,7 @@ public class AcceptDonorAndCreatePendingDonationFromRequestUseCase {
 
 
     return createPendingDonationFromRequestUseCase.execute(
-        donorId,
+        personId,
         requestId,
         expectedDate,
         currentDate);

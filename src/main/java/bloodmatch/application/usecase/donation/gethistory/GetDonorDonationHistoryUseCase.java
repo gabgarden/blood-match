@@ -17,11 +17,11 @@ public class GetDonorDonationHistoryUseCase {
     this.donationRepository = donationRepository;
   }
 
-  public List<OutputItem> execute(DomainID donorId) {
-    if (donorId == null)
-      throw new IllegalArgumentException("Donor id cannot be null");
+  public List<OutputItem> execute(DomainID personId) {
+    if (personId == null)
+      throw new IllegalArgumentException("Person id cannot be null");
 
-    return donationRepository.findByDonorId(donorId)
+    return donationRepository.findByDonorId(personId)
         .stream()
         .sorted(Comparator.comparing(Donation::getDonationDate).reversed())
         .map(donation -> new OutputItem(

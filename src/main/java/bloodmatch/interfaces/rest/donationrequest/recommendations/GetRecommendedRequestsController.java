@@ -25,19 +25,19 @@ public class GetRecommendedRequestsController {
   }
 
   @GetMapping("/recommendations")
-  public ResponseEntity<?> getByQuery(@RequestParam String donorId) {
-    return execute(donorId);
+  public ResponseEntity<?> getByQuery(@RequestParam String personId) {
+    return execute(personId);
   }
 
 
 
-  private ResponseEntity<?> execute(String donorIdValue) {
+  private ResponseEntity<?> execute(String personIdValue) {
     try {
-      if (isBlank(donorIdValue))
-        throw new IllegalArgumentException("donorId cannot be blank");
+      if (isBlank(personIdValue))
+        throw new IllegalArgumentException("personId cannot be blank");
 
-      DomainID donorId = parseDomainId(donorIdValue, "donorId");
-      return ResponseEntity.ok(useCase.execute(donorId));
+      DomainID personId = parseDomainId(personIdValue, "personId");
+      return ResponseEntity.ok(useCase.execute(personId));
 
     } catch (IllegalArgumentException | IllegalStateException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

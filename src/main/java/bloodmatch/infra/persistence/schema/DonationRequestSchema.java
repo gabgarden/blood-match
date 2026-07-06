@@ -35,7 +35,7 @@ public class DonationRequestSchema {
   private String bloodTypeNeeded;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
-  private boolean isActive;
+  private boolean active;
   private String urgency;
 
   public DonationRequestSchema(DonationRequest donationRequest) {
@@ -48,7 +48,7 @@ public class DonationRequestSchema {
     this.bloodTypeNeeded = donationRequest.getBloodTypeNeeded().getType();
     this.dateRequested = donationRequest.getDateRequested();
     this.dateLimit = donationRequest.getDateLimit();
-    this.isActive = donationRequest.isActive();
+    this.active = donationRequest.isActive();
     this.urgency = donationRequest.getUrgency().name();
  
   }
@@ -81,7 +81,7 @@ public class DonationRequestSchema {
         BloodType.of(this.bloodTypeNeeded),
         this.dateRequested,
         this.dateLimit,
-        this.isActive,
+        this.active,
         Urgency.valueOf(this.urgency));
   }
 }

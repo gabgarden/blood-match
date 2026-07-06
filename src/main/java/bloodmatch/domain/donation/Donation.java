@@ -14,9 +14,9 @@ public class Donation extends DomainObject {
   private DonationRequest request;
   private LocalDate donationDate;
   private BloodCenter bloodCenter;
-  private boolean isCancelled;
-  private boolean isCompleted;
-  private boolean isPending;
+  private boolean cancelled;
+  private boolean completed;
+  private boolean pending;
 
   private Donation(
       Donor donor,
@@ -61,9 +61,9 @@ public class Donation extends DomainObject {
         expectedDate,
         request.getBloodCenter());
 
-    donation.isPending = true;
-    donation.isCompleted = false;
-    donation.isCancelled = false;
+    donation.pending = true;
+    donation.completed = false;
+    donation.cancelled = false;
 
     return donation;
   }
@@ -86,9 +86,9 @@ public class Donation extends DomainObject {
       throw new IllegalArgumentException("Blood center cannot be null");
 
     Donation donation = new Donation(donor, null, donationDate, bloodCenter);
-    donation.isCompleted = true;
-    donation.isPending = false;
-    donation.isCancelled = false;
+    donation.completed = true;
+    donation.pending = false;
+    donation.cancelled = false;
 
     return donation;
   }
@@ -117,9 +117,9 @@ public class Donation extends DomainObject {
     Donation donation = new Donation(donor, request, donationDate, bloodCenter);
 
     donation.setId(id);
-    donation.isCompleted = isCompleted;
-    donation.isPending = isPending;
-    donation.isCancelled = isCancelled;
+    donation.completed = isCompleted;
+    donation.pending = isPending;
+    donation.cancelled = isCancelled;
 
     return donation;
   }
@@ -152,16 +152,16 @@ public class Donation extends DomainObject {
       throw new IllegalArgumentException("Completion date cannot be in the future");
 
     this.donationDate = completionDate;
-    this.isCompleted = true;
-    this.isPending = false;
+    this.completed = true;
+    this.pending = false;
   }
 
   public void cancel() {
     if (!isPending())
       throw new IllegalStateException("Only pending donations can be cancelled");
 
-    this.isCancelled = true;
-    this.isPending = false;
+    this.cancelled = true;
+    this.pending = false;
   }
 
   // queries
@@ -171,15 +171,15 @@ public class Donation extends DomainObject {
   }
 
   public boolean isPending() {
-    return isPending;
+    return pending;
   }
 
   public boolean isCompleted() {
-    return isCompleted;
+    return completed;
   }
 
   public boolean isCancelled() {
-    return isCancelled;
+    return cancelled;
   }
 
   public Donor getDonor() {

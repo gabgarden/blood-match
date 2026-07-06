@@ -16,7 +16,7 @@ public class DonationRequest extends DomainObject {
   private BloodType bloodTypeNeeded;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
-  private boolean isActive;
+  private boolean active;
 
 
 
@@ -38,7 +38,7 @@ public class DonationRequest extends DomainObject {
     this.bloodTypeNeeded = bloodTypeNeeded;
     this.dateRequested = currentDate;
     this.dateLimit = dateLimit;
-    this.isActive = true;
+    this.active = true;
     this.urgency = urgency;
   }
 
@@ -122,20 +122,20 @@ public class DonationRequest extends DomainObject {
 
     request.setId(id);
     request.dateRequested = dateRequested;
-    request.isActive = isActive;
+    request.active = isActive;
 
     return request;
   }
 
   public void close() {
-    if (!isActive)
+    if (!active)
       throw new IllegalStateException("Request already closed");
 
-    this.isActive = false;
+    this.active = false;
   }
 
   public boolean isActive() {
-    return isActive;
+    return active;
   }
 
   public boolean isExpired() {

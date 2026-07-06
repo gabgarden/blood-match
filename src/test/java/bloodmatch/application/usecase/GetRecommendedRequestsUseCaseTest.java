@@ -1,10 +1,12 @@
 package bloodmatch.application.usecase;
 
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
+import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
+import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
@@ -28,9 +30,11 @@ class GetRecommendedRequestsUseCaseTest {
 
   private final DonorRepositoryInterface donorRepository = mock(DonorRepositoryInterface.class);
   private final DonationRequestRepositoryInterface donationRequestRepository = mock(DonationRequestRepositoryInterface.class);
+  private final DonationRepositoryInterface donationRepository = mock(DonationRepositoryInterface.class);
   private final GetRecommendedRequestsUseCase useCase = new GetRecommendedRequestsUseCase(
       donorRepository,
-      donationRequestRepository);
+      donationRequestRepository,
+      donationRepository);
 
   @Test
   void shouldNotRecommendRequestsWhenDonorIsNotEligible() {
