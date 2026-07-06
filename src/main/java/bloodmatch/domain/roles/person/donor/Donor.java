@@ -2,6 +2,7 @@ package bloodmatch.domain.roles.person.donor;
 
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.roles.person.PersonRole;
+import bloodmatch.domain.shared.policy.DonationPolicy;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
@@ -12,10 +13,6 @@ public class Donor extends PersonRole {
     private BloodType bloodType;
     private LocalDate lastDonationDate;
     private double weight;
-
-    //metodo estatico private para alterar os campos estaticos com os numeros minimo possivel para a doação ser realizada novamente por um doador
-    // permite ser configuravel 
-    
 
     public Donor(Person person, BloodType bloodType, double weight) {
         super(person);
@@ -74,7 +71,7 @@ public class Donor extends PersonRole {
             return true;
         }
         return !lastDonationDate
-            .plusMonths(3)
+            .plusMonths(DonationPolicy.getDonationIntervalInMonths())
             .isAfter(currentDate);
     }
 
@@ -121,5 +118,4 @@ public class Donor extends PersonRole {
     public double getWeight() {
         return weight;
     }
-
 }
