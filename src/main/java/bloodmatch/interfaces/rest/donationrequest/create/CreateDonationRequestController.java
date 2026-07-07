@@ -33,13 +33,13 @@ public class CreateDonationRequestController {
       validatePayload(payload);
 
       DomainID requesterDomainId = parseDomainId(payload.partyId(), "partyId");
-      DomainID bloodCenterDomainId = parseDomainId(payload.bloodCenterId(), "bloodCenterId");
+      DomainID organizationId = parseDomainId(payload.organizationId(), "organizationId");
       BloodType bloodTypeNeeded = BloodType.of(payload.bloodTypeNeeded());
       Urgency urgency = Urgency.valueOf(payload.urgency().toUpperCase());
 
       DonationRequest request = useCase.execute(
           requesterDomainId,
-          bloodCenterDomainId,
+          organizationId,
           bloodTypeNeeded,
           payload.dateLimit(),
           urgency);
@@ -62,8 +62,7 @@ public class CreateDonationRequestController {
     if (isBlank(payload.partyId()))
       throw new IllegalArgumentException("partyId cannot be blank");
 
-    if (isBlank(payload.bloodCenterId()))
-      throw new IllegalArgumentException("bloodCenterId cannot be blank");
+    if (isBlank(payload.organizationId()))
 
     if (isBlank(payload.bloodTypeNeeded()))
       throw new IllegalArgumentException("bloodTypeNeeded cannot be blank");

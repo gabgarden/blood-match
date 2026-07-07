@@ -1,6 +1,6 @@
-package bloodmatch.interfaces.rest.donationrequest.acceptandcreatepending;
+package bloodmatch.interfaces.rest.donation.createpending;
 
-import bloodmatch.application.usecase.donation.acceptandcreatependingfromrequest.AcceptDonorAndCreatePendingDonationFromRequestUseCase;
+import bloodmatch.application.usecase.donation.creatependingfromrequest.CreatePendingDonationFromRequestUseCase;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
@@ -16,17 +16,17 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
-@RequestMapping("/donation-requests")
-public class AcceptDonorAndCreatePendingDonationController {
+@RequestMapping("/donation")
+public class CreatePendingDonationController {
 
-  private final AcceptDonorAndCreatePendingDonationFromRequestUseCase useCase;
+  private final CreatePendingDonationFromRequestUseCase useCase;
 
-  public AcceptDonorAndCreatePendingDonationController(AcceptDonorAndCreatePendingDonationFromRequestUseCase useCase) {
+  public CreatePendingDonationController(CreatePendingDonationFromRequestUseCase useCase) {
     this.useCase = useCase;
   }
 
-  @PostMapping("/accept-and-create-pending")
-  public ResponseEntity<?> execute(@RequestBody AcceptDonorAndCreatePendingDonationDto payload) {
+  @PostMapping("/create-pending")
+  public ResponseEntity<?> execute(@RequestBody CreatePendingDonationDto payload) {
     try {
       if (payload == null)
         throw new IllegalArgumentException("Request body cannot be null");

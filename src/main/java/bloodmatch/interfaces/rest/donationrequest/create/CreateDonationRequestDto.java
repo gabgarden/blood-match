@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public record CreateDonationRequestDto(
     String partyId,
-    String bloodCenterId,
+    String organizationId,
     String bloodTypeNeeded,
     LocalDate dateLimit,
     String urgency) {

@@ -29,11 +29,8 @@ public class RegisterDonorController {
   @PostMapping("/donors")
   public ResponseEntity<Map<String, String>> registerDonor(@RequestBody RegisterDonorDto payload) {
 
-    // criar novo ID para o Donor, e não usar o ID da pessoa, pois o Donor é um objeto separado da Person. O ID da Person será usado para associar o Donor à Person.
 
-
-    
-
+  
     try {
       if (payload == null)
         throw new IllegalArgumentException("Request body cannot be null");
