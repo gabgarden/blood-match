@@ -7,6 +7,8 @@ public record RegisterOrganizationDto(
     String password,
     String passwordConfirmation,
     String street,
+    String number,
+    String neighborhood,
     String city,
     String state,
     String zipCode) {

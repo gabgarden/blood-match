@@ -35,6 +35,8 @@ public class PartySchema {
   private LocalDate birthDate;
   private String cnpj;
   private String street;
+  private String number;
+  private String neighborhood;
   private String city;
   private String state;
   private String zipCode;
@@ -55,6 +57,8 @@ public class PartySchema {
       this.cnpj = null;
       if (person.getAddress() != null) {
         this.street = person.getAddress().getStreet();
+        this.number = person.getAddress().getNumber();
+        this.neighborhood = person.getAddress().getNeighborhood();
         this.city = person.getAddress().getCity();
         this.state = person.getAddress().getState();
         this.zipCode = person.getAddress().getZipCode();
@@ -71,6 +75,8 @@ public class PartySchema {
       this.birthDate = null;
       if (organization.getAddress() != null) {
         this.street = organization.getAddress().getStreet();
+        this.number = organization.getAddress().getNumber();
+        this.neighborhood = organization.getAddress().getNeighborhood();
         this.city = organization.getAddress().getCity();
         this.state = organization.getAddress().getState();
         this.zipCode = organization.getAddress().getZipCode();
@@ -88,16 +94,16 @@ public class PartySchema {
 
     if (TYPE_PERSON.equals(this.partyType)) {
       Person person = new PersistedPerson(partyId, this.name, new CPF(this.cpf), this.birthDate);
-      if (street != null && city != null && state != null) {
-        person.changeAddress(new Address(street, city, state, zipCode, latitude, longitude));
+      if (street != null && city != null && state != null && number != null) {
+        person.changeAddress(new Address(street, number, neighborhood, city, state, zipCode, latitude, longitude));
       }
       return person;
     }
 
     if (TYPE_ORGANIZATION.equals(this.partyType)) {
       Organization organization = new PersistedOrganization(partyId, this.name, new CNPJ(this.cnpj));
-      if (street != null && city != null && state != null) {
-        organization.changeAddress(new Address(street, city, state, zipCode, latitude, longitude));
+      if (street != null && city != null && state != null && number != null) {
+        organization.changeAddress(new Address(street, number, neighborhood, city, state, zipCode, latitude, longitude));
       }
       return organization;
     }
