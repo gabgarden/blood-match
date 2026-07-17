@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 import static org.springframework.http.HttpMethod.PATCH;
@@ -69,6 +70,7 @@ public class SecurityConfig {
             .requestMatchers(GET, "/users/*/donation-requests").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/donation-requests/accept-and-create-pending").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/donation-requests").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
+            .requestMatchers(DELETE, "/donation-requests/*").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
              .requestMatchers(POST, "/donations/external").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(PATCH, "/donations/from-request/complete").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
 

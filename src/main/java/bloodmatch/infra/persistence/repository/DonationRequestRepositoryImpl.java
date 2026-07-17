@@ -69,6 +69,14 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
         .toList();
   }
 
+  @Override
+  public void deleteById(DomainID id) {
+    if (id == null)
+      throw new IllegalArgumentException("Donation request id cannot be null");
+
+    mongoRepository.deleteById(id.getValue().toString());
+  }
+
   private DonationRequest toDomain(DonationRequestSchema schema) {
     return schema.toDomain(requesterRepository, partyRepository, donorRepository);
   }
