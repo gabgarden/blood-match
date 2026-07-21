@@ -1,6 +1,6 @@
-package bloodmatch.interfaces.rest.donation.createexternal;
+package bloodmatch.interfaces.rest.donation.createcompleted;
 
-import bloodmatch.application.usecase.donation.createexternal.CreateExternalDonationUseCase;
+import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
@@ -17,16 +17,16 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDo
 
 @RestController
 @RequestMapping("/donations")
-public class CreateExternalDonationController {
+public class CreateCompletedDonationController {
 
-  private final CreateExternalDonationUseCase useCase;
+  private final CreateCompletedDonationUseCase useCase;
 
-  public CreateExternalDonationController(CreateExternalDonationUseCase useCase) {
+  public CreateCompletedDonationController(CreateCompletedDonationUseCase useCase) {
     this.useCase = useCase;
   }
 
-  @PostMapping("/external")
-  public ResponseEntity<?> create(@RequestBody CreateExternalDonationDto payload) {
+  @PostMapping("/completed")
+  public ResponseEntity<?> create(@RequestBody CreateCompletedDonationDto payload) {
     try {
       if (payload == null)
         throw new IllegalArgumentException("Request body cannot be null");
@@ -42,9 +42,9 @@ public class CreateExternalDonationController {
 
       Donation donation = useCase.execute(personId, bloodCenterId, payload.donationDate());
 
-        String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
+      String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+      return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
           "id", donation.getId().getValue().toString(),
           "donationDate", donation.getDonationDate().toString(),
           "status", status));

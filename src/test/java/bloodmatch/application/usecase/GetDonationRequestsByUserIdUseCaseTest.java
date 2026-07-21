@@ -5,6 +5,7 @@ import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
+import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.requester.Requester;
@@ -25,7 +26,8 @@ import static org.mockito.Mockito.when;
 class GetDonationRequestsByUserIdUseCaseTest {
 
   private final DonationRequestRepositoryInterface donationRequestRepository = mock(DonationRequestRepositoryInterface.class);
-  private final GetDonationRequestsByUserIdUseCase useCase = new GetDonationRequestsByUserIdUseCase(donationRequestRepository);
+  private final DonationRepositoryInterface donationRepository = mock(DonationRepositoryInterface.class);
+  private final GetDonationRequestsByUserIdUseCase useCase = new GetDonationRequestsByUserIdUseCase(donationRequestRepository, donationRepository);
 
   @Test
   void shouldReturnRequestsOrderedByDateRequestedDesc() {
@@ -42,6 +44,9 @@ class GetDonationRequestsByUserIdUseCaseTest {
     assertEquals(2, result.size());
     assertEquals(newer.getId().getValue().toString(), result.get(0).requestId());
     assertEquals(older.getId().getValue().toString(), result.get(1).requestId());
+    assertEquals(1, result.get(0).goalBloodBags());
+    assertEquals(0, result.get(0).fulfilledBloodBags());
+    assertEquals(false, result.get(0).goalReached());
   }
 
   @Test
@@ -63,6 +68,7 @@ class GetDonationRequestsByUserIdUseCaseTest {
         requester,
         bloodCenter,
         BloodType.of("A+"),
+      1,
         dateRequested.plusDays(10),
         dateRequested,
         Urgency.MEDIUM);

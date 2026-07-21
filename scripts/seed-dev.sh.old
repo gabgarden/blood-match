@@ -110,14 +110,13 @@ while IFS='|' read -r name cnpj email street city state zip_code; do
 
 done <<< "$ORGS_DATA"
 
+
 donor_request_types=("A+" "B+" "AB+" "O+" "A-" "B-" "AB-" "O-" "A+" "AB+")
 org_request_types=("O+" "A+" "B+" "AB+" "O-" "A-" "B-" "AB-" "A+" "B+")
 
 donor_urgencies=("critical" "medium" "low" "critical" "medium" "low" "critical" "medium" "low" "low")
+goal_blood_bags=(2 1 3 2 4 1 5 2 3 4)
 org_urgencies=("medium" "critical" "low" "critical" "medium" "low" "critical" "low" "medium" "critical")
-
-donor_goal_bags=(2 3 1 4 2 3 1 2 3 1)
-org_goal_bags=(5 10 3 8 6 4 12 5 7 9)
 
 created_request_ids=()
 
@@ -133,11 +132,13 @@ for i in "${!DONOR_PERSON_IDS[@]}"; do
   # requests com prazo entre amanhã e +10 dias (garante não vencidas)
   request_limit=$(date -d "+$((i + 1)) days" +%F)
 
-  request_body="{\"requesterId\":\"$requester_id\",\"bloodCenterId\":\"$blood_center_id\",\"bloodTypeNeeded\":\"${donor_request_types[$i]}\",\"dateLimit\":\"$request_limit\",\"urgency\":\"${donor_urgencies[$i]}\",\"goalBloodBags\":${donor_goal_bags[$i]}}"
+  request_body="{\"requesterId\":\"$requester_id\",\"bloodCenterId\":\"$blood_center_id\",\"bloodTypeNeeded\",\"goalBloodBags":${goal_blood_bags[$i]},:\"${donor_request_types[$i]}\",\"dateLimit\":\"$request_limit\",\"urgency\":\"${donor_urgencies[$i]}\"}"
 
   request_id=$(post /donation-requests "$requester_token" "$request_body" | jq -r '.id')
 
   created_request_ids+=("$request_id")
+
+  
 done
 
 # =========================
@@ -152,11 +153,13 @@ for i in "${!ORG_IDS[@]}"; do
   # próximos dias
   request_limit=$(date -d "+$((2 + i)) days" +%F)
 
-  request_body="{\"requesterId\":\"$requester_id\",\"bloodCenterId\":\"$blood_center_id\",\"bloodTypeNeeded\":\"${org_request_types[$i]}\",\"dateLimit\":\"$request_limit\",\"urgency\":\"${org_urgencies[$i]}\",\"goalBloodBags\":${org_goal_bags[$i]}}"
+  request_body="{\"requesterId\":\"$requester_id\",\"bloodCenterId\":\"$blood_center_id\",\"bloodTypeNeeded\","\"goalBloodBags":${goal_blood_bags[$i]},:\"${org_request_types[$i]}\",\"dateLimit\":\"$request_limit\",\"urgency\":\"${org_urgencies[$i]}\"}"
 
   request_id=$(post /donation-requests "$requester_token" "$request_body" | jq -r '.id')
 
   created_request_ids+=("$request_id")
+
+ 
 done
 
 # =========================
@@ -186,12 +189,12 @@ done
 donor_logins=$(printf "%s\n" "$DONORS_DATA" | awk -F'|' '{print "- " $4}')
 org_logins=$(printf "%s\n" "$ORGS_DATA" | awk -F'|' '{print "- " $3}')
 
-cat <<EOF
 Seed concluído.
 
 Doadores: ${#DONOR_PERSON_IDS[@]}
 Hemocentros/hospitais: ${#ORG_IDS[@]}
 Requests criados: ${#created_request_ids[@]}
+Requests aceitos e concluídos: ${#completed_donation_ids[@]}
 Doações externas: ${#external_donation_ids[@]}
 
 Senha padrão: $SEED_PASSWORD

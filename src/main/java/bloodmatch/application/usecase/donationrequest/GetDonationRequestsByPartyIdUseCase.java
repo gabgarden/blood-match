@@ -2,6 +2,7 @@ package bloodmatch.application.usecase.donationrequest;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
+import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
@@ -11,20 +12,23 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class GetDonationRequestsByUserIdUseCase {
+public class GetDonationRequestsByPartyIdUseCase {
 
   private final DonationRequestRepositoryInterface donationRequestRepository;
+  private final DonationRepositoryInterface donationRepository;
 
-  public GetDonationRequestsByUserIdUseCase(
-      DonationRequestRepositoryInterface donationRequestRepository) {
+  public GetDonationRequestsByPartyIdUseCase(
+      DonationRequestRepositoryInterface donationRequestRepository,
+      DonationRepositoryInterface donationRepository) {
     this.donationRequestRepository = donationRequestRepository;
+    this.donationRepository = donationRepository;
   }
 
-  public List<OutputItem> execute(DomainID userId) {
-    if (userId == null)
-      throw new IllegalArgumentException("User id cannot be null");
+  public List<OutputItem> execute(DomainID partyId) {
+    if (partyId == null)
+      throw new IllegalArgumentException("Party id cannot be null");
 
-    return donationRequestRepository.findByRequesterPartyId(userId)
+    return donationRequestRepository.findByRequesterPartyId(partyId)
         .stream()
         .sorted(Comparator.comparing(DonationRequest::getDateRequested).reversed())
         .map(this::toOutput)
@@ -32,6 +36,9 @@ public class GetDonationRequestsByUserIdUseCase {
   }
 
   private OutputItem toOutput(DonationRequest request) {
+    LocalDate currentDate = LocalDate.now();
+    int fulfilledBloodBags = request.countFulfilledBloodBags(donationRepository, currentDate);
+
     return new OutputItem(
         request.getId().getValue().toString(),
         request.getBloodTypeNeeded().getType(),
@@ -39,7 +46,10 @@ public class GetDonationRequestsByUserIdUseCase {
         request.getDateLimit(),
         request.isActive(),
         request.getBloodCenter().getOrganization().getName(),
-        request.getUrgency());
+      request.getUrgency(),
+      request.getGoalBloodBags(),
+      fulfilledBloodBags,
+      request.hasReachedGoal(donationRepository, currentDate));
   }
 
   public record OutputItem(
@@ -49,6 +59,9 @@ public class GetDonationRequestsByUserIdUseCase {
       LocalDate dateLimit,
       boolean active,
       String bloodCenterName,
-      Urgency urgency) {
+      Urgency urgency,
+      int goalBloodBags,
+      int fulfilledBloodBags,
+      boolean goalReached) {
   }
 }

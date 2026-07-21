@@ -6,6 +6,7 @@ public record CreateDonationRequestDto(
     String partyId,
     String organizationId,
     String bloodTypeNeeded,
+    Integer goalBloodBags,
     LocalDate dateLimit,
     String urgency) {
 }

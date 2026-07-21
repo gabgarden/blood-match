@@ -2,7 +2,6 @@ package bloodmatch.infra.persistence.schema;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
-import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
 import bloodmatch.domain.party.Organization;
@@ -18,7 +17,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Document(collection = "donation_requests")
@@ -33,6 +31,7 @@ public class DonationRequestSchema {
   private String requesterId;
   private String bloodCenterId;
   private String bloodTypeNeeded;
+  private int goalBloodBags;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
   private boolean active;
@@ -46,6 +45,7 @@ public class DonationRequestSchema {
     this.requesterId = donationRequest.getRequester().getParty().getId().getValue().toString();
     this.bloodCenterId = donationRequest.getBloodCenter().getOrganization().getId().getValue().toString();
     this.bloodTypeNeeded = donationRequest.getBloodTypeNeeded().getType();
+    this.goalBloodBags = donationRequest.getGoalBloodBags();
     this.dateRequested = donationRequest.getDateRequested();
     this.dateLimit = donationRequest.getDateLimit();
     this.active = donationRequest.isActive();
@@ -55,8 +55,7 @@ public class DonationRequestSchema {
 
   public DonationRequest toDomain(
       RequesterRepositoryInterface requesterRepository,
-      PartyRepositoryInterface partyRepository,
-      DonorRepositoryInterface donorRepository) {
+      PartyRepositoryInterface partyRepository) {
     DomainID requesterId = new DomainID(UUID.fromString(this.requesterId));
     DomainID bloodCenterId = new DomainID(UUID.fromString(this.bloodCenterId));
 
@@ -79,6 +78,7 @@ public class DonationRequestSchema {
         requester,
         bloodCenter,
         BloodType.of(this.bloodTypeNeeded),
+        this.goalBloodBags,
         this.dateRequested,
         this.dateLimit,
         this.active,

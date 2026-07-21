@@ -41,6 +41,7 @@ public class CreateDonationRequestController {
           requesterDomainId,
           organizationId,
           bloodTypeNeeded,
+          payload.goalBloodBags(),
           payload.dateLimit(),
           urgency);
 
@@ -63,9 +64,16 @@ public class CreateDonationRequestController {
       throw new IllegalArgumentException("partyId cannot be blank");
 
     if (isBlank(payload.organizationId()))
+      throw new IllegalArgumentException("organizationId cannot be blank");
 
     if (isBlank(payload.bloodTypeNeeded()))
       throw new IllegalArgumentException("bloodTypeNeeded cannot be blank");
+
+    if (payload.goalBloodBags() == null)
+      throw new IllegalArgumentException("goalBloodBags cannot be null");
+
+    if (payload.goalBloodBags() <= 0)
+      throw new IllegalArgumentException("goalBloodBags must be greater than zero");
 
     if (payload.dateLimit() == null)
       throw new IllegalArgumentException("dateLimit cannot be null");

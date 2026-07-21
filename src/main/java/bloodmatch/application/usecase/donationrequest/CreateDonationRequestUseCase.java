@@ -57,12 +57,14 @@ public class CreateDonationRequestUseCase {
       DomainID partyId,
       DomainID bloodCenterID,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateLimit,
       Urgency urgency) {
     return execute(
         partyId,
         bloodCenterID,
         bloodTypeNeeded,
+        goalBloodBags,
         dateLimit,
         LocalDate.now(),
         urgency);
@@ -72,6 +74,7 @@ public class CreateDonationRequestUseCase {
       DomainID partyId,
       DomainID bloodCenterID,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateLimit,
       LocalDate currentDate,
       Urgency urgency) {
@@ -82,6 +85,8 @@ public class CreateDonationRequestUseCase {
       throw new IllegalArgumentException("Blood center id cannot be null");
     if (bloodTypeNeeded == null)
       throw new IllegalArgumentException("Blood type needed cannot be null");
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
     if (dateLimit == null)
       throw new IllegalArgumentException("Date limit cannot be null");
     if (currentDate == null)
@@ -108,6 +113,7 @@ public class CreateDonationRequestUseCase {
         requester,
         bloodCenter,
         bloodTypeNeeded,
+        goalBloodBags,
         dateLimit,
         currentDate,
         urgency);

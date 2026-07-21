@@ -2,7 +2,6 @@ package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
-import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -19,17 +18,14 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
   private final DonationRequestMongoRepository mongoRepository;
   private final RequesterRepositoryInterface requesterRepository;
   private final PartyRepositoryInterface partyRepository;
-  private final DonorRepositoryInterface donorRepository;
 
   public DonationRequestRepositoryImpl(
       DonationRequestMongoRepository mongoRepository,
       RequesterRepositoryInterface requesterRepository,
-      PartyRepositoryInterface partyRepository,
-      DonorRepositoryInterface donorRepository) {
+      PartyRepositoryInterface partyRepository) {
     this.mongoRepository = mongoRepository;
     this.requesterRepository = requesterRepository;
     this.partyRepository = partyRepository;
-    this.donorRepository = donorRepository;
   }
 
   @Override
@@ -78,6 +74,6 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
   }
 
   private DonationRequest toDomain(DonationRequestSchema schema) {
-    return schema.toDomain(requesterRepository, partyRepository, donorRepository);
+    return schema.toDomain(requesterRepository, partyRepository);
   }
 }

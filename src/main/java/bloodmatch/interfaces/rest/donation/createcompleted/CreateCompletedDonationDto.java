@@ -1,8 +1,8 @@
-package bloodmatch.interfaces.rest.donation.createexternal;
+package bloodmatch.interfaces.rest.donation.createcompleted;
 
 import java.time.LocalDate;
 
-public record CreateExternalDonationDto(
+public record CreateCompletedDonationDto(
     String personId,
     String bloodCenterId,
     LocalDate donationDate) {

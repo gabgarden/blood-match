@@ -5,7 +5,6 @@ import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.requester.Requester;
@@ -19,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -28,36 +28,20 @@ class CancelDonationRequestUseCaseTest {
 
   private final DonationRequestRepositoryInterface donationRequestRepository = mock(
       DonationRequestRepositoryInterface.class);
-  private final DonationRepositoryInterface donationRepository = mock(DonationRepositoryInterface.class);
 
   private final CancelDonationRequestUseCase useCase = new CancelDonationRequestUseCase(
-      donationRequestRepository,
-      donationRepository);
+      donationRequestRepository);
 
   @Test
-  void shouldDeleteRequestWhenNoDonationsAreAssociated() {
+  void shouldCloseRequestWhenCancelled() {
     DonationRequest request = createRequest();
     DomainID requestId = request.getId();
 
     when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
-    when(donationRepository.existsByRequestId(requestId)).thenReturn(false);
 
     useCase.execute(requestId);
 
-    verify(donationRequestRepository).deleteById(requestId);
-  }
-
-  @Test
-  void shouldThrowWhenRequestHasAssociatedDonations() {
-    DonationRequest request = createRequest();
-    DomainID requestId = request.getId();
-
-    when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
-    when(donationRepository.existsByRequestId(requestId)).thenReturn(true);
-
-    assertThrows(IllegalStateException.class, () -> useCase.execute(requestId));
-
-    verify(donationRequestRepository, never()).deleteById(requestId);
+    verify(donationRequestRepository).save(request);
   }
 
   @Test
@@ -68,8 +52,7 @@ class CancelDonationRequestUseCaseTest {
 
     assertThrows(IllegalArgumentException.class, () -> useCase.execute(requestId));
 
-    verify(donationRepository, never()).existsByRequestId(requestId);
-    verify(donationRequestRepository, never()).deleteById(requestId);
+    verify(donationRequestRepository, never()).save(any());
   }
 
   @Test
@@ -91,7 +74,8 @@ class CancelDonationRequestUseCaseTest {
         requester,
         bloodCenter,
         BloodType.of("A+"),
-        LocalDate.of(2026, 4, 30),
+        1,
+        LocalDate.now().plusDays(30),
         Urgency.MEDIUM);
   }
 }

@@ -1,12 +1,15 @@
 package bloodmatch.domain.donationrequest;
 
+import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.requester.Requester;
+import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.shared.entity.DomainObject;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 public class DonationRequest extends DomainObject {
@@ -14,6 +17,7 @@ public class DonationRequest extends DomainObject {
   private Requester requester;
   private BloodCenter bloodCenter;
   private BloodType bloodTypeNeeded;
+  private int goalBloodBags;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
   private boolean active;
@@ -29,6 +33,7 @@ public class DonationRequest extends DomainObject {
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateLimit,
       LocalDate currentDate,
       Urgency urgency) {
@@ -36,6 +41,7 @@ public class DonationRequest extends DomainObject {
     this.requester = requester;
     this.bloodCenter = bloodCenter;
     this.bloodTypeNeeded = bloodTypeNeeded;
+    this.goalBloodBags = goalBloodBags;
     this.dateRequested = currentDate;
     this.dateLimit = dateLimit;
     this.active = true;
@@ -46,12 +52,14 @@ public class DonationRequest extends DomainObject {
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateLimit,
       Urgency urgency) {
     return create(
         requester,
         bloodCenter,
         bloodTypeNeeded,
+        goalBloodBags,
         dateLimit,
         LocalDate.now(),
         urgency);
@@ -61,6 +69,7 @@ public class DonationRequest extends DomainObject {
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateLimit,
       LocalDate currentDate,
       Urgency urgency) {
@@ -70,6 +79,8 @@ public class DonationRequest extends DomainObject {
       throw new IllegalArgumentException("Blood center cannot be null");
     if (bloodTypeNeeded == null)
       throw new IllegalArgumentException("Blood type cannot be null");
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
     if (dateLimit == null)
       throw new IllegalArgumentException("Limit date cannot be null");
     if (currentDate == null)
@@ -82,6 +93,7 @@ public class DonationRequest extends DomainObject {
         requester,
         bloodCenter,
         bloodTypeNeeded,
+        goalBloodBags,
         dateLimit,
         currentDate,
         urgency);
@@ -92,6 +104,7 @@ public class DonationRequest extends DomainObject {
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateRequested,
       LocalDate dateLimit,
       boolean isActive,
@@ -105,6 +118,8 @@ public class DonationRequest extends DomainObject {
       throw new IllegalArgumentException("Blood center cannot be null");
     if (bloodTypeNeeded == null)
       throw new IllegalArgumentException("Blood type cannot be null");
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
     if (dateRequested == null)
       throw new IllegalArgumentException("Requested date cannot be null");
     if (dateLimit == null)
@@ -116,6 +131,7 @@ public class DonationRequest extends DomainObject {
         requester,
         bloodCenter,
         bloodTypeNeeded,
+        goalBloodBags,
         dateLimit,
         dateRequested,
         urgency);
@@ -177,6 +193,10 @@ public class DonationRequest extends DomainObject {
     return bloodTypeNeeded;
   }
 
+  public int getGoalBloodBags() {
+    return goalBloodBags;
+  }
+
   public BloodCenter getBloodCenter() {
     return bloodCenter;
   }
@@ -195,5 +215,38 @@ public class DonationRequest extends DomainObject {
 
   public Urgency getUrgency() {
     return urgency;
+  }
+
+  public int countFulfilledBloodBags(
+      DonationRepositoryInterface donationRepository,
+      LocalDate currentDate) {
+
+    if (donationRepository == null)
+      throw new IllegalArgumentException("Donation repository cannot be null");
+    if (currentDate == null)
+      throw new IllegalArgumentException("Current date cannot be null");
+
+    int fulfilledBags = 0;
+    List<Donation> donations = donationRepository.findCompletedDonationsOrderedByDonationDateAsc();
+
+    for (Donation donation : donations) {
+      if (donation == null)
+        continue;
+      if (donation.getDonationDate() == null || donation.getDonationDate().isAfter(currentDate))
+        continue;
+      if (!donation.getDonor().getBloodType().canDonateTo(bloodTypeNeeded))
+        continue;
+
+      fulfilledBags++;
+    }
+
+    return fulfilledBags;
+  }
+
+  public boolean hasReachedGoal(
+      DonationRepositoryInterface donationRepository,
+      LocalDate currentDate) {
+
+    return countFulfilledBloodBags(donationRepository, currentDate) >= goalBloodBags;
   }
 }

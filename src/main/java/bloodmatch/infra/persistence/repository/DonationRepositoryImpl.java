@@ -2,7 +2,6 @@ package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -18,17 +17,14 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
 
   private final DonationMongoRepository mongoRepository;
   private final DonorRepositoryInterface donorRepository;
-  private final DonationRequestRepositoryInterface donationRequestRepository;
   private final PartyRepositoryInterface partyRepository;
 
   public DonationRepositoryImpl(
       DonationMongoRepository mongoRepository,
       DonorRepositoryInterface donorRepository,
-      DonationRequestRepositoryInterface donationRequestRepository,
       PartyRepositoryInterface partyRepository) {
     this.mongoRepository = mongoRepository;
     this.donorRepository = donorRepository;
-    this.donationRequestRepository = donationRequestRepository;
     this.partyRepository = partyRepository;
   }
 
@@ -61,26 +57,6 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
   }
 
   @Override
-  public boolean existsByDonorIdAndRequestId(DomainID donorId, DomainID requestId) {
-    if (donorId == null)
-      throw new IllegalArgumentException("Donor id cannot be null");
-    if (requestId == null)
-      throw new IllegalArgumentException("Request id cannot be null");
-
-    return mongoRepository.existsByDonorPersonIdAndRequestId(
-        donorId.getValue().toString(),
-        requestId.getValue().toString());
-  }
-
-  @Override
-  public boolean existsByRequestId(DomainID requestId) {
-    if (requestId == null)
-      throw new IllegalArgumentException("Request id cannot be null");
-
-    return mongoRepository.existsByRequestId(requestId.getValue().toString());
-  }
-
-  @Override
   public long countByDonorId(DomainID donorId) {
     if (donorId == null)
       throw new IllegalArgumentException("Donor id cannot be null");
@@ -88,7 +64,16 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     return mongoRepository.countByDonorPersonId(donorId.getValue().toString());
   }
 
+  @Override
+  public List<Donation> findCompletedDonationsOrderedByDonationDateAsc() {
+    return mongoRepository.findByCompleted(true)
+        .stream()
+        .map(this::toDomain)
+      .sorted(java.util.Comparator.comparing(Donation::getDonationDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())))
+        .toList();
+  }
+
   private Donation toDomain(DonationSchema schema) {
-    return schema.toDomain(donorRepository, donationRequestRepository, partyRepository);
+    return schema.toDomain(donorRepository, partyRepository);
   }
 }

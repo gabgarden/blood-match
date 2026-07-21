@@ -1,4 +1,4 @@
-package bloodmatch.application.usecase.donation.completefromrequest;
+package bloodmatch.application.usecase.donation.completependingdonation;
 
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
 @Service
-public class CompletePendingDonationFromRequestUseCase {
+public class CompletePendingDonationUseCase {
 
   private final DonationRepositoryInterface donationRepository;
   private final DonorRepositoryInterface donorRepository;
 
-  public CompletePendingDonationFromRequestUseCase(
+  public CompletePendingDonationUseCase(
       DonationRepositoryInterface donationRepository,
       DonorRepositoryInterface donorRepository) {
     this.donationRepository = donationRepository;

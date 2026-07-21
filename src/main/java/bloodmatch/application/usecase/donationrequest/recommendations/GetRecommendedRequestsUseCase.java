@@ -44,7 +44,7 @@ public class GetRecommendedRequestsUseCase {
         .stream()
         .filter(request -> donor.isEligibleToDonate(currentDate))
         .filter(request -> request.canBeFulfilledBy(donor.getBloodType(), currentDate))
-        .filter(request -> !donationRepository.existsByDonorIdAndRequestId(donor.getPerson().getId(), request.getId()))
+        .filter(request -> !request.hasReachedGoal(donationRepository, currentDate))
         .map(request -> toOutput(request, donor))
 
         // Ordena primeiro pela distância (mais perto) e depois pela data limite
@@ -57,6 +57,8 @@ public class GetRecommendedRequestsUseCase {
 
   private OutputItem toOutput(DonationRequest request, Donor donor) {
     Double distance = calculateDistance(donor.getPerson().getAddress(), request.getBloodCenter().getOrganization().getAddress());
+    LocalDate currentDate = LocalDate.now();
+    int fulfilledBloodBags = request.countFulfilledBloodBags(donationRepository, currentDate);
 
     return new OutputItem(
         request.getId().getValue().toString(),
@@ -64,7 +66,10 @@ public class GetRecommendedRequestsUseCase {
         request.getDateLimit(),
         request.getBloodCenter().getOrganization().getName(),
         request.getUrgency(),
-        distance != null ? Math.round(distance * 10.0) / 10.0 : null 
+        distance != null ? Math.round(distance * 10.0) / 10.0 : null,
+        request.getGoalBloodBags(),
+        fulfilledBloodBags,
+        request.hasReachedGoal(donationRepository, currentDate)
     );
   }
 
@@ -92,6 +97,9 @@ public class GetRecommendedRequestsUseCase {
       java.time.LocalDate dateLimit,
       String bloodCenterName,
       Urgency urgency,
-      Double distanceInKm 
+      Double distanceInKm,
+      int goalBloodBags,
+      int fulfilledBloodBags,
+      boolean goalReached
   ) {}
 }

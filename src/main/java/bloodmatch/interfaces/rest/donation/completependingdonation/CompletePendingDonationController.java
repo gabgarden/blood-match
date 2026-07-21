@@ -1,6 +1,6 @@
-package bloodmatch.interfaces.rest.donation.completefromrequest;
+package bloodmatch.interfaces.rest.donation.completependingdonation;
 
-import bloodmatch.application.usecase.donation.completefromrequest.CompletePendingDonationFromRequestUseCase;
+import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +16,16 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDo
 
 @RestController
 @RequestMapping("/donations")
-public class CompleteDonationFromRequestController {
+public class CompletePendingDonationController {
 
-  private final CompletePendingDonationFromRequestUseCase useCase;
+  private final CompletePendingDonationUseCase useCase;
 
-  public CompleteDonationFromRequestController(CompletePendingDonationFromRequestUseCase useCase) {
+  public CompletePendingDonationController(CompletePendingDonationUseCase useCase) {
     this.useCase = useCase;
   }
 
   @PatchMapping("/from-request/complete")
-  public ResponseEntity<?> complete(@RequestBody CompleteDonationFromRequestDto payload) {
+  public ResponseEntity<?> complete(@RequestBody CompletePendingDonationDto payload) {
     try {
       if (payload == null)
         throw new IllegalArgumentException("Request body cannot be null");

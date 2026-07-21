@@ -1,4 +1,4 @@
-package bloodmatch.application.usecase.donation.creatependingfromrequest;
+package bloodmatch.application.usecase.donation.createpending;
 
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
 @Service
-public class CreatePendingDonationFromRequestUseCase {
+public class CreatePendingDonationUseCase {
 
   private final DonorRepositoryInterface donorRepository;
   private final DonationRequestRepositoryInterface donationRequestRepository;
   private final DonationRepositoryInterface donationRepository;
 
-  public CreatePendingDonationFromRequestUseCase(
+  public CreatePendingDonationUseCase(
       DonorRepositoryInterface donorRepository,
       DonationRequestRepositoryInterface donationRequestRepository,
       DonationRepositoryInterface donationRepository) {
@@ -56,7 +56,16 @@ public class CreatePendingDonationFromRequestUseCase {
     DonationRequest request = donationRequestRepository.findById(requestId)
         .orElseThrow(() -> new IllegalArgumentException("Donation request not found"));
 
-    Donation donation = Donation.createFromRequest(donor, request, expectedDate, currentDate);
+    if (!request.isActive())
+      throw new IllegalStateException("Request is not active");
+    if (request.isExpired(currentDate))
+      throw new IllegalStateException("Request has expired");
+    if (!donor.getBloodType().canDonateTo(request.getBloodTypeNeeded()))
+      throw new IllegalStateException("Incompatible blood type");
+    if (expectedDate.isAfter(request.getDateLimit()))
+      throw new IllegalArgumentException("Expected date cannot be after the request deadline");
+
+    Donation donation = Donation.createPending(donor, expectedDate, request.getBloodCenter(), currentDate);
     donationRepository.save(donation);
 
     return donation;

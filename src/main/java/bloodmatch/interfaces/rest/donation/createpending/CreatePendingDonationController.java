@@ -1,6 +1,6 @@
 package bloodmatch.interfaces.rest.donation.createpending;
 
-import bloodmatch.application.usecase.donation.creatependingfromrequest.CreatePendingDonationFromRequestUseCase;
+import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
@@ -19,9 +19,9 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDo
 @RequestMapping("/donation")
 public class CreatePendingDonationController {
 
-  private final CreatePendingDonationFromRequestUseCase useCase;
+  private final CreatePendingDonationUseCase useCase;
 
-  public CreatePendingDonationController(CreatePendingDonationFromRequestUseCase useCase) {
+  public CreatePendingDonationController(CreatePendingDonationUseCase useCase) {
     this.useCase = useCase;
   }
 
@@ -47,7 +47,6 @@ public class CreatePendingDonationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
           "id", donation.getId().getValue().toString(),
           "expectedDate", donation.getDonationDate().toString(),
-          "requestId", donation.getRequest().getId().getValue().toString(),
           "status", status));
 
     } catch (IllegalArgumentException | IllegalStateException e) {

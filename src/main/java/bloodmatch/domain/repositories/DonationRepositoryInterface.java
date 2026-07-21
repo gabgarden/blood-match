@@ -17,9 +17,7 @@ public interface DonationRepositoryInterface {
 
   List<Donation> findByDonorId(DomainID donorId);
 
-  boolean existsByDonorIdAndRequestId(DomainID donorId, DomainID requestId);
-
-  boolean existsByRequestId(DomainID requestId);
+  List<Donation> findCompletedDonationsOrderedByDonationDateAsc();
 
   long countByDonorId(DomainID donorId);
 }

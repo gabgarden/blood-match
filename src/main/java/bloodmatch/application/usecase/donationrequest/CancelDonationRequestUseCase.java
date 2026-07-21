@@ -1,7 +1,6 @@
 package bloodmatch.application.usecase.donationrequest;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
@@ -12,18 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CancelDonationRequestUseCase {
 
   private final DonationRequestRepositoryInterface donationRequestRepository;
-  private final DonationRepositoryInterface donationRepository;
 
   public CancelDonationRequestUseCase(
-      DonationRequestRepositoryInterface donationRequestRepository,
-      DonationRepositoryInterface donationRepository) {
+      DonationRequestRepositoryInterface donationRequestRepository) {
     if (donationRequestRepository == null)
       throw new IllegalArgumentException("DonationRequestRepository cannot be null");
-    if (donationRepository == null)
-      throw new IllegalArgumentException("DonationRepository cannot be null");
 
     this.donationRequestRepository = donationRequestRepository;
-    this.donationRepository = donationRepository;
   }
 
   @Transactional
@@ -34,9 +28,7 @@ public class CancelDonationRequestUseCase {
     DonationRequest request = donationRequestRepository.findById(requestId)
         .orElseThrow(() -> new IllegalArgumentException("Donation request not found"));
 
-    if (donationRepository.existsByRequestId(requestId))
-      throw new IllegalStateException("Cannot cancel request with associated donations");
-
-    donationRequestRepository.deleteById(request.getId());
+    request.close();
+    donationRequestRepository.save(request);
   }
 }

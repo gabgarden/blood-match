@@ -1,9 +1,7 @@
 package bloodmatch.infra.persistence.schema;
 
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.party.Organization;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
@@ -29,7 +27,6 @@ public class DonationSchema {
   @Id
   private String id;
   private String donorPersonId;
-  private String requestId;
   private String bloodCenterId;
   private LocalDate donationDate;
   private boolean completed;
@@ -42,9 +39,6 @@ public class DonationSchema {
 
     this.id = donation.getId().getValue().toString();
     this.donorPersonId = donation.getDonor().getPerson().getId().getValue().toString();
-    this.requestId = donation.getRequest() != null
-        ? donation.getRequest().getId().getValue().toString()
-        : null;
     this.bloodCenterId = donation.getBloodCenter().getOrganization().getId().getValue().toString();
     this.donationDate = donation.getDonationDate();
     this.completed = donation.isCompleted();
@@ -54,7 +48,6 @@ public class DonationSchema {
 
   public Donation toDomain(
       DonorRepositoryInterface donorRepository,
-      DonationRequestRepositoryInterface donationRequestRepository,
       PartyRepositoryInterface partyRepository) {
 
     DomainID donorId = new DomainID(UUID.fromString(this.donorPersonId));
@@ -69,17 +62,9 @@ public class DonationSchema {
 
     BloodCenter bloodCenter = new BloodCenter(organization);
 
-    DonationRequest request = null;
-    if (this.requestId != null) {
-      DomainID requestDomainId = new DomainID(UUID.fromString(this.requestId));
-      request = donationRequestRepository.findById(requestDomainId)
-          .orElseThrow(() -> new IllegalArgumentException("Donation request not found"));
-    }
-
     return Donation.reconstitute(
       new DomainID(UUID.fromString(this.id)),
       donor,
-      request,
       this.donationDate,
       bloodCenter,
       this.completed,

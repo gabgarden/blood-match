@@ -61,10 +61,28 @@ class GetRecommendedRequestsUseCaseTest {
 
     Donor donor = createDonor(currentDate);
     DonationRequest request = createRequest(currentDate);
-    request.acceptBy(donor, currentDate);
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of());
+
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+
+    assertEquals(1, result.size());
+  }
+
+  @Test
+  void shouldNotRecommendRequestsWhenGoalIsAlreadyReached() {
+    LocalDate currentDate = LocalDate.of(2026, 4, 17);
+    DomainID donorId = DomainID.generate();
+
+    Donor donor = createDonor(currentDate);
+    DonationRequest request = createRequest(currentDate);
+
+    when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
+    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of(
+        Donation.registerExternalDonation(donor, currentDate.minusDays(1), request.getBloodCenter(), currentDate)));
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
 
@@ -97,6 +115,7 @@ class GetRecommendedRequestsUseCaseTest {
         requester,
         bloodCenter,
         BloodType.of("A+"),
+        1,
         currentDate.plusDays(10),
         currentDate,
         Urgency.MEDIUM);

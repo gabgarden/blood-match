@@ -1,4 +1,4 @@
-package bloodmatch.application.usecase.donation.createexternal;
+package bloodmatch.application.usecase.donation.createcompleted;
 
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
 @Service
-public class CreateExternalDonationUseCase {
+public class CreateCompletedDonationUseCase {
 
   private final DonorRepositoryInterface donorRepository;
   private final BloodCenterRepositoryInterface bloodCenterRepository;
   private final DonationRepositoryInterface donationRepository;
 
-  public CreateExternalDonationUseCase(
+  public CreateCompletedDonationUseCase(
       DonorRepositoryInterface donorRepository,
       BloodCenterRepositoryInterface bloodCenterRepository,
       DonationRepositoryInterface donationRepository) {
