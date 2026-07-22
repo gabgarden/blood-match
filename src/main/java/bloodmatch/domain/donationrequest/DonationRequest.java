@@ -197,6 +197,14 @@ public class DonationRequest extends DomainObject {
     return goalBloodBags;
   }
 
+
+  public void setGoalBloodBags(int goalBloodBags) {
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
+    this.goalBloodBags = goalBloodBags;
+  }
+
+  
   public BloodCenter getBloodCenter() {
     return bloodCenter;
   }
