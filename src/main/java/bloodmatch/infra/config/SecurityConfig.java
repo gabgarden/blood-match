@@ -71,6 +71,8 @@ public class SecurityConfig {
             .requestMatchers(POST, "/donation-requests/accept-and-create-pending").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/donation-requests").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
             .requestMatchers(DELETE, "/donation-requests/*").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
+            .requestMatchers(PATCH, "/donation-requests/goal-blood-bags").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
+            .requestMatchers(PATCH, "/donation-requests/date-limit").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/donations/completed").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(PATCH, "/donations/from-request/complete").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
 

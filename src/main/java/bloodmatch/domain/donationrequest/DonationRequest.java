@@ -217,6 +217,14 @@ public class DonationRequest extends DomainObject {
     return dateLimit;
   }
 
+  public void setDateLimit(LocalDate dateLimit) {
+    if (dateLimit == null)
+      throw new IllegalArgumentException("Limit date cannot be null");
+    if (dateLimit.isBefore(LocalDate.now()))
+      throw new IllegalArgumentException("Limit date cannot be in the past");
+    this.dateLimit = dateLimit;
+  }
+
   public Requester getRequester() {
     return requester;
   }
