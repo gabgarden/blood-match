@@ -3,13 +3,11 @@ package bloodmatch.domain.donationrequest;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.requester.Requester;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.shared.entity.DomainObject;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
-import java.util.List;
 
 
 public class DonationRequest extends DomainObject {
@@ -232,37 +230,34 @@ public class DonationRequest extends DomainObject {
   public Urgency getUrgency() {
     return urgency;
   }
+  public boolean acceptsDonation(
+        Donation donation,
+        LocalDate currentDate) {
 
-  public int countFulfilledBloodBags(
-      DonationRepositoryInterface donationRepository,
-      LocalDate currentDate) {
+    if (donation == null)
+        throw new IllegalArgumentException("Donation cannot be null");
 
-    if (donationRepository == null)
-      throw new IllegalArgumentException("Donation repository cannot be null");
     if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
+        throw new IllegalArgumentException("Current date cannot be null");
 
-    int fulfilledBags = 0;
-    List<Donation> donations = donationRepository.findCompletedDonationsOrderedByDonationDateAsc();
+    if (!isActive())
+        return false;
 
-    for (Donation donation : donations) {
-      if (donation == null)
-        continue;
-      if (donation.getDonationDate() == null || donation.getDonationDate().isAfter(currentDate))
-        continue;
-      if (!donation.getDonor().getBloodType().canDonateTo(bloodTypeNeeded))
-        continue;
+    if (isExpired(currentDate))
+        return false;
 
-      fulfilledBags++;
-    }
+    if (!donation.isCompleted())
+        return false;
 
-    return fulfilledBags;
-  }
+    if (donation.getDonationDate().isBefore(dateRequested))
+        return false;
 
-  public boolean hasReachedGoal(
-      DonationRepositoryInterface donationRepository,
-      LocalDate currentDate) {
+    if (donation.getDonationDate().isAfter(dateLimit))
+        return false;
 
-    return countFulfilledBloodBags(donationRepository, currentDate) >= goalBloodBags;
-  }
+    return donation.getDonor()
+            .getBloodType()
+            .canDonateTo(bloodTypeNeeded);
+}
+  
 }
