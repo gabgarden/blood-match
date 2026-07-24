@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -34,9 +35,11 @@ public class DonationRequestFulfillmentService {
                         .thenComparing(donation -> donation.getId().getValue()));
 
         Map<DomainID, Integer> fulfilled = initialize(requests);
+        Map<DomainID, List<DonationRequest>> requestsByBloodCenter = requests.stream()
+                .collect(Collectors.groupingBy(request -> request.getBloodCenter().getId()));
 
         distributeDonations(
-                requests,
+                requestsByBloodCenter,
                 donations,
                 currentDate,
                 fulfilled);
@@ -59,17 +62,18 @@ public class DonationRequestFulfillmentService {
     }
 
     private void distributeDonations(
-            List<DonationRequest> requests,
+            Map<DomainID, List<DonationRequest>> requestsByBloodCenter,
             List<Donation> donations,
             LocalDate currentDate,
             Map<DomainID, Integer> fulfilled) {
 
         for (Donation donation : donations) {
 
-            for (DonationRequest request : requests) {
+            List<DonationRequest> requestsAtBloodCenter = requestsByBloodCenter.getOrDefault(
+                    donation.getBloodCenter().getId(),
+                    List.of());
 
-                if (!belongsToSameBloodCenter(request, donation))
-                    continue;
+            for (DonationRequest request : requestsAtBloodCenter) {
 
                 if (!request.acceptsDonation(donation, currentDate))
                     continue;
@@ -84,21 +88,9 @@ public class DonationRequestFulfillmentService {
                         request.getId(),
                         currentFulfilled + 1);
 
-                // FIFO:
-                // uma bolsa só abastece uma única request
                 break;
             }
         }
-    }
-
-    private boolean belongsToSameBloodCenter(
-            DonationRequest request,
-            Donation donation) {
-
-        return request.getBloodCenter()
-                .getId()
-                .equals(
-                        donation.getBloodCenter().getId());
     }
 
     private Map<DomainID, DonationRequestFulfillmentStatusRecord> buildResult(

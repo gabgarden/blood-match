@@ -45,7 +45,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(older, newer));
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(older, newer));
-    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of());
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of());
 
     List<GetDonationRequestsByPartyIdUseCase.OutputItem> result = useCase.execute(userId, now);
 
@@ -69,7 +69,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(cancelled));
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of());
-    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of());
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of());
 
     List<GetDonationRequestsByPartyIdUseCase.OutputItem> result = useCase.execute(userId, now);
 
@@ -91,7 +91,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(expired));
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(expired));
-    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of(donation));
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of(donation));
 
     GetDonationRequestsByPartyIdUseCase.OutputItem result = useCase.execute(userId, currentDate).get(0);
 

@@ -73,6 +73,27 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
         .toList();
   }
 
+  @Override
+  public List<Donation> findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+      List<DomainID> bloodCenterIds) {
+    if (bloodCenterIds == null)
+      throw new IllegalArgumentException("Blood center ids cannot be null");
+
+    if (bloodCenterIds.isEmpty())
+      return List.of();
+
+    List<String> ids = bloodCenterIds.stream()
+        .map(DomainID::getValue)
+        .map(Object::toString)
+        .distinct()
+        .toList();
+
+    return mongoRepository.findByCompletedTrueAndBloodCenterIdInOrderByDonationDateAsc(ids)
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
   private Donation toDomain(DonationSchema schema) {
     return schema.toDomain(donorRepository, bloodCenterRepository);
   }

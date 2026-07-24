@@ -12,11 +12,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Document(collection = "donations")
+@CompoundIndex(name = "completed_blood_center_donation_date", def = "{'completed': 1, 'bloodCenterId': 1, 'donationDate': 1}")
 @Getter
 @Setter
 @NoArgsConstructor

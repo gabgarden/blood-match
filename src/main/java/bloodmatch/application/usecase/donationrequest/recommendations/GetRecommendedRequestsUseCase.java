@@ -56,8 +56,12 @@ public class GetRecommendedRequestsUseCase {
         List<DonationRequest> activeRequests =
                 donationRequestRepository.findActiveRequests();
 
-        List<Donation> donations =
-                donationRepository.findCompletedDonationsOrderedByDonationDateAsc();
+        List<Donation> donations = donationRepository
+                .findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+                        activeRequests.stream()
+                                .map(request -> request.getBloodCenter().getId())
+                                .distinct()
+                                .toList());
 
         Map<DomainID, DonationRequestFulfillmentStatusRecord> fulfillment =
                 fulfillmentService.calculate(

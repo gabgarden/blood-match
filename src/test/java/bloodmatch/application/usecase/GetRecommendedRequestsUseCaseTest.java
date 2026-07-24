@@ -66,7 +66,7 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
-    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of());
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
 
@@ -85,7 +85,7 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
-    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of(
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of(
         Donation.registerExternalDonation(donor, currentDate, request.getBloodCenter(), currentDate)));
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
