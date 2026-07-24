@@ -52,7 +52,7 @@ public class GetDonationRequestsByPartyIdUseCase {
         List<Donation> donations = donationRepository
                 .findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
                         activeRequests.stream()
-                                .map(request -> request.getBloodCenter().getId())
+                                .map(request -> request.getBloodCenter().getOrganization().getId())
                                 .distinct()
                                 .toList());
 

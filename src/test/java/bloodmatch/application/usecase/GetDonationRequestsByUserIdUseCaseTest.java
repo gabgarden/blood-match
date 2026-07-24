@@ -24,6 +24,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class GetDonationRequestsByPartyIdUseCaseTest {
@@ -58,6 +59,10 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     assertEquals(false, result.get(0).goalReached());
     assertEquals(true, result.get(0).active());
     assertEquals(false, result.get(0).expired());
+    verify(donationRepository).findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+        List.of(
+            older.getBloodCenter().getOrganization().getId(),
+            newer.getBloodCenter().getOrganization().getId()));
   }
 
   @Test

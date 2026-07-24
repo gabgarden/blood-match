@@ -35,20 +35,20 @@ public class CreateCompletedDonationUseCase {
 
   public Donation execute(
       DomainID personId,
-      DomainID bloodCenterId,
+      DomainID organizationId,
       LocalDate donationDate) {
 
     if (personId == null)
       throw new IllegalArgumentException("Person id cannot be null");
-    if (bloodCenterId == null)
-      throw new IllegalArgumentException("Blood center id cannot be null");
+    if (organizationId == null)
+      throw new IllegalArgumentException("Organization id cannot be null");
     if (donationDate == null)
       throw new IllegalArgumentException("Donation date cannot be null");
 
     Donor donor = donorRepository.findByPartyId(personId)
         .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
 
-    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(bloodCenterId)
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
         .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
 
     Donation donation = Donation.registerExternalDonation(donor, donationDate, bloodCenter, LocalDate.now());

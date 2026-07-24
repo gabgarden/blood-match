@@ -55,14 +55,14 @@ public class CreateDonationRequestUseCase {
 
   public DonationRequest execute(
       DomainID partyId,
-      DomainID bloodCenterID,
+      DomainID organizationId,
       BloodType bloodTypeNeeded,
       int goalBloodBags,
       LocalDate dateLimit,
       Urgency urgency) {
     return execute(
         partyId,
-        bloodCenterID,
+        organizationId,
         bloodTypeNeeded,
         goalBloodBags,
         dateLimit,
@@ -72,7 +72,7 @@ public class CreateDonationRequestUseCase {
 
   public DonationRequest execute(
       DomainID partyId,
-      DomainID bloodCenterID,
+      DomainID organizationId,
       BloodType bloodTypeNeeded,
       int goalBloodBags,
       LocalDate dateLimit,
@@ -81,8 +81,8 @@ public class CreateDonationRequestUseCase {
 
     if (partyId == null)
       throw new IllegalArgumentException("Party id cannot be null");
-    if (bloodCenterID == null)
-      throw new IllegalArgumentException("Blood center id cannot be null");
+    if (organizationId == null)
+      throw new IllegalArgumentException("Organization id cannot be null");
     if (bloodTypeNeeded == null)
       throw new IllegalArgumentException("Blood type needed cannot be null");
     if (goalBloodBags <= 0)
@@ -99,7 +99,7 @@ public class CreateDonationRequestUseCase {
     Requester requester = requesterRepository.findByPartyId(partyId)
       .orElseThrow(() -> new IllegalArgumentException("Requester role not found"));
 
-    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(bloodCenterID)
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
       .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
 
     // Ensure blood center organization address has coordinates

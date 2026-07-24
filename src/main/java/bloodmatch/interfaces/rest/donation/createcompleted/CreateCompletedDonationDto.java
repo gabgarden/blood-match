@@ -4,6 +4,6 @@ import java.time.LocalDate;
 
 public record CreateCompletedDonationDto(
     String personId,
-    String bloodCenterId,
+    String organizationId,
     LocalDate donationDate) {
 }
