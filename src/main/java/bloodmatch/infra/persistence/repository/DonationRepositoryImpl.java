@@ -1,9 +1,9 @@
 package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.donation.Donation;
+import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.persistence.repository.mongo.DonationMongoRepository;
 import bloodmatch.infra.persistence.schema.DonationSchema;
@@ -17,15 +17,15 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
 
   private final DonationMongoRepository mongoRepository;
   private final DonorRepositoryInterface donorRepository;
-  private final PartyRepositoryInterface partyRepository;
+  private final BloodCenterRepositoryInterface bloodCenterRepository;
 
   public DonationRepositoryImpl(
       DonationMongoRepository mongoRepository,
       DonorRepositoryInterface donorRepository,
-      PartyRepositoryInterface partyRepository) {
+      BloodCenterRepositoryInterface bloodCenterRepository) {
     this.mongoRepository = mongoRepository;
     this.donorRepository = donorRepository;
-    this.partyRepository = partyRepository;
+    this.bloodCenterRepository = bloodCenterRepository;
   }
 
   @Override
@@ -74,6 +74,6 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
   }
 
   private Donation toDomain(DonationSchema schema) {
-    return schema.toDomain(donorRepository, partyRepository);
+    return schema.toDomain(donorRepository, bloodCenterRepository);
   }
 }

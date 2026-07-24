@@ -1,9 +1,8 @@
 package bloodmatch.infra.persistence.schema;
 
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.party.Organization;
+import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -48,19 +47,15 @@ public class DonationSchema {
 
   public Donation toDomain(
       DonorRepositoryInterface donorRepository,
-      PartyRepositoryInterface partyRepository) {
+      BloodCenterRepositoryInterface bloodCenterRepository) {
 
     DomainID donorId = new DomainID(UUID.fromString(this.donorPersonId));
     Donor donor = donorRepository.findByPartyId(donorId)
         .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
 
     DomainID bloodCenterPartyId = new DomainID(UUID.fromString(this.bloodCenterId));
-    Organization organization = partyRepository.findById(bloodCenterPartyId)
-        .filter(Organization.class::isInstance)
-        .map(Organization.class::cast)
-        .orElseThrow(() -> new IllegalArgumentException("Blood center organization not found"));
-
-    BloodCenter bloodCenter = new BloodCenter(organization);
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(bloodCenterPartyId)
+        .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
 
     return Donation.reconstitute(
       new DomainID(UUID.fromString(this.id)),

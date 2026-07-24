@@ -1,8 +1,8 @@
 package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
+import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.persistence.repository.mongo.DonationRequestMongoRepository;
@@ -17,15 +17,15 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
 
   private final DonationRequestMongoRepository mongoRepository;
   private final RequesterRepositoryInterface requesterRepository;
-  private final PartyRepositoryInterface partyRepository;
+  private final BloodCenterRepositoryInterface bloodCenterRepository;
 
   public DonationRequestRepositoryImpl(
       DonationRequestMongoRepository mongoRepository,
       RequesterRepositoryInterface requesterRepository,
-      PartyRepositoryInterface partyRepository) {
+      BloodCenterRepositoryInterface bloodCenterRepository) {
     this.mongoRepository = mongoRepository;
     this.requesterRepository = requesterRepository;
-    this.partyRepository = partyRepository;
+    this.bloodCenterRepository = bloodCenterRepository;
   }
 
   @Override
@@ -48,7 +48,7 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
 
   @Override
   public List<DonationRequest> findActiveRequests() {
-    return mongoRepository.findByActive(true)
+    return mongoRepository.findByActiveOrderByDateRequestedAscIdAsc(true)
         .stream()
         .map(this::toDomain)
         .toList();
@@ -74,6 +74,6 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
   }
 
   private DonationRequest toDomain(DonationRequestSchema schema) {
-    return schema.toDomain(requesterRepository, partyRepository);
+    return schema.toDomain(requesterRepository, bloodCenterRepository);
   }
 }

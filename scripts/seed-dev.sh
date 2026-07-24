@@ -154,7 +154,7 @@ done
 for i in "${!ORG_IDS[@]}"; do
   requester_token=$(token_for "${ORG_EMAILS[$i]}")
   requester_id="${ORG_IDS[$i]}"
-  blood_center_id="${ORG_IDS[$(((i + 1) % ${#ORG_IDS[@]}))]}"
+  blood_center_id="${ORG_IDS[$i]}"
   request_limit=$(days_from_today $((i + 10)))
 
   request_body="{\"partyId\":\"$requester_id\",\"organizationId\":\"$blood_center_id\",\"bloodTypeNeeded\":\"${org_request_types[$i]}\",\"dateLimit\":\"$request_limit\",\"urgency\":\"${org_urgencies[$i]}\",\"goalBloodBags\":${org_goal_bags[$i]}}"
@@ -213,11 +213,11 @@ Hemocentros/hospitais: ${#ORG_IDS[@]}
 Requests criados: ${#created_request_ids[@]}
 Doações concluídas (hoje): ${#completed_donation_ids[@]}
 
-Cenários de teste (fulfillment):
-- hemo1: Ana (A+, meta 2) recebe 3 doações hoje → meta atingida
-- hemo2: requests parcialmente abastecidas (Bruno, Daniel, Juliana)
-- hemo3/hemo4: requests com 1 doação cada (parcial)
-- hemo5–hemo10: requests sem doação (meta 0)
+Critérios de teste (fulfillment):
+- Cada request aponta para o próprio hemocentro do solicitante.
+- A alocação é FIFO por data e hora de criação; cada bolsa atende apenas uma request compatível.
+- hemo1–hemo4 possuem doações concluídas hoje para validar metas atingidas, parciais e abertas.
+- hemo5–hemo10 não possuem doações concluídas para validar requests abertas sem progresso.
 - doadores Gabriel, Igor e Lucas: elegíveis para novas doações/recomendações
 
 Senha padrão: $SEED_PASSWORD

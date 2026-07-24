@@ -25,11 +25,13 @@ public class DonationRequestFulfillmentService {
 
         requests = new ArrayList<>(requests);
         requests.sort(
-                Comparator.comparing(DonationRequest::getDateRequested));
+                Comparator.comparing(DonationRequest::getDateRequested)
+                        .thenComparing(request -> request.getId().getValue()));
 
         donations = new ArrayList<>(donations);
         donations.sort(
-                Comparator.comparing(Donation::getDonationDate));
+                Comparator.comparing(Donation::getDonationDate)
+                        .thenComparing(donation -> donation.getId().getValue()));
 
         Map<DomainID, Integer> fulfilled = initialize(requests);
 

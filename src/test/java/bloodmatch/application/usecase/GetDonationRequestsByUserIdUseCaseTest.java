@@ -1,6 +1,7 @@
 package bloodmatch.application.usecase;
 
-import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByUserIdUseCase;
+import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByPartyIdUseCase;
+import bloodmatch.domain.services.DonationRequestFulfillmentService;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
@@ -23,11 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class GetDonationRequestsByUserIdUseCaseTest {
+class GetDonationRequestsByPartyIdUseCaseTest {
 
   private final DonationRequestRepositoryInterface donationRequestRepository = mock(DonationRequestRepositoryInterface.class);
   private final DonationRepositoryInterface donationRepository = mock(DonationRepositoryInterface.class);
-  private final GetDonationRequestsByUserIdUseCase useCase = new GetDonationRequestsByUserIdUseCase(donationRequestRepository, donationRepository);
+  private final GetDonationRequestsByPartyIdUseCase useCase = new GetDonationRequestsByPartyIdUseCase(
+      donationRequestRepository,
+      donationRepository,
+      new DonationRequestFulfillmentService());
 
   @Test
   void shouldReturnRequestsOrderedByDateRequestedDesc() {
@@ -38,15 +42,40 @@ class GetDonationRequestsByUserIdUseCaseTest {
     DonationRequest newer = createRequest(now.minusDays(1));
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(older, newer));
+    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(older, newer));
+    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of());
 
-    List<GetDonationRequestsByUserIdUseCase.OutputItem> result = useCase.execute(userId);
+    List<GetDonationRequestsByPartyIdUseCase.OutputItem> result = useCase.execute(userId, now);
 
     assertEquals(2, result.size());
     assertEquals(newer.getId().getValue().toString(), result.get(0).requestId());
     assertEquals(older.getId().getValue().toString(), result.get(1).requestId());
     assertEquals(1, result.get(0).goalBloodBags());
     assertEquals(0, result.get(0).fulfilledBloodBags());
+    assertEquals(1, result.get(0).remainingBloodBags());
     assertEquals(false, result.get(0).goalReached());
+    assertEquals(true, result.get(0).active());
+    assertEquals(false, result.get(0).expired());
+  }
+
+  @Test
+  void shouldReturnCancelledRequestWithZeroProgress() {
+    LocalDate now = LocalDate.of(2026, 4, 23);
+    DomainID userId = DomainID.generate();
+    DonationRequest cancelled = createRequest(now.minusDays(1));
+    cancelled.close();
+
+    when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(cancelled));
+    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of());
+    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of());
+
+    List<GetDonationRequestsByPartyIdUseCase.OutputItem> result = useCase.execute(userId, now);
+
+    assertEquals(1, result.size());
+    assertEquals(0, result.get(0).fulfilledBloodBags());
+    assertEquals(1, result.get(0).remainingBloodBags());
+    assertEquals(false, result.get(0).active());
+    assertEquals(false, result.get(0).expired());
   }
 
   @Test

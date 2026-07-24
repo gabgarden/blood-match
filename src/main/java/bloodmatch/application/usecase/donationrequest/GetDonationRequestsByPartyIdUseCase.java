@@ -33,11 +33,15 @@ public class GetDonationRequestsByPartyIdUseCase {
     }
 
     public List<OutputItem> execute(DomainID partyId) {
+        return execute(partyId, LocalDate.now());
+    }
+
+    public List<OutputItem> execute(DomainID partyId, LocalDate currentDate) {
 
         if (partyId == null)
             throw new IllegalArgumentException("Party id cannot be null");
-
-        LocalDate currentDate = LocalDate.now();
+        if (currentDate == null)
+            throw new IllegalArgumentException("Current date cannot be null");
 
         List<DonationRequest> userRequests =
                 donationRequestRepository.findByRequesterPartyId(partyId);
@@ -57,16 +61,21 @@ public class GetDonationRequestsByPartyIdUseCase {
         return userRequests.stream()
                 .sorted(
                         Comparator.comparing(DonationRequest::getDateRequested)
-                                .reversed())
-                .map(request -> toOutput(
-                        request,
-                        fulfillment.get(request.getId())))
+                                .reversed()
+                                .thenComparing(request -> request.getId().getValue()))
+                .map(request -> toOutput(request, fulfillment.get(request.getId()), currentDate))
                 .toList();
     }
 
     private OutputItem toOutput(
             DonationRequest request,
-            DonationRequestFulfillmentStatusRecord fulfillment) {
+            DonationRequestFulfillmentStatusRecord fulfillment,
+            LocalDate currentDate) {
+
+        int fulfilledBloodBags = fulfillment != null
+                ? fulfillment.fulfilledBloodBags()
+                : 0;
+        boolean goalReached = fulfillment != null && fulfillment.goalReached();
 
         return new OutputItem(
                 request.getId().getValue().toString(),
@@ -74,11 +83,13 @@ public class GetDonationRequestsByPartyIdUseCase {
                 request.getDateRequested(),
                 request.getDateLimit(),
                 request.isActive(),
+                request.isExpired(currentDate),
                 request.getBloodCenter().getOrganization().getName(),
                 request.getUrgency(),
                 request.getGoalBloodBags(),
-                fulfillment.fulfilledBloodBags(),
-                fulfillment.goalReached());
+                fulfilledBloodBags,
+                Math.max(0, request.getGoalBloodBags() - fulfilledBloodBags),
+                goalReached);
     }
 
     public record OutputItem(
@@ -87,10 +98,12 @@ public class GetDonationRequestsByPartyIdUseCase {
             LocalDate dateRequested,
             LocalDate dateLimit,
             boolean active,
+            boolean expired,
             String bloodCenterName,
             Urgency urgency,
             int goalBloodBags,
             int fulfilledBloodBags,
+            int remainingBloodBags,
             boolean goalReached) {
     }
 }

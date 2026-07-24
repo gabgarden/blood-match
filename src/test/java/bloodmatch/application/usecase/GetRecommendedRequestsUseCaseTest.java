@@ -8,6 +8,7 @@ import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
+import bloodmatch.domain.services.DonationRequestFulfillmentService;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.person.donor.Donor;
@@ -34,7 +35,8 @@ class GetRecommendedRequestsUseCaseTest {
   private final GetRecommendedRequestsUseCase useCase = new GetRecommendedRequestsUseCase(
       donorRepository,
       donationRequestRepository,
-      donationRepository);
+      donationRepository,
+      new DonationRequestFulfillmentService());
 
   @Test
   void shouldNotRecommendRequestsWhenDonorIsNotEligible() {
@@ -82,7 +84,7 @@ class GetRecommendedRequestsUseCaseTest {
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
     when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of(
-        Donation.registerExternalDonation(donor, currentDate.minusDays(1), request.getBloodCenter(), currentDate)));
+        Donation.registerExternalDonation(donor, currentDate, request.getBloodCenter(), currentDate)));
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
 
