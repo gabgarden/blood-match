@@ -1,6 +1,7 @@
 package bloodmatch.application.usecase;
 
 import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByPartyIdUseCase;
+import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.services.DonationRequestFulfillmentService;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
@@ -9,6 +10,7 @@ import bloodmatch.domain.party.Person;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
+import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
@@ -79,6 +81,27 @@ class GetDonationRequestsByPartyIdUseCaseTest {
   }
 
   @Test
+  void shouldExposeExpiredAndFulfillmentBooleansInsteadOfASituation() {
+    LocalDate currentDate = LocalDate.of(2026, 4, 23);
+    DomainID userId = DomainID.generate();
+    DonationRequest expired = createRequest(currentDate.minusDays(12));
+    Donor donor = createDonor(currentDate);
+    Donation donation = Donation.registerExternalDonation(
+        donor, expired.getDateRequested().plusDays(1), expired.getBloodCenter(), currentDate);
+
+    when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(expired));
+    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(expired));
+    when(donationRepository.findCompletedDonationsOrderedByDonationDateAsc()).thenReturn(List.of(donation));
+
+    GetDonationRequestsByPartyIdUseCase.OutputItem result = useCase.execute(userId, currentDate).get(0);
+
+    assertEquals(true, result.active());
+    assertEquals(true, result.expired());
+    assertEquals(0, result.fulfilledBloodBags());
+    assertEquals(false, result.goalReached());
+  }
+
+  @Test
   void shouldThrowWhenUserIdIsNull() {
     assertThrows(IllegalArgumentException.class, () -> useCase.execute(null));
   }
@@ -101,5 +124,12 @@ class GetDonationRequestsByPartyIdUseCaseTest {
         dateRequested.plusDays(10),
         dateRequested,
         Urgency.MEDIUM);
+  }
+
+  private Donor createDonor(LocalDate currentDate) {
+    return new Donor(
+        new Person("Donor Person", new CPF("98765432100"), currentDate.minusYears(30)),
+        BloodType.of("O-"),
+        75.0);
   }
 }

@@ -57,7 +57,7 @@ class GetRecommendedRequestsUseCaseTest {
   }
 
   @Test
-  void shouldNotRecommendAlreadyAcceptedRequestsForTheSameDonor() {
+  void shouldRecommendEligibleRequestsWithOutstandingGoal() {
     LocalDate currentDate = LocalDate.of(2026, 4, 17);
     DomainID donorId = DomainID.generate();
 
@@ -71,6 +71,8 @@ class GetRecommendedRequestsUseCaseTest {
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
 
     assertEquals(1, result.size());
+    assertEquals(0, result.get(0).fulfilledBloodBags());
+    assertEquals(false, result.get(0).goalReached());
   }
 
   @Test
