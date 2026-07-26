@@ -41,8 +41,8 @@ public class RegisterPersonController {
       if (isBlank(payload.passwordConfirmation()))
         throw new IllegalArgumentException("passwordConfirmation cannot be blank");
 
-      if ((payload.street() != null || payload.city() != null || payload.state() != null || payload.zipCode() != null || payload.neighborhood() != null || payload.number() != null) &&
-         (isBlank(payload.street()) || isBlank(payload.city()) || isBlank(payload.state()) || isBlank(payload.zipCode()) || isBlank(payload.neighborhood()) || isBlank(payload.number())))
+      if ((payload.street() != null || payload.city() != null || payload.state() != null || payload.zipCode() != null) &&
+         (isBlank(payload.street()) || isBlank(payload.city()) || isBlank(payload.state()) || isBlank(payload.zipCode())))
         throw new IllegalArgumentException("All address fields must be provided together");
 
       Person person = registerPartyUseCase.registerPerson(
@@ -53,8 +53,6 @@ public class RegisterPersonController {
           payload.password(),
           payload.passwordConfirmation(),
           payload.street(),
-          payload.number(),
-          payload.neighborhood(),
           payload.city(),
           payload.state(),
           payload.zipCode());

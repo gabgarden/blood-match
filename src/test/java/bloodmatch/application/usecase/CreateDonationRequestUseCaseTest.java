@@ -97,10 +97,10 @@ class CreateDonationRequestUseCaseTest {
         "Main Blood Center",
         new CNPJ("12345678000100"));
     bloodCenterParty.changeAddress(new Address(
-        "Rua A", null, null, "São Paulo", "SP", "01000-000"));
+        "Rua A", null, null, "São Paulo", -23.55, -46.6));
 
     Address geocodedAddress = new Address(
-        "Rua A", null, null, "São Paulo", "SP", "01000-000", -23.55, -46.63);
+        "Rua A", null, null, "São Paulo", -23.55, -46.6);
 
     DomainID requesterId = DomainID.generate();
     DomainID bloodCenterId = DomainID.generate();

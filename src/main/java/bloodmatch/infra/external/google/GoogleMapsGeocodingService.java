@@ -76,18 +76,20 @@ public class GoogleMapsGeocodingService implements GeocodingServiceInterface {
     private Address tryGeocode(String searchAddress, String expectedZipCode) {
 
         try {
-            String url = UriComponentsBuilder
-                    .fromHttpUrl(GOOGLE_GEOCODING_API_URL)
-                    .queryParam("address", searchAddress)
-                    .queryParam("components", "country:BR")
-                    .queryParam("key", apiKey)
-                    .toUriString();
+            java.net.URI uri = UriComponentsBuilder
+                .fromHttpUrl(GOOGLE_GEOCODING_API_URL)
+                .queryParam("address", searchAddress)
+                .queryParam("components", "country:BR")
+                .queryParam("key", apiKey)
+                .build()
+                .encode() // converte os acentos corretamente
+                .toUri();
 
             System.out.println("======================================");
             System.out.println("GEOCODING");
             System.out.println("Buscando: " + searchAddress);
 
-            JsonNode response = restTemplate.getForObject(url, JsonNode.class);
+            JsonNode response = restTemplate.getForObject(uri, JsonNode.class);
 
             if (response == null) {
                 System.out.println("Resposta nula do Google");
@@ -146,8 +148,7 @@ public class GoogleMapsGeocodingService implements GeocodingServiceInterface {
                 }
             }
 
-            JsonNode chosen = zipMatchResult != null ? zipMatchResult
-                    : (!hasZip ? bestPrecisionResult : null);
+            JsonNode chosen = zipMatchResult != null ? zipMatchResult : bestPrecisionResult; //Priorizando o match exato de CEP. Se não rolar, aceita o de melhor precisão
 
             if (chosen == null) {
                 System.out.println("Nenhum resultado passou nos critérios de aceitação.");
@@ -162,7 +163,7 @@ public class GoogleMapsGeocodingService implements GeocodingServiceInterface {
             System.out.println("Lat: " + latitude + " | Lng: " + longitude);
             System.out.println("======================================");
 
-            return new Address("", "", "", "", "", "", latitude, longitude);
+            return new Address("", "", "", "", latitude, longitude);
 
         } catch (Exception e) {
             System.err.println("Erro na tentativa de geocoding: " + e.getMessage());
@@ -197,8 +198,6 @@ public class GoogleMapsGeocodingService implements GeocodingServiceInterface {
     private Address copyCoordinates(Address original, Address geocoded) {
         return new Address(
                 original.getStreet(),
-                original.getNumber(),
-                original.getNeighborhood(),
                 original.getCity(),
                 original.getState(),
                 original.getZipCode(),

@@ -56,8 +56,6 @@ public class RegisterPartyUseCase {
       String password,
       String passwordConfirmation,
       String street,
-      String number,
-      String neighborhood,
       String city,
       String state,
       String zipCode) {
@@ -67,8 +65,8 @@ public class RegisterPartyUseCase {
     ensureEmailIsAvailable(userEmail);
 
     Person person = new Person(name, new CPF(cpf), birthDate);
-    if (street != null && city != null && state != null && zipCode != null && neighborhood != null && number != null) {
-      person.changeAddress(new Address(street, number, neighborhood, city, state, zipCode));
+    if (street != null && city != null && state != null && zipCode != null) {
+      person.changeAddress(new Address(street, city, state, zipCode));
     }
     personRepository.save(person);
 
@@ -90,8 +88,6 @@ public class RegisterPartyUseCase {
       String password,
       String passwordConfirmation,
       String street,
-      String number,
-      String neighborhood,
       String city,
       String state,
       String zipCode) {
@@ -101,8 +97,8 @@ public class RegisterPartyUseCase {
     ensureEmailIsAvailable(userEmail);
 
     Organization organization = new Organization(name, new CNPJ(cnpj));
-    if (street != null && city != null && state != null && zipCode != null && neighborhood != null && number != null) {
-      organization.changeAddress(new Address(street, number, neighborhood, city, state, zipCode));
+    if (street != null && city != null && state != null && zipCode != null) {
+      organization.changeAddress(new Address(street, city, state, zipCode));
     }
     partyRepository.save(organization);
 

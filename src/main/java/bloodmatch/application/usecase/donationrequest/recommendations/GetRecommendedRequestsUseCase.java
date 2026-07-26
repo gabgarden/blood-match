@@ -82,6 +82,7 @@ public class GetRecommendedRequestsUseCase {
                                 .comparing(
                                         OutputItem::distanceInKm,
                                         Comparator.nullsLast(Comparator.naturalOrder()))
+                                .thenComparing(OutputItem::urgency, Comparator.reverseOrder())
                                 .thenComparing(OutputItem::dateLimit))
                 .toList();
     }
