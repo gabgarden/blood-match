@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donation.completependingdonation;
 
 import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Complete Pending Donation", description = "Complete a pending donation operation.")
 @RequestMapping("/donations")
 public class CompletePendingDonationController {
 
@@ -24,7 +26,7 @@ public class CompletePendingDonationController {
     this.useCase = useCase;
   }
 
-  @PatchMapping("/from-request/complete")
+  @PatchMapping("/complete")
   public ResponseEntity<?> complete(@RequestBody CompletePendingDonationDto payload) {
     try {
       if (payload == null)

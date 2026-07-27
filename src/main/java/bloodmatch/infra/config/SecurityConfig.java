@@ -62,6 +62,7 @@ public class SecurityConfig {
             }))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(OPTIONS, "/**").permitAll()
+            .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
             .requestMatchers(POST, "/auth/login").permitAll()
             .requestMatchers(POST, "/parties/persons").permitAll()
             .requestMatchers(POST, "/parties/organizations").permitAll()
@@ -74,8 +75,7 @@ public class SecurityConfig {
             .requestMatchers(PATCH, "/donation-requests/goal-blood-bags").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
             .requestMatchers(PATCH, "/donation-requests/date-limit").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/donations/completed").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
-            .requestMatchers(PATCH, "/donations/from-request/complete").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
-
+            .requestMatchers(POST, "/donations/create-pending").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(PATCH, "/parties/name").authenticated()
             .requestMatchers(POST, "/donors").authenticated()
             .requestMatchers(PATCH, "/donors/profile").authenticated()

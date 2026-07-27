@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donationrequest.create;
 
 import bloodmatch.application.usecase.donationrequest.CreateDonationRequestUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.shared.valueObjects.BloodType;
@@ -18,6 +19,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Create Donation Request", description = "Create a new blood donation request.")
 @RequestMapping("/donation-requests")
 public class CreateDonationRequestController {
 

@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.auth.login;
 
 import bloodmatch.application.usecase.auth.AuthenticationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import java.util.Map;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
 
 @RestController
+@Tag(name = "Authentication", description = "Login operation.")
 @RequestMapping("/auth")
 public class AuthController {
 

@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.role.registerrequester;
 
 import bloodmatch.application.usecase.role.RegisterRequesterUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Register Requester", description = "Register a new requester role to a Party.")
 @RequestMapping
 public class RegisterRequesterController {
 

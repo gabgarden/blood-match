@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.role.registerbloodcenter;
 
 import bloodmatch.application.usecase.role.RegisterBloodCenterUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Register Blood Center", description = "Register a new blood center role to an Organization.")
 @RequestMapping
 public class RegisterBloodCenterController {
 

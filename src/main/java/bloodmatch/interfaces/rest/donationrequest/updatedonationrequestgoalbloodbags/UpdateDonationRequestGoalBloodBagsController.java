@@ -1,4 +1,5 @@
 package bloodmatch.interfaces.rest.donationrequest.updatedonationrequestgoalbloodbags;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDo
 import java.util.Map;
 
 @RestController
+@Tag(name = "Update Donation Request Goal Blood Bags", description = "Update the goal blood bags of a blood donation request.")
 @RequestMapping("/donation-requests")
 public class UpdateDonationRequestGoalBloodBagsController {
 

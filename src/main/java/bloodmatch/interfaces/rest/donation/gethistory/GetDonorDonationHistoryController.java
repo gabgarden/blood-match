@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donation.gethistory;
 
 import bloodmatch.application.usecase.donation.gethistory.GetDonorDonationHistoryUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Get Donor Donation History", description = "Get the donation history of a specific donor by personId.")
 @RequestMapping("/donors")
 public class GetDonorDonationHistoryController {
 

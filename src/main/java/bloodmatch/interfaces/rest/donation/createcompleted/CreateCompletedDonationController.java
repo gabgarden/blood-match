@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donation.createcompleted;
 
 import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Create Completed Donation", description = "Create a new completed donation.")
 @RequestMapping("/donations")
 public class CreateCompletedDonationController {
 

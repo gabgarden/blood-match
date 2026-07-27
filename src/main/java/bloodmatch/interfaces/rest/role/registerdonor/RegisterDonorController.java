@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.role.registerdonor;
 
 import bloodmatch.application.usecase.role.RegisterDonorUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -17,6 +18,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Register Donor", description = "Register a new donor role to a Person.")
 @RequestMapping
 public class RegisterDonorController {
 

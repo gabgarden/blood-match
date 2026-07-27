@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donationrequest.recommendations;
 
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Get Recommended Requests", description = "Get a list of recommended donation requests for a specific person.")
 @RequestMapping("/requests")
 public class GetRecommendedRequestsController {
 

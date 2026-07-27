@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donationrequest.getdonationrequestsbypartyid;
 
 import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByPartyIdUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Get Donation Requests by Party ID", description = "Get all donation requests associated with a specific party.")
 @RequestMapping("/donation-requests")
 public class GetDonationRequestsByPartyIdController {
 

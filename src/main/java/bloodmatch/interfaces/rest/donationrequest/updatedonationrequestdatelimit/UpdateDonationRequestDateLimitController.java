@@ -6,6 +6,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDo
 import java.time.LocalDate;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 @RestController
+@Tag(name = "Update Donation Request Date Limit", description = "Update the date limit of a blood donation request.")
 @RequestMapping("/donation-requests")
 public class UpdateDonationRequestDateLimitController {
     private final UpdateDonationRequestDateLimitUseCase useCase;

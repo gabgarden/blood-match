@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donationrequest.cancel;
 
 import bloodmatch.application.usecase.donationrequest.CancelDonationRequestUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Cancel Donation Request", description = "Cancel a  donation request.")
 @RequestMapping("/donation-requests")
 public class CancelDonationRequestController {
 

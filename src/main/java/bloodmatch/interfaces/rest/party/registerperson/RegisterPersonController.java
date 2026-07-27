@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.party.registerperson;
 
 import bloodmatch.application.usecase.party.RegisterPartyUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.party.Person;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.Map;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
 
 @RestController
+@Tag(name = "Register Person", description = "Register a new person.")
 @RequestMapping("/parties")
 public class RegisterPersonController {
 

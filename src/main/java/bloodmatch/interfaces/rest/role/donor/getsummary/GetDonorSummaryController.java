@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.role.donor.getsummary;
 
 import bloodmatch.application.usecase.donor.getsummary.GetDonorSummaryUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Get Donor Summary", description = "Get a summary of a donor's information.")
 @RequestMapping("/donors")
 public class GetDonorSummaryController {
 
