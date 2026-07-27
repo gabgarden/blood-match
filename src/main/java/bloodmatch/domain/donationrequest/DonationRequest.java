@@ -1,32 +1,37 @@
 package bloodmatch.domain.donationrequest;
 
+import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
-import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.entity.DomainObject;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 
 public class DonationRequest extends DomainObject {
 
   private Requester requester;
   private BloodCenter bloodCenter;
   private BloodType bloodTypeNeeded;
+  private int goalBloodBags;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
   private boolean active;
-  private List<Donor> acceptedDonors = new ArrayList<>();
+
+
+
+
+
+
   private Urgency urgency;
 
   private DonationRequest(
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateLimit,
       LocalDate currentDate,
       Urgency urgency) {
@@ -34,6 +39,7 @@ public class DonationRequest extends DomainObject {
     this.requester = requester;
     this.bloodCenter = bloodCenter;
     this.bloodTypeNeeded = bloodTypeNeeded;
+    this.goalBloodBags = goalBloodBags;
     this.dateRequested = currentDate;
     this.dateLimit = dateLimit;
     this.active = true;
@@ -44,12 +50,14 @@ public class DonationRequest extends DomainObject {
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateLimit,
       Urgency urgency) {
     return create(
         requester,
         bloodCenter,
         bloodTypeNeeded,
+        goalBloodBags,
         dateLimit,
         LocalDate.now(),
         urgency);
@@ -59,6 +67,7 @@ public class DonationRequest extends DomainObject {
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateLimit,
       LocalDate currentDate,
       Urgency urgency) {
@@ -68,6 +77,8 @@ public class DonationRequest extends DomainObject {
       throw new IllegalArgumentException("Blood center cannot be null");
     if (bloodTypeNeeded == null)
       throw new IllegalArgumentException("Blood type cannot be null");
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
     if (dateLimit == null)
       throw new IllegalArgumentException("Limit date cannot be null");
     if (currentDate == null)
@@ -80,6 +91,7 @@ public class DonationRequest extends DomainObject {
         requester,
         bloodCenter,
         bloodTypeNeeded,
+        goalBloodBags,
         dateLimit,
         currentDate,
         urgency);
@@ -90,10 +102,10 @@ public class DonationRequest extends DomainObject {
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
+      int goalBloodBags,
       LocalDate dateRequested,
       LocalDate dateLimit,
-      boolean active,
-      List<Donor> acceptedDonors,
+      boolean isActive,
       Urgency urgency) {
 
     if (id == null)
@@ -104,12 +116,12 @@ public class DonationRequest extends DomainObject {
       throw new IllegalArgumentException("Blood center cannot be null");
     if (bloodTypeNeeded == null)
       throw new IllegalArgumentException("Blood type cannot be null");
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
     if (dateRequested == null)
       throw new IllegalArgumentException("Requested date cannot be null");
     if (dateLimit == null)
       throw new IllegalArgumentException("Limit date cannot be null");
-    if (acceptedDonors == null)
-      throw new IllegalArgumentException("Accepted donors cannot be null");
     if (urgency == null)
       throw new IllegalArgumentException("Urgency cannot be null");
 
@@ -117,14 +129,15 @@ public class DonationRequest extends DomainObject {
         requester,
         bloodCenter,
         bloodTypeNeeded,
+        goalBloodBags,
         dateLimit,
         dateRequested,
         urgency);
 
     request.setId(id);
     request.dateRequested = dateRequested;
-    request.active = active;
-    request.acceptedDonors = new ArrayList<>(acceptedDonors);
+    request.active = isActive;
+
     return request;
   }
 
@@ -164,7 +177,7 @@ public class DonationRequest extends DomainObject {
     if (currentDate == null)
       throw new IllegalArgumentException("Current date cannot be null");
 
-    if (!active)
+    if (!isActive())
       return false;
 
     if (isExpired(currentDate))
@@ -173,37 +186,23 @@ public class DonationRequest extends DomainObject {
     return candidateBloodType.canDonateTo(bloodTypeNeeded);
   }
 
-  public void acceptBy(Donor donor) {
-    acceptBy(donor, LocalDate.now());
-  }
-
-  public void acceptBy(Donor donor, LocalDate currentDate) {
-
-    if (donor == null)
-      throw new IllegalArgumentException("Donor cannot be null");
-
-    if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
-
-    if (!isActive())
-      throw new IllegalStateException("Request is not active");
-
-    if (!canBeFulfilledBy(donor.getBloodType(), currentDate))
-      throw new IllegalArgumentException("Donor blood type incompatible");
-
-    if (!donor.isEligibleToDonate(currentDate))
-      throw new IllegalStateException("Donor not eligible to donate");
-
-    if (acceptedDonors.contains(donor))
-      throw new IllegalStateException("Donor already accepted this request");
-
-    acceptedDonors.add(donor);
-  }
-
+  
   public BloodType getBloodTypeNeeded() {
     return bloodTypeNeeded;
   }
 
+  public int getGoalBloodBags() {
+    return goalBloodBags;
+  }
+
+
+  public void setGoalBloodBags(int goalBloodBags) {
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
+    this.goalBloodBags = goalBloodBags;
+  }
+
+  
   public BloodCenter getBloodCenter() {
     return bloodCenter;
   }
@@ -216,15 +215,49 @@ public class DonationRequest extends DomainObject {
     return dateLimit;
   }
 
-  public Requester getRequester() {
-    return requester;
+  public void setDateLimit(LocalDate dateLimit) {
+    if (dateLimit == null)
+      throw new IllegalArgumentException("Limit date cannot be null");
+    if (dateLimit.isBefore(LocalDate.now()))
+      throw new IllegalArgumentException("Limit date cannot be in the past");
+    this.dateLimit = dateLimit;
   }
 
-  public List<Donor> getAcceptedDonors() {
-    return Collections.unmodifiableList(acceptedDonors);
+  public Requester getRequester() {
+    return requester;
   }
 
   public Urgency getUrgency() {
     return urgency;
   }
+  public boolean acceptsDonation(
+        Donation donation,
+        LocalDate currentDate) {
+
+    if (donation == null)
+        throw new IllegalArgumentException("Donation cannot be null");
+
+    if (currentDate == null)
+        throw new IllegalArgumentException("Current date cannot be null");
+
+    if (!isActive())
+        return false;
+
+    if (isExpired(currentDate))
+        return false;
+
+    if (!donation.isCompleted())
+        return false;
+
+    if (donation.getDonationDate().isBefore(dateRequested))
+        return false;
+
+    if (donation.getDonationDate().isAfter(dateLimit))
+        return false;
+
+    return donation.getDonor()
+            .getBloodType()
+            .canDonateTo(bloodTypeNeeded);
+}
+  
 }

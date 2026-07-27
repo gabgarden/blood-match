@@ -17,4 +17,6 @@ public interface DonationRequestRepositoryInterface {
 
   List<DonationRequest> findByRequesterPartyId(DomainID requesterPartyId);
 
+  void deleteById(DomainID id);
+
 }

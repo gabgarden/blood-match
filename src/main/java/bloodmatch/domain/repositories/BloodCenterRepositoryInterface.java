@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface BloodCenterRepositoryInterface {
 
   Optional<BloodCenter> findByPartyId(DomainID partyId);
+
+  void save(BloodCenter bloodCenter);
 }

@@ -1,7 +1,7 @@
 package bloodmatch.interfaces.rest.security;
 
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
-import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByUserIdUseCase;
+import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByPartyIdUseCase;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
@@ -36,12 +36,12 @@ class SecurityAuthorizationIntegrationTest {
   private GetRecommendedRequestsUseCase getRecommendedRequestsUseCase;
 
   @MockitoBean
-  private GetDonationRequestsByUserIdUseCase getDonationRequestsByUserIdUseCase;
+  private GetDonationRequestsByPartyIdUseCase getDonationRequestsByPartyIdUseCase;
 
   @Test
   void shouldReturn401WhenTokenIsMissing() throws Exception {
     mockMvc.perform(get("/requests/recommendations")
-            .param("donorId", UUID.randomUUID().toString()))
+            .param("personId", UUID.randomUUID().toString()))
         .andExpect(status().isUnauthorized());
 
     verify(getRecommendedRequestsUseCase, never()).execute(any(DomainID.class));
@@ -57,7 +57,7 @@ class SecurityAuthorizationIntegrationTest {
     when(jwtTokenProvider.extractPartyId(token)).thenReturn(UUID.randomUUID().toString());
 
     mockMvc.perform(get("/requests/recommendations")
-            .param("donorId", UUID.randomUUID().toString())
+            .param("personId", UUID.randomUUID().toString())
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isForbidden());
 
@@ -75,7 +75,7 @@ class SecurityAuthorizationIntegrationTest {
     when(getRecommendedRequestsUseCase.execute(any(DomainID.class))).thenReturn(List.of());
 
     mockMvc.perform(get("/requests/recommendations")
-            .param("donorId", UUID.randomUUID().toString())
+            .param("personId", UUID.randomUUID().toString())
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
         .andExpect(content().json("[]"));
@@ -83,10 +83,10 @@ class SecurityAuthorizationIntegrationTest {
 
   @Test
   void shouldReturn401WhenTokenIsMissingForUserDonationRequests() throws Exception {
-    mockMvc.perform(get("/users/{userId}/donation-requests", UUID.randomUUID()))
+    mockMvc.perform(get("/donation-requests/{partyId}", UUID.randomUUID()))
         .andExpect(status().isUnauthorized());
 
-    verify(getDonationRequestsByUserIdUseCase, never()).execute(any(DomainID.class));
+    verify(getDonationRequestsByPartyIdUseCase, never()).execute(any(DomainID.class));
   }
 
   @Test
@@ -98,11 +98,11 @@ class SecurityAuthorizationIntegrationTest {
     when(jwtTokenProvider.extractUserId(token)).thenReturn(UUID.randomUUID().toString());
     when(jwtTokenProvider.extractPartyId(token)).thenReturn(UUID.randomUUID().toString());
 
-    mockMvc.perform(get("/users/{userId}/donation-requests", UUID.randomUUID())
+    mockMvc.perform(get("/donation-requests/{partyId}", UUID.randomUUID())
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isForbidden());
 
-    verify(getDonationRequestsByUserIdUseCase, never()).execute(any(DomainID.class));
+    verify(getDonationRequestsByPartyIdUseCase, never()).execute(any(DomainID.class));
   }
 
   @Test
@@ -112,12 +112,29 @@ class SecurityAuthorizationIntegrationTest {
     when(jwtTokenProvider.validateToken(token)).thenReturn(true);
     when(jwtTokenProvider.extractRoles(token)).thenReturn(List.of("REQUESTER"));
     when(jwtTokenProvider.extractUserId(token)).thenReturn(UUID.randomUUID().toString());
-    when(jwtTokenProvider.extractPartyId(token)).thenReturn(UUID.randomUUID().toString());
-    when(getDonationRequestsByUserIdUseCase.execute(any(DomainID.class))).thenReturn(List.of());
+    String partyId = UUID.randomUUID().toString();
+    when(jwtTokenProvider.extractPartyId(token)).thenReturn(partyId);
+    when(getDonationRequestsByPartyIdUseCase.execute(any(DomainID.class))).thenReturn(List.of());
 
-    mockMvc.perform(get("/users/{userId}/donation-requests", UUID.randomUUID())
+    mockMvc.perform(get("/donation-requests/{partyId}", partyId)
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
         .andExpect(content().json("[]"));
+  }
+
+  @Test
+  void shouldReturn403WhenRequesterReadsAnotherPartyDonationRequests() throws Exception {
+    String token = "requester-token";
+
+    when(jwtTokenProvider.validateToken(token)).thenReturn(true);
+    when(jwtTokenProvider.extractRoles(token)).thenReturn(List.of("REQUESTER"));
+    when(jwtTokenProvider.extractUserId(token)).thenReturn(UUID.randomUUID().toString());
+    when(jwtTokenProvider.extractPartyId(token)).thenReturn(UUID.randomUUID().toString());
+
+    mockMvc.perform(get("/donation-requests/{partyId}", UUID.randomUUID())
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isForbidden());
+
+    verify(getDonationRequestsByPartyIdUseCase, never()).execute(any(DomainID.class));
   }
 }

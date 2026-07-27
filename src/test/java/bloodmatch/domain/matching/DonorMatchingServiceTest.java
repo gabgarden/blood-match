@@ -1,0 +1,45 @@
+package bloodmatch.domain.matching;
+
+import bloodmatch.domain.donationrequest.DonationRequest;
+import bloodmatch.domain.donationrequest.Urgency;
+import bloodmatch.domain.party.Organization;
+import bloodmatch.domain.party.Person;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
+import bloodmatch.domain.roles.person.donor.Donor;
+import bloodmatch.domain.roles.requester.Requester;
+import bloodmatch.domain.shared.valueObjects.BloodType;
+import bloodmatch.domain.shared.valueObjects.CNPJ;
+import bloodmatch.domain.shared.valueObjects.CPF;
+import java.time.LocalDate;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class DonorMatchingServiceTest {
+
+  private final LocalDate currentDate = LocalDate.of(2026, 4, 23);
+  private final DonorMatchingService service = new DonorMatchingService();
+
+  @Test
+  void shouldReturnOnlyCompatibleAndEligibleDonorsForAnActiveRequest() {
+    DonationRequest request = DonationRequest.create(
+        new Requester(new Person("Requester", new CPF("12345678901"), LocalDate.of(1990, 1, 1))),
+        new BloodCenter(new Organization("Center", new CNPJ("12345678000100"))),
+        BloodType.of("A+"), 1, currentDate.plusDays(2), currentDate, Urgency.MEDIUM);
+    Donor compatible = donor("98765432100", BloodType.of("O-"));
+    Donor incompatible = donor("12312312399", BloodType.of("B-"));
+    Donor temporarilyIneligible = donor("32132132199", BloodType.of("O-"));
+    temporarilyIneligible.registerDonation(currentDate.minusMonths(1), currentDate);
+
+    List<Donor> result = service.findEligibleDonors(
+        request, List.of(compatible, incompatible, temporarilyIneligible), currentDate);
+
+    assertEquals(List.of(compatible), result);
+  }
+
+  private Donor donor(String cpf, BloodType type) {
+    return new Donor(
+        new Person("Donor", new CPF(cpf), currentDate.minusYears(30)), type, 70.0);
+  }
+}

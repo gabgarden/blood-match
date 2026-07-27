@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.role.donor.getsummary;
 
 import bloodmatch.application.usecase.donor.getsummary.GetDonorSummaryUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Get Donor Summary", description = "Get a summary of a donor's information.")
 @RequestMapping("/donors")
 public class GetDonorSummaryController {
 
@@ -23,23 +25,24 @@ public class GetDonorSummaryController {
     this.useCase = useCase;
   }
 
-  @GetMapping("/{donorId}/summary")
-  public ResponseEntity<?> get(@PathVariable String donorId) {
-    return execute(donorId);
+  @GetMapping("/{personId}/summary")
+  public ResponseEntity<?> get(@PathVariable String personId) {
+    return execute(personId);
   }
 
-  private ResponseEntity<?> execute(String donorIdValue) {
+  private ResponseEntity<?> execute(String personIdValue) {
     try {
-      if (isBlank(donorIdValue))
-        throw new IllegalArgumentException("donorId cannot be blank");
+      if (isBlank(personIdValue))
+        throw new IllegalArgumentException("personId cannot be blank");
 
-      DomainID donorId = parseDomainId(donorIdValue, "donorId");
-      GetDonorSummaryUseCase.Output output = useCase.execute(donorId);
+      DomainID personId = parseDomainId(personIdValue, "personId");
+      GetDonorSummaryUseCase.Output output = useCase.execute(personId);
 
       return ResponseEntity.ok(Map.of(
-          "donorId", output.donorId(),
+          "personId", output.personId(),
           "donorName", output.donorName(),
           "bloodType", output.bloodType(),
+          "adreess", output.adreess(), // Só pra testar o endereço mrm, remover dps se quiser **
           "lastDonationDate", String.valueOf(output.lastDonationDate()),
           "daysRemaining", output.daysRemaining(),
           "livesImpacted", output.livesImpacted()));

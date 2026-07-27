@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donationrequest.create;
 
 import bloodmatch.application.usecase.donationrequest.CreateDonationRequestUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.shared.valueObjects.BloodType;
@@ -18,6 +19,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Create Donation Request", description = "Create a new blood donation request.")
 @RequestMapping("/donation-requests")
 public class CreateDonationRequestController {
 
@@ -32,15 +34,16 @@ public class CreateDonationRequestController {
     try {
       validatePayload(payload);
 
-      DomainID requesterDomainId = parseDomainId(payload.requesterId(), "requesterId");
-      DomainID bloodCenterDomainId = parseDomainId(payload.bloodCenterId(), "bloodCenterId");
+      DomainID requesterDomainId = parseDomainId(payload.partyId(), "partyId");
+      DomainID organizationId = parseDomainId(payload.organizationId(), "organizationId");
       BloodType bloodTypeNeeded = BloodType.of(payload.bloodTypeNeeded());
       Urgency urgency = Urgency.valueOf(payload.urgency().toUpperCase());
 
       DonationRequest request = useCase.execute(
           requesterDomainId,
-          bloodCenterDomainId,
+          organizationId,
           bloodTypeNeeded,
+          payload.goalBloodBags(),
           payload.dateLimit(),
           urgency);
 
@@ -59,14 +62,20 @@ public class CreateDonationRequestController {
     if (payload == null)
       throw new IllegalArgumentException("Request body cannot be null");
 
-    if (isBlank(payload.requesterId()))
-      throw new IllegalArgumentException("requesterId cannot be blank");
+    if (isBlank(payload.partyId()))
+      throw new IllegalArgumentException("partyId cannot be blank");
 
-    if (isBlank(payload.bloodCenterId()))
-      throw new IllegalArgumentException("bloodCenterId cannot be blank");
+    if (isBlank(payload.organizationId()))
+      throw new IllegalArgumentException("organizationId cannot be blank");
 
     if (isBlank(payload.bloodTypeNeeded()))
       throw new IllegalArgumentException("bloodTypeNeeded cannot be blank");
+
+    if (payload.goalBloodBags() == null)
+      throw new IllegalArgumentException("goalBloodBags cannot be null");
+
+    if (payload.goalBloodBags() <= 0)
+      throw new IllegalArgumentException("goalBloodBags must be greater than zero");
 
     if (payload.dateLimit() == null)
       throw new IllegalArgumentException("dateLimit cannot be null");

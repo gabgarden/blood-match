@@ -109,6 +109,7 @@ class FindEligibleDonorsUseCaseTest {
         requester,
         bloodCenter,
         BloodType.of("A+"),
+      1,
         currentDate.plusDays(10),
       currentDate,
       Urgency.MEDIUM);

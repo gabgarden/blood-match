@@ -1,11 +1,8 @@
 package bloodmatch.infra.persistence.schema;
 
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.donationrequest.DonationRequest;
-import bloodmatch.domain.party.Organization;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
+import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -15,11 +12,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Document(collection = "donations")
+@CompoundIndex(name = "completed_blood_center_donation_date", def = "{'completed': 1, 'bloodCenterId': 1, 'donationDate': 1}")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,10 +28,11 @@ public class DonationSchema {
   @Id
   private String id;
   private String donorPersonId;
-  private String requestId;
   private String bloodCenterId;
   private LocalDate donationDate;
-  private String status;
+  private boolean completed;
+  private boolean pending;
+  private boolean cancelled;
 
   public DonationSchema(Donation donation) {
     if (donation == null)
@@ -40,44 +40,32 @@ public class DonationSchema {
 
     this.id = donation.getId().getValue().toString();
     this.donorPersonId = donation.getDonor().getPerson().getId().getValue().toString();
-    this.requestId = donation.getRequest() != null
-        ? donation.getRequest().getId().getValue().toString()
-        : null;
     this.bloodCenterId = donation.getBloodCenter().getOrganization().getId().getValue().toString();
     this.donationDate = donation.getDonationDate();
-    this.status = donation.getStatus().name();
+    this.completed = donation.isCompleted();
+    this.pending = donation.isPending();
+    this.cancelled = donation.isCancelled();
   }
 
   public Donation toDomain(
       DonorRepositoryInterface donorRepository,
-      DonationRequestRepositoryInterface donationRequestRepository,
-      PartyRepositoryInterface partyRepository) {
+      BloodCenterRepositoryInterface bloodCenterRepository) {
 
     DomainID donorId = new DomainID(UUID.fromString(this.donorPersonId));
     Donor donor = donorRepository.findByPartyId(donorId)
         .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
 
     DomainID bloodCenterPartyId = new DomainID(UUID.fromString(this.bloodCenterId));
-    Organization organization = partyRepository.findById(bloodCenterPartyId)
-        .filter(Organization.class::isInstance)
-        .map(Organization.class::cast)
-        .orElseThrow(() -> new IllegalArgumentException("Blood center organization not found"));
-
-    BloodCenter bloodCenter = new BloodCenter(organization);
-
-    DonationRequest request = null;
-    if (this.requestId != null) {
-      DomainID requestDomainId = new DomainID(UUID.fromString(this.requestId));
-      request = donationRequestRepository.findById(requestDomainId)
-          .orElseThrow(() -> new IllegalArgumentException("Donation request not found"));
-    }
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(bloodCenterPartyId)
+        .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
 
     return Donation.reconstitute(
-        new DomainID(UUID.fromString(this.id)),
-        donor,
-        request,
-        this.donationDate,
-        bloodCenter,
-        Donation.DonationStatus.valueOf(this.status));
+      new DomainID(UUID.fromString(this.id)),
+      donor,
+      this.donationDate,
+      bloodCenter,
+      this.completed,
+      this.pending,
+      this.cancelled);
   }
 }

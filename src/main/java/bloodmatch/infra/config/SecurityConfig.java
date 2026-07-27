@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 import static org.springframework.http.HttpMethod.PATCH;
@@ -61,20 +62,25 @@ public class SecurityConfig {
             }))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(OPTIONS, "/**").permitAll()
+            .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
             .requestMatchers(POST, "/auth/login").permitAll()
             .requestMatchers(POST, "/parties/persons").permitAll()
             .requestMatchers(POST, "/parties/organizations").permitAll()
 
             .requestMatchers(GET, "/requests/recommendations").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
-            .requestMatchers(GET, "/users/*/donation-requests").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
-            .requestMatchers(POST, "/donation-requests/accept-and-create-pending").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
+            .requestMatchers(GET, "/donation-requests/*").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
+            .requestMatchers(POST, "/donation/create-pending").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/donation-requests").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
-             .requestMatchers(POST, "/donations/external").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
-            .requestMatchers(PATCH, "/donations/from-request/complete").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
-
+            .requestMatchers(DELETE, "/donation-requests/*").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
+            .requestMatchers(PATCH, "/donation-requests/goal-blood-bags").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
+            .requestMatchers(PATCH, "/donation-requests/date-limit").hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
+            .requestMatchers(POST, "/donations/completed").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
+            .requestMatchers(PATCH, "/donations/complete").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
+            .requestMatchers(POST, "/donations/create-pending").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(PATCH, "/parties/name").authenticated()
             .requestMatchers(POST, "/donors").authenticated()
             .requestMatchers(PATCH, "/donors/profile").authenticated()
+            .requestMatchers(PATCH, "/donors/recommendation-distance").hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/requesters").authenticated()
             .requestMatchers(GET, "/donors/*/summary").authenticated()
             .requestMatchers(GET, "/donors/*/donations").authenticated()

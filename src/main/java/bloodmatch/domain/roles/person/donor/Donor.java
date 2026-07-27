@@ -2,15 +2,20 @@ package bloodmatch.domain.roles.person.donor;
 
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.roles.person.PersonRole;
+import bloodmatch.domain.shared.policy.DonationPolicy;
 import bloodmatch.domain.shared.valueObjects.BloodType;
+import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
 
 public class Donor extends PersonRole {
 
+    public static final double DEFAULT_MAX_RECOMMENDATION_DISTANCE_KM = 30.0;
+
     private BloodType bloodType;
     private LocalDate lastDonationDate;
     private double weight;
+    private double maxRecommendationDistanceKm;
 
     public Donor(Person person, BloodType bloodType, double weight) {
         super(person);
@@ -24,13 +29,37 @@ public class Donor extends PersonRole {
 
         this.bloodType = bloodType;
         this.weight = weight;
+        this.maxRecommendationDistanceKm = DEFAULT_MAX_RECOMMENDATION_DISTANCE_KM;
     }
 
-    public boolean canDonateTo(BloodType requestedType) {
+  protected Donor(Person person, BloodType bloodType, double weight, DomainID id) {
+    super(person, id);
 
-        if (requestedType == null) {
-            throw new IllegalArgumentException("Requested blood type cannot be null");
-        }
+    if (bloodType == null) {
+      throw new IllegalArgumentException("Blood type cannot be null");
+    }
+    if (weight < 50) {
+      throw new IllegalArgumentException("Minimum weight is 50kg");
+    }
+
+    this.bloodType = bloodType;
+    this.weight = weight;
+    this.maxRecommendationDistanceKm = DEFAULT_MAX_RECOMMENDATION_DISTANCE_KM;
+  }
+
+  public static Donor reconstitute(Person person, BloodType bloodType, double weight, LocalDate lastDonationDate,
+      Double maxRecommendationDistanceKm, DomainID id) {
+    Donor donor = new Donor(person, bloodType, weight, id);
+    if (lastDonationDate != null) {
+      donor.registerDonation(lastDonationDate, lastDonationDate);
+    }
+    if (maxRecommendationDistanceKm != null) {
+      donor.updateMaxRecommendationDistanceKm(maxRecommendationDistanceKm);
+    }
+    return donor;
+  }
+
+  public boolean canDonateTo(BloodType requestedType) {
 
         return bloodType.canDonateTo(requestedType);
     }
@@ -51,7 +80,7 @@ public class Donor extends PersonRole {
             return true;
         }
         return !lastDonationDate
-            .plusMonths(3)
+            .plusMonths(DonationPolicy.getDonationIntervalInMonths())
             .isAfter(currentDate);
     }
 
@@ -87,6 +116,14 @@ public class Donor extends PersonRole {
         this.weight = weight;
     }
 
+    public void updateMaxRecommendationDistanceKm(double maxRecommendationDistanceKm) {
+        if (maxRecommendationDistanceKm <= 0) {
+            throw new IllegalArgumentException("Maximum recommendation distance must be greater than zero");
+        }
+
+        this.maxRecommendationDistanceKm = maxRecommendationDistanceKm;
+    }
+
     public BloodType getBloodType() {
         return bloodType;
     }
@@ -99,4 +136,7 @@ public class Donor extends PersonRole {
         return weight;
     }
 
+    public double getMaxRecommendationDistanceKm() {
+        return maxRecommendationDistanceKm;
+    }
 }

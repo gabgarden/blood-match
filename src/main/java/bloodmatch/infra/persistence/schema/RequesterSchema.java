@@ -36,6 +36,7 @@ public class RequesterSchema {
     DomainID partyId = new DomainID(UUID.fromString(this.partyId));
     Party party = partyRepository.findById(partyId)
         .orElseThrow(() -> new IllegalArgumentException("Party not found"));
-    return new Requester(party);
+    DomainID requesterId = new DomainID(UUID.fromString(this.id));
+    return Requester.reconstitute(party, requesterId);
   }
 }

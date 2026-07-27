@@ -25,29 +25,30 @@ public class GetDonorSummaryUseCase {
     this.donationRepository = donationRepository;
   }
 
-  public Output execute(DomainID donorId) {
-    return execute(donorId, LocalDate.now());
+  public Output execute(DomainID personId) {
+    return execute(personId, LocalDate.now());
   }
 
-  public Output execute(DomainID donorId, LocalDate currentDate) {
-    if (donorId == null)
-      throw new IllegalArgumentException("Donor id cannot be null");
+  public Output execute(DomainID personId, LocalDate currentDate) {
+    if (personId == null)
+      throw new IllegalArgumentException("Person id cannot be null");
     if (currentDate == null)
       throw new IllegalArgumentException("Current date cannot be null");
 
-    Donor donor = donorRepository.findByPartyId(donorId)
+    Donor donor = donorRepository.findByPartyId(personId)
         .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
 
     LocalDate lastDonationDate = donor.getLastDonationDate();
     int daysRemaining = calculateDaysRemaining(lastDonationDate, currentDate);
 
-    long donationsCount = donationRepository.countByDonorId(donorId);
+    long donationsCount = donationRepository.countByDonorId(personId);
     long livesImpacted = donationsCount * IMPACT_LIVES_PER_DONATION;
 
     return new Output(
         donor.getPerson().getId().getValue().toString(),
         donor.getPerson().getName(),
         donor.getBloodType().getType(),
+        donor.getPerson().getAddress().getFullAddressAsString(), // Só pra testar o endereço mrm, remover dps se quiser **
         lastDonationDate,
         daysRemaining,
         livesImpacted);
@@ -67,9 +68,10 @@ public class GetDonorSummaryUseCase {
   }
 
   public record Output(
-      String donorId,
+      String personId,
       String donorName,
       String bloodType,
+      String adreess, // **
       LocalDate lastDonationDate,
       int daysRemaining,
       long livesImpacted) {

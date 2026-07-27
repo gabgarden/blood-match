@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.donationrequest.recommendations;
 
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Get Recommended Requests", description = "Get a list of recommended donation requests for a specific person.")
 @RequestMapping("/requests")
 public class GetRecommendedRequestsController {
 
@@ -25,19 +27,19 @@ public class GetRecommendedRequestsController {
   }
 
   @GetMapping("/recommendations")
-  public ResponseEntity<?> getByQuery(@RequestParam String donorId) {
-    return execute(donorId);
+  public ResponseEntity<?> getByQuery(@RequestParam String personId) {
+    return execute(personId);
   }
 
 
 
-  private ResponseEntity<?> execute(String donorIdValue) {
+  private ResponseEntity<?> execute(String personIdValue) {
     try {
-      if (isBlank(donorIdValue))
-        throw new IllegalArgumentException("donorId cannot be blank");
+      if (isBlank(personIdValue))
+        throw new IllegalArgumentException("personId cannot be blank");
 
-      DomainID donorId = parseDomainId(donorIdValue, "donorId");
-      return ResponseEntity.ok(useCase.execute(donorId));
+      DomainID personId = parseDomainId(personIdValue, "personId");
+      return ResponseEntity.ok(useCase.execute(personId));
 
     } catch (IllegalArgumentException | IllegalStateException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

@@ -17,5 +17,10 @@ public interface DonationRepositoryInterface {
 
   List<Donation> findByDonorId(DomainID donorId);
 
+  List<Donation> findCompletedDonationsOrderedByDonationDateAsc();
+
+  List<Donation> findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+      List<DomainID> bloodCenterIds);
+
   long countByDonorId(DomainID donorId);
 }

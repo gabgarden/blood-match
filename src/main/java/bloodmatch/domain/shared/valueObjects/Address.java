@@ -8,20 +8,29 @@ public class Address {
     private final String city;
     private final String state;
     private final String zipCode;
+    private final Double latitude;
+    private final Double longitude;
 
-    public Address(
-            String street,
-            String city,
-            String state,
-            String zipCode) {
-
-        if (street == null || city == null || state == null)
+    public Address(String street, String city, String state, String zipCode, Double latitude, Double longitude) {
+        if (street == null || city == null || state == null) {
             throw new IllegalArgumentException("Address fields cannot be null");
-
+        }
         this.street = street;
         this.city = city;
         this.state = state;
         this.zipCode = zipCode;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    // utilizado quando ainda NÃO tem as coordenadas (ex: cadastro inicial)
+    public Address(String street, String city, String state, String zipCode) {
+        this(street, city, state, zipCode, null, null);
+    }
+
+    // verificar se este endereço já foi geolocalizado
+    public boolean hasCoordinates() {
+        return this.latitude != null && this.longitude != null;
     }
 
     public String getStreet() {
@@ -40,6 +49,13 @@ public class Address {
         return zipCode;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+    public Double getLongitude() {
+        return longitude;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -50,12 +66,44 @@ public class Address {
         return street.equals(address.street) &&
                 city.equals(address.city) &&
                 state.equals(address.state) &&
-                Objects.equals(zipCode, address.zipCode);
+                Objects.equals(zipCode, address.zipCode) &&
+                Objects.equals(latitude, address.latitude) &&
+                Objects.equals(longitude, address.longitude);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(street, city, state, zipCode);
+        return Objects.hash(street, city, state, zipCode, latitude, longitude);
     }
 
+
+
+    // "Rua X, 241, Bairro, Cidade, UF, CEP, Brasil"
+    public String getFullAddressAsString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(street);
+
+        sb.append(", ").append(city)
+          .append(", ").append(state);
+
+        if (zipCode != null && !zipCode.isBlank()) {
+            sb.append(", ").append(zipCode);
+        }
+
+        sb.append(", Brasil");
+
+        return sb.toString();
+    }
+
+    // "Rua X, 241, Bairro, Cidade, UF, Brasil" (sem CEP, usado no fallback)
+    public String getFallbackAddressAsString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(street);
+
+        sb.append(", ").append(city)
+          .append(", ").append(state)
+          .append(", Brasil");
+
+        return sb.toString();
+    }
 }

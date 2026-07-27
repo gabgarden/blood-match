@@ -1,10 +1,9 @@
 package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.donation.Donation;
+import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.persistence.repository.mongo.DonationMongoRepository;
 import bloodmatch.infra.persistence.schema.DonationSchema;
@@ -18,18 +17,15 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
 
   private final DonationMongoRepository mongoRepository;
   private final DonorRepositoryInterface donorRepository;
-  private final DonationRequestRepositoryInterface donationRequestRepository;
-  private final PartyRepositoryInterface partyRepository;
+  private final BloodCenterRepositoryInterface bloodCenterRepository;
 
   public DonationRepositoryImpl(
       DonationMongoRepository mongoRepository,
       DonorRepositoryInterface donorRepository,
-      DonationRequestRepositoryInterface donationRequestRepository,
-      PartyRepositoryInterface partyRepository) {
+      BloodCenterRepositoryInterface bloodCenterRepository) {
     this.mongoRepository = mongoRepository;
     this.donorRepository = donorRepository;
-    this.donationRequestRepository = donationRequestRepository;
-    this.partyRepository = partyRepository;
+    this.bloodCenterRepository = bloodCenterRepository;
   }
 
   @Override
@@ -68,7 +64,37 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     return mongoRepository.countByDonorPersonId(donorId.getValue().toString());
   }
 
+  @Override
+  public List<Donation> findCompletedDonationsOrderedByDonationDateAsc() {
+    return mongoRepository.findByCompleted(true)
+        .stream()
+        .map(this::toDomain)
+      .sorted(java.util.Comparator.comparing(Donation::getDonationDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())))
+        .toList();
+  }
+
+  @Override
+  public List<Donation> findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+      List<DomainID> bloodCenterIds) {
+    if (bloodCenterIds == null)
+      throw new IllegalArgumentException("Blood center ids cannot be null");
+
+    if (bloodCenterIds.isEmpty())
+      return List.of();
+
+    List<String> ids = bloodCenterIds.stream()
+        .map(DomainID::getValue)
+        .map(Object::toString)
+        .distinct()
+        .toList();
+
+    return mongoRepository.findByCompletedTrueAndBloodCenterIdInOrderByDonationDateAsc(ids)
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
   private Donation toDomain(DonationSchema schema) {
-    return schema.toDomain(donorRepository, donationRequestRepository, partyRepository);
+    return schema.toDomain(donorRepository, bloodCenterRepository);
   }
 }

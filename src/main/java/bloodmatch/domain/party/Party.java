@@ -38,4 +38,7 @@ public abstract class Party extends DomainObject {
         this.name = newName;
     }
 
+    public void changeAddress(Address newAddress) {
+        this.address = newAddress;
+    }
 }

@@ -1,6 +1,7 @@
 package bloodmatch.interfaces.rest.party.updatepartyname;
 
 import bloodmatch.application.usecase.party.UpdatePartyNameUseCase;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import bloodmatch.domain.party.Party;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
 
 @RestController
+@Tag(name = "Update Party Name", description = "Update the name of an existing party.")
 @RequestMapping("/parties")
 public class UpdatePartyNameController {
 

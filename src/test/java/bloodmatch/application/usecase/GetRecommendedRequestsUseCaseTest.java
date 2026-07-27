@@ -1,11 +1,14 @@
 package bloodmatch.application.usecase;
 
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
+import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
+import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
+import bloodmatch.domain.services.DonationRequestFulfillmentService;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.person.donor.Donor;
@@ -14,6 +17,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.Address;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -28,9 +32,12 @@ class GetRecommendedRequestsUseCaseTest {
 
   private final DonorRepositoryInterface donorRepository = mock(DonorRepositoryInterface.class);
   private final DonationRequestRepositoryInterface donationRequestRepository = mock(DonationRequestRepositoryInterface.class);
+  private final DonationRepositoryInterface donationRepository = mock(DonationRepositoryInterface.class);
   private final GetRecommendedRequestsUseCase useCase = new GetRecommendedRequestsUseCase(
       donorRepository,
-      donationRequestRepository);
+      donationRequestRepository,
+      donationRepository,
+      new DonationRequestFulfillmentService());
 
   @Test
   void shouldNotRecommendRequestsWhenDonorIsNotEligible() {
@@ -51,16 +58,56 @@ class GetRecommendedRequestsUseCaseTest {
   }
 
   @Test
-  void shouldNotRecommendAlreadyAcceptedRequestsForTheSameDonor() {
+  void shouldRecommendEligibleRequestsWithOutstandingGoal() {
     LocalDate currentDate = LocalDate.of(2026, 4, 17);
     DomainID donorId = DomainID.generate();
 
     Donor donor = createDonor(currentDate);
     DonationRequest request = createRequest(currentDate);
-    request.acceptBy(donor, currentDate);
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of());
+
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+
+    assertEquals(1, result.size());
+    assertEquals(0, result.get(0).fulfilledBloodBags());
+    assertEquals(false, result.get(0).goalReached());
+  }
+
+  @Test
+  void shouldNotRecommendRequestsWhenGoalIsAlreadyReached() {
+    LocalDate currentDate = LocalDate.of(2026, 4, 17);
+    DomainID donorId = DomainID.generate();
+
+    Donor donor = createDonor(currentDate);
+    DonationRequest request = createRequest(currentDate);
+
+    when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
+    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of(
+        Donation.registerExternalDonation(donor, currentDate, request.getBloodCenter(), currentDate)));
+
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+
+    assertEquals(List.of(), result);
+  }
+
+  @Test
+  void shouldNotRecommendRequestsOutsideTheDonorMaximumDistance() {
+    LocalDate currentDate = LocalDate.of(2026, 4, 17);
+    DomainID donorId = DomainID.generate();
+    Donor donor = createDonor(currentDate);
+    donor.getPerson().changeAddress(new Address("Street", "Sao Paulo", "SP", "01001000", -23.5505, -46.6333));
+
+    DonationRequest request = createRequest(currentDate);
+    request.getBloodCenter().getOrganization().changeAddress(
+        new Address("Street", "Rio de Janeiro", "RJ", "20000000", -22.9068, -43.1729));
+
+    when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
+    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
 
@@ -93,6 +140,7 @@ class GetRecommendedRequestsUseCaseTest {
         requester,
         bloodCenter,
         BloodType.of("A+"),
+        1,
         currentDate.plusDays(10),
         currentDate,
         Urgency.MEDIUM);
