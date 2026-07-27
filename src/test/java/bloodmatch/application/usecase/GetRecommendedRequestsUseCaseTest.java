@@ -17,6 +17,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.Address;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -87,6 +88,26 @@ class GetRecommendedRequestsUseCaseTest {
     when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
     when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of(
         Donation.registerExternalDonation(donor, currentDate, request.getBloodCenter(), currentDate)));
+
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+
+    assertEquals(List.of(), result);
+  }
+
+  @Test
+  void shouldNotRecommendRequestsOutsideTheDonorMaximumDistance() {
+    LocalDate currentDate = LocalDate.of(2026, 4, 17);
+    DomainID donorId = DomainID.generate();
+    Donor donor = createDonor(currentDate);
+    donor.getPerson().changeAddress(new Address("Street", "Sao Paulo", "SP", "01001000", -23.5505, -46.6333));
+
+    DonationRequest request = createRequest(currentDate);
+    request.getBloodCenter().getOrganization().changeAddress(
+        new Address("Street", "Rio de Janeiro", "RJ", "20000000", -22.9068, -43.1729));
+
+    when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
+    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
 

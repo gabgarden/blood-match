@@ -77,6 +77,8 @@ public class GetRecommendedRequestsUseCase {
                         request,
                         donor,
                         fulfillment.get(request.getId())))
+                .filter(request -> request.distanceInKm() == null
+                        || request.distanceInKm() <= donor.getMaxRecommendationDistanceKm())
                 .sorted(
                         Comparator
                                 .comparing(

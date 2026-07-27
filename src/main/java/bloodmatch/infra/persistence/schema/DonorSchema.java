@@ -31,6 +31,7 @@ public class DonorSchema {
   private String bloodType;
   private Double weight;
   private LocalDate lastDonationDate;
+  private Double maxRecommendationDistanceKm;
 
   @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
   private double[] location;
@@ -44,6 +45,7 @@ public class DonorSchema {
     this.bloodType = donor.getBloodType().getType();
     this.weight = donor.getWeight();
     this.lastDonationDate = donor.getLastDonationDate();
+    this.maxRecommendationDistanceKm = donor.getMaxRecommendationDistanceKm();
 
     Address address = donor.getPerson().getAddress();
     if (address != null && address.hasCoordinates()) {
@@ -57,6 +59,7 @@ public class DonorSchema {
         .orElseThrow(() -> new IllegalArgumentException("Person not found"));
 
     DomainID donorId = new DomainID(UUID.fromString(this.id));
-    return Donor.reconstitute(person, BloodType.of(bloodType), weight, lastDonationDate, donorId);
+    return Donor.reconstitute(person, BloodType.of(bloodType), weight, lastDonationDate,
+        maxRecommendationDistanceKm, donorId);
   }
 }

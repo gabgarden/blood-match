@@ -10,9 +10,12 @@ import java.time.LocalDate;
 
 public class Donor extends PersonRole {
 
+    public static final double DEFAULT_MAX_RECOMMENDATION_DISTANCE_KM = 30.0;
+
     private BloodType bloodType;
     private LocalDate lastDonationDate;
     private double weight;
+    private double maxRecommendationDistanceKm;
 
     public Donor(Person person, BloodType bloodType, double weight) {
         super(person);
@@ -26,6 +29,7 @@ public class Donor extends PersonRole {
 
         this.bloodType = bloodType;
         this.weight = weight;
+        this.maxRecommendationDistanceKm = DEFAULT_MAX_RECOMMENDATION_DISTANCE_KM;
     }
 
   protected Donor(Person person, BloodType bloodType, double weight, DomainID id) {
@@ -40,12 +44,17 @@ public class Donor extends PersonRole {
 
     this.bloodType = bloodType;
     this.weight = weight;
+    this.maxRecommendationDistanceKm = DEFAULT_MAX_RECOMMENDATION_DISTANCE_KM;
   }
 
-  public static Donor reconstitute(Person person, BloodType bloodType, double weight, LocalDate lastDonationDate, DomainID id) {
+  public static Donor reconstitute(Person person, BloodType bloodType, double weight, LocalDate lastDonationDate,
+      Double maxRecommendationDistanceKm, DomainID id) {
     Donor donor = new Donor(person, bloodType, weight, id);
     if (lastDonationDate != null) {
       donor.registerDonation(lastDonationDate, lastDonationDate);
+    }
+    if (maxRecommendationDistanceKm != null) {
+      donor.updateMaxRecommendationDistanceKm(maxRecommendationDistanceKm);
     }
     return donor;
   }
@@ -107,6 +116,14 @@ public class Donor extends PersonRole {
         this.weight = weight;
     }
 
+    public void updateMaxRecommendationDistanceKm(double maxRecommendationDistanceKm) {
+        if (maxRecommendationDistanceKm <= 0) {
+            throw new IllegalArgumentException("Maximum recommendation distance must be greater than zero");
+        }
+
+        this.maxRecommendationDistanceKm = maxRecommendationDistanceKm;
+    }
+
     public BloodType getBloodType() {
         return bloodType;
     }
@@ -117,5 +134,9 @@ public class Donor extends PersonRole {
 
     public double getWeight() {
         return weight;
+    }
+
+    public double getMaxRecommendationDistanceKm() {
+        return maxRecommendationDistanceKm;
     }
 }

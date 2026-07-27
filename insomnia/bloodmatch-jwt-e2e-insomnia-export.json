@@ -29,7 +29,6 @@
         "person_id": "",
         "organization_id": "",
         "party_id": "",
-        "blood_center_id": "",
         "request_id": "",
         "donation_id": ""
       },
@@ -42,7 +41,6 @@
           "person_id",
           "organization_id",
           "party_id",
-          "blood_center_id",
           "request_id",
           "donation_id"
         ]
@@ -124,7 +122,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"name\": \"Maria da Silva\",\n  \"cpf\": \"12345678901\",\n  \"birthDate\": \"1995-05-20\",\n  \"email\": \"maria@bloodmatch.com\",\n  \"password\": \"senhaForte123\",\n  \"passwordConfirmation\": \"senhaForte123\",\n  \"street\": \"Avenida Paulista\",\n  \"number\": \"1578\",\n  \"neighborhood\": \"Bela Vista\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"01310-200\"\n}"
+        "text": "{\n  \"name\": \"Maria da Silva\",\n  \"cpf\": \"12345678901\",\n  \"birthDate\": \"1995-05-20\",\n  \"email\": \"maria@bloodmatch.com\",\n  \"password\": \"senhaForte123\",\n  \"passwordConfirmation\": \"senhaForte123\",\n  \"street\": \"Rua Rocha Leão, 2 - Caju\",\n  \"city\": \"Campos dos Goytacazes\",\n  \"state\": \"RJ\",\n  \"zipCode\": \"28035-045\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -155,7 +153,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"name\": \"Hemocentro Central\",\n  \"cnpj\": \"12345678000100\",\n  \"email\": \"hemo@bloodmatch.com\",\n  \"password\": \"senhaForte123\",\n  \"passwordConfirmation\": \"senhaForte123\",\n  \"street\": \"Avenida Doutor Eneas Carvalho de Aguiar\",\n  \"number\": \"155\",\n  \"neighborhood\": \"Cerqueira Cesar\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"05403-000\"\n}"
+        "text": "{\n  \"name\": \"Hemocentro Regional de Campos\",\n  \"cnpj\": \"12345678000100\",\n  \"email\": \"hemo@bloodmatch.com\",\n  \"password\": \"senhaForte123\",\n  \"passwordConfirmation\": \"senhaForte123\",\n  \"street\": \"Rua Rocha Leão, 2 - Caju\",\n  \"city\": \"Campos dos Goytacazes\",\n  \"state\": \"RJ\",\n  \"zipCode\": \"28035-045\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -467,6 +465,41 @@
     },
 
     {
+      "_id": "req_update_donor_recommendation_distance",
+      "_type": "request",
+      "parentId": "fld_role_donor",
+      "modified": 1785200000000,
+      "created": 1785200000000,
+      "url": "{{ _.base_url }}/donors/recommendation-distance",
+      "name": "PATCH Update Donor Recommendation Distance",
+      "description": "DONOR or SYSTEM_ADMIN - Sets the maximum distance, in kilometers, for recommended donation requests. Default: 30 km.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"personId\": \"{{ _.person_id }}\",\n  \"maxDistanceInKm\": 30\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
       "_id": "req_get_recommendations",
       "_type": "request",
       "parentId": "fld_role_donor",
@@ -511,7 +544,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"requestId\": \"{{ _.request_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
+        "text": "{\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -681,7 +714,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"personId\": \"{{ _.person_id }}\",\n  \"bloodCenterId\": \"{{ _.blood_center_id }}\",\n  \"donationDate\": \"2026-07-22\"\n}"
+        "text": "{\n  \"personId\": \"{{ _.person_id }}\",\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"donationDate\": \"2026-07-22\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -710,9 +743,9 @@
       "parentId": "fld_role_blood_center",
       "modified": 1776706800000,
       "created": 1776706800000,
-      "url": "{{ _.base_url }}/donations/from-request/complete",
-      "name": "PATCH Complete Donation From Request",
-      "description": "DONOR or SYSTEM_ADMIN - Conclui doacao pendente vinculada a request",
+      "url": "{{ _.base_url }}/donations/complete",
+      "name": "PATCH Complete Pending Donation",
+      "description": "DONOR or SYSTEM_ADMIN - Completes a pending donation",
       "method": "PATCH",
       "body": {
         "mimeType": "application/json",

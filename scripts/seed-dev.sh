@@ -58,8 +58,8 @@ require_command jq
 
 echo "Seeding via API: $API_URL (data base: $TODAY)"
 
-DONORS_DATA=$'Ana Silva|12345678901|1998-05-10|ana.silva@blood.local|O-|78.0|Avenida Paulista|1578|Bela Vista|São Paulo|SP|01310-200\nBruno Santos|98765432100|1997-08-21|bruno.santos@blood.local|O+|82.0|Rua Augusta|1449|Consolação|São Paulo|SP|01305-100\nCarla Oliveira|11122233344|1996-04-14|carla.oliveira@blood.local|A-|74.0|Rua Haddock Lobo|595|Jardins|São Paulo|SP|01414-001\nDaniel Costa|22233344455|1999-09-02|daniel.costa@blood.local|A+|68.5|Rua da Consolação|2300|Consolação|São Paulo|SP|01302-001\nFernanda Lima|33344455566|1995-12-18|fernanda.lima@blood.local|B-|80.0|Rua Oscar Freire|379|Jardins|São Paulo|SP|01426-001\nGabriel Almeida|44455566677|2000-03-23|gabriel.almeida@blood.local|B+|71.5|Rua dos Pinheiros|937|Pinheiros|São Paulo|SP|05422-012\nHelena Rocha|55566677788|1997-07-11|helena.rocha@blood.local|AB-|76.0|Rua Teodoro Sampaio|1020|Pinheiros|São Paulo|SP|05406-050\nIgor Pereira|66677788899|1998-11-30|igor.pereira@blood.local|AB+|69.0|Rua Vergueiro|1000|Vila Mariana|São Paulo|SP|01504-000\nJuliana Martins|77788899900|2001-01-19|juliana.martins@blood.local|O+|77.0|Avenida Brigadeiro Faria Lima|2232|Jardim Paulistano|São Paulo|SP|01451-000\nLucas Ferreira|88899900011|2002-06-27|lucas.ferreira@blood.local|A+|66.0|Rua Bela Cintra|934|Jardins|São Paulo|SP|01415-000'
-ORGS_DATA=$'Fundação Pró-Sangue Clínicas|12345678000100|hemo1@blood.local|Avenida Doutor Enéas Carvalho de Aguiar|155|Cerqueira César|São Paulo|SP|05403-000\nFundação Pró-Sangue Mandaqui|12345678000101|hemo2@blood.local|Rua Voluntários da Pátria|4227|Santana|São Paulo|SP|02401-400\nHospital São Paulo|12345678000102|hemo3@blood.local|Rua Napoleão de Barros|715|Vila Clementino|São Paulo|SP|04024-002\nHospital Beneficência Portuguesa|12345678000103|hemo4@blood.local|Rua Maestro Cardim|769|Bela Vista|São Paulo|SP|01323-001\nHospital Alemão Oswaldo Cruz|12345678000104|hemo5@blood.local|Rua João Julião|331|Bela Vista|São Paulo|SP|01323-903\nHospital das Clínicas FMUSP|12345678000105|hemo6@blood.local|Avenida Doutor Enéas Carvalho de Aguiar|255|Cerqueira César|São Paulo|SP|05403-000\nHospital do Servidor Público Estadual|12345678000106|hemo7@blood.local|Rua Pedro de Toledo|1800|Vila Clementino|São Paulo|SP|04039-901\nHospital Santa Cruz|12345678000107|hemo8@blood.local|Rua Santa Cruz|398|Vila Mariana|São Paulo|SP|04122-000\nHospital Israelita Albert Einstein|12345678000108|hemo9@blood.local|Avenida Albert Einstein|627|Morumbi|São Paulo|SP|05652-900\nHospital Sírio-Libanês|12345678000109|hemo10@blood.local|Rua Dona Adma Jafet|91|Bela Vista|São Paulo|SP|01308-050'
+DONORS_DATA=$'Ana Silva|12345678901|1998-05-10|ana.silva@blood.local|O-|78.0|Rua Rocha Leão, 2 - Caju|Campos dos Goytacazes|RJ|28035-045\nBruno Santos|98765432100|1997-08-21|bruno.santos@blood.local|O+|82.0|Rua Barão de Miracema, 140 - Centro|Campos dos Goytacazes|RJ|28035-562\nCarla Oliveira|11122233344|1996-04-14|carla.oliveira@blood.local|A-|74.0|Rua Visconde de Itaboraí, 402 - Parque Rosário|Campos dos Goytacazes|RJ|28010-295\nDaniel Costa|22233344455|1999-09-02|daniel.costa@blood.local|A+|68.5|Avenida Pelinca, 115 - Parque Tamandaré|Campos dos Goytacazes|RJ|28035-053\nFernanda Lima|33344455566|1995-12-18|fernanda.lima@blood.local|B-|80.0|Rua Visconde de Itaboraí, 427 - Parque Rosário|Campos dos Goytacazes|RJ|28010-295\nGabriel Almeida|44455566677|2000-03-23|gabriel.almeida@blood.local|B+|71.5|Avenida José Alves de Azevedo, 337 - Parque Rosário|Campos dos Goytacazes|RJ|28025-497\nHelena Rocha|55566677788|1997-07-11|helena.rocha@blood.local|AB-|76.0|Avenida Senador José Carlos Pereira Pinto, 400 - Parque Calabouço|Campos dos Goytacazes|RJ|28080-000\nIgor Pereira|66677788899|1998-11-30|igor.pereira@blood.local|AB+|69.0|Rua Conselheiro Otaviano, 129 - Centro|Campos dos Goytacazes|RJ|28010-140\nJuliana Martins|77788899900|2001-01-19|juliana.martins@blood.local|O+|77.0|Rua Barão da Lagoa Dourada, 409 - Centro|Campos dos Goytacazes|RJ|28035-211\nLucas Ferreira|88899900011|2002-06-27|lucas.ferreira@blood.local|A+|66.0|Rua Rocha Leão, 2 - Caju|Campos dos Goytacazes|RJ|28035-045'
+ORGS_DATA=$'Hospital Ferreira Machado|12345678000100|hemo1@blood.local|Rua Rocha Leão, 2 - Caju|Campos dos Goytacazes|RJ|28035-045\nHemocentro Regional de Campos|12345678000101|hemo2@blood.local|Rua Rocha Leão, 2 - Caju|Campos dos Goytacazes|RJ|28035-045\nHospital Geral Benê (Beneficência Portuguesa)|12345678000102|hemo3@blood.local|Rua Barão de Miracema, 140 - Centro|Campos dos Goytacazes|RJ|28035-562\nNúcleo Medicina Transfusional (Banco de Sangue)|12345678000103|hemo4@blood.local|Rua Visconde de Itaboraí, 402 - Parque Rosário|Campos dos Goytacazes|RJ|28010-295\nSanta Casa de Misericórdia de Campos|12345678000104|hemo5@blood.local|Avenida Pelinca, 115 - Parque Tamandaré|Campos dos Goytacazes|RJ|28035-053\nHospital Unimed Campos|12345678000105|hemo6@blood.local|Rua Visconde de Itaboraí, 427 - Parque Rosário|Campos dos Goytacazes|RJ|28010-295\nHospital dos Plantadores de Cana|12345678000106|hemo7@blood.local|Avenida José Alves de Azevedo, 337 - Parque Rosário|Campos dos Goytacazes|RJ|28025-497\nHospital Geral de Guarus|12345678000107|hemo8@blood.local|Avenida Senador José Carlos Pereira Pinto, 400 - Parque Calabouço|Campos dos Goytacazes|RJ|28080-000\nHospital Geral Dr. Beda|12345678000108|hemo9@blood.local|Rua Conselheiro Otaviano, 129 - Centro|Campos dos Goytacazes|RJ|28010-140\nHospital Escola Álvaro Alvim|12345678000109|hemo10@blood.local|Rua Barão da Lagoa Dourada, 409 - Centro|Campos dos Goytacazes|RJ|28035-211'
 
 DONOR_PERSON_IDS=()
 DONOR_EMAILS=()
@@ -67,12 +67,12 @@ DONOR_BLOOD_TYPES=()
 ORG_IDS=()
 ORG_EMAILS=()
 
-while IFS='|' read -r name cpf birth_date email blood_type weight street number neighborhood city state zip_code; do
+while IFS='|' read -r name cpf birth_date email blood_type weight street city state zip_code; do
   [[ -z "$name" ]] && continue
 
   person_id=$(
     post /parties/persons "" \
-      "{\"name\":\"$name\",\"cpf\":\"$cpf\",\"birthDate\":\"$birth_date\",\"email\":\"$email\",\"password\":\"$SEED_PASSWORD\",\"passwordConfirmation\":\"$SEED_PASSWORD\",\"street\":\"$street\",\"number\":\"$number\",\"neighborhood\":\"$neighborhood\",\"city\":\"$city\",\"state\":\"$state\",\"zipCode\":\"$zip_code\"}" \
+      "{\"name\":\"$name\",\"cpf\":\"$cpf\",\"birthDate\":\"$birth_date\",\"email\":\"$email\",\"password\":\"$SEED_PASSWORD\",\"passwordConfirmation\":\"$SEED_PASSWORD\",\"street\":\"$street\",\"city\":\"$city\",\"state\":\"$state\",\"zipCode\":\"$zip_code\"}" \
       | jq -r '.id'
   )
 
@@ -92,12 +92,12 @@ while IFS='|' read -r name cpf birth_date email blood_type weight street number 
 
 done <<< "$DONORS_DATA"
 
-while IFS='|' read -r name cnpj email street number neighborhood city state zip_code; do
+while IFS='|' read -r name cnpj email street city state zip_code; do
   [[ -z "$name" ]] && continue
 
   org_id=$(
     post /parties/organizations "" \
-      "{\"name\":\"$name\",\"cnpj\":\"$cnpj\",\"email\":\"$email\",\"password\":\"$SEED_PASSWORD\",\"passwordConfirmation\":\"$SEED_PASSWORD\",\"street\":\"$street\",\"number\":\"$number\",\"neighborhood\":\"$neighborhood\",\"city\":\"$city\",\"state\":\"$state\",\"zipCode\":\"$zip_code\"}" \
+      "{\"name\":\"$name\",\"cnpj\":\"$cnpj\",\"email\":\"$email\",\"password\":\"$SEED_PASSWORD\",\"passwordConfirmation\":\"$SEED_PASSWORD\",\"street\":\"$street\",\"city\":\"$city\",\"state\":\"$state\",\"zipCode\":\"$zip_code\"}" \
       | jq -r '.id'
   )
 
@@ -193,7 +193,7 @@ while IFS='|' read -r donor_idx org_idx; do
   donation_id=$(
     post /donations/completed \
       "$donor_token" \
-      "{\"personId\":\"$donor_id\",\"bloodCenterId\":\"$blood_center_id\",\"donationDate\":\"$TODAY\"}" \
+      "{\"personId\":\"$donor_id\",\"organizationId\":\"$blood_center_id\",\"donationDate\":\"$TODAY\"}" \
       | jq -r '.id'
   )
 

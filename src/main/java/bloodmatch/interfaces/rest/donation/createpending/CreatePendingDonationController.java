@@ -39,10 +39,10 @@ public class CreatePendingDonationController {
       if (payload.expectedDate() == null)
         throw new IllegalArgumentException("expectedDate cannot be null");
 
-      DomainID requestId = parseDomainId(payload.organizationId(), "organizationId");
+      DomainID organizationId = parseDomainId(payload.organizationId(), "organizationId");
       DomainID personId = parseDomainId(payload.personId(), "personId");
 
-      Donation donation = useCase.execute(requestId, personId, payload.expectedDate());
+      Donation donation = useCase.execute(personId, organizationId, payload.expectedDate());
 
         String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
 
