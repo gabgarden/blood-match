@@ -42,7 +42,7 @@ public class GetDonorSummaryController {
           "personId", output.personId(),
           "donorName", output.donorName(),
           "bloodType", output.bloodType(),
-          "adreess", output.adreess(), // Só pra testar o endereço mrm, remover dps se quiser **
+          "address", output.address(), 
           "lastDonationDate", String.valueOf(output.lastDonationDate()),
           "daysRemaining", output.daysRemaining(),
           "livesImpacted", output.livesImpacted()));

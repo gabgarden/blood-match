@@ -13,12 +13,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Document(collection = "donation_requests")
+@CompoundIndex(name = "active_blood_type_date_limit", def = "{'active': 1, 'bloodTypeNeeded': 1, 'dateLimit': 1}")
+@CompoundIndex(name = "active_blood_center_date_requested", def = "{'active': 1, 'bloodCenterId': 1, 'dateRequested': 1, '_id': 1}")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,6 +33,8 @@ public class DonationRequestSchema {
 
   @Id
   private String id;
+  @Version
+  private Long version;
   private String requesterId;
   private String bloodCenterId;
   private String bloodTypeNeeded;
@@ -35,12 +43,15 @@ public class DonationRequestSchema {
   private LocalDate dateLimit;
   private boolean active;
   private String urgency;
+  @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+  private double[] location;
 
   public DonationRequestSchema(DonationRequest donationRequest) {
     if (donationRequest == null)
       throw new IllegalArgumentException("DonationRequest cannot be null");
 
     this.id = donationRequest.getId().getValue().toString();
+    this.version = donationRequest.getVersion();
     this.requesterId = donationRequest.getRequester().getParty().getId().getValue().toString();
     this.bloodCenterId = donationRequest.getBloodCenter().getOrganization().getId().getValue().toString();
     this.bloodTypeNeeded = donationRequest.getBloodTypeNeeded().getType();
@@ -49,6 +60,12 @@ public class DonationRequestSchema {
     this.dateLimit = donationRequest.getDateLimit();
     this.active = donationRequest.isActive();
     this.urgency = donationRequest.getUrgency().name();
+    if (donationRequest.getBloodCenter().getOrganization().getAddress() != null
+        && donationRequest.getBloodCenter().getOrganization().getAddress().hasCoordinates()) {
+      this.location = new double[]{
+          donationRequest.getBloodCenter().getOrganization().getAddress().getLongitude(),
+          donationRequest.getBloodCenter().getOrganization().getAddress().getLatitude()};
+    }
  
   }
 
@@ -73,6 +90,7 @@ public class DonationRequestSchema {
         this.dateRequested,
         this.dateLimit,
         this.active,
-        Urgency.valueOf(this.urgency));
+        Urgency.valueOf(this.urgency),
+        this.version);
   }
 }

@@ -19,6 +19,7 @@ public class DonationRequest extends DomainObject {
   private LocalDate dateRequested;
   private LocalDate dateLimit;
   private boolean active;
+  private Long version;
 
 
 
@@ -107,6 +108,21 @@ public class DonationRequest extends DomainObject {
       LocalDate dateLimit,
       boolean isActive,
       Urgency urgency) {
+    return reconstitute(id, requester, bloodCenter, bloodTypeNeeded, goalBloodBags, dateRequested,
+        dateLimit, isActive, urgency, null);
+  }
+
+  public static DonationRequest reconstitute(
+      DomainID id,
+      Requester requester,
+      BloodCenter bloodCenter,
+      BloodType bloodTypeNeeded,
+      int goalBloodBags,
+      LocalDate dateRequested,
+      LocalDate dateLimit,
+      boolean isActive,
+      Urgency urgency,
+      Long version) {
 
     if (id == null)
       throw new IllegalArgumentException("Id cannot be null");
@@ -137,6 +153,7 @@ public class DonationRequest extends DomainObject {
     request.setId(id);
     request.dateRequested = dateRequested;
     request.active = isActive;
+    request.version = version;
 
     return request;
   }
@@ -209,6 +226,10 @@ public class DonationRequest extends DomainObject {
 
   public LocalDate getDateRequested() {
     return dateRequested;
+  }
+
+  public Long getVersion() {
+    return version;
   }
 
   public LocalDate getDateLimit() {

@@ -50,7 +50,8 @@ class GetRecommendedRequestsUseCaseTest {
     DonationRequest request = createRequest(currentDate);
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
-    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
+    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
 
@@ -66,7 +67,8 @@ class GetRecommendedRequestsUseCaseTest {
     DonationRequest request = createRequest(currentDate);
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
-    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
+    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
     when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
@@ -85,7 +87,8 @@ class GetRecommendedRequestsUseCaseTest {
     DonationRequest request = createRequest(currentDate);
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
-    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
+    when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
+    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
     when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of(
         Donation.registerExternalDonation(donor, currentDate, request.getBloodCenter(), currentDate)));
 
@@ -95,19 +98,14 @@ class GetRecommendedRequestsUseCaseTest {
   }
 
   @Test
-  void shouldNotRecommendRequestsOutsideTheDonorMaximumDistance() {
+  void shouldReturnNoRecommendationsWhenTheDatabaseFindsNoRequestWithinTheMaximumDistance() {
     LocalDate currentDate = LocalDate.of(2026, 4, 17);
     DomainID donorId = DomainID.generate();
     Donor donor = createDonor(currentDate);
     donor.getPerson().changeAddress(new Address("Street", "Sao Paulo", "SP", "01001000", -23.5505, -46.6333));
 
-    DonationRequest request = createRequest(currentDate);
-    request.getBloodCenter().getOrganization().changeAddress(
-        new Address("Street", "Rio de Janeiro", "RJ", "20000000", -22.9068, -43.1729));
-
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
-    when(donationRequestRepository.findActiveRequests()).thenReturn(List.of(request));
-    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(org.mockito.ArgumentMatchers.anyList())).thenReturn(List.of());
+    when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
 

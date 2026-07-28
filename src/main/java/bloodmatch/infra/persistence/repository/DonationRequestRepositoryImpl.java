@@ -5,10 +5,17 @@ import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.Address;
+import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.infra.persistence.repository.mongo.DonationRequestMongoRepository;
 import bloodmatch.infra.persistence.schema.DonationRequestSchema;
 import org.springframework.stereotype.Repository;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +41,11 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
       throw new IllegalArgumentException("DonationRequest cannot be null");
 
     DonationRequestSchema schema = new DonationRequestSchema(request);
-    mongoRepository.save(schema);
+    try {
+      mongoRepository.save(schema);
+    } catch (OptimisticLockingFailureException e) {
+      throw new IllegalStateException("Donation request was changed by another operation. Reload it and try again.", e);
+    }
   }
 
   @Override
@@ -49,6 +60,57 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
   @Override
   public List<DonationRequest> findActiveRequests() {
     return mongoRepository.findByActiveOrderByDateRequestedAscIdAsc(true)
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
+  public List<DonationRequest> findActiveRequestsForDonor(
+      BloodType donorBloodType,
+      Address donorAddress,
+      double maxDistanceInKm,
+      LocalDate currentDate) {
+    if (donorBloodType == null)
+      throw new IllegalArgumentException("Donor blood type cannot be null");
+    if (donorAddress == null || !donorAddress.hasCoordinates())
+      return List.of();
+    if (maxDistanceInKm <= 0)
+      throw new IllegalArgumentException("Maximum distance must be greater than zero");
+    if (currentDate == null)
+      throw new IllegalArgumentException("Current date cannot be null");
+
+    Point donorLocation = new Point(donorAddress.getLongitude(), donorAddress.getLatitude());
+    Distance maxDistance = new Distance(maxDistanceInKm, Metrics.KILOMETERS);
+
+    return mongoRepository
+        .findByActiveTrueAndDateLimitGreaterThanEqualAndBloodTypeNeededInAndLocationNear(
+            currentDate, donorBloodType.getCompatibleRecipientTypes(), donorLocation, maxDistance)
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
+  public List<DonationRequest> findActiveRequestsByBloodCenterIds(
+      List<DomainID> bloodCenterIds,
+      LocalDate currentDate) {
+    if (bloodCenterIds == null)
+      throw new IllegalArgumentException("Blood center ids cannot be null");
+    if (currentDate == null)
+      throw new IllegalArgumentException("Current date cannot be null");
+    if (bloodCenterIds.isEmpty())
+      return List.of();
+
+    List<String> ids = bloodCenterIds.stream()
+        .map(DomainID::getValue)
+        .map(Object::toString)
+        .distinct()
+        .toList();
+
+    return mongoRepository
+        .findByActiveTrueAndDateLimitGreaterThanEqualAndBloodCenterIdInOrderByDateRequestedAscIdAsc(
+            currentDate, ids)
         .stream()
         .map(this::toDomain)
         .toList();

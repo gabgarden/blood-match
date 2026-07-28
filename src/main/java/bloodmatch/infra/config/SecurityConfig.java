@@ -62,7 +62,7 @@ public class SecurityConfig {
             }))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(OPTIONS, "/**").permitAll()
-            .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+            .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs.yaml/**").permitAll()
             .requestMatchers(POST, "/auth/login").permitAll()
             .requestMatchers(POST, "/parties/persons").permitAll()
             .requestMatchers(POST, "/parties/organizations").permitAll()

@@ -53,8 +53,26 @@ public class GetRecommendedRequestsUseCase {
         Donor donor = donorRepository.findByPartyId(personId)
                 .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
 
-        List<DonationRequest> activeRequests =
-                donationRequestRepository.findActiveRequests();
+        if (!donor.isEligibleToDonate(currentDate)) {
+            return List.of();
+        }
+
+        List<DonationRequest> candidateRequests = donationRequestRepository.findActiveRequestsForDonor(
+                donor.getBloodType(),
+                donor.getPerson().getAddress(),
+                donor.getMaxRecommendationDistanceKm(),
+                currentDate);
+
+        if (candidateRequests.isEmpty()) {
+            return List.of();
+        }
+
+        List<DonationRequest> activeRequests = donationRequestRepository.findActiveRequestsByBloodCenterIds(
+                candidateRequests.stream()
+                        .map(request -> request.getBloodCenter().getOrganization().getId())
+                        .distinct()
+                        .toList(),
+                currentDate);
 
         List<Donation> donations = donationRepository
                 .findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
@@ -69,16 +87,12 @@ public class GetRecommendedRequestsUseCase {
                         donations,
                         currentDate);
 
-        return activeRequests.stream()
-                .filter(request -> donor.isEligibleToDonate(currentDate))
-                .filter(request -> request.canBeFulfilledBy(donor.getBloodType(), currentDate))
+        return candidateRequests.stream()
                 .filter(request -> !fulfillment.get(request.getId()).goalReached())
                 .map(request -> toOutput(
                         request,
                         donor,
                         fulfillment.get(request.getId())))
-                .filter(request -> request.distanceInKm() == null
-                        || request.distanceInKm() <= donor.getMaxRecommendationDistanceKm())
                 .sorted(
                         Comparator
                                 .comparing(

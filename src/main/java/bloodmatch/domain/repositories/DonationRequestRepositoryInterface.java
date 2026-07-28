@@ -1,6 +1,8 @@
 package bloodmatch.domain.repositories;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
+import bloodmatch.domain.shared.valueObjects.Address;
+import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.util.List;
@@ -14,6 +16,16 @@ public interface DonationRequestRepositoryInterface {
   Optional<DonationRequest> findById(DomainID id);
 
   List<DonationRequest> findActiveRequests();
+
+  List<DonationRequest> findActiveRequestsForDonor(
+      BloodType donorBloodType,
+      Address donorAddress,
+      double maxDistanceInKm,
+      java.time.LocalDate currentDate);
+
+  List<DonationRequest> findActiveRequestsByBloodCenterIds(
+      List<DomainID> bloodCenterIds,
+      java.time.LocalDate currentDate);
 
   List<DonationRequest> findByRequesterPartyId(DomainID requesterPartyId);
 

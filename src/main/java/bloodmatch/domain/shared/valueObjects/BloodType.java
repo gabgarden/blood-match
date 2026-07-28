@@ -2,6 +2,7 @@ package bloodmatch.domain.shared.valueObjects;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 import java.util.Objects;
 
 public class BloodType {
@@ -74,6 +75,13 @@ public class BloodType {
                         default ->
                                 throw new IllegalStateException("Unexpected blood type");
                 };
+        }
+
+        public List<String> getCompatibleRecipientTypes() {
+                return TYPES.values().stream()
+                                .filter(this::canDonateTo)
+                                .map(BloodType::getType)
+                                .toList();
         }
         
         @Override

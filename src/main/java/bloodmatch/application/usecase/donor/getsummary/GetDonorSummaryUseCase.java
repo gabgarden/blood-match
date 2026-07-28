@@ -71,7 +71,7 @@ public class GetDonorSummaryUseCase {
       String personId,
       String donorName,
       String bloodType,
-      String adreess, // **
+      String address, 
       LocalDate lastDonationDate,
       int daysRemaining,
       long livesImpacted) {
