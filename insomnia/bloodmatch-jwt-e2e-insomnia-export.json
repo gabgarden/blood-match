@@ -1,14 +1,14 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2026-07-22T20:30:00.000Z",
-  "__export_source": "insomnia.desktop.app:v10",
+  "__export_date": "2026-07-31T05:48:45.101Z",
+  "__export_source": "insomnia.desktop.app:v13",
   "resources": [
     {
       "_id": "wrk_bloodmatch_jwt",
       "_type": "workspace",
       "parentId": null,
-      "modified": 1776706800000,
+      "modified": 1785200000000,
       "created": 1776706800000,
       "name": "Bloodmatch JWT API",
       "description": "Colecao para validar autenticacao/autorizacao JWT end-to-end",
@@ -18,7 +18,7 @@
       "_id": "env_bloodmatch_base",
       "_type": "environment",
       "parentId": "wrk_bloodmatch_jwt",
-      "modified": 1776706800000,
+      "modified": 1785200000000,
       "created": 1776706800000,
       "name": "Base Environment",
       "data": {
@@ -104,7 +104,7 @@
       "modified": 1776706800000,
       "created": 1776706800000,
       "name": "5 - Donor Donation Actions",
-      "description": "Exigem role DONOR ou SYSTEM_ADMIN",
+      "description": "Exigem role DONOR ou SYSTEM_ADMIN - Endpoints /donations/*",
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -600
@@ -114,7 +114,7 @@
       "_id": "req_register_person",
       "_type": "request",
       "parentId": "fld_public",
-      "modified": 1776706800000,
+      "modified": 1785200000000,
       "created": 1776706800000,
       "url": "{{ _.base_url }}/parties/persons",
       "name": "POST Register Person",
@@ -122,7 +122,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"name\": \"Maria da Silva\",\n  \"cpf\": \"12345678901\",\n  \"birthDate\": \"1995-05-20\",\n  \"email\": \"maria@bloodmatch.com\",\n  \"password\": \"senhaForte123\",\n  \"passwordConfirmation\": \"senhaForte123\",\n  \"street\": \"Rua Rocha Leão, 2 - Caju\",\n  \"city\": \"Campos dos Goytacazes\",\n  \"state\": \"RJ\",\n  \"zipCode\": \"28035-045\"\n}"
+        "text": "{\n  \"name\": \"Maria da Silva\",\n  \"phoneNumber\": \"22999998888\",\n  \"cpf\": \"12345678901\",\n  \"birthDate\": \"1995-05-20\",\n  \"email\": \"maria@bloodmatch.com\",\n  \"password\": \"senhaForte123\",\n  \"passwordConfirmation\": \"senhaForte123\",\n  \"street\": \"Rua Rocha Leão, 2 - Caju\",\n  \"city\": \"Campos dos Goytacazes\",\n  \"state\": \"RJ\",\n  \"zipCode\": \"28035-045\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -145,7 +145,7 @@
       "_id": "req_register_organization",
       "_type": "request",
       "parentId": "fld_public",
-      "modified": 1776706800000,
+      "modified": 1785200000000,
       "created": 1776706800000,
       "url": "{{ _.base_url }}/parties/organizations",
       "name": "POST Register Organization",
@@ -153,7 +153,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"name\": \"Hemocentro Regional de Campos\",\n  \"cnpj\": \"12345678000100\",\n  \"email\": \"hemo@bloodmatch.com\",\n  \"password\": \"senhaForte123\",\n  \"passwordConfirmation\": \"senhaForte123\",\n  \"street\": \"Rua Rocha Leão, 2 - Caju\",\n  \"city\": \"Campos dos Goytacazes\",\n  \"state\": \"RJ\",\n  \"zipCode\": \"28035-045\"\n}"
+        "text": "{\n  \"name\": \"Hemocentro Regional de Campos\",\n  \"cnpj\": \"12345678000100\",\n  \"email\": \"hemo@bloodmatch.com\",\n  \"phoneNumber\": \"22888889999\",\n  \"password\": \"senhaForte123\",\n  \"passwordConfirmation\": \"senhaForte123\",\n  \"street\": \"Rua Rocha Leão, 2 - Caju\",\n  \"city\": \"Campos dos Goytacazes\",\n  \"state\": \"RJ\",\n  \"zipCode\": \"28035-045\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -532,47 +532,12 @@
       "settingRebuildPath": true,
       "settingFollowRedirects": "global"
     },
-    {
-      "_id": "req_create_pending_donation",
-      "_type": "request",
-      "parentId": "fld_role_donor",
-      "modified": 1776706800000,
-      "created": 1776706800000,
-      "url": "{{ _.base_url }}/donation/create-pending",
-      "name": "POST Create Pending Donation",
-      "description": "AUTHENTICATED - Aceita request e cria doacao pendente vinculada",
-      "method": "POST",
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
-      },
-      "parameters": [],
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ _.access_token }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "authentication": {},
-      "metaSortKey": -900,
-      "isPrivate": false,
-      "settingStoreCookies": true,
-      "settingSendCookies": true,
-      "settingDisableRenderRequestBody": false,
-      "settingEncodeUrl": true,
-      "settingRebuildPath": true,
-      "settingFollowRedirects": "global"
-    },
 
     {
       "_id": "req_create_donation_request",
       "_type": "request",
       "parentId": "fld_role_requester",
-      "modified": 1776706800000,
+      "modified": 1785200000000,
       "created": 1776706800000,
       "url": "{{ _.base_url }}/donation-requests",
       "name": "POST Create Donation Request",
@@ -580,7 +545,7 @@
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"partyId\": \"{{ _.party_id }}\",\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"bloodTypeNeeded\": \"A+\",\n  \"goalBloodBags\": 2,\n  \"dateLimit\": \"2026-12-31\",\n  \"urgency\": \"medium\"\n}"
+        "text": "{\n  \"partyId\": \"{{ _.party_id }}\",\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"bloodTypeNeeded\": \"A+\",\n  \"goalBloodBags\": 2,\n  \"dateLimit\": \"2026-12-31\",\n  \"urgency\": \"medium\",\n  \"directedTo\": \"\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -701,7 +666,70 @@
       "settingRebuildPath": true,
       "settingFollowRedirects": "global"
     },
+    {
+      "_id": "req_send_notification_donors",
+      "_type": "request",
+      "parentId": "fld_role_requester",
+      "modified": 1785200100000,
+      "created": 1785200100000,
+      "url": "{{ _.base_url }}/requests/{{ _.request_id }}/notify",
+      "name": "POST Send Notification to Donors",
+      "description": "REQUESTER or SYSTEM_ADMIN - Notifica doadores compativeis sobre a solicitacao",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -800,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
 
+    {
+      "_id": "req_create_pending_donation",
+      "_type": "request",
+      "parentId": "fld_role_blood_center",
+      "modified": 1785200000000,
+      "created": 1776706800000,
+      "url": "{{ _.base_url }}/donations/create-pending",
+      "name": "POST Create Pending Donation",
+      "description": "DONOR or SYSTEM_ADMIN - Aceita uma donation-request e cria doacao pendente vinculada. Requer requestId (solicitacao aceita) e organizationId (hemocentro escolhido).",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"requestId\": \"{{ _.request_id }}\",\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
     {
       "_id": "req_create_completed_donation",
       "_type": "request",
@@ -764,6 +792,41 @@
       ],
       "authentication": {},
       "metaSortKey": -900,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_reschedule_pending_donation",
+      "_type": "request",
+      "parentId": "fld_role_blood_center",
+      "modified": 1785200200000,
+      "created": 1785200200000,
+      "url": "{{ _.base_url }}/donations/reschedule",
+      "name": "PATCH Reschedule Pending Donation",
+      "description": "DONOR or SYSTEM_ADMIN - Reagenda a data prevista de uma doacao pendente",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"donationId\": \"{{ _.donation_id }}\",\n  \"newExpectedDate\": \"2027-01-01\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -800,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,
