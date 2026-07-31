@@ -32,6 +32,8 @@ public class RegisterOrganizationController {
         throw new IllegalArgumentException("Request body cannot be null");
       if (isBlank(payload.name()))
         throw new IllegalArgumentException("name cannot be blank");
+      if (isBlank(payload.phoneNumber()))
+        throw new IllegalArgumentException("phoneNumber cannot be blank");
       if (isBlank(payload.cnpj()))
         throw new IllegalArgumentException("cnpj cannot be blank");
       if (isBlank(payload.email()))
@@ -47,6 +49,7 @@ public class RegisterOrganizationController {
 
       Organization organization = registerPartyUseCase.registerOrganization(
           payload.name(),
+          payload.phoneNumber(),
           payload.cnpj(),
           payload.email(),
           payload.password(),

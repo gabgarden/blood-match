@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Data required to register a person.")
 public record RegisterPersonDto(
     @Schema(description = "Person full name.", example = "Ana Silva", requiredMode = Schema.RequiredMode.REQUIRED) String name,
+    @Schema(description = "Phone Number.", example = "22999998888", requiredMode = Schema.RequiredMode.REQUIRED) String phoneNumber,
     @Schema(description = "Brazilian individual taxpayer registry number.", example = "12345678909", requiredMode = Schema.RequiredMode.REQUIRED) String cpf,
     @Schema(description = "Person date of birth.", format = "date", example = "1990-05-15", requiredMode = Schema.RequiredMode.REQUIRED) LocalDate birthDate,
     @Schema(description = "Account email address.", format = "email", example = "ana.silva@example.com", requiredMode = Schema.RequiredMode.REQUIRED) String email,

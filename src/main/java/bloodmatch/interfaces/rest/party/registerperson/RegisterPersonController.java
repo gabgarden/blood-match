@@ -32,6 +32,8 @@ public class RegisterPersonController {
         throw new IllegalArgumentException("Request body cannot be null");
       if (isBlank(payload.name()))
         throw new IllegalArgumentException("name cannot be blank");
+      if (isBlank(payload.phoneNumber()))
+        throw new IllegalArgumentException("phoneNumber cannot be blank");
       if (isBlank(payload.cpf()))
         throw new IllegalArgumentException("cpf cannot be blank");
       if (payload.birthDate() == null)
@@ -49,6 +51,7 @@ public class RegisterPersonController {
 
       Person person = registerPartyUseCase.registerPerson(
           payload.name(),
+          payload.phoneNumber(),
           payload.cpf(),
           payload.birthDate(),
           payload.email(),

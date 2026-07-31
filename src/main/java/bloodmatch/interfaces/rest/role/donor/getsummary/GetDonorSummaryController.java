@@ -41,6 +41,7 @@ public class GetDonorSummaryController {
       return ResponseEntity.ok(Map.of(
           "personId", output.personId(),
           "donorName", output.donorName(),
+          "phoneNumber", output.phoneNumber(),
           "bloodType", output.bloodType(),
           "address", output.address(), 
           "lastDonationDate", String.valueOf(output.lastDonationDate()),

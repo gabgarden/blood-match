@@ -47,8 +47,9 @@ public class GetDonorSummaryUseCase {
     return new Output(
         donor.getPerson().getId().getValue().toString(),
         donor.getPerson().getName(),
+        donor.getPerson().getPhoneNumber().getValue(),
         donor.getBloodType().getType(),
-        donor.getPerson().getAddress().getFullAddressAsString(), // Só pra testar o endereço mrm, remover dps se quiser **
+        donor.getPerson().getAddress().getFullAddressAsString(),
         lastDonationDate,
         daysRemaining,
         livesImpacted);
@@ -70,6 +71,7 @@ public class GetDonorSummaryUseCase {
   public record Output(
       String personId,
       String donorName,
+      String phoneNumber,
       String bloodType,
       String address, 
       LocalDate lastDonationDate,

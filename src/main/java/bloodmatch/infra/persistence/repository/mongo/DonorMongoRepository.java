@@ -15,4 +15,6 @@ public interface DonorMongoRepository extends MongoRepository<DonorSchema, Strin
   Optional<DonorSchema> findByPersonId(String personId);
 
   List<DonorSchema> findByLocationNear(Point location, Distance distance);
+
+  List<DonorSchema> findAll();
 }

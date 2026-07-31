@@ -7,6 +7,7 @@ import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ public class PartySchema {
   private String id;
   private String partyType;
   private String name;
+  private String phoneNumber;
   private String cpf;
   private LocalDate birthDate;
   private String cnpj;
@@ -50,6 +52,7 @@ public class PartySchema {
 
     if (party instanceof Person person) {
       this.partyType = TYPE_PERSON;
+      this.phoneNumber = person.getPhoneNumber().getValue();
       this.cpf = person.getCpf().getValue();
       this.birthDate = person.getBirthDate();
       this.cnpj = null;
@@ -66,6 +69,7 @@ public class PartySchema {
 
     if (party instanceof Organization organization) {
       this.partyType = TYPE_ORGANIZATION;
+      this.phoneNumber = organization.getPhoneNumber().getValue();
       this.cnpj = organization.getCnpj().getValue();
       this.cpf = null;
       this.birthDate = null;
@@ -87,7 +91,7 @@ public class PartySchema {
     DomainID partyId = new DomainID(UUID.fromString(this.id));
 
     if (TYPE_PERSON.equals(this.partyType)) {
-      Person person = new PersistedPerson(partyId, this.name, new CPF(this.cpf), this.birthDate);
+      Person person = new PersistedPerson(partyId, this.name, new PhoneNumber(this.phoneNumber), new CPF(this.cpf), this.birthDate);
       if (street != null && city != null && state != null) {
         person.changeAddress(new Address(street, city, state, zipCode, latitude, longitude));
       }
@@ -95,7 +99,7 @@ public class PartySchema {
     }
 
     if (TYPE_ORGANIZATION.equals(this.partyType)) {
-      Organization organization = new PersistedOrganization(partyId, this.name, new CNPJ(this.cnpj));
+      Organization organization = new PersistedOrganization(partyId, this.name, new PhoneNumber(this.phoneNumber), new CNPJ(this.cnpj));
       if (street != null && city != null && state != null) {
         organization.changeAddress(new Address(street, city, state, zipCode, latitude, longitude));
       }
@@ -107,16 +111,16 @@ public class PartySchema {
 
   private static class PersistedPerson extends Person {
 
-    private PersistedPerson(DomainID id, String name, CPF cpf, LocalDate birthDate) {
-      super(name, cpf, birthDate);
+    private PersistedPerson(DomainID id, String name, PhoneNumber phonenumber, CPF cpf, LocalDate birthDate) {
+      super(name, phonenumber, cpf, birthDate);
       setId(id);
     }
   }
 
   private static class PersistedOrganization extends Organization {
 
-    private PersistedOrganization(DomainID id, String name, CNPJ cnpj) {
-      super(name, cnpj);
+    private PersistedOrganization(DomainID id, String name, PhoneNumber phonenumber, CNPJ cnpj) {
+      super(name, phonenumber, cnpj);
       setId(id);
     }
   }

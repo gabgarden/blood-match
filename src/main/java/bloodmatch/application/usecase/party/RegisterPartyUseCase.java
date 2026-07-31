@@ -10,6 +10,7 @@ import bloodmatch.domain.security.UserAccount;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.Email;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +51,7 @@ public class RegisterPartyUseCase {
   @Transactional
   public Person registerPerson(
       String name,
+      String phoneNumber,
       String cpf,
       LocalDate birthDate,
       String email,
@@ -64,7 +66,7 @@ public class RegisterPartyUseCase {
     Email userEmail = new Email(email);
     ensureEmailIsAvailable(userEmail);
 
-    Person person = new Person(name, new CPF(cpf), birthDate);
+    Person person = new Person(name, new PhoneNumber(phoneNumber), new CPF(cpf), birthDate);
     if (street != null && city != null && state != null && zipCode != null) {
       person.changeAddress(new Address(street, city, state, zipCode));
     }
@@ -83,6 +85,7 @@ public class RegisterPartyUseCase {
   @Transactional
   public Organization registerOrganization(
       String name,
+      String phoneNumber,
       String cnpj,
       String email,
       String password,
@@ -96,7 +99,7 @@ public class RegisterPartyUseCase {
     Email userEmail = new Email(email);
     ensureEmailIsAvailable(userEmail);
 
-    Organization organization = new Organization(name, new CNPJ(cnpj));
+    Organization organization = new Organization(name, new PhoneNumber(phoneNumber), new CNPJ(cnpj));
     if (street != null && city != null && state != null && zipCode != null) {
       organization.changeAddress(new Address(street, city, state, zipCode));
     }

@@ -8,6 +8,7 @@ import bloodmatch.infra.persistence.repository.mongo.DonorMongoRepository;
 import bloodmatch.infra.persistence.schema.DonorSchema;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,6 +31,15 @@ public class DonorRepositoryImpl implements DonorRepositoryInterface {
 
     return mongoRepository.findByPersonId(personId.getValue().toString())
         .map(schema -> schema.toDomain(personRepository));
+  }
+
+  @Override
+  public List<Donor> findAll() {
+    List<DonorSchema> schemas = mongoRepository.findAll();
+
+    return schemas.stream()
+        .map(schema -> schema.toDomain(personRepository))
+        .toList();
   }
 
   @Override
