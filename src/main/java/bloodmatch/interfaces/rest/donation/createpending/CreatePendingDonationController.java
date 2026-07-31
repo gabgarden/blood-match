@@ -18,7 +18,7 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDo
 
 @RestController
 @Tag(name = "Create Pending Donation", description = "Create a new pending donation.")
-@RequestMapping("/donation")
+@RequestMapping("/donations")
 public class CreatePendingDonationController {
 
   private final CreatePendingDonationUseCase useCase;

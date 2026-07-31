@@ -142,6 +142,19 @@ public class Donation extends DomainObject {
     this.pending = false;
   }
 
+  public void reschedule(LocalDate newExpectedDate, LocalDate currentDate) {
+    if (newExpectedDate == null)
+      throw new IllegalArgumentException("New expected date cannot be null");
+    if (currentDate == null)
+      throw new IllegalArgumentException("Current date cannot be null");
+    if (!isPending())
+      throw new IllegalStateException("Only pending donations can be rescheduled");
+    if (newExpectedDate.isBefore(currentDate))
+      throw new IllegalArgumentException("New expected date cannot be in the past");
+
+    this.donationDate = newExpectedDate;
+  }
+
   public void cancel() {
     if (!isPending())
       throw new IllegalStateException("Only pending donations can be cancelled");
