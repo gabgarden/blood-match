@@ -20,11 +20,8 @@ public class DonationRequest extends DomainObject {
   private LocalDate dateLimit;
   private boolean active;
   private Long version;
-
-
-
-
-
+  
+  private String directedTo; //paciente, caso a request seja pra uma pessoa especifica (o campo é não obrigatório)
 
   private Urgency urgency;
 
@@ -35,7 +32,8 @@ public class DonationRequest extends DomainObject {
       int goalBloodBags,
       LocalDate dateLimit,
       LocalDate currentDate,
-      Urgency urgency) {
+      Urgency urgency,
+      String directedTo) {
     this.id = DomainID.generate();
     this.requester = requester;
     this.bloodCenter = bloodCenter;
@@ -45,6 +43,7 @@ public class DonationRequest extends DomainObject {
     this.dateLimit = dateLimit;
     this.active = true;
     this.urgency = urgency;
+    this.directedTo = directedTo;
   }
 
   public static DonationRequest create(
@@ -53,7 +52,8 @@ public class DonationRequest extends DomainObject {
       BloodType bloodTypeNeeded,
       int goalBloodBags,
       LocalDate dateLimit,
-      Urgency urgency) {
+      Urgency urgency,
+      String directedTo) {
     return create(
         requester,
         bloodCenter,
@@ -61,7 +61,8 @@ public class DonationRequest extends DomainObject {
         goalBloodBags,
         dateLimit,
         LocalDate.now(),
-        urgency);
+        urgency,
+        directedTo);
   }
 
   public static DonationRequest create(
@@ -71,7 +72,8 @@ public class DonationRequest extends DomainObject {
       int goalBloodBags,
       LocalDate dateLimit,
       LocalDate currentDate,
-      Urgency urgency) {
+      Urgency urgency,
+      String directedTo) {
     if (requester == null)
       throw new IllegalArgumentException("Requester cannot be null");
     if (bloodCenter == null)
@@ -95,21 +97,8 @@ public class DonationRequest extends DomainObject {
         goalBloodBags,
         dateLimit,
         currentDate,
-        urgency);
-  }
-
-  public static DonationRequest reconstitute(
-      DomainID id,
-      Requester requester,
-      BloodCenter bloodCenter,
-      BloodType bloodTypeNeeded,
-      int goalBloodBags,
-      LocalDate dateRequested,
-      LocalDate dateLimit,
-      boolean isActive,
-      Urgency urgency) {
-    return reconstitute(id, requester, bloodCenter, bloodTypeNeeded, goalBloodBags, dateRequested,
-        dateLimit, isActive, urgency, null);
+        urgency,
+        directedTo);
   }
 
   public static DonationRequest reconstitute(
@@ -122,6 +111,22 @@ public class DonationRequest extends DomainObject {
       LocalDate dateLimit,
       boolean isActive,
       Urgency urgency,
+      String directedTo) {
+    return reconstitute(id, requester, bloodCenter, bloodTypeNeeded, goalBloodBags, dateRequested,
+        dateLimit, isActive, urgency, directedTo, null);
+  }
+
+  public static DonationRequest reconstitute(
+      DomainID id,
+      Requester requester,
+      BloodCenter bloodCenter,
+      BloodType bloodTypeNeeded,
+      int goalBloodBags,
+      LocalDate dateRequested,
+      LocalDate dateLimit,
+      boolean isActive,
+      Urgency urgency,
+      String directedTo,
       Long version) {
 
     if (id == null)
@@ -148,7 +153,8 @@ public class DonationRequest extends DomainObject {
         goalBloodBags,
         dateLimit,
         dateRequested,
-        urgency);
+        urgency,
+        directedTo);
 
     request.setId(id);
     request.dateRequested = dateRequested;
@@ -251,6 +257,11 @@ public class DonationRequest extends DomainObject {
   public Urgency getUrgency() {
     return urgency;
   }
+
+  public String getDirectedTo() {
+    return directedTo;
+  }
+
   public boolean acceptsDonation(
         Donation donation,
         LocalDate currentDate) {
@@ -279,6 +290,5 @@ public class DonationRequest extends DomainObject {
     return donation.getDonor()
             .getBloodType()
             .canDonateTo(bloodTypeNeeded);
-}
-  
+    }
 }

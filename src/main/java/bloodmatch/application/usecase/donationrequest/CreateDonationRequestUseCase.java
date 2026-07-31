@@ -59,7 +59,8 @@ public class CreateDonationRequestUseCase {
       BloodType bloodTypeNeeded,
       int goalBloodBags,
       LocalDate dateLimit,
-      Urgency urgency) {
+      Urgency urgency,
+      String directedTo) {
     return execute(
         partyId,
         organizationId,
@@ -67,7 +68,8 @@ public class CreateDonationRequestUseCase {
         goalBloodBags,
         dateLimit,
         LocalDate.now(),
-        urgency);
+        urgency,
+        directedTo);
   }
 
   public DonationRequest execute(
@@ -77,7 +79,8 @@ public class CreateDonationRequestUseCase {
       int goalBloodBags,
       LocalDate dateLimit,
       LocalDate currentDate,
-      Urgency urgency) {
+      Urgency urgency,
+      String directedTo) {
 
     if (partyId == null)
       throw new IllegalArgumentException("Party id cannot be null");
@@ -116,7 +119,8 @@ public class CreateDonationRequestUseCase {
         goalBloodBags,
         dateLimit,
         currentDate,
-        urgency);
+        urgency,
+        directedTo);
 
     donationRequestRepository.save(request);
     return request;

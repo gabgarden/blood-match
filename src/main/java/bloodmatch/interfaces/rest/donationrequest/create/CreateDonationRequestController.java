@@ -45,7 +45,8 @@ public class CreateDonationRequestController {
           bloodTypeNeeded,
           payload.goalBloodBags(),
           payload.dateLimit(),
-          urgency);
+          urgency,
+          payload.directedTo());
 
       return ResponseEntity
           .status(HttpStatus.CREATED)
@@ -82,5 +83,7 @@ public class CreateDonationRequestController {
 
     if (isBlank(payload.urgency()))
       throw new IllegalArgumentException("urgency cannot be blank");
+      
+    //directedTo é um campo opcional e pode ser null, por isso n tem validação.
   }
 }

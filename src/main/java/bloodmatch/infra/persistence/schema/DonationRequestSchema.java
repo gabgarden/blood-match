@@ -43,6 +43,7 @@ public class DonationRequestSchema {
   private LocalDate dateLimit;
   private boolean active;
   private String urgency;
+  private String directedTo;
   @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
   private double[] location;
 
@@ -60,6 +61,7 @@ public class DonationRequestSchema {
     this.dateLimit = donationRequest.getDateLimit();
     this.active = donationRequest.isActive();
     this.urgency = donationRequest.getUrgency().name();
+    this.directedTo = donationRequest.getDirectedTo();
     if (donationRequest.getBloodCenter().getOrganization().getAddress() != null
         && donationRequest.getBloodCenter().getOrganization().getAddress().hasCoordinates()) {
       this.location = new double[]{
@@ -91,6 +93,7 @@ public class DonationRequestSchema {
         this.dateLimit,
         this.active,
         Urgency.valueOf(this.urgency),
+        this.directedTo,
         this.version);
   }
 }

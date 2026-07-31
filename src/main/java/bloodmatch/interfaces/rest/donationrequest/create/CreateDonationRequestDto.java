@@ -10,5 +10,6 @@ public record CreateDonationRequestDto(
     @Schema(description = "Required blood type.", example = "O-", allowableValues = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"}, requiredMode = Schema.RequiredMode.REQUIRED) String bloodTypeNeeded,
     @Schema(description = "Target number of blood bags.", example = "10", minimum = "1", requiredMode = Schema.RequiredMode.REQUIRED) Integer goalBloodBags,
     @Schema(description = "Deadline for fulfilling the request.", format = "date", example = "2026-08-31", requiredMode = Schema.RequiredMode.REQUIRED) LocalDate dateLimit,
-    @Schema(description = "Urgency level of the request.", example = "CRITICAL", allowableValues = {"LOW", "MEDIUM", "CRITICAL"}, requiredMode = Schema.RequiredMode.REQUIRED) String urgency) {
+    @Schema(description = "Urgency level of the request.", example = "CRITICAL", allowableValues = {"LOW", "MEDIUM", "CRITICAL"}, requiredMode = Schema.RequiredMode.REQUIRED) String urgency,
+    @Schema(description = "Optional name of a specific patient the donation is directed to.", example = "João da Silva", requiredMode = Schema.RequiredMode.NOT_REQUIRED) String directedTo) {
 }
