@@ -13,6 +13,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -212,7 +213,7 @@ class DonationRequestFulfillmentFifoTest {
       boolean active) {
     return DonationRequest.reconstitute(
         id(id), requester(), center, BloodType.of(neededBloodType), goal,
-        requestedAt, limit, active, Urgency.MEDIUM);
+      requestedAt, limit, active, Urgency.MEDIUM, null, 0, null);
   }
 
   private Donation donation(long id, BloodCenter center, String donorBloodType, LocalDate date) {
@@ -220,16 +221,16 @@ class DonationRequestFulfillmentFifoTest {
   }
 
   private BloodCenter center(String suffix) {
-    return new BloodCenter(new Organization("Center " + suffix, new CNPJ("12345678000100")));
+    return new BloodCenter(new Organization("Center " + suffix, new PhoneNumber("1133334444"), new CNPJ("12345678000100")));
   }
 
   private Requester requester() {
-    return new Requester(new Person("Requester", new CPF("12345678901"), LocalDate.of(1990, 1, 1)));
+    return new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1)));
   }
 
   private Donor donor(String bloodType) {
     return new Donor(
-        new Person("Donor", new CPF("98765432100"), LocalDate.of(1990, 1, 1)),
+        new Person("Donor", new PhoneNumber("11988887777"), new CPF("98765432100"), LocalDate.of(1990, 1, 1)),
         BloodType.of(bloodType),
         70.0);
   }

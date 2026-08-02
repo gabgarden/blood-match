@@ -19,6 +19,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class DonationRequestFulfillmentService {
 
+        public Map<DomainID, DonationRequestFulfillmentStatusRecord> synchronize(
+                        List<DonationRequest> requests,
+                        List<Donation> donations,
+                        LocalDate currentDate) {
+
+                Map<DomainID, DonationRequestFulfillmentStatusRecord> result = calculate(
+                                requests,
+                                donations,
+                                currentDate);
+
+                for (DonationRequest request : requests) {
+                        DonationRequestFulfillmentStatusRecord status = result.get(request.getId());
+                        request.setFulfilledBloodBags(
+                                        status != null ? status.fulfilledBloodBags() : 0);
+                }
+
+                return result;
+        }
+
     public Map<DomainID, DonationRequestFulfillmentStatusRecord> calculate(
             List<DonationRequest> requests,
             List<Donation> donations,

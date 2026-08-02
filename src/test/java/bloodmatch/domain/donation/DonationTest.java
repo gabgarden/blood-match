@@ -8,6 +8,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -50,11 +51,11 @@ class DonationTest {
   }
 
   private Donor donor() {
-    return new Donor(new Person("Donor", new CPF("12345678901"), currentDate.minusYears(30)),
+    return new Donor(new Person("Donor", new PhoneNumber("11988887777"), new CPF("12345678901"), currentDate.minusYears(30)),
         BloodType.of("O-"), 70.0);
   }
 
   private BloodCenter bloodCenter() {
-    return new BloodCenter(new Organization("Center", new CNPJ("12345678000100")));
+    return new BloodCenter(new Organization("Center", new PhoneNumber("1133334444"), new CNPJ("12345678000100")));
   }
 }

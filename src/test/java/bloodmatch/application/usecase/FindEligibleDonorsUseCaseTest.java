@@ -15,6 +15,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import bloodmatch.interfaces.DonorRecommendationPolicyInterface;
 
 import org.junit.jupiter.api.Test;
@@ -96,12 +97,14 @@ class FindEligibleDonorsUseCaseTest {
   private DonationRequest createDonationRequest(LocalDate currentDate) {
     Person requesterParty = new Person(
         "Requester Person",
+        new PhoneNumber("11999990000"),
         new CPF("12345678901"),
         LocalDate.of(1995, 1, 1));
     Requester requester = new Requester(requesterParty);
 
     Organization bloodCenterParty = new Organization(
         "Main Blood Center",
+        new PhoneNumber("1133334444"),
         new CNPJ("12345678000100"));
     BloodCenter bloodCenter = new BloodCenter(bloodCenterParty);
 
@@ -109,16 +112,18 @@ class FindEligibleDonorsUseCaseTest {
         requester,
         bloodCenter,
         BloodType.of("A+"),
-      1,
+        1,
         currentDate.plusDays(10),
-      currentDate,
-      Urgency.MEDIUM);
+        currentDate,
+        Urgency.MEDIUM,
+        null);
   }
 
   private Donor createDonor(LocalDate currentDate, String cpf) {
     return new Donor(
-                new Person(
+        new Person(
             "Donor Person",
+            new PhoneNumber("11988887777"),
             new CPF(cpf),
             currentDate.minusYears(30)),
         BloodType.of("O-"),

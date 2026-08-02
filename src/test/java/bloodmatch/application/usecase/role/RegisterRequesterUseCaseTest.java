@@ -9,6 +9,7 @@ import bloodmatch.domain.security.UserAccount;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.Email;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -36,6 +37,7 @@ class RegisterRequesterUseCaseTest {
   void shouldAddRequesterRoleToUserAccountWhenRegisteringRequester() {
     Person party = new Person(
         "Requester Person",
+        new PhoneNumber("11999990000"),
         new CPF("98765432100"),
         LocalDate.of(1992, 2, 2));
     DomainID partyId = party.getId();

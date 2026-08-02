@@ -12,6 +12,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -63,11 +64,13 @@ class CancelDonationRequestUseCaseTest {
   private DonationRequest createRequest() {
     Requester requester = new Requester(new Person(
         "Requester Person",
+      new PhoneNumber("11999990000"),
         new CPF("12345678901"),
         LocalDate.of(1990, 1, 1)));
 
     BloodCenter bloodCenter = new BloodCenter(new Organization(
         "Blood Center",
+      new PhoneNumber("1133334444"),
         new CNPJ("12345678000100")));
 
     return DonationRequest.create(
@@ -76,6 +79,7 @@ class CancelDonationRequestUseCaseTest {
         BloodType.of("A+"),
         1,
         LocalDate.now().plusDays(30),
-        Urgency.MEDIUM);
+        Urgency.MEDIUM,
+        null);
   }
 }

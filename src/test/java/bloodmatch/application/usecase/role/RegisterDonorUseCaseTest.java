@@ -10,6 +10,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.Email;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import org.junit.jupiter.api.Test;
 import bloodmatch.domain.services.GeocodingServiceInterface;
 
@@ -40,6 +41,7 @@ class RegisterDonorUseCaseTest {
   void shouldAddDonorRoleToUserAccountWhenRegisteringDonor() {
     Person person = new Person(
         "Donor Person",
+        new PhoneNumber("11988887777"),
         new CPF("12345678901"),
         LocalDate.of(1990, 1, 1));
     DomainID partyId = person.getId();

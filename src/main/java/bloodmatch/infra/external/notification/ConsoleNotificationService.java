@@ -14,7 +14,7 @@ public class ConsoleNotificationService implements NotificationServiceInterface 
         String donorName = donor.getPerson().getName();
         String donorEmail = account.getEmail().getValue();
         String bloodCenterName = request.getBloodCenter().getOrganization().getName();
-        String bloodType = request.getBloodTypeNeeded().getType();
+        String bloodType = donor.getBloodType().getType();
 
         System.out.println("=====================================================");
         System.out.println("[NOTIFICAÇÃO ENVIADA - SIMULAÇÃO PUSH/EMAIL]");

@@ -1,14 +1,10 @@
 package bloodmatch.application.usecase.donationrequest.recommendations;
 
-import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
-import bloodmatch.domain.services.DonationRequestFulfillmentService;
-import bloodmatch.domain.services.records.DonationRequestFulfillmentStatusRecord;
 import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
@@ -16,26 +12,19 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class GetRecommendedRequestsUseCase {
 
     private final DonorRepositoryInterface donorRepository;
     private final DonationRequestRepositoryInterface donationRequestRepository;
-    private final DonationRepositoryInterface donationRepository;
-    private final DonationRequestFulfillmentService fulfillmentService;
 
     public GetRecommendedRequestsUseCase(
             DonorRepositoryInterface donorRepository,
-            DonationRequestRepositoryInterface donationRequestRepository,
-            DonationRepositoryInterface donationRepository,
-            DonationRequestFulfillmentService fulfillmentService) {
+                        DonationRequestRepositoryInterface donationRequestRepository) {
 
         this.donorRepository = donorRepository;
         this.donationRequestRepository = donationRequestRepository;
-        this.donationRepository = donationRepository;
-        this.fulfillmentService = fulfillmentService;
     }
 
     public List<OutputItem> execute(DomainID personId) {
@@ -67,32 +56,11 @@ public class GetRecommendedRequestsUseCase {
             return List.of();
         }
 
-        List<DonationRequest> activeRequests = donationRequestRepository.findActiveRequestsByBloodCenterIds(
-                candidateRequests.stream()
-                        .map(request -> request.getBloodCenter().getOrganization().getId())
-                        .distinct()
-                        .toList(),
-                currentDate);
-
-        List<Donation> donations = donationRepository
-                .findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
-                        activeRequests.stream()
-                                .map(request -> request.getBloodCenter().getOrganization().getId())
-                                .distinct()
-                                .toList());
-
-        Map<DomainID, DonationRequestFulfillmentStatusRecord> fulfillment =
-                fulfillmentService.calculate(
-                        activeRequests,
-                        donations,
-                        currentDate);
-
         return candidateRequests.stream()
-                .filter(request -> !fulfillment.get(request.getId()).goalReached())
+                .filter(request -> !request.isGoalReached())
                 .map(request -> toOutput(
                         request,
-                        donor,
-                        fulfillment.get(request.getId())))
+                        donor))
                 .sorted(
                         Comparator
                                 .comparing(
@@ -105,8 +73,7 @@ public class GetRecommendedRequestsUseCase {
 
     private OutputItem toOutput(
             DonationRequest request,
-            Donor donor,
-            DonationRequestFulfillmentStatusRecord fulfillment) {
+            Donor donor) {
 
         Double distance = calculateDistance(
                 donor.getPerson().getAddress(),
@@ -120,8 +87,8 @@ public class GetRecommendedRequestsUseCase {
                 request.getUrgency(),
                 distance != null ? Math.round(distance * 10.0) / 10.0 : null,
                 request.getGoalBloodBags(),
-                fulfillment.fulfilledBloodBags(),
-                fulfillment.goalReached());
+                request.getFulfilledBloodBags(),
+                request.isGoalReached());
     }
 
     private Double calculateDistance(Address addr1, Address addr2) {

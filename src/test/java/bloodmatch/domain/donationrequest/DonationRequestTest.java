@@ -9,6 +9,7 @@ import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -45,13 +46,13 @@ class DonationRequestTest {
 
   private DonationRequest request(BloodType type, LocalDate dateLimit) {
     return DonationRequest.create(
-        new Requester(new Person("Requester", new CPF("12345678901"), LocalDate.of(1990, 1, 1))),
-        new BloodCenter(new Organization("Center", new CNPJ("12345678000100"))),
-        type, 2, dateLimit, requestedAt, Urgency.MEDIUM);
+        new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1))),
+        new BloodCenter(new Organization("Center", new PhoneNumber("1133334444"), new CNPJ("12345678000100"))),
+        type, 2, dateLimit, requestedAt, Urgency.MEDIUM, null);
   }
 
   private Donor donor(BloodType type) {
     return new Donor(
-        new Person("Donor", new CPF("98765432100"), LocalDate.of(1990, 1, 1)), type, 70.0);
+        new Person("Donor", new PhoneNumber("11988887777"), new CPF("98765432100"), LocalDate.of(1990, 1, 1)), type, 70.0);
   }
 }

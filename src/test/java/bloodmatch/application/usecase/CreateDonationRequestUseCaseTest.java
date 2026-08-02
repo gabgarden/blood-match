@@ -16,6 +16,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 
 import org.junit.jupiter.api.Test;
 
@@ -53,12 +54,14 @@ class CreateDonationRequestUseCaseTest {
 
     Person requesterParty = new Person(
         "Requester Person",
+        new PhoneNumber("11999990000"),
         new CPF("12345678901"),
         LocalDate.of(1995, 1, 1));
     Requester requester = new Requester(requesterParty);
 
     Organization bloodCenterParty = new Organization(
         "Main Blood Center",
+        new PhoneNumber("1133334444"),
         new CNPJ("12345678000100"));
     DomainID requesterId = DomainID.generate();
     DomainID bloodCenterId = DomainID.generate();
@@ -73,7 +76,8 @@ class CreateDonationRequestUseCaseTest {
         3,
         dateLimit,
         currentDate,
-        Urgency.MEDIUM);
+        Urgency.MEDIUM,
+        null);
 
     assertNotNull(request);
     assertEquals(currentDate, request.getDateRequested());
@@ -89,18 +93,20 @@ class CreateDonationRequestUseCaseTest {
 
     Person requesterParty = new Person(
         "Requester Person",
+        new PhoneNumber("11999990000"),
         new CPF("12345678901"),
         LocalDate.of(1995, 1, 1));
     Requester requester = new Requester(requesterParty);
 
     Organization bloodCenterParty = new Organization(
         "Main Blood Center",
+        new PhoneNumber("1133334444"),
         new CNPJ("12345678000100"));
     bloodCenterParty.changeAddress(new Address(
-        "Rua A", null, null, "São Paulo", -23.55, -46.6));
+        "Rua A", "São Paulo", "SP", "01001000"));
 
     Address geocodedAddress = new Address(
-        "Rua A", null, null, "São Paulo", -23.55, -46.6);
+        "Rua A", "São Paulo", "SP", "01001000", -23.55, -46.6);
 
     DomainID requesterId = DomainID.generate();
     DomainID bloodCenterId = DomainID.generate();
@@ -116,7 +122,8 @@ class CreateDonationRequestUseCaseTest {
         3,
         dateLimit,
         currentDate,
-        Urgency.MEDIUM);
+        Urgency.MEDIUM,
+        null);
 
     assertNotNull(request);
     verify(geocodingService).getCoordinatesFromAddress(any());
@@ -132,6 +139,7 @@ class CreateDonationRequestUseCaseTest {
 
     Organization bloodCenterParty = new Organization(
         "Main Blood Center",
+        new PhoneNumber("1133334444"),
         new CNPJ("12345678000100"));
     when(requesterRepository.findByPartyId(requesterId)).thenReturn(Optional.empty());
     when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(Optional.of(new bloodmatch.domain.roles.organization.bloodcenter.BloodCenter(bloodCenterParty)));
@@ -145,6 +153,7 @@ class CreateDonationRequestUseCaseTest {
                         3,
             currentDate.plusDays(10),
                         currentDate,
-                        Urgency.MEDIUM));
+                        Urgency.MEDIUM,
+                        null));
   }
 }

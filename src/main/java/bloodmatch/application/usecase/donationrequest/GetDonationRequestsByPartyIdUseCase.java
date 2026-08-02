@@ -1,35 +1,24 @@
 package bloodmatch.application.usecase.donationrequest;
 
-import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
-import bloodmatch.domain.services.DonationRequestFulfillmentService;
-import bloodmatch.domain.services.records.DonationRequestFulfillmentStatusRecord;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class GetDonationRequestsByPartyIdUseCase {
 
     private final DonationRequestRepositoryInterface donationRequestRepository;
-    private final DonationRepositoryInterface donationRepository;
-    private final DonationRequestFulfillmentService fulfillmentService;
 
     public GetDonationRequestsByPartyIdUseCase(
-            DonationRequestRepositoryInterface donationRequestRepository,
-            DonationRepositoryInterface donationRepository,
-            DonationRequestFulfillmentService fulfillmentService) {
+                        DonationRequestRepositoryInterface donationRequestRepository) {
 
         this.donationRequestRepository = donationRequestRepository;
-        this.donationRepository = donationRepository;
-        this.fulfillmentService = fulfillmentService;
     }
 
     public List<OutputItem> execute(DomainID partyId) {
@@ -46,40 +35,21 @@ public class GetDonationRequestsByPartyIdUseCase {
         List<DonationRequest> userRequests =
                 donationRequestRepository.findByRequesterPartyId(partyId);
 
-        List<DonationRequest> activeRequests =
-                donationRequestRepository.findActiveRequests();
-
-        List<Donation> donations = donationRepository
-                .findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
-                        activeRequests.stream()
-                                .map(request -> request.getBloodCenter().getOrganization().getId())
-                                .distinct()
-                                .toList());
-
-        Map<DomainID, DonationRequestFulfillmentStatusRecord> fulfillment =
-                fulfillmentService.calculate(
-                        activeRequests,
-                        donations,
-                        currentDate);
-
         return userRequests.stream()
                 .sorted(
                         Comparator.comparing(DonationRequest::getDateRequested)
                                 .reversed()
                                 .thenComparing(request -> request.getId().getValue()))
-                .map(request -> toOutput(request, fulfillment.get(request.getId()), currentDate))
+                .map(request -> toOutput(request, currentDate))
                 .toList();
     }
 
     private OutputItem toOutput(
             DonationRequest request,
-            DonationRequestFulfillmentStatusRecord fulfillment,
             LocalDate currentDate) {
 
-        int fulfilledBloodBags = fulfillment != null
-                ? fulfillment.fulfilledBloodBags()
-                : 0;
-        boolean goalReached = fulfillment != null && fulfillment.goalReached();
+        int fulfilledBloodBags = request.getFulfilledBloodBags();
+        boolean goalReached = request.isGoalReached();
 
         return new OutputItem(
                 request.getId().getValue().toString(),

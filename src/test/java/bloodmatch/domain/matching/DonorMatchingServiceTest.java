@@ -10,6 +10,7 @@ import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,9 @@ class DonorMatchingServiceTest {
   @Test
   void shouldReturnOnlyCompatibleAndEligibleDonorsForAnActiveRequest() {
     DonationRequest request = DonationRequest.create(
-        new Requester(new Person("Requester", new CPF("12345678901"), LocalDate.of(1990, 1, 1))),
-        new BloodCenter(new Organization("Center", new CNPJ("12345678000100"))),
-        BloodType.of("A+"), 1, currentDate.plusDays(2), currentDate, Urgency.MEDIUM);
+      new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1))),
+      new BloodCenter(new Organization("Center", new PhoneNumber("1133334444"), new CNPJ("12345678000100"))),
+      BloodType.of("A+"), 1, currentDate.plusDays(2), currentDate, Urgency.MEDIUM, null);
     Donor compatible = donor("98765432100", BloodType.of("O-"));
     Donor incompatible = donor("12312312399", BloodType.of("B-"));
     Donor temporarilyIneligible = donor("32132132199", BloodType.of("O-"));
@@ -40,6 +41,6 @@ class DonorMatchingServiceTest {
 
   private Donor donor(String cpf, BloodType type) {
     return new Donor(
-        new Person("Donor", new CPF(cpf), currentDate.minusYears(30)), type, 70.0);
+      new Person("Donor", new PhoneNumber("11988887777"), new CPF(cpf), currentDate.minusYears(30)), type, 70.0);
   }
 }

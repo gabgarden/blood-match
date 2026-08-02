@@ -6,6 +6,7 @@ import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class UpdateDonorRecommendationDistanceUseCaseTest {
 
   private Donor donor() {
     return new Donor(
-        new Person("Donor", new CPF("12345678901"), LocalDate.of(1990, 1, 1)),
+        new Person("Donor", new PhoneNumber("11988887777"), new CPF("12345678901"), LocalDate.of(1990, 1, 1)),
         BloodType.of("O+"),
         70);
   }
