@@ -76,8 +76,6 @@ public class Address {
         return Objects.hash(street, city, state, zipCode, latitude, longitude);
     }
 
-
-
     // "Rua X, 241, Bairro, Cidade, UF, CEP, Brasil"
     public String getFullAddressAsString() {
         StringBuilder sb = new StringBuilder();
@@ -105,5 +103,26 @@ public class Address {
           .append(", Brasil");
 
         return sb.toString();
+    }
+
+    public final Double distanceTo(Address other) {
+        if (!this.hasCoordinates() || other == null || !other.hasCoordinates()) {
+            return null;
+        }
+
+        final int R = 6371; // Raio da terra em KM
+
+        double latDistance = Math.toRadians(other.getLatitude() - this.getLatitude());
+        double lonDistance = Math.toRadians(other.getLongitude() - this.getLongitude());
+
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(this.getLatitude()))
+                * Math.cos(Math.toRadians(other.getLatitude()))
+                * Math.sin(lonDistance / 2)
+                * Math.sin(lonDistance / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
     }
 }

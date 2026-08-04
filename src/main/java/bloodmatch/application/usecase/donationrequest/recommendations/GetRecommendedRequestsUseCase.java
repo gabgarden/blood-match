@@ -75,9 +75,9 @@ public class GetRecommendedRequestsUseCase {
             DonationRequest request,
             Donor donor) {
 
-        Double distance = calculateDistance(
-                donor.getPerson().getAddress(),
-                request.getBloodCenter().getOrganization().getAddress());
+        Address addr1 = donor.getPerson().getAddress();
+        Address addr2 = request.getBloodCenter().getOrganization().getAddress();
+        Double distance = addr1.distanceTo(addr2);
 
         return new OutputItem(
                 request.getId().getValue().toString(),
@@ -89,33 +89,6 @@ public class GetRecommendedRequestsUseCase {
                 request.getGoalBloodBags(),
                 request.getFulfilledBloodBags(),
                 request.isGoalReached());
-    }
-
-    private Double calculateDistance(Address addr1, Address addr2) {
-        if (addr1 == null || addr2 == null
-                || !addr1.hasCoordinates()
-                || !addr2.hasCoordinates()) {
-            return null;
-        }
-
-        final int R = 6371;
-
-        double latDistance = Math.toRadians(
-                addr2.getLatitude() - addr1.getLatitude());
-
-        double lonDistance = Math.toRadians(
-                addr2.getLongitude() - addr1.getLongitude());
-
-        double a =
-                Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                        + Math.cos(Math.toRadians(addr1.getLatitude()))
-                        * Math.cos(Math.toRadians(addr2.getLatitude()))
-                        * Math.sin(lonDistance / 2)
-                        * Math.sin(lonDistance / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return R * c;
     }
 
     public record OutputItem(
