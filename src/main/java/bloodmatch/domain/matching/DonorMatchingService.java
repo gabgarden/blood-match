@@ -2,6 +2,7 @@ package bloodmatch.domain.matching;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.roles.person.donor.Donor;
+import bloodmatch.domain.shared.valueObjects.Address;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ public class DonorMatchingService {
             throw new IllegalArgumentException("Current date cannot be null");
 
         List<Donor> eligibleDonors = new ArrayList<>();
+        
+        Address bloodCenterAddress = request.getBloodCenter().getOrganization().getAddress();
 
         for (Donor donor : donors) {
 
@@ -36,10 +39,19 @@ public class DonorMatchingService {
             if (!donor.isEligibleToDonate(currentDate))
                 continue;
 
+            Address donorAddress = donor.getPerson().getAddress();
+            
+            if (donorAddress == null || bloodCenterAddress == null)
+                continue;
+                
+            Double distanceInKm = donorAddress.distanceTo(bloodCenterAddress);
+            
+            if (distanceInKm == null || distanceInKm > donor.getMaxRecommendationDistanceKm())
+                continue;
+
             eligibleDonors.add(donor);
         }
 
         return eligibleDonors;
     }
-
 }
