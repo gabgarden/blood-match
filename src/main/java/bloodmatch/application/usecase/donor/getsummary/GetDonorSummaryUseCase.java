@@ -1,5 +1,8 @@
 package bloodmatch.application.usecase.donor.getsummary;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
@@ -25,18 +28,20 @@ public class GetDonorSummaryUseCase {
     this.donationRepository = donationRepository;
   }
 
-  public Output execute(DomainID personId) {
-    return execute(personId, LocalDate.now());
+  public Output execute(Input input) {
+    return execute(input, LocalDate.now());
   }
 
-  public Output execute(DomainID personId, LocalDate currentDate) {
-    if (personId == null)
-      throw new IllegalArgumentException("Person id cannot be null");
+  public Output execute(Input input, LocalDate currentDate) {
+    if (input == null)
+      throw new ValidationException("Request cannot be null");
     if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
+      throw new ValidationException("Current date cannot be null");
+
+    DomainID personId = DomainIdParser.parse(input.personId(), "personId");
 
     Donor donor = donorRepository.findByPartyId(personId)
-        .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
+        .orElseThrow(() -> new NotFoundException("Donor role not found"));
 
     LocalDate lastDonationDate = donor.getLastDonationDate();
     int daysRemaining = calculateDaysRemaining(lastDonationDate, currentDate);
@@ -68,12 +73,15 @@ public class GetDonorSummaryUseCase {
     return (int) remaining;
   }
 
+  public record Input(String personId) {
+  }
+
   public record Output(
       String personId,
       String donorName,
       String phoneNumber,
       String bloodType,
-      String address, 
+      String address,
       LocalDate lastDonationDate,
       int daysRemaining,
       long livesImpacted) {

@@ -1,17 +1,20 @@
 package bloodmatch.application.usecase.role;
 
+import bloodmatch.application.exception.ConflictException;
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.repositories.PersonRepositoryInterface;
 import bloodmatch.domain.repositories.UserAccountRepositoryInterface;
+import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.security.SecurityRole;
 import bloodmatch.domain.security.UserAccount;
-import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.services.GeocodingServiceInterface;
 import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,39 +47,59 @@ public class RegisterDonorUseCase {
   }
 
   @Transactional
-  public Donor execute(DomainID personId, BloodType bloodType, double weight) {
+  public Output execute(Input input) {
+    if (input == null)
+      throw new ValidationException("Request body cannot be null");
+    if (input.bloodType() == null || input.bloodType().isBlank())
+      throw new ValidationException("bloodType cannot be blank");
 
-    if (personId == null) throw new IllegalArgumentException("Person id cannot be null");
-    if (bloodType == null) throw new IllegalArgumentException("Blood type cannot be null");
+    DomainID personId = DomainIdParser.parse(input.personId(), "personId");
+    BloodType bloodType = parseBloodType(input.bloodType());
 
     Person person = personRepository.findById(personId)
-        .orElseThrow(() -> new IllegalArgumentException("Person not found"));
+        .orElseThrow(() -> new NotFoundException("Person not found"));
 
     if (donorRepository.findByPartyId(personId).isPresent()) {
-      throw new IllegalStateException("Donor already registered for person");
+      throw new ConflictException("Donor already registered for person");
     }
 
-    //geo
     Address currentAddress = person.getAddress();
     if (currentAddress != null && !currentAddress.hasCoordinates()) {
-        Address addressWithCoords = geocodingService.getCoordinatesFromAddress(currentAddress);
-        person.changeAddress(addressWithCoords);
-        personRepository.save(person);
+      Address addressWithCoords = geocodingService.getCoordinatesFromAddress(currentAddress);
+      person.changeAddress(addressWithCoords);
+      personRepository.save(person);
     }
 
-    Donor donor = new Donor(person, bloodType, weight);
+    Donor donor = new Donor(person, bloodType, input.weight());
     donorRepository.save(donor);
     addRoleToUserAccount(personId, SecurityRole.DONOR);
-    return donor;
+    return Output.from(donor);
+  }
+
+  private BloodType parseBloodType(String bloodType) {
+    try {
+      return BloodType.of(bloodType);
+    } catch (IllegalArgumentException e) {
+      throw new ValidationException(e.getMessage());
+    }
   }
 
   private void addRoleToUserAccount(DomainID partyId, SecurityRole role) {
     UserAccount userAccount = userAccountRepository.findByPartyId(partyId)
-        .orElseThrow(() -> new IllegalStateException("User account not found for party"));
+        .orElseThrow(() -> new NotFoundException("User account not found for party"));
 
     Set<SecurityRole> updatedRoles = new HashSet<>(userAccount.getRoles());
     updatedRoles.add(role);
     userAccount.updateRoles(updatedRoles);
     userAccountRepository.save(userAccount);
+  }
+
+  public record Input(String personId, String bloodType, double weight) {
+  }
+
+  public record Output(String id) {
+    public static Output from(Donor donor) {
+      return new Output(donor.getId().getValue().toString());
+    }
   }
 }

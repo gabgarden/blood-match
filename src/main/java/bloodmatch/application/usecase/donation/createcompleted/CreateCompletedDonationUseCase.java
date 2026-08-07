@@ -1,6 +1,10 @@
 package bloodmatch.application.usecase.donation.createcompleted;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.donation.Donation;
+import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
@@ -46,35 +50,41 @@ public class CreateCompletedDonationUseCase {
     this.fulfillmentService = fulfillmentService;
   }
 
-  public Donation execute(
-      DomainID personId,
-      DomainID organizationId,
-      LocalDate donationDate) {
+  public Output execute(Input input) {
+    return execute(input, LocalDate.now());
+  }
 
-    if (personId == null)
-      throw new IllegalArgumentException("Person id cannot be null");
-    if (organizationId == null)
-      throw new IllegalArgumentException("Organization id cannot be null");
-    if (donationDate == null)
-      throw new IllegalArgumentException("Donation date cannot be null");
+  public Output execute(Input input, LocalDate currentDate) {
+    if (input == null) {
+      throw new ValidationException("Request body cannot be null");
+    }
+    if (currentDate == null) {
+      throw new ValidationException("Current date cannot be null");
+    }
+
+    DomainID personId = DomainIdParser.parse(input.personId(), "personId");
+    DomainID organizationId = DomainIdParser.parse(input.organizationId(), "organizationId");
+    if (input.donationDate() == null) {
+      throw new ValidationException("donationDate cannot be null");
+    }
 
     Donor donor = donorRepository.findByPartyId(personId)
-        .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
+        .orElseThrow(() -> new NotFoundException("Donor role not found"));
 
     BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
-        .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
+        .orElseThrow(() -> new NotFoundException("Blood center role not found"));
 
-    Donation donation = Donation.registerExternalDonation(donor, donationDate, bloodCenter, LocalDate.now());
-    donor.registerDonation(donationDate, LocalDate.now());
+    Donation donation = Donation.registerExternalDonation(donor, input.donationDate(), bloodCenter, currentDate);
+    donor.registerDonation(input.donationDate(), currentDate);
     donorRepository.save(donor);
     donationRepository.save(donation);
-    refreshFulfillment(bloodCenter.getOrganization().getId(), LocalDate.now());
+    refreshFulfillment(bloodCenter.getOrganization().getId(), currentDate);
 
-    return donation;
+    return Output.from(donation);
   }
 
   private void refreshFulfillment(DomainID bloodCenterId, LocalDate currentDate) {
-    List<bloodmatch.domain.donationrequest.DonationRequest> requests =
+    List<DonationRequest> requests =
         donationRequestRepository.findActiveRequestsByBloodCenterIds(
             List.of(bloodCenterId),
             currentDate);
@@ -88,8 +98,33 @@ public class CreateCompletedDonationUseCase {
 
     fulfillmentService.synchronize(requests, donations, currentDate);
 
-    for (bloodmatch.domain.donationrequest.DonationRequest request : requests) {
+    for (DonationRequest request : requests) {
       donationRequestRepository.save(request);
+    }
+  }
+
+  public record Input(String personId, String organizationId, LocalDate donationDate) {
+  }
+
+  public record Output(String id, LocalDate donationDate, String status) {
+    public static Output from(Donation donation) {
+      return new Output(
+          donation.getId().getValue().toString(),
+          donation.getDonationDate(),
+          statusOf(donation));
+    }
+
+    private static String statusOf(Donation donation) {
+      if (donation.isCompleted()) {
+        return "COMPLETED";
+      }
+      if (donation.isPending()) {
+        return "PENDING";
+      }
+      if (donation.isCancelled()) {
+        return "CANCELLED";
+      }
+      return "UNKNOWN";
     }
   }
 }

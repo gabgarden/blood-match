@@ -48,7 +48,8 @@ class GetRecommendedRequestsUseCaseTest {
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
     when(donationRequestRepository.findActiveRequestsByBloodCenterIds(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
 
-    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
+        new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
 
     assertEquals(List.of(), result);
   }
@@ -65,7 +66,8 @@ class GetRecommendedRequestsUseCaseTest {
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
 
-    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
+        new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
 
     assertEquals(1, result.size());
     assertEquals(0, result.get(0).fulfilledBloodBags());
@@ -84,7 +86,8 @@ class GetRecommendedRequestsUseCaseTest {
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
 
-    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
+        new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
 
     assertEquals(List.of(), result);
   }
@@ -106,7 +109,8 @@ class GetRecommendedRequestsUseCaseTest {
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any()))
         .thenReturn(List.of(farther, closer));
 
-    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
+        new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
 
     assertEquals(2, result.size());
     assertEquals(closer.getId().getValue().toString(), result.get(0).requestId());
@@ -123,7 +127,8 @@ class GetRecommendedRequestsUseCaseTest {
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
 
-    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(donorId, currentDate);
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
+        new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
 
     assertEquals(List.of(), result);
   }

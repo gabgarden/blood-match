@@ -1,23 +1,25 @@
 package bloodmatch.application.usecase.role;
 
+import bloodmatch.application.usecase.role.RegisterDonorUseCase.Input;
+import bloodmatch.application.usecase.role.RegisterDonorUseCase.Output;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.repositories.PersonRepositoryInterface;
 import bloodmatch.domain.repositories.UserAccountRepositoryInterface;
 import bloodmatch.domain.security.SecurityRole;
 import bloodmatch.domain.security.UserAccount;
-import bloodmatch.domain.shared.valueObjects.BloodType;
+import bloodmatch.domain.services.GeocodingServiceInterface;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.Email;
 import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import org.junit.jupiter.api.Test;
-import bloodmatch.domain.services.GeocodingServiceInterface;
 
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -56,8 +58,9 @@ class RegisterDonorUseCaseTest {
     when(donorRepository.findByPartyId(partyId)).thenReturn(Optional.empty());
     when(userAccountRepository.findByPartyId(partyId)).thenReturn(Optional.of(userAccount));
 
-    useCase.execute(partyId, BloodType.of("A+"), 72.5);
+    Output output = useCase.execute(new Input(partyId.getValue().toString(), "A+", 72.5));
 
+    assertNotNull(output.id());
     assertTrue(userAccount.getRoles().contains(SecurityRole.DONOR));
     verify(donorRepository).save(any());
     verify(userAccountRepository).save(userAccount);

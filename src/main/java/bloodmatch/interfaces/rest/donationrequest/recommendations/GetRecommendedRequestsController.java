@@ -1,19 +1,17 @@
 package bloodmatch.interfaces.rest.donationrequest.recommendations;
 
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
+import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase.Input;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.util.List;
 
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Get Recommended Requests", description = "Get a list of recommended donation requests for a specific person.")
@@ -27,22 +25,13 @@ public class GetRecommendedRequestsController {
   }
 
   @GetMapping("/recommendations")
-  public ResponseEntity<?> getByQuery(@RequestParam String personId) {
-    return execute(personId);
-  }
+  public ResponseEntity<List<RecommendedRequestResponseDto>> getByQuery(@RequestParam String personId) {
+    requireNotBlank(personId, "personId cannot be blank");
 
+    List<RecommendedRequestResponseDto> body = useCase.execute(new Input(personId)).stream()
+        .map(RecommendedRequestResponseDto::from)
+        .toList();
 
-
-  private ResponseEntity<?> execute(String personIdValue) {
-    try {
-      if (isBlank(personIdValue))
-        throw new IllegalArgumentException("personId cannot be blank");
-
-      DomainID personId = parseDomainId(personIdValue, "personId");
-      return ResponseEntity.ok(useCase.execute(personId));
-
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    }
+    return ResponseEntity.ok(body);
   }
 }

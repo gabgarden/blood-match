@@ -1,5 +1,6 @@
 package bloodmatch.application.usecase.auth;
 
+import bloodmatch.application.exception.UnauthorizedException;
 import bloodmatch.domain.repositories.UserAccountRepositoryInterface;
 import bloodmatch.domain.security.SecurityRole;
 import bloodmatch.domain.security.UserAccount;
@@ -50,7 +51,7 @@ class AuthenticationServiceTest {
         .thenReturn(true);
     when(jwtTokenProvider.generateAccessToken(userAccount)).thenReturn("valid-token");
 
-    AuthenticationService.AuthenticationResult result = authenticationService.authenticate(
+    AuthenticationService.Output result = authenticationService.authenticate(
         "user@bloodmatch.com",
         "plain-password");
 
@@ -58,7 +59,7 @@ class AuthenticationServiceTest {
     assertEquals("Bearer", result.tokenType());
     assertEquals(3600_000L, result.expiresIn());
     assertEquals(userAccount.getPartyId().getValue().toString(), result.partyId());
-    assertEquals(Set.of(SecurityRole.DONOR), result.roles());
+    assertEquals(Set.of("DONOR"), result.roles());
   }
 
   @Test
@@ -70,7 +71,7 @@ class AuthenticationServiceTest {
     when(passwordEncoder.matches("wrong-password", userAccount.getPasswordHash()))
         .thenReturn(false);
 
-    assertThrows(IllegalArgumentException.class,
+    assertThrows(UnauthorizedException.class,
         () -> authenticationService.authenticate("user@bloodmatch.com", "wrong-password"));
   }
 
@@ -82,7 +83,7 @@ class AuthenticationServiceTest {
     when(userAccountRepository.findByEmail(new Email("user@bloodmatch.com")))
         .thenReturn(Optional.of(userAccount));
 
-    assertThrows(IllegalStateException.class,
+    assertThrows(UnauthorizedException.class,
         () -> authenticationService.authenticate("user@bloodmatch.com", "plain-password"));
   }
 
@@ -91,7 +92,7 @@ class AuthenticationServiceTest {
     when(userAccountRepository.findByEmail(new Email("missing@bloodmatch.com")))
         .thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class,
+    assertThrows(UnauthorizedException.class,
         () -> authenticationService.authenticate("missing@bloodmatch.com", "plain-password"));
   }
 

@@ -1,10 +1,12 @@
 package bloodmatch.application.usecase.role;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,19 +23,37 @@ public class UpdateDonorProfileUseCase {
   }
 
   @Transactional
-  public Donor execute(
-      DomainID personId,
-      BloodType bloodType,
-      double weight) {
+  public Output execute(Input input) {
+    if (input == null)
+      throw new ValidationException("Request body cannot be null");
+    if (input.bloodType() == null || input.bloodType().isBlank())
+      throw new ValidationException("bloodType cannot be blank");
 
-    if (personId == null)
-      throw new IllegalArgumentException("Person id cannot be null");
+    DomainID personId = DomainIdParser.parse(input.personId(), "personId");
+    BloodType bloodType = parseBloodType(input.bloodType());
 
     Donor donor = donorRepository.findByPartyId(personId)
-        .orElseThrow(() -> new IllegalArgumentException("Donor not found"));
+        .orElseThrow(() -> new NotFoundException("Donor not found"));
 
-    donor.updateProfile(bloodType, weight);
+    donor.updateProfile(bloodType, input.weight());
     donorRepository.save(donor);
-    return donor;
+    return Output.from(donor);
+  }
+
+  private BloodType parseBloodType(String bloodType) {
+    try {
+      return BloodType.of(bloodType);
+    } catch (IllegalArgumentException e) {
+      throw new ValidationException(e.getMessage());
+    }
+  }
+
+  public record Input(String personId, String bloodType, double weight) {
+  }
+
+  public record Output(String id) {
+    public static Output from(Donor donor) {
+      return new Output(donor.getId().getValue().toString());
+    }
   }
 }

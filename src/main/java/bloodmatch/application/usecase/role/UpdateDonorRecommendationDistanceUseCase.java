@@ -1,5 +1,8 @@
 package bloodmatch.application.usecase.role;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -19,15 +22,30 @@ public class UpdateDonorRecommendationDistanceUseCase {
   }
 
   @Transactional
-  public Donor execute(DomainID personId, double maxDistanceInKm) {
-    if (personId == null)
-      throw new IllegalArgumentException("Person id cannot be null");
+  public Output execute(Input input) {
+    if (input == null)
+      throw new ValidationException("Request body cannot be null");
+    if (input.maxDistanceInKm() <= 0)
+      throw new ValidationException("maxDistanceInKm must be greater than zero");
+
+    DomainID personId = DomainIdParser.parse(input.personId(), "personId");
 
     Donor donor = donorRepository.findByPartyId(personId)
-        .orElseThrow(() -> new IllegalArgumentException("Donor not found"));
+        .orElseThrow(() -> new NotFoundException("Donor not found"));
 
-    donor.updateMaxRecommendationDistanceKm(maxDistanceInKm);
+    donor.updateMaxRecommendationDistanceKm(input.maxDistanceInKm());
     donorRepository.save(donor);
-    return donor;
+    return Output.from(donor);
+  }
+
+  public record Input(String personId, double maxDistanceInKm) {
+  }
+
+  public record Output(String personId, double maxDistanceInKm) {
+    public static Output from(Donor donor) {
+      return new Output(
+          donor.getPerson().getId().getValue().toString(),
+          donor.getMaxRecommendationDistanceKm());
+    }
   }
 }

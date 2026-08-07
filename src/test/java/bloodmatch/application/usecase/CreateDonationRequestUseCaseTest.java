@@ -1,6 +1,8 @@
 package bloodmatch.application.usecase;
 
+import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.usecase.donationrequest.CreateDonationRequestUseCase;
+import bloodmatch.application.usecase.donationrequest.CreateDonationRequestUseCase.Input;
 import bloodmatch.domain.services.GeocodingServiceInterface;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
@@ -8,11 +10,9 @@ import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
 import bloodmatch.domain.donationrequest.DonationRequest;
-import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.roles.requester.Requester;
-import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,7 +35,7 @@ class CreateDonationRequestUseCaseTest {
   private final DonationRequestRepositoryInterface donationRequestRepository = mock(
       DonationRequestRepositoryInterface.class);
   private final RequesterRepositoryInterface requesterRepository = mock(RequesterRepositoryInterface.class);
-    private final BloodCenterRepositoryInterface bloodCenterRepository = mock(BloodCenterRepositoryInterface.class);
+  private final BloodCenterRepositoryInterface bloodCenterRepository = mock(BloodCenterRepositoryInterface.class);
   private final PartyRepositoryInterface partyRepository = mock(PartyRepositoryInterface.class);
 
   private final GeocodingServiceInterface geocodingService = mock(GeocodingServiceInterface.class);
@@ -67,22 +66,22 @@ class CreateDonationRequestUseCaseTest {
     DomainID bloodCenterId = DomainID.generate();
 
     when(requesterRepository.findByPartyId(requesterId)).thenReturn(Optional.of(requester));
-    when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(Optional.of(new bloodmatch.domain.roles.organization.bloodcenter.BloodCenter(bloodCenterParty)));
+    when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(
+        Optional.of(new bloodmatch.domain.roles.organization.bloodcenter.BloodCenter(bloodCenterParty)));
 
-    DonationRequest request = useCase.execute(
-        requesterId,
-        bloodCenterId,
-        BloodType.of("A+"),
-        3,
-        dateLimit,
-        currentDate,
-        Urgency.MEDIUM,
-        null);
+    CreateDonationRequestUseCase.Output output = useCase.execute(
+        new Input(
+            requesterId.getValue().toString(),
+            bloodCenterId.getValue().toString(),
+            "A+",
+            3,
+            dateLimit,
+            "MEDIUM",
+            null),
+        currentDate);
 
-    assertNotNull(request);
-    assertEquals(currentDate, request.getDateRequested());
-    assertEquals(dateLimit, request.getDateLimit());
-    assertEquals(3, request.getGoalBloodBags());
+    assertNotNull(output);
+    assertNotNull(output.id());
     verify(donationRequestRepository).save(any(DonationRequest.class));
   }
 
@@ -112,27 +111,29 @@ class CreateDonationRequestUseCaseTest {
     DomainID bloodCenterId = DomainID.generate();
 
     when(requesterRepository.findByPartyId(requesterId)).thenReturn(Optional.of(requester));
-    when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(Optional.of(new bloodmatch.domain.roles.organization.bloodcenter.BloodCenter(bloodCenterParty)));
+    when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(
+        Optional.of(new bloodmatch.domain.roles.organization.bloodcenter.BloodCenter(bloodCenterParty)));
     when(geocodingService.getCoordinatesFromAddress(any())).thenReturn(geocodedAddress);
 
-    DonationRequest request = useCase.execute(
-        requesterId,
-        bloodCenterId,
-        BloodType.of("A+"),
-        3,
-        dateLimit,
-        currentDate,
-        Urgency.MEDIUM,
-        null);
+    CreateDonationRequestUseCase.Output output = useCase.execute(
+        new Input(
+            requesterId.getValue().toString(),
+            bloodCenterId.getValue().toString(),
+            "A+",
+            3,
+            dateLimit,
+            "MEDIUM",
+            null),
+        currentDate);
 
-    assertNotNull(request);
+    assertNotNull(output);
     verify(geocodingService).getCoordinatesFromAddress(any());
     verify(partyRepository).save(bloodCenterParty);
     verify(donationRequestRepository).save(any(DonationRequest.class));
   }
 
   @Test
-    void shouldThrowWhenRequesterRoleIsMissing() {
+  void shouldThrowWhenRequesterRoleIsMissing() {
     LocalDate currentDate = LocalDate.of(2026, 3, 16);
     DomainID requesterId = DomainID.generate();
     DomainID bloodCenterId = DomainID.generate();
@@ -142,18 +143,20 @@ class CreateDonationRequestUseCaseTest {
         new PhoneNumber("1133334444"),
         new CNPJ("12345678000100"));
     when(requesterRepository.findByPartyId(requesterId)).thenReturn(Optional.empty());
-    when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(Optional.of(new bloodmatch.domain.roles.organization.bloodcenter.BloodCenter(bloodCenterParty)));
+    when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(
+        Optional.of(new bloodmatch.domain.roles.organization.bloodcenter.BloodCenter(bloodCenterParty)));
 
     assertThrows(
-        IllegalArgumentException.class,
+        NotFoundException.class,
         () -> useCase.execute(
-            requesterId,
-            bloodCenterId,
-            BloodType.of("A+"),
-                        3,
-            currentDate.plusDays(10),
-                        currentDate,
-                        Urgency.MEDIUM,
-                        null));
+            new Input(
+                requesterId.getValue().toString(),
+                bloodCenterId.getValue().toString(),
+                "A+",
+                3,
+                currentDate.plusDays(10),
+                "MEDIUM",
+                null),
+            currentDate));
   }
 }

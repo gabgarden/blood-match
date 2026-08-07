@@ -703,11 +703,11 @@
       "created": 1776706800000,
       "url": "{{ _.base_url }}/donations/create-pending",
       "name": "POST Create Pending Donation",
-      "description": "DONOR or SYSTEM_ADMIN - Aceita uma donation-request e cria doacao pendente vinculada. Requer requestId (solicitacao aceita) e organizationId (hemocentro escolhido).",
+      "description": "DONOR or SYSTEM_ADMIN - Agenda uma doacao pendente no hemocentro. Body: organizationId, personId, expectedDate.",
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"requestId\": \"{{ _.request_id }}\",\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
+        "text": "{\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
       },
       "parameters": [],
       "headers": [

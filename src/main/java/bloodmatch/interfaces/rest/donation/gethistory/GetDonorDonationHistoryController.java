@@ -1,18 +1,17 @@
 package bloodmatch.interfaces.rest.donation.gethistory;
 
 import bloodmatch.application.usecase.donation.gethistory.GetDonorDonationHistoryUseCase;
+import bloodmatch.application.usecase.donation.gethistory.GetDonorDonationHistoryUseCase.Input;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.util.List;
 
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Get Donor Donation History", description = "Get the donation history of a specific donor by personId.")
@@ -26,22 +25,14 @@ public class GetDonorDonationHistoryController {
   }
 
   @GetMapping("/{personId}/donations")
-  public ResponseEntity<?> getByPath(@PathVariable String personId) {
-    return execute(personId);
-  }
+  public ResponseEntity<List<GetDonorDonationHistoryResponseDto>> getByPath(
+      @PathVariable String personId) {
+    requireNotBlank(personId, "personId cannot be blank");
 
+    List<GetDonorDonationHistoryResponseDto> body = useCase.execute(new Input(personId)).stream()
+        .map(GetDonorDonationHistoryResponseDto::from)
+        .toList();
 
-
-  private ResponseEntity<?> execute(String personIdValue) {
-    try {
-      if (isBlank(personIdValue))
-        throw new IllegalArgumentException("personId cannot be blank");
-
-      DomainID personId = parseDomainId(personIdValue, "personId");
-      return ResponseEntity.ok(useCase.execute(personId));
-
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    }
+    return ResponseEntity.ok(body);
   }
 }

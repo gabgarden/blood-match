@@ -1,6 +1,8 @@
 package bloodmatch.application.usecase.donation;
 
 import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase;
+import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase.Input;
+import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase.Output;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
@@ -66,10 +68,12 @@ class CompletePendingDonationUseCaseTest {
     when(donationRequestRepository.findActiveRequestsByBloodCenterIds(List.of(bloodCenter.getOrganization().getId()), currentDate)).thenReturn(List.of(request));
     when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(List.of(bloodCenter.getOrganization().getId()))).thenReturn(List.of(donation));
 
-    Donation result = useCase.execute(donation.getId(), currentDate);
+    Output result = useCase.execute(
+        new Input(donation.getId().getValue().toString(), currentDate),
+        currentDate);
 
     assertEquals(1, request.getFulfilledBloodBags());
     verify(donationRequestRepository).save(request);
-    assertEquals(true, result.isCompleted());
+    assertEquals("COMPLETED", result.status());
   }
 }

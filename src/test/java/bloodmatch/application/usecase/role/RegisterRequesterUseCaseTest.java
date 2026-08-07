@@ -1,5 +1,7 @@
 package bloodmatch.application.usecase.role;
 
+import bloodmatch.application.usecase.role.RegisterRequesterUseCase.Input;
+import bloodmatch.application.usecase.role.RegisterRequesterUseCase.Output;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -52,8 +55,9 @@ class RegisterRequesterUseCaseTest {
     when(requesterRepository.findByPartyId(partyId)).thenReturn(Optional.empty());
     when(userAccountRepository.findByPartyId(partyId)).thenReturn(Optional.of(userAccount));
 
-    useCase.execute(partyId);
+    Output output = useCase.execute(new Input(partyId.getValue().toString()));
 
+    assertNotNull(output.id());
     assertTrue(userAccount.getRoles().contains(SecurityRole.REQUESTER));
     verify(requesterRepository).save(any());
     verify(userAccountRepository).save(userAccount);

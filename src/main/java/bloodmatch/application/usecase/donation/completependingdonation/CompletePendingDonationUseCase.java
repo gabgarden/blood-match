@@ -1,6 +1,10 @@
 package bloodmatch.application.usecase.donation.completependingdonation;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.donation.Donation;
+import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
@@ -30,27 +34,38 @@ public class CompletePendingDonationUseCase {
     this.fulfillmentService = fulfillmentService;
   }
 
-  public Donation execute(DomainID donationId, LocalDate completionDate) {
-    if (donationId == null)
-      throw new IllegalArgumentException("Donation id cannot be null");
-    if (completionDate == null)
-      throw new IllegalArgumentException("Completion date cannot be null");
+  public Output execute(Input input) {
+    return execute(input, LocalDate.now());
+  }
+
+  public Output execute(Input input, LocalDate currentDate) {
+    if (input == null) {
+      throw new ValidationException("Request body cannot be null");
+    }
+    if (currentDate == null) {
+      throw new ValidationException("Current date cannot be null");
+    }
+
+    DomainID donationId = DomainIdParser.parse(input.donationId(), "donationId");
+    if (input.completionDate() == null) {
+      throw new ValidationException("completionDate cannot be null");
+    }
 
     Donation donation = donationRepository.findById(donationId)
-        .orElseThrow(() -> new IllegalArgumentException("Donation not found"));
+        .orElseThrow(() -> new NotFoundException("Donation not found"));
 
-    donation.complete(completionDate, LocalDate.now());
-    donation.getDonor().registerDonation(completionDate, LocalDate.now());
+    donation.complete(input.completionDate(), currentDate);
+    donation.getDonor().registerDonation(input.completionDate(), currentDate);
 
     donorRepository.save(donation.getDonor());
     donationRepository.save(donation);
-    refreshFulfillment(donation.getBloodCenter().getOrganization().getId(), LocalDate.now());
+    refreshFulfillment(donation.getBloodCenter().getOrganization().getId(), currentDate);
 
-    return donation;
+    return Output.from(donation);
   }
 
   private void refreshFulfillment(DomainID bloodCenterId, LocalDate currentDate) {
-    List<bloodmatch.domain.donationrequest.DonationRequest> requests =
+    List<DonationRequest> requests =
         donationRequestRepository.findActiveRequestsByBloodCenterIds(
             List.of(bloodCenterId),
             currentDate);
@@ -64,8 +79,33 @@ public class CompletePendingDonationUseCase {
 
     fulfillmentService.synchronize(requests, donations, currentDate);
 
-    for (bloodmatch.domain.donationrequest.DonationRequest request : requests) {
+    for (DonationRequest request : requests) {
       donationRequestRepository.save(request);
+    }
+  }
+
+  public record Input(String donationId, LocalDate completionDate) {
+  }
+
+  public record Output(String id, LocalDate completionDate, String status) {
+    public static Output from(Donation donation) {
+      return new Output(
+          donation.getId().getValue().toString(),
+          donation.getDonationDate(),
+          statusOf(donation));
+    }
+
+    private static String statusOf(Donation donation) {
+      if (donation.isCompleted()) {
+        return "COMPLETED";
+      }
+      if (donation.isPending()) {
+        return "PENDING";
+      }
+      if (donation.isCancelled()) {
+        return "CANCELLED";
+      }
+      return "UNKNOWN";
     }
   }
 }

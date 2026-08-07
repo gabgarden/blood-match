@@ -1,6 +1,8 @@
 package bloodmatch.application.usecase.donation;
 
 import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase;
+import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase.Input;
+import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase.Output;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
@@ -47,31 +49,36 @@ class CreateCompletedDonationUseCaseTest {
     LocalDate currentDate = LocalDate.now();
 
     Donor donor = new Donor(
-      new Person("Donor", new PhoneNumber("11988887777"), new CPF("98765432100"), LocalDate.of(1990, 1, 1)),
+        new Person("Donor", new PhoneNumber("11988887777"), new CPF("98765432100"), LocalDate.of(1990, 1, 1)),
         BloodType.of("O-"),
         70.0);
 
     BloodCenter bloodCenter = new BloodCenter(new Organization("Center", new PhoneNumber("1133334444"), new CNPJ("12345678000100")));
 
     DonationRequest request = DonationRequest.create(
-      new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1))),
+        new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1))),
         bloodCenter,
         BloodType.of("A+"),
         1,
         currentDate.plusDays(10),
-      currentDate.minusDays(1),
-      Urgency.MEDIUM,
-      null);
+        currentDate.minusDays(1),
+        Urgency.MEDIUM,
+        null);
 
     when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
     when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId())).thenReturn(Optional.of(bloodCenter));
     when(donationRequestRepository.findActiveRequestsByBloodCenterIds(List.of(bloodCenter.getOrganization().getId()), currentDate)).thenReturn(List.of(request));
     when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(List.of(bloodCenter.getOrganization().getId()))).thenReturn(List.of(Donation.registerExternalDonation(donor, currentDate, bloodCenter, currentDate)));
 
-    Donation result = useCase.execute(donor.getPerson().getId(), bloodCenter.getOrganization().getId(), currentDate);
+    Output result = useCase.execute(
+        new Input(
+            donor.getPerson().getId().getValue().toString(),
+            bloodCenter.getOrganization().getId().getValue().toString(),
+            currentDate),
+        currentDate);
 
     assertEquals(1, request.getFulfilledBloodBags());
     verify(donationRequestRepository).save(request);
-    assertEquals(true, result.isCompleted());
+    assertEquals("COMPLETED", result.status());
   }
 }

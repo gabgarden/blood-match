@@ -1,5 +1,8 @@
 package bloodmatch.application.usecase.role;
 
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.usecase.role.UpdateDonorRecommendationDistanceUseCase.Input;
+import bloodmatch.application.usecase.role.UpdateDonorRecommendationDistanceUseCase.Output;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
@@ -7,9 +10,10 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.PhoneNumber;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.Optional;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,9 +40,10 @@ class UpdateDonorRecommendationDistanceUseCaseTest {
     DomainID personId = donor.getPerson().getId();
     when(donorRepository.findByPartyId(personId)).thenReturn(Optional.of(donor));
 
-    Donor updatedDonor = useCase.execute(personId, 45.5);
+    Output output = useCase.execute(new Input(personId.getValue().toString(), 45.5));
 
-    assertEquals(45.5, updatedDonor.getMaxRecommendationDistanceKm());
+    assertEquals(45.5, output.maxDistanceInKm());
+    assertEquals(personId.getValue().toString(), output.personId());
     verify(donorRepository).save(donor);
   }
 
@@ -48,7 +53,9 @@ class UpdateDonorRecommendationDistanceUseCaseTest {
     DomainID personId = donor.getPerson().getId();
     when(donorRepository.findByPartyId(personId)).thenReturn(Optional.of(donor));
 
-    assertThrows(IllegalArgumentException.class, () -> useCase.execute(personId, 0));
+    assertThrows(
+        ValidationException.class,
+        () -> useCase.execute(new Input(personId.getValue().toString(), 0)));
   }
 
   private Donor donor() {

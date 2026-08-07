@@ -1,19 +1,16 @@
 package bloodmatch.interfaces.rest.party.updatepartyname;
 
 import bloodmatch.application.usecase.party.UpdatePartyNameUseCase;
+import bloodmatch.application.usecase.party.UpdatePartyNameUseCase.Input;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import bloodmatch.domain.party.Party;
-import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Update Party Name", description = "Update the name of an existing party.")
@@ -27,24 +24,13 @@ public class UpdatePartyNameController {
   }
 
   @PatchMapping("/name")
-  public ResponseEntity<Map<String, String>> updatePartyName(@RequestBody UpdatePartyNameDto payload) {
-    try {
-      if (payload == null)
-        throw new IllegalArgumentException("Request body cannot be null");
-      if (isBlank(payload.partyId()))
-        throw new IllegalArgumentException("partyId cannot be blank");
-      if (isBlank(payload.newName()))
-        throw new IllegalArgumentException("newName cannot be blank");
+  public ResponseEntity<UpdatePartyNameResponseDto> updatePartyName(@RequestBody UpdatePartyNameDto payload) {
+    requireNonNull(payload, "Request body cannot be null");
+    requireNotBlank(payload.partyId(), "partyId cannot be blank");
+    requireNotBlank(payload.newName(), "newName cannot be blank");
 
-      DomainID id = parseDomainId(payload.partyId(), "partyId");
-      Party party = updatePartyNameUseCase.execute(id, payload.newName());
+    var output = updatePartyNameUseCase.execute(new Input(payload.partyId(), payload.newName()));
 
-      return ResponseEntity.ok(Map.of(
-          "id", party.getId().getValue().toString(),
-          "name", party.getName()));
-
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    }
+    return ResponseEntity.ok(UpdatePartyNameResponseDto.from(output));
   }
 }

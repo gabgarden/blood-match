@@ -1,18 +1,16 @@
 package bloodmatch.interfaces.rest.role.updatedonorrecommendationdistance;
 
 import bloodmatch.application.usecase.role.UpdateDonorRecommendationDistanceUseCase;
-import bloodmatch.domain.roles.person.donor.Donor;
-import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.application.usecase.role.UpdateDonorRecommendationDistanceUseCase.Input;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Update Donor Recommendation Distance", description = "Configure the maximum distance for donation request recommendations.")
@@ -26,23 +24,14 @@ public class UpdateDonorRecommendationDistanceController {
   }
 
   @PatchMapping("/recommendation-distance")
-  public ResponseEntity<Map<String, Object>> update(@RequestBody UpdateDonorRecommendationDistanceDto payload) {
-    try {
-      if (payload == null)
-        throw new IllegalArgumentException("Request body cannot be null");
-      if (isBlank(payload.personId()))
-        throw new IllegalArgumentException("personId cannot be blank");
-      if (payload.maxDistanceInKm() == null || payload.maxDistanceInKm() <= 0)
-        throw new IllegalArgumentException("maxDistanceInKm must be greater than zero");
+  public ResponseEntity<UpdateDonorRecommendationDistanceResponseDto> update(
+      @RequestBody UpdateDonorRecommendationDistanceDto payload) {
+    requireNonNull(payload, "Request body cannot be null");
+    requireNotBlank(payload.personId(), "personId cannot be blank");
+    requireNonNull(payload.maxDistanceInKm(), "maxDistanceInKm cannot be null");
 
-      DomainID personId = parseDomainId(payload.personId(), "personId");
-      Donor donor = useCase.execute(personId, payload.maxDistanceInKm());
+    var output = useCase.execute(new Input(payload.personId(), payload.maxDistanceInKm()));
 
-      return ResponseEntity.ok(Map.of(
-          "personId", donor.getPerson().getId().getValue().toString(),
-          "maxDistanceInKm", donor.getMaxRecommendationDistanceKm()));
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    }
+    return ResponseEntity.ok(UpdateDonorRecommendationDistanceResponseDto.from(output));
   }
 }
