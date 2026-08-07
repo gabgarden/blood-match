@@ -1,7 +1,6 @@
 package bloodmatch.interfaces.rest.donationrequest.recommendations;
 
-import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
-import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase.Input;
+
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase.OutputItem;
 import io.swagger.v3.oas.annotations.media.Schema;
 
