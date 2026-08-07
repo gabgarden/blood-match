@@ -3,6 +3,7 @@ package bloodmatch.application.usecase.donationrequest;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
+import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -34,10 +35,12 @@ public class CancelDonationRequestUseCase {
     DonationRequest request = donationRequestRepository.findById(requestId)
         .orElseThrow(() -> new NotFoundException("Donation request not found"));
 
+    PartyOwnership.requireSameParty(request.getRequester().getParty().getId(), input.actorPartyId());
+
     request.close();
     donationRequestRepository.save(request);
   }
 
-  public record Input(String requestId) {
+  public record Input(String requestId, String actorPartyId) {
   }
 }

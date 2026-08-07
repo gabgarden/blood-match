@@ -3,6 +3,7 @@ package bloodmatch.application.usecase.donationrequest.notification;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
+import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.matching.DonorMatchingService;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
@@ -57,6 +58,8 @@ public class NotifyPotentialDonorsUseCase {
     DonationRequest request = requestRepository.findById(requestId)
         .orElseThrow(() -> new NotFoundException("Donation request not found"));
 
+    PartyOwnership.requireSameParty(request.getRequester().getParty().getId(), input.actorPartyId());
+
     if (currentDate.isAfter(request.getDateLimit())) {
       throw new ValidationException(
           "Cannot notify donors. The donation request has already expired.");
@@ -91,7 +94,7 @@ public class NotifyPotentialDonorsUseCase {
     return Output.success();
   }
 
-  public record Input(String requestId) {
+  public record Input(String requestId, String actorPartyId) {
   }
 
   public record Output(String message) {

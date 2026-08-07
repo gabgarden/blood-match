@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
@@ -37,6 +38,7 @@ public class CreateDonationRequestController {
     }
     requireNonNull(payload.dateLimit(), "dateLimit cannot be null");
     requireNotBlank(payload.urgency(), "urgency cannot be blank");
+    requireSamePartyOrAdmin(payload.partyId());
 
     var output = useCase.execute(new Input(
         payload.partyId(),

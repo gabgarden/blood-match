@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
@@ -29,6 +30,7 @@ public class UpdateDonorRecommendationDistanceController {
     requireNonNull(payload, "Request body cannot be null");
     requireNotBlank(payload.personId(), "personId cannot be blank");
     requireNonNull(payload.maxDistanceInKm(), "maxDistanceInKm cannot be null");
+    requireSamePartyOrAdmin(payload.personId());
 
     var output = useCase.execute(new Input(payload.personId(), payload.maxDistanceInKm()));
 

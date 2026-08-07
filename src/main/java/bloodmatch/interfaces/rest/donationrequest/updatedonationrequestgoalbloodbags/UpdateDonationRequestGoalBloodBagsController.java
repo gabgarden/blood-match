@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.actorPartyIdForOwnership;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
@@ -33,7 +34,10 @@ public class UpdateDonationRequestGoalBloodBagsController {
       throw new ValidationException("newGoalBloodBags must be greater than zero");
     }
 
-    var output = useCase.execute(new Input(payload.requestId(), payload.newGoalBloodBags()));
+    var output = useCase.execute(new Input(
+        payload.requestId(),
+        payload.newGoalBloodBags(),
+        actorPartyIdForOwnership()));
 
     return ResponseEntity.ok(UpdateDonationRequestGoalBloodBagsResponseDto.from(output));
   }

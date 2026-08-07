@@ -69,7 +69,10 @@ class CompletePendingDonationUseCaseTest {
     when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(List.of(bloodCenter.getOrganization().getId()))).thenReturn(List.of(donation));
 
     Output result = useCase.execute(
-        new Input(donation.getId().getValue().toString(), currentDate),
+        new Input(
+            donation.getId().getValue().toString(),
+            currentDate,
+            donor.getPerson().getId().getValue().toString()),
         currentDate);
 
     assertEquals(1, request.getFulfilledBloodBags());

@@ -3,6 +3,7 @@ package bloodmatch.application.usecase.donation.reschedulependingdonation;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
+import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -39,6 +40,8 @@ public class ReschedulePendingDonationUseCase {
     Donation donation = donationRepository.findById(donationId)
         .orElseThrow(() -> new NotFoundException("Donation not found"));
 
+    PartyOwnership.requireSameParty(donation.getDonor().getPerson().getId(), input.actorPartyId());
+
     donation.reschedule(input.newExpectedDate(), currentDate);
 
     donationRepository.save(donation);
@@ -46,7 +49,7 @@ public class ReschedulePendingDonationUseCase {
     return Output.from(donation);
   }
 
-  public record Input(String donationId, LocalDate newExpectedDate) {
+  public record Input(String donationId, LocalDate newExpectedDate, String actorPartyId) {
   }
 
   public record Output(String id, LocalDate expectedDate, String status) {

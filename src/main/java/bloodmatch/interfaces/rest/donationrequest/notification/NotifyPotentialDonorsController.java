@@ -2,16 +2,19 @@ package bloodmatch.interfaces.rest.donationrequest.notification;
 
 import bloodmatch.application.usecase.donationrequest.notification.NotifyPotentialDonorsUseCase;
 import bloodmatch.application.usecase.donationrequest.notification.NotifyPotentialDonorsUseCase.Input;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.actorPartyIdForOwnership;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
-@RequestMapping("/requests")
+@Tag(name = "Notify Potential Donors", description = "Notify eligible donors about a donation request.")
+@RequestMapping("/donation-requests")
 public class NotifyPotentialDonorsController {
 
   private final NotifyPotentialDonorsUseCase useCase;
@@ -25,7 +28,7 @@ public class NotifyPotentialDonorsController {
       @PathVariable("id") String requestIdValue) {
     requireNotBlank(requestIdValue, "Request ID cannot be blank");
 
-    var output = useCase.execute(new Input(requestIdValue));
+    var output = useCase.execute(new Input(requestIdValue, actorPartyIdForOwnership()));
 
     return ResponseEntity.ok(NotifyPotentialDonorsResponseDto.from(output));
   }

@@ -3,6 +3,7 @@ package bloodmatch.application.usecase.donationrequest;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
+import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -36,12 +37,16 @@ public class UpdateDonationRequestGoalBloodBagsUseCase {
     DonationRequest donationRequest = donationRequestRepository.findById(donationRequestId)
         .orElseThrow(() -> new NotFoundException("DonationRequest not found"));
 
+    PartyOwnership.requireSameParty(
+        donationRequest.getRequester().getParty().getId(),
+        input.actorPartyId());
+
     donationRequest.setGoalBloodBags(input.newGoalBloodBags());
     donationRequestRepository.save(donationRequest);
     return Output.from(donationRequest);
   }
 
-  public record Input(String requestId, int newGoalBloodBags) {
+  public record Input(String requestId, int newGoalBloodBags, String actorPartyId) {
   }
 
   public record Output(String id, int goalBloodBags) {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
@@ -29,6 +30,7 @@ public class RegisterBloodCenterController {
       @RequestBody RegisterBloodCenterDto payload) {
     requireNonNull(payload, "Request body cannot be null");
     requireNotBlank(payload.organizationId(), "organizationId cannot be blank");
+    requireSamePartyOrAdmin(payload.organizationId());
 
     var output = registerBloodCenterUseCase.execute(new Input(payload.organizationId()));
 

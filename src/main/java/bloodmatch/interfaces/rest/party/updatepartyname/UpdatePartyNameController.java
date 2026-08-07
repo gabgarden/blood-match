@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
@@ -28,6 +29,7 @@ public class UpdatePartyNameController {
     requireNonNull(payload, "Request body cannot be null");
     requireNotBlank(payload.partyId(), "partyId cannot be blank");
     requireNotBlank(payload.newName(), "newName cannot be blank");
+    requireSamePartyOrAdmin(payload.partyId());
 
     var output = updatePartyNameUseCase.execute(new Input(payload.partyId(), payload.newName()));
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.actorPartyIdForOwnership;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
@@ -30,7 +31,10 @@ public class ReschedulePendingDonationController {
     requireNotBlank(payload.donationId(), "donationId cannot be blank");
     requireNonNull(payload.newExpectedDate(), "newExpectedDate cannot be null");
 
-    var output = useCase.execute(new Input(payload.donationId(), payload.newExpectedDate()));
+    var output = useCase.execute(new Input(
+        payload.donationId(),
+        payload.newExpectedDate(),
+        actorPartyIdForOwnership()));
 
     return ResponseEntity.ok(ReschedulePendingDonationResponseDto.from(output));
   }

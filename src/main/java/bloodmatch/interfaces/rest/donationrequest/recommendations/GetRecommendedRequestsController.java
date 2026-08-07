@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Get Recommended Requests", description = "Get a list of recommended donation requests for a specific person.")
-@RequestMapping("/requests")
+@RequestMapping("/donation-requests")
 public class GetRecommendedRequestsController {
 
   private final GetRecommendedRequestsUseCase useCase;
@@ -27,6 +28,7 @@ public class GetRecommendedRequestsController {
   @GetMapping("/recommendations")
   public ResponseEntity<List<RecommendedRequestResponseDto>> getByQuery(@RequestParam String personId) {
     requireNotBlank(personId, "personId cannot be blank");
+    requireSamePartyOrAdmin(personId);
 
     List<RecommendedRequestResponseDto> body = useCase.execute(new Input(personId)).stream()
         .map(RecommendedRequestResponseDto::from)

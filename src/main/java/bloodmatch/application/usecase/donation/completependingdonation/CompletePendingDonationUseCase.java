@@ -3,6 +3,7 @@ package bloodmatch.application.usecase.donation.completependingdonation;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
+import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
@@ -54,6 +55,8 @@ public class CompletePendingDonationUseCase {
     Donation donation = donationRepository.findById(donationId)
         .orElseThrow(() -> new NotFoundException("Donation not found"));
 
+    PartyOwnership.requireSameParty(donation.getDonor().getPerson().getId(), input.actorPartyId());
+
     donation.complete(input.completionDate(), currentDate);
     donation.getDonor().registerDonation(input.completionDate(), currentDate);
 
@@ -84,7 +87,7 @@ public class CompletePendingDonationUseCase {
     }
   }
 
-  public record Input(String donationId, LocalDate completionDate) {
+  public record Input(String donationId, LocalDate completionDate, String actorPartyId) {
   }
 
   public record Output(String id, LocalDate completionDate, String status) {

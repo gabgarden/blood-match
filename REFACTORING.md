@@ -165,7 +165,9 @@ Todos os controllers REST passaram pelo padrão (sem imports de domínio):
 
 Ownership explícito:
 
-- `GET /donation-requests/{partyId}` → `AuthenticatedPartySupport.requireSamePartyOrAdmin(partyId)`
+- Controllers com `partyId`/`personId`/`organizationId` → `AuthenticatedPartySupport.requireSamePartyOrAdmin(...)`
+- Operações por `requestId`/`donationId` → `actorPartyIdForOwnership()` + `PartyOwnership.requireSameParty(...)` no use case
+- `SYSTEM_ADMIN` faz bypass (actorPartyId `null` ou check de admin no support)
 
 ---
 
@@ -222,4 +224,6 @@ Sugestões naturais (fora do escopo já feito):
 4. Controller: validar → `execute(Input)` → `ResponseEntity<ResponseDto>`
 5. Zero imports de `bloodmatch.domain.*` no controller
 6. Sem `try/catch` / sem `Map.of` de resposta
-7. Cobrir com teste de use case assertando em `Output`
+7. Ownership: `requireSamePartyOrAdmin` (ids no request) ou `actorPartyIdForOwnership` + `PartyOwnership` (recurso por id)
+8. Cobrir com teste de use case assertando em `Output`
+9. Registrar matcher de role em `SecurityConfig` (não depender só de `anyRequest().authenticated()`)

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
@@ -25,6 +26,7 @@ public class GetDonorSummaryController {
   @GetMapping("/{personId}/summary")
   public ResponseEntity<GetDonorSummaryResponseDto> get(@PathVariable String personId) {
     requireNotBlank(personId, "personId cannot be blank");
+    requireSamePartyOrAdmin(personId);
 
     var output = useCase.execute(new Input(personId));
 

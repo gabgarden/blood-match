@@ -72,8 +72,8 @@ Comandos:
 | PATCH | /donation-requests/goal-blood-bags | Atualiza meta de bolsas |
 | PATCH | /donation-requests/date-limit | Atualiza prazo |
 | DELETE | /donation-requests/{requestId} | Cancela pedido |
-| GET | /requests/recommendations | Recomenda pedidos para doador |
-| POST | /requests/{id}/notify | Notifica doadores potenciais |
+| GET | /donation-requests/recommendations | Recomenda pedidos para doador |
+| POST | /donation-requests/{id}/notify | Notifica doadores potenciais |
 
 ### 4.4 Donations
 

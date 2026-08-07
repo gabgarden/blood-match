@@ -1,5 +1,6 @@
 package bloodmatch.application.usecase;
 
+import bloodmatch.application.exception.ForbiddenException;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.usecase.donationrequest.CancelDonationRequestUseCase;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,7 +45,7 @@ class CancelDonationRequestUseCaseTest {
 
     when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
 
-    useCase.execute(new Input(requestId.getValue().toString()));
+    useCase.execute(new Input(requestId.getValue().toString(), requesterPartyId(request)));
 
     verify(donationRequestRepository).save(request);
   }
@@ -55,14 +57,43 @@ class CancelDonationRequestUseCaseTest {
     when(donationRequestRepository.findById(requestId)).thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class,
-        () -> useCase.execute(new Input(requestId.getValue().toString())));
+        () -> useCase.execute(new Input(requestId.getValue().toString(), UUID.randomUUID().toString())));
 
     verify(donationRequestRepository, never()).save(any());
   }
 
   @Test
   void shouldThrowWhenRequestIdIsNull() {
-    assertThrows(ValidationException.class, () -> useCase.execute(new Input(null)));
+    assertThrows(ValidationException.class, () -> useCase.execute(new Input(null, null)));
+  }
+
+  @Test
+  void shouldThrowWhenActorDoesNotOwnRequest() {
+    DonationRequest request = createRequest();
+    DomainID requestId = request.getId();
+
+    when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
+
+    assertThrows(ForbiddenException.class,
+        () -> useCase.execute(new Input(requestId.getValue().toString(), UUID.randomUUID().toString())));
+
+    verify(donationRequestRepository, never()).save(any());
+  }
+
+  @Test
+  void shouldAllowAdminBypassWhenActorPartyIdIsNull() {
+    DonationRequest request = createRequest();
+    DomainID requestId = request.getId();
+
+    when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
+
+    useCase.execute(new Input(requestId.getValue().toString(), null));
+
+    verify(donationRequestRepository).save(request);
+  }
+
+  private static String requesterPartyId(DonationRequest request) {
+    return request.getRequester().getParty().getId().getValue().toString();
   }
 
   private DonationRequest createRequest() {

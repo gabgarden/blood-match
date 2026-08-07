@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
+import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -36,12 +37,16 @@ public class UpdateDonationRequestDateLimitUseCase {
     DonationRequest donationRequest = donationRequestRepository.findById(donationRequestId)
         .orElseThrow(() -> new NotFoundException("DonationRequest not found"));
 
+    PartyOwnership.requireSameParty(
+        donationRequest.getRequester().getParty().getId(),
+        input.actorPartyId());
+
     donationRequest.setDateLimit(input.newDateLimit());
     donationRequestRepository.save(donationRequest);
     return Output.from(donationRequest);
   }
 
-  public record Input(String requestId, LocalDate newDateLimit) {
+  public record Input(String requestId, LocalDate newDateLimit, String actorPartyId) {
   }
 
   public record Output(String id, LocalDate dateLimit) {

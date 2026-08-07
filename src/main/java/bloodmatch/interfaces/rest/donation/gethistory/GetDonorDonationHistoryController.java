@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
@@ -28,6 +29,7 @@ public class GetDonorDonationHistoryController {
   public ResponseEntity<List<GetDonorDonationHistoryResponseDto>> getByPath(
       @PathVariable String personId) {
     requireNotBlank(personId, "personId cannot be blank");
+    requireSamePartyOrAdmin(personId);
 
     List<GetDonorDonationHistoryResponseDto> body = useCase.execute(new Input(personId)).stream()
         .map(GetDonorDonationHistoryResponseDto::from)
