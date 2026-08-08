@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Document(collection = "donation_requests")
 @CompoundIndex(name = "active_blood_type_date_limit", def = "{'active': 1, 'bloodTypeNeeded': 1, 'dateLimit': 1}")
-@CompoundIndex(name = "active_blood_center_date_requested", def = "{'active': 1, 'bloodCenterId': 1, 'dateRequested': 1, '_id': 1}")
+@CompoundIndex(name = "active_organization_date_requested", def = "{'active': 1, 'organizationId': 1, 'dateRequested': 1, '_id': 1}")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -36,7 +36,7 @@ public class DonationRequestSchema {
   @Version
   private Long version;
   private String requesterId;
-  private String bloodCenterId;
+  private String organizationId;
   private String bloodTypeNeeded;
   private int goalBloodBags;
   private int fulfilledBloodBags;
@@ -55,7 +55,7 @@ public class DonationRequestSchema {
     this.id = donationRequest.getId().getValue().toString();
     this.version = donationRequest.getVersion();
     this.requesterId = donationRequest.getRequester().getParty().getId().getValue().toString();
-    this.bloodCenterId = donationRequest.getBloodCenter().getOrganization().getId().getValue().toString();
+    this.organizationId = donationRequest.getBloodCenter().getOrganization().getId().getValue().toString();
     this.bloodTypeNeeded = donationRequest.getBloodTypeNeeded().getType();
     this.goalBloodBags = donationRequest.getGoalBloodBags();
     this.fulfilledBloodBags = donationRequest.getFulfilledBloodBags();
@@ -77,12 +77,12 @@ public class DonationRequestSchema {
       RequesterRepositoryInterface requesterRepository,
       BloodCenterRepositoryInterface bloodCenterRepository) {
     DomainID requesterId = new DomainID(UUID.fromString(this.requesterId));
-    DomainID bloodCenterId = new DomainID(UUID.fromString(this.bloodCenterId));
+    DomainID organizationId = new DomainID(UUID.fromString(this.organizationId));
 
     Requester requester = requesterRepository.findByPartyId(requesterId)
         .orElseThrow(() -> new IllegalArgumentException("Requester role not found"));
 
-    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(bloodCenterId)
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
         .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
 
     return DonationRequest.reconstitute(

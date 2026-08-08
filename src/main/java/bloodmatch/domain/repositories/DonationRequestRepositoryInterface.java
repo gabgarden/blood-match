@@ -23,8 +23,8 @@ public interface DonationRequestRepositoryInterface {
       double maxDistanceInKm,
       java.time.LocalDate currentDate);
 
-  List<DonationRequest> findActiveRequestsByBloodCenterIds(
-      List<DomainID> bloodCenterIds,
+  List<DonationRequest> findActiveRequestsByOrganizationIds(
+      List<DomainID> organizationIds,
       java.time.LocalDate currentDate);
 
   List<DonationRequest> findByRequesterPartyId(DomainID requesterPartyId);

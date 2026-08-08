@@ -20,6 +20,6 @@ public interface DonationRequestMongoRepository extends MongoRepository<Donation
   List<DonationRequestSchema> findByActiveTrueAndDateLimitGreaterThanEqualAndBloodTypeNeededInAndLocationNear(
       LocalDate currentDate, Collection<String> bloodTypes, Point location, Distance distance);
 
-  List<DonationRequestSchema> findByActiveTrueAndDateLimitGreaterThanEqualAndBloodCenterIdInOrderByDateRequestedAscIdAsc(
-      LocalDate currentDate, Collection<String> bloodCenterIds);
+  List<DonationRequestSchema> findByActiveTrueAndDateLimitGreaterThanEqualAndOrganizationIdInOrderByDateRequestedAscIdAsc(
+      LocalDate currentDate, Collection<String> organizationIds);
 }

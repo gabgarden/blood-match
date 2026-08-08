@@ -74,19 +74,21 @@ Isso se chama *materialized / denormalized counter*: guardamos o resultado do c�
 
 ## 4. Onde o contador é atualizado (write path)
 
-Hoje o refresh acontece em **dois** use cases:
+Hoje o refresh é disparado por **dois** use cases, mas o write path vive em um só lugar:
 
 | Use case | Quando |
 |----------|--------|
 | `CreateCompletedDonationUseCase` | Doação já registrada como completa |
 | `CompletePendingDonationUseCase` | Doação pendente é marcada como completa |
 
-Fluxo comum (`refreshFulfillment`):
+Ambos chamam `DonationRequestFulfillmentRefresher.refresh(organizationId, currentDate)`, onde `organizationId` é o party id da organization do hemocentro (campo Mongo `organizationId` em requests e donations).
+
+Fluxo comum (`DonationRequestFulfillmentRefresher`):
 
 ```text
-1. Salva a doação (e o donor, se preciso)
-2. Busca requests ATIVAS do hemocentro (ainda não expiradas)
-3. Busca TODAS as doações COMPLETADAS daquele hemocentro (ordenadas)
+1. Salva a doação (e o donor, se preciso) — no use case
+2. Busca requests ATIVAS da organization (ainda não expiradas)
+3. Busca TODAS as doações COMPLETADAS daquela organization (ordenadas)
 4. Chama fulfillmentService.synchronize(requests, donations, currentDate)
 5. Para cada request, donationRequestRepository.save(request)
 ```
@@ -96,7 +98,7 @@ Fluxo comum (`refreshFulfillment`):
 1. `calculate(...)` — roda o algoritmo FIFO e monta o mapa de status.
 2. Atualiza `request.setFulfilledBloodBags(...)` em memória.
 
-Depois o use case **persiste** cada request com o novo valor.
+Depois o refresher **persiste** cada request com o novo valor.
 
 ### O que NÃO dispara refresh (de propósito)
 
@@ -139,14 +141,15 @@ Depois o use case **persiste** cada request com o novo valor.
                                    │
                                    ▼
                     ┌─────────────────────────────┐
-                    │ refreshFulfillment          │
-                    │ (só daquele hemocentro)     │
+                    │ DonationRequestFulfillment  │
+                    │ Refresher.refresh           │
+                    │ (só daquela organization)   │
                     └──────────────┬──────────────┘
                                    │
               ┌────────────────────┼────────────────────┐
               ▼                                         ▼
    requests ativas                          doações completadas
-   do hemocentro                            do hemocentro
+   (organizationId)                         (organizationId)
               │                                         │
               └────────────────────┬────────────────────┘
                                    ▼
@@ -228,12 +231,12 @@ Hoje o refresh **só** roda quando uma doação completa entra no sistema. Entã
    → muda quem pode receber doações / se a meta já foi batida, mas o campo persistido só é reescrito no próximo refresh.
 
 4. **Request expirar**  
-   → some da lista usada no refresh (`findActiveRequestsByBloodCenterIds`). Doações históricas passam a ser redistribuídas só entre as ainda ativas (respeitando a janela de datas de cada uma). O valor antigo na request expirada permanece como histórico da última sincronização.
+   → some da lista usada no refresh (`findActiveRequestsByOrganizationIds`). Doações históricas passam a ser redistribuídas só entre as ainda ativas (respeitando a janela de datas de cada uma). O valor antigo na request expirada permanece como histórico da última sincronização.
 
 Isso **não invalida** a estratégia de otimização; só define o contrato:  
 *“`fulfilledBloodBags` está correto em relação ao último recálculo disparado por doação completa.”*
 
-Se o produto precisar de consistência imediata após criar/cancelar/alterar request, o caminho natural é **também** chamar o mesmo `refreshFulfillment` nesses use cases (ainda sem recalcular nas leituras).
+Se o produto precisar de consistência imediata após criar/cancelar/alterar request, o caminho natural é **também** chamar o mesmo `DonationRequestFulfillmentRefresher` nesses use cases (ainda sem recalcular nas leituras).
 
 ---
 
@@ -256,6 +259,7 @@ Se o produto precisar de consistência imediata após criar/cancelar/alterar req
 | Status calculado | `domain/services/records/DonationRequestFulfillmentStatusRecord.java` |
 | Campo + `acceptsDonation` | `domain/donationrequest/DonationRequest.java` |
 | Persistência do contador | `infra/persistence/schema/DonationRequestSchema.java` |
+| Write path compartilhado | `application/.../fulfillment/DonationRequestFulfillmentRefresher.java` |
 | Write: doação completa | `application/.../createcompleted/CreateCompletedDonationUseCase.java` |
 | Write: completar pendente | `application/.../completependingdonation/CompletePendingDonationUseCase.java` |
 | Read: recomendações | `application/.../recommendations/GetRecommendedRequestsUseCase.java` |

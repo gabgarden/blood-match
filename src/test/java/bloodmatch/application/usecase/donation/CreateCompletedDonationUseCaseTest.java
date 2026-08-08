@@ -3,6 +3,7 @@ package bloodmatch.application.usecase.donation;
 import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase;
 import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase.Input;
 import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase.Output;
+import bloodmatch.application.usecase.donation.fulfillment.DonationRequestFulfillmentRefresher;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
@@ -44,12 +45,15 @@ class CreateCompletedDonationUseCaseTest {
   private final BloodCenterRepositoryInterface bloodCenterRepository = mock(BloodCenterRepositoryInterface.class);
   private final DonationRepositoryInterface donationRepository = mock(DonationRepositoryInterface.class);
   private final DonationRequestRepositoryInterface donationRequestRepository = mock(DonationRequestRepositoryInterface.class);
+  private final DonationRequestFulfillmentRefresher fulfillmentRefresher = new DonationRequestFulfillmentRefresher(
+      donationRequestRepository,
+      donationRepository,
+      new DonationRequestFulfillmentService());
   private final CreateCompletedDonationUseCase useCase = new CreateCompletedDonationUseCase(
       donorRepository,
       bloodCenterRepository,
       donationRepository,
-      donationRequestRepository,
-      new DonationRequestFulfillmentService());
+      fulfillmentRefresher);
 
   @Test
   void shouldPersistFulfillmentCountAfterRegisteringCompletedDonation() {
@@ -59,10 +63,10 @@ class CreateCompletedDonationUseCaseTest {
     when(donorRepository.findByPartyId(fixture.donor.getPerson().getId())).thenReturn(Optional.of(fixture.donor));
     when(bloodCenterRepository.findByPartyId(fixture.bloodCenter.getOrganization().getId()))
         .thenReturn(Optional.of(fixture.bloodCenter));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(
+    when(donationRequestRepository.findActiveRequestsByOrganizationIds(
             List.of(fixture.bloodCenter.getOrganization().getId()), currentDate))
         .thenReturn(List.of(fixture.request));
-    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+    when(donationRepository.findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(
             List.of(fixture.bloodCenter.getOrganization().getId())))
         .thenReturn(List.of(Donation.registerExternalDonation(fixture.donor, currentDate, fixture.bloodCenter, currentDate)));
 
@@ -87,7 +91,7 @@ class CreateCompletedDonationUseCaseTest {
     when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
     when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId()))
         .thenReturn(Optional.of(bloodCenter));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(
+    when(donationRequestRepository.findActiveRequestsByOrganizationIds(
             List.of(bloodCenter.getOrganization().getId()), currentDate))
         .thenReturn(List.of());
 
@@ -100,7 +104,7 @@ class CreateCompletedDonationUseCaseTest {
 
     verify(donationRepository).save(any(Donation.class));
     verify(donationRepository, never())
-        .findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(anyList());
+        .findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(anyList());
     verify(donationRequestRepository, never()).save(any(DonationRequest.class));
   }
 
@@ -119,10 +123,10 @@ class CreateCompletedDonationUseCaseTest {
     when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
     when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId()))
         .thenReturn(Optional.of(bloodCenter));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(
+    when(donationRequestRepository.findActiveRequestsByOrganizationIds(
             List.of(bloodCenter.getOrganization().getId()), currentDate))
         .thenReturn(List.of(newest, oldest));
-    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+    when(donationRepository.findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(
             List.of(bloodCenter.getOrganization().getId())))
         .thenReturn(List.of(olderDonation, newerDonation));
 
@@ -147,10 +151,10 @@ class CreateCompletedDonationUseCaseTest {
     when(donorRepository.findByPartyId(fixture.donor.getPerson().getId())).thenReturn(Optional.of(fixture.donor));
     when(bloodCenterRepository.findByPartyId(fixture.bloodCenter.getOrganization().getId()))
         .thenReturn(Optional.of(fixture.bloodCenter));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(
+    when(donationRequestRepository.findActiveRequestsByOrganizationIds(
             List.of(fixture.bloodCenter.getOrganization().getId()), currentDate))
         .thenReturn(List.of(fixture.request));
-    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+    when(donationRepository.findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(
             List.of(fixture.bloodCenter.getOrganization().getId())))
         .thenReturn(List.of(Donation.registerExternalDonation(fixture.donor, currentDate, fixture.bloodCenter, currentDate)));
 

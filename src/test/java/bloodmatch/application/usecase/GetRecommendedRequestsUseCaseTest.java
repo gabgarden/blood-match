@@ -46,8 +46,6 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
-
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
         new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
 

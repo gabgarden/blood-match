@@ -3,6 +3,7 @@ package bloodmatch.application.usecase.donation;
 import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase;
 import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase.Input;
 import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase.Output;
+import bloodmatch.application.usecase.donation.fulfillment.DonationRequestFulfillmentRefresher;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
@@ -42,11 +43,14 @@ class CompletePendingDonationUseCaseTest {
   private final DonationRepositoryInterface donationRepository = mock(DonationRepositoryInterface.class);
   private final DonorRepositoryInterface donorRepository = mock(DonorRepositoryInterface.class);
   private final DonationRequestRepositoryInterface donationRequestRepository = mock(DonationRequestRepositoryInterface.class);
+  private final DonationRequestFulfillmentRefresher fulfillmentRefresher = new DonationRequestFulfillmentRefresher(
+      donationRequestRepository,
+      donationRepository,
+      new DonationRequestFulfillmentService());
   private final CompletePendingDonationUseCase useCase = new CompletePendingDonationUseCase(
       donationRepository,
       donorRepository,
-      donationRequestRepository,
-      new DonationRequestFulfillmentService());
+      fulfillmentRefresher);
 
   @Test
   void shouldPersistFulfillmentCountAfterCompletingDonation() {
@@ -54,10 +58,10 @@ class CompletePendingDonationUseCaseTest {
     Fixture fixture = fixture(currentDate);
 
     when(donationRepository.findById(fixture.donation.getId())).thenReturn(Optional.of(fixture.donation));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(
+    when(donationRequestRepository.findActiveRequestsByOrganizationIds(
             List.of(fixture.bloodCenter.getOrganization().getId()), currentDate))
         .thenReturn(List.of(fixture.request));
-    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+    when(donationRepository.findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(
             List.of(fixture.bloodCenter.getOrganization().getId())))
         .thenReturn(List.of(fixture.donation));
 
@@ -81,7 +85,7 @@ class CompletePendingDonationUseCaseTest {
     Donation donation = Donation.createPending(donor, currentDate, bloodCenter, currentDate.minusDays(1));
 
     when(donationRepository.findById(donation.getId())).thenReturn(Optional.of(donation));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(
+    when(donationRequestRepository.findActiveRequestsByOrganizationIds(
             List.of(bloodCenter.getOrganization().getId()), currentDate))
         .thenReturn(List.of());
 
@@ -94,7 +98,7 @@ class CompletePendingDonationUseCaseTest {
 
     verify(donationRepository).save(donation);
     verify(donationRepository, never())
-        .findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(anyList());
+        .findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(anyList());
     verify(donationRequestRepository, never()).save(any(DonationRequest.class));
   }
 
@@ -110,10 +114,10 @@ class CompletePendingDonationUseCaseTest {
         new DomainID(new UUID(0, 1)), donor, currentDate.minusDays(1), bloodCenter, true, false, false);
 
     when(donationRepository.findById(pending.getId())).thenReturn(Optional.of(pending));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(
+    when(donationRequestRepository.findActiveRequestsByOrganizationIds(
             List.of(bloodCenter.getOrganization().getId()), currentDate))
         .thenReturn(List.of(newest, oldest));
-    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+    when(donationRepository.findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(
             List.of(bloodCenter.getOrganization().getId())))
         .thenReturn(List.of(historical, pending));
 
@@ -136,10 +140,10 @@ class CompletePendingDonationUseCaseTest {
     fixture.request.setFulfilledBloodBags(99);
 
     when(donationRepository.findById(fixture.donation.getId())).thenReturn(Optional.of(fixture.donation));
-    when(donationRequestRepository.findActiveRequestsByBloodCenterIds(
+    when(donationRequestRepository.findActiveRequestsByOrganizationIds(
             List.of(fixture.bloodCenter.getOrganization().getId()), currentDate))
         .thenReturn(List.of(fixture.request));
-    when(donationRepository.findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(
+    when(donationRepository.findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(
             List.of(fixture.bloodCenter.getOrganization().getId())))
         .thenReturn(List.of(fixture.donation));
 

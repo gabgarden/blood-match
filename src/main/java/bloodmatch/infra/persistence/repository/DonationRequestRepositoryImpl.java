@@ -92,24 +92,24 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
   }
 
   @Override
-  public List<DonationRequest> findActiveRequestsByBloodCenterIds(
-      List<DomainID> bloodCenterIds,
+  public List<DonationRequest> findActiveRequestsByOrganizationIds(
+      List<DomainID> organizationIds,
       LocalDate currentDate) {
-    if (bloodCenterIds == null)
-      throw new IllegalArgumentException("Blood center ids cannot be null");
+    if (organizationIds == null)
+      throw new IllegalArgumentException("Organization ids cannot be null");
     if (currentDate == null)
       throw new IllegalArgumentException("Current date cannot be null");
-    if (bloodCenterIds.isEmpty())
+    if (organizationIds.isEmpty())
       return List.of();
 
-    List<String> ids = bloodCenterIds.stream()
+    List<String> ids = organizationIds.stream()
         .map(DomainID::getValue)
         .map(Object::toString)
         .distinct()
         .toList();
 
     return mongoRepository
-        .findByActiveTrueAndDateLimitGreaterThanEqualAndBloodCenterIdInOrderByDateRequestedAscIdAsc(
+        .findByActiveTrueAndDateLimitGreaterThanEqualAndOrganizationIdInOrderByDateRequestedAscIdAsc(
             currentDate, ids)
         .stream()
         .map(this::toDomain)

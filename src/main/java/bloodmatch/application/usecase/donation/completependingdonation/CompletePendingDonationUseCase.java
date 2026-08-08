@@ -4,35 +4,29 @@ import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.application.shared.PartyOwnership;
+import bloodmatch.application.usecase.donation.fulfillment.DonationRequestFulfillmentRefresher;
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
-import bloodmatch.domain.services.DonationRequestFulfillmentService;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class CompletePendingDonationUseCase {
 
   private final DonationRepositoryInterface donationRepository;
   private final DonorRepositoryInterface donorRepository;
-  private final DonationRequestRepositoryInterface donationRequestRepository;
-  private final DonationRequestFulfillmentService fulfillmentService;
+  private final DonationRequestFulfillmentRefresher fulfillmentRefresher;
 
   public CompletePendingDonationUseCase(
       DonationRepositoryInterface donationRepository,
       DonorRepositoryInterface donorRepository,
-      DonationRequestRepositoryInterface donationRequestRepository,
-      DonationRequestFulfillmentService fulfillmentService) {
+      DonationRequestFulfillmentRefresher fulfillmentRefresher) {
     this.donationRepository = donationRepository;
     this.donorRepository = donorRepository;
-    this.donationRequestRepository = donationRequestRepository;
-    this.fulfillmentService = fulfillmentService;
+    this.fulfillmentRefresher = fulfillmentRefresher;
   }
 
   public Output execute(Input input) {
@@ -62,29 +56,10 @@ public class CompletePendingDonationUseCase {
 
     donorRepository.save(donation.getDonor());
     donationRepository.save(donation);
-    refreshFulfillment(donation.getBloodCenter().getOrganization().getId(), currentDate);
+    fulfillmentRefresher.refresh(
+        donation.getBloodCenter().getOrganization().getId(), currentDate);
 
     return Output.from(donation);
-  }
-
-  private void refreshFulfillment(DomainID bloodCenterId, LocalDate currentDate) {
-    List<DonationRequest> requests =
-        donationRequestRepository.findActiveRequestsByBloodCenterIds(
-            List.of(bloodCenterId),
-            currentDate);
-
-    if (requests.isEmpty()) {
-      return;
-    }
-
-    List<Donation> donations = donationRepository
-        .findCompletedDonationsForBloodCentersOrderedByDonationDateAsc(List.of(bloodCenterId));
-
-    fulfillmentService.synchronize(requests, donations, currentDate);
-
-    for (DonationRequest request : requests) {
-      donationRequestRepository.save(request);
-    }
   }
 
   public record Input(String donationId, LocalDate completionDate, String actorPartyId) {
