@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Public Sans', sans-serif;
+  background-color: #f9f9fb;
+}
+
+.headline-font {
+  font-family: 'Manrope', sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.bg-pulse-gradient {
+  background: linear-gradient(135deg, #ae131a 0%, #d2312f 100%);
+}
+
+.glass-panel {
+  backdrop-filter: blur(20px);
+  background-color: rgba(249, 249, 251, 0.8);
+}

@@ -92,7 +92,7 @@ Persistir no frontend: `accessToken`, `partyId`, `roles`, `expiresIn`.
 |------|-------------|
 | `DONOR` | Doador |
 | `REQUESTER` | Solicitante de sangue |
-| `BLOOD_CENTER` | Hemocentro (também autorizado em `GET /blood-centers/search`) |
+| `BLOOD_CENTER` | Hemocentro (registrável; quase sem rotas gated por esse role hoje) |
 | `SYSTEM_ADMIN` | Admin (bypass de ownership; não há fluxo público para obter) |
 
 Roles no JWT **não** usam prefixo `ROLE_`.
@@ -261,31 +261,8 @@ Response: `{ "id": "<requesterRoleId>" }`
 ```
 
 Response: `{ "id": "<bloodCenterRoleId>" }`  
-**Depois: re-login.**
-
-#### `GET /blood-centers/search?q=&limit=` — Roles `DONOR` | `REQUESTER` | `BLOOD_CENTER` | `SYSTEM_ADMIN` → `200`
-
-Busca hemocentros cadastrados pelo **nome da organização**.
-
-| Query | Obrigatório | Regras |
-|-------|-------------|--------|
-| `q` | sim | ≥ 2 caracteres (case-insensitive, partial match) |
-| `limit` | não | default `10`, máximo `20` |
-
-Response:
-
-```json
-[
-  {
-    "organizationId": "<uuid>",
-    "name": "Hemocentro Regional de Campos",
-    "city": "Campos dos Goytacazes",
-    "state": "RJ"
-  }
-]
-```
-
-Use `organizationId` nos payloads de `POST /donation-requests`, `POST /donations/create-pending` e `POST /donations/completed`.
+**Depois: re-login.**  
+Obs.: hoje nenhuma rota de negócio exige autoridade `BLOOD_CENTER` no `SecurityConfig`.
 
 #### `PATCH /donors/profile` — Auth + Own(`personId`) → `200`
 
@@ -375,7 +352,6 @@ Item:
 ```json
 {
   "requestId": "<uuid>",
-  "organizationId": "<uuid do hemocentro>",
   "bloodTypeNeeded": "A+",
   "dateLimit": "2026-12-31",
   "bloodCenterName": "string",
@@ -386,8 +362,6 @@ Item:
   "goalReached": false
 }
 ```
-
-`organizationId` é o mesmo valor aceito por `POST /donations/create-pending` (aceitar recomendação).
 
 #### `GET /donation-requests/{partyId}` — Role `REQUESTER` + Own(path) → `200`
 
@@ -552,7 +526,6 @@ Response:
 | GET | `/donors/{personId}/donations` | Auth + Own |
 | POST | `/requesters` | Auth + Own → re-login |
 | POST | `/blood-centers` | Auth + Own → re-login |
-| GET | `/blood-centers/search` | DONOR / REQUESTER / BLOOD_CENTER / SYSTEM_ADMIN |
 | POST | `/donation-requests` | REQUESTER + Own |
 | GET | `/donation-requests/recommendations` | DONOR + Own |
 | GET | `/donation-requests/{partyId}` | REQUESTER + Own |
@@ -579,8 +552,6 @@ Use como lista de trabalho no outro projeto:
 - [ ] Após registro de papel → forçar novo login (ou chamar `/auth/login` de novo)
 - [ ] Substituir qualquer `/requests/...` por `/donation-requests/...`
 - [ ] Recommendations: query `personId` = usuário logado
-- [ ] Criar pedido / doação externa: buscar hemocentro via `GET /blood-centers/search` e enviar só `organizationId`
-- [ ] Recommendations: usar `organizationId` retornado para agendar doação pendente
 - [ ] Criar pedido: `partyId` = usuário logado; `organizationId` = hemocentro escolhido
 - [ ] Guards de UI por role (`DONOR` / `REQUESTER`) alinhados à matriz
 - [ ] Forms de PATCH (perfil, distance, date-limit, goal, complete, reschedule) com campos exatos
@@ -598,8 +569,6 @@ Use como lista de trabalho no outro projeto:
 4. `PATCH /donations/reschedule` agora exige role `DONOR`
 5. `POST /donation-requests/*/notify` agora exige role `REQUESTER`
 6. CORS passa a permitir `PATCH` explicitamente
-7. `GET /donation-requests/recommendations` agora inclui `organizationId`
-8. Novo: `GET /blood-centers/search` para resolver hemocentro por nome → `organizationId`
 
 ---
 

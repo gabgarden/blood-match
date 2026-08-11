@@ -16,13 +16,19 @@ interfaces/rest -> application/usecase -> domain -> infra/persistence
 
 ## 2. Estrutura do projeto
 
-- src/main/java/bloodmatch/domain
-- src/main/java/bloodmatch/application/usecase
-- src/main/java/bloodmatch/interfaces/rest
-- src/main/java/bloodmatch/infra/persistence
-- src/main/java/bloodmatch/infra/security
-- scripts
-- insomnia
+Monorepo:
+
+- `backend/` — API Spring Boot
+- `frontend/` — app React/Vite
+- `scripts/`, `insomnia/`, `docs/`, `tcc-latex/`
+
+Camadas do backend:
+
+- backend/src/main/java/bloodmatch/domain
+- backend/src/main/java/bloodmatch/application/usecase
+- backend/src/main/java/bloodmatch/interfaces/rest
+- backend/src/main/java/bloodmatch/infra/persistence
+- backend/src/main/java/bloodmatch/infra/security
 
 ## 3. Como executar localmente
 
@@ -31,12 +37,21 @@ Pre-requisitos:
 - Java 17
 - Maven
 - MongoDB
+- Node.js 22+ (frontend)
+- ou Docker Compose
 
 Comandos:
 
 ```bash
-./mvnw spring-boot:run
-./mvnw test
+# stack completa
+docker compose up --build
+
+# backend isolado
+cd backend && ./mvnw spring-boot:run
+
+# frontend isolado
+cd frontend && npm install && npm run dev
+
 ./scripts/seed-dev.sh
 ```
 

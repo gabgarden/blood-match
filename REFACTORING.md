@@ -70,8 +70,8 @@ ErrorResponseDto { "error": "mensagem" } + status HTTP
 
 Arquivos de referência:
 
-- [`CreatePendingDonationController.java`](src/main/java/bloodmatch/interfaces/rest/donation/createpending/CreatePendingDonationController.java)
-- [`CreatePendingDonationUseCase.java`](src/main/java/bloodmatch/application/usecase/donation/createpending/CreatePendingDonationUseCase.java)
+- [`CreatePendingDonationController.java`](backend/src/main/java/bloodmatch/interfaces/rest/donation/createpending/CreatePendingDonationController.java)
+- [`CreatePendingDonationUseCase.java`](backend/src/main/java/bloodmatch/application/usecase/donation/createpending/CreatePendingDonationUseCase.java)
 
 ---
 
