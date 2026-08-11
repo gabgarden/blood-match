@@ -1,0 +1,15 @@
+\chapter{Considerações finais}
+
+Este capítulo retomará, na versão final do trabalho, a problemática apresentada na Introdução à luz dos resultados obtidos com o desenvolvimento e a avaliação da API. Como a avaliação descrita no Capítulo~6 ainda está em andamento, as seções a seguir estruturam o raciocínio que orientará essas considerações, sem antecipar conclusões sobre resultados ainda não obtidos.
+
+\section{Alcance dos objetivos}
+
+Os objetivos específicos O1 (mapeamento do processo de doação com DDD) e O2 (identificação de sistemas similares) já foram integralmente endereçados, respectivamente, pela modelagem de domínio apresentada no Capítulo~5 e pelo mapeamento sistemático da literatura conduzido no Capítulo~3. O objetivo O3 (mecanismos de recomendação e notificação) foi implementado e descrito na Seção~5.6, restando avaliar seu comportamento em cenários mais amplos. Os objetivos O4 (validação por estudo de caso) e O5 (avaliação de manutenibilidade) dependem diretamente do plano de avaliação do Capítulo~6; o alcance desses dois últimos objetivos será formalmente discutido nesta seção após a conclusão dos testes e da análise de manutenibilidade.
+
+\section{Principais contribuições}
+
+Do ponto de vista acadêmico, este trabalho contribui com um mapeamento sistemático da literatura sobre sistemas de captação de doadores de sangue (Capítulo~3) e com um estudo de caso detalhado de aplicação de DDD e princípios SOLID a um domínio de saúde pública com regras de elegibilidade e compatibilidade sanguínea. Do ponto de vista tecnológico, a principal contribuição é a própria API RESTful, incluindo a estratégia de recomendação de solicitações e a materialização do cumprimento de metas por meio de alocação FIFO (Seção~5.6), que pode servir de referência para soluções semelhantes. As contribuições específicas de cada frente serão detalhadas nesta seção conforme os resultados do Capítulo~6 forem consolidados.
+
+\section{Trabalhos futuros}
+
+Como direcionamentos para evoluções futuras, destacam-se: (i) a extensão do recálculo de \texttt{fulfilledBloodBags} para eventos além da conclusão de doações (criação, cancelamento e alteração de solicitações), reduzindo a janela de inconsistência descrita na Seção~5.6; (ii) a evolução do algoritmo de recomendação para considerar critérios adicionais, como o histórico de resposta do doador a notificações anteriores; (iii) a extração de módulos mais explicitamente isolados para os contextos delimitados hoje tratados apenas por convenção de nomenclatura (Seção~5.4.1); e (iv) a ampliação da suíte de testes automatizados e da avaliação de manutenibilidade para outras versões da API, à medida que novas funcionalidades forem incorporadas.

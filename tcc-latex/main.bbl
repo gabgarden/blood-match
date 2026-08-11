@@ -1,0 +1,182 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{v-1.9.7 }
+
+\bibitem[Alessa 2022]{alessa2022}
+\abntrefinfo{Alessa}{ALESSA}{2022}
+{ALESSA, T. Evaluation of the wateen app in the blood-donation process in saudi
+  arabia.
+\emph{Journal of Blood Medicine}, v.~13, p. 181--190, 2022.}
+
+\bibitem[Bloch 2018]{bloch2018}
+\abntrefinfo{Bloch}{BLOCH}{2018}
+{BLOCH, J. \emph{Effective Java}. 3. ed. Boston: Addison-Wesley, 2018.}
+
+\bibitem[Booch 2007]{booch2007}
+\abntrefinfo{Booch}{BOOCH}{2007}
+{BOOCH, G. \emph{Object-oriented analysis and design with applications}. 3. ed.
+  Boston: Addison-Wesley, 2007.}
+
+\bibitem[{Ceará. Secretaria da Saúde} 2021]{ceara2021}
+\abntrefinfo{{Ceará. Secretaria da Saúde}}{{Ceará. Secretaria da
+  Saúde}}{2021}
+{{Ceará. Secretaria da Saúde}. \emph{Homens são os que mais doam sangue no
+  Ceará entre os 2\% da população doadora}. Fortaleza: [s.n.], 2021.
+  Online.}
+
+\bibitem[{Ceará. Secretaria da Saúde} 2025]{ceara2025}
+\abntrefinfo{{Ceará. Secretaria da Saúde}}{{Ceará. Secretaria da
+  Saúde}}{2025}
+{{Ceará. Secretaria da Saúde}. \emph{Hemoce registra número recorde de
+  doações em 2024, o maior nos últimos 30 anos}. Fortaleza: [s.n.], 2025.
+  Online.}
+
+\bibitem[{Centro de Hematologia e Hemoterapia do Ceará --- HEMOCE}
+  2022]{hemoce2022}
+\abntrefinfo{{Centro de Hematologia e Hemoterapia do Ceará ---
+  HEMOCE}}{{Centro de Hematologia e Hemoterapia do Ceará --- HEMOCE}}{2022}
+{{Centro de Hematologia e Hemoterapia do Ceará --- HEMOCE}. \emph{Rede de
+  atendimento}. Fortaleza: [s.n.], 2022. Online.}
+
+\bibitem[Chacon e Straub 2014]{chacon2014}
+\abntrefinfo{Chacon e Straub}{CHACON; STRAUB}{2014}
+{CHACON, S.; STRAUB, B. \emph{Pro Git}. [S.l.]: Apress, 2014.}
+
+\bibitem[Deitel e Deitel 2017]{deitel2017}
+\abntrefinfo{Deitel e Deitel}{DEITEL; DEITEL}{2017}
+{DEITEL, P.; DEITEL, H. \emph{Java: How to Program}. [S.l.]: Pearson, 2017.}
+
+\bibitem[{Elsevier} 2024]{elsevier2024}
+\abntrefinfo{{Elsevier}}{{Elsevier}}{2024}
+{{Elsevier}. \emph{Scopus}. [S. l.]: Elsevier, 2024. Online.}
+
+\bibitem[{Elsevier} 2025]{elsevier2025}
+\abntrefinfo{{Elsevier}}{{Elsevier}}{2025}
+{{Elsevier}. \emph{Scopus content coverage}. 2025. Online.
+Mais de 2,4 bilhões de referências citadas desde 1970.}
+
+\bibitem[Evans 2003]{evans2003}
+\abntrefinfo{Evans}{EVANS}{2003}
+{EVANS, E. \emph{Domain-Driven Design: Tackling Complexity in the Heart of
+  Software}. [S.l.]: Addison-Wesley, 2003.}
+
+\bibitem[Frandsen 2020]{frandsen2020}
+\abntrefinfo{Frandsen}{FRANDSEN}{2020}
+{FRANDSEN, F. \emph{Health sciences literature review made easy: The PICO
+  strategy}. Burlington: Jones \& Bartlett Learning, 2020.}
+
+\bibitem[Gamma et al. 1994]{gamma1994}
+\abntrefinfo{Gamma et al.}{GAMMA et al.}{1994}
+{GAMMA, E. et al. \emph{Design patterns: elements of reusable object-oriented
+  software}. Reading: Addison-Wesley, 1994.}
+
+\bibitem[Gil 2008]{gil2008}
+\abntrefinfo{Gil}{GIL}{2008}
+{GIL, A.~C. \emph{Métodos e técnicas de pesquisa social}. 6. ed. São Paulo:
+  Atlas, 2008.}
+
+\bibitem[{Hemorio} 2023]{hemorio2023}
+\abntrefinfo{{Hemorio}}{{Hemorio}}{2023}
+{{Hemorio}. \emph{Doação de sangue no Brasil: desafios e perspectivas}.
+Rio de Janeiro, 2023.}
+
+\bibitem[Li et al. 2023]{li2023}
+\abntrefinfo{Li et al.}{LI et al.}{2023}
+{LI, L. et al. Mobile applications for encouraging blood donation: A systematic
+  review and case study.
+2023.}
+
+\bibitem[Marconi e Lakatos 2003]{marconi2003}
+\abntrefinfo{Marconi e Lakatos}{MARCONI; LAKATOS}{2003}
+{MARCONI, M. d.~A.; LAKATOS, E.~M. \emph{Fundamentos de metodologia
+  científica}. 5. ed. São Paulo: Atlas, 2003.}
+
+\bibitem[Martin 2000]{martin2000}
+\abntrefinfo{Martin}{MARTIN}{2000}
+{MARTIN, R.~C. \emph{Design principles and design patterns}.
+[S.l.], 2000.}
+
+\bibitem[Martin 2003]{martin2003}
+\abntrefinfo{Martin}{MARTIN}{2003}
+{MARTIN, R.~C. \emph{Agile software development: principles, patterns, and
+  practices}. Upper Saddle River: Prentice Hall, 2003.}
+
+\bibitem[Martin 2008]{martin2008}
+\abntrefinfo{Martin}{MARTIN}{2008}
+{MARTIN, R.~C. \emph{Clean code: a handbook of agile software craftsmanship}.
+  Upper Saddle River: Prentice Hall, 2008.}
+
+\bibitem[Martin 2017]{martin2017}
+\abntrefinfo{Martin}{MARTIN}{2017}
+{MARTIN, R.~C. \emph{Clean architecture: a craftsman's guide to software
+  structure and design}. Boston: Prentice Hall, 2017.}
+
+\bibitem[Minayo 2001]{minayo2001}
+\abntrefinfo{Minayo}{MINAYO}{2001}
+{MINAYO, M. C. d.~S. \emph{Pesquisa social: teoria, método e criatividade}.
+  19. ed. Petrópolis: Vozes, 2001.}
+
+\bibitem[{Organização Mundial da Saúde} 2020]{oms2020}
+\abntrefinfo{{Organização Mundial da Saúde}}{{Organização Mundial da
+  Saúde}}{2020}
+{{Organização Mundial da Saúde}. \emph{Blood safety and availability}.
+Geneva, 2020.}
+
+\bibitem[{Organização Pan-Americana da Saúde} 2020]{opas2020}
+\abntrefinfo{{Organização Pan-Americana da Saúde}}{{Organização
+  Pan-Americana da Saúde}}{2020}
+{{Organização Pan-Americana da Saúde}. \emph{Supply of blood for transfusion
+  in Latin American and Caribbean countries 2019-2020}.
+Washington, D.C., 2020.}
+
+\bibitem[Ou-Yang et al. 2020]{ouyang2020}
+\abntrefinfo{Ou-Yang et al.}{OU-YANG et al.}{2020}
+{OU-YANG, J. et al. Effective methods for reactivating inactive blood donors: A
+  stratified randomised controlled study.
+2020.}
+
+\bibitem[Petersen et al. 2008]{petersen2008}
+\abntrefinfo{Petersen et al.}{PETERSEN et al.}{2008}
+{PETERSEN, K. et al. Systematic mapping studies in software engineering. In:
+  \emph{12th International Conference on Evaluation and Assessment in Software
+  Engineering (EASE)}. [S.l.: s.n.], 2008. p. 1--10.}
+
+\bibitem[Pressman e Maxim 2016]{pressman2016}
+\abntrefinfo{Pressman e Maxim}{PRESSMAN; MAXIM}{2016}
+{PRESSMAN, R.~S.; MAXIM, B.~R. \emph{Engenharia de Software: uma abordagem
+  profissional}. 8. ed. Porto Alegre: AMGH, 2016.}
+
+\bibitem[Prodanov e Freitas 2013]{prodanov2013}
+\abntrefinfo{Prodanov e Freitas}{PRODANOV; FREITAS}{2013}
+{PRODANOV, C.~C.; FREITAS, E. C.~d. \emph{Metodologia do trabalho científico}.
+  2. ed. Novo Hamburgo: Feevale, 2013.}
+
+\bibitem[Silva et al. 2021]{dasilva2021}
+\abntrefinfo{Silva et al.}{SILVA et al.}{2021}
+{SILVA, J.~R. D. et al. Blood donation support application: Contributions from
+  experts on the tool's functionality.
+\emph{Ciência \& Saúde Coletiva}, v.~26, n.~2, p. 493--503, 2021.}
+
+\bibitem[Sommerville 2011]{sommerville2011}
+\abntrefinfo{Sommerville}{SOMMERVILLE}{2011}
+{SOMMERVILLE, I. \emph{Engenharia de software}. 9. ed. São Paulo: Pearson
+  Prentice Hall, 2011.}
+
+\bibitem[Vernon 2013]{vernon2013}
+\abntrefinfo{Vernon}{VERNON}{2013}
+{VERNON, V. \emph{Implementing Domain-Driven Design}. [S.l.]: Addison-Wesley,
+  2013.}
+
+\bibitem[Vernon 2016]{vernon2016}
+\abntrefinfo{Vernon}{VERNON}{2016}
+{VERNON, V. \emph{Domain-driven design distilled}. Boston: Addison-Wesley,
+  2016.}
+
+\bibitem[Walls 2019]{walls2019}
+\abntrefinfo{Walls}{WALLS}{2019}
+{WALLS, C. \emph{Spring in Action}. [S.l.]: Manning, 2019.}
+
+\end{thebibliography}

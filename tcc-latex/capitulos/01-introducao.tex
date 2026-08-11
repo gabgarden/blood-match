@@ -1,0 +1,33 @@
+\chapter{Introdução}
+
+\section{Problema e contexto}
+
+A transfusão sanguínea é essencial em emergências, cirurgias de grande porte e tratamentos de condições crônicas. Mantê-la depende de doações periódicas e de mecanismos eficazes de captação.
+
+Segundo a Organização Mundial da Saúde (OMS) e a Organização Pan-Americana da Saúde (OPAS) \citeonline{oms2020,opas2020}, a taxa de doação por mil habitantes varia de 32,6 em países de alta renda a 4,4 em países de baixa renda. No Brasil, a demanda permanece elevada frente à oferta de doadores.
+
+Do ponto de vista tecnológico, a conexão entre oferta e demanda ainda é limitada. Solicitações emergenciais em redes sociais evidenciam a dificuldade de localizar doadores adequados com rapidez e a baixa conversão dessas chamadas em doações efetivas. É necessário, portanto, desenvolver soluções escaláveis e bem estruturadas, com ciclo de vida longo.
+
+\section{Objetivos}
+
+O objetivo geral deste trabalho é desenvolver uma \textit{Application Programming Interface} (API) RESTful (\textit{Representational State Transfer}) para apoiar a captação de doadores a partir de solicitações de unidades de saúde e pacientes. A API atua como intermediadora entre demanda (requisitantes) e oferta (doadores), com recomendação de solicitações compatíveis --- considerando tipagem sanguínea e proximidade geográfica --- e identificação de doadores elegíveis para notificação.
+
+Objetivos específicos:
+
+\begin{itemize}[leftmargin=*]
+  \item[\textbf{O1}] Mapear o processo da doação sanguínea com técnicas de \textit{Domain-Driven Design} (DDD).
+  \item[\textbf{O2}] Identificar sistemas com funcionalidades similares.
+  \item[\textbf{O3}] Desenvolver mecanismos de recomendação de solicitações a doadores e de notificação a candidatos elegíveis.
+  \item[\textbf{O4}] Validar a proposta por meio de estudo de caso e implementação da API.
+  \item[\textbf{O5}] Avaliar a manutenibilidade da solução.
+\end{itemize}
+
+\section{Justificativa}
+
+A OMS recomenda que ao menos 1\% da população doe sangue \citeonline{oms2020}. Mesmo quando índices nominais são atingidos, a oferta pode ser insuficiente \citeonline{hemorio2023}. O Ceará, com 2,21\% da população doadora \citeonline{ceara2021}, ilustra o efeito de uma hemorrede integrada coordenada pelo Hemoce, com mais de 480 unidades de saúde \citeonline{hemoce2022} e recorde de 110.784 doações em 2024 \citeonline{ceara2025}.
+
+No plano técnico, o DDD favorece a modelagem fiel das regras do domínio \citeonline{evans2003}, e os princípios SOLID \citeonline{martin2000} apoiam evolução e integração. A contribuição deste trabalho é uma API RESTful orientada a esse domínio, voltada à captação efetiva de doadores.
+
+\section{Organização da monografia}
+
+A Seção~2 apresenta o referencial teórico (orientação a objetos, SOLID e DDD). A Seção~3 relata o mapeamento sistemático da literatura e os trabalhos relacionados. A Seção~4 descreve métodos, instrumentos e cronograma. A Seção~5 detalha requisitos, modelagem e implementação. A Seção~6 trata da avaliação. A Seção~7 reúne as considerações finais.

@@ -1,0 +1,237 @@
+%% ============================================================================
+%% Monografia / TCC — ABNT NBR 14724:2024 (vigente em 2026)
+%% Autores: Gabriel Silveira de Azevedo e Mateus Carvalho Costa Nogueira
+%% Classe: abnTeX2 (CTAN) com ajustes da revisão 2024
+%% Compilação: pdflatex → bibtex → pdflatex → pdflatex
+%% ============================================================================
+\documentclass[
+  12pt,
+  oneside,              % só anverso (PDF/entrega digital) — NBR 14724:2024
+  openany,
+  a4paper,
+  english,
+  brazilian
+]{abntex2}
+
+% Codificação e fontes (NBR 14724: fonte Times ou Arial, 12 pt)
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% newtx = Times escalável (Type1); evita erro do microtype com mathptmx no MiKTeX
+\usepackage{newtxtext,newtxmath}
+\usepackage[expansion=false]{microtype}
+
+% Citações e referências ABNT (NBR 10520 / NBR 6023)
+\usepackage[alf]{abntex2cite}
+
+% Pacotes utilitários
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{csquotes}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{indentfirst}
+\usepackage{geometry}
+
+% --- Margens NBR 14724:2024 (anverso) — medidas exatas -----------------
+% esquerda/superior = 3 cm | direita/inferior = 2 cm
+\geometry{
+  a4paper,
+  left=3cm,
+  right=2cm,
+  top=3cm,
+  bottom=2cm,
+  headheight=14.5pt,
+  headsep=1cm,
+  footskip=0pt,
+  includehead=false,
+  includefoot=false
+}
+
+% Recuo de parágrafo típico ABNT
+\setlength{\parindent}{1.25cm}
+
+% Numeração: canto superior direito, sem linha no cabeçalho
+\makepagestyle{abntsimples}
+\makeoddhead{abntsimples}{}{}{\ABNTEXfontereduzida\thepage}
+\makeevenhead{abntsimples}{}{}{\ABNTEXfontereduzida\thepage}
+\makeoddfoot{abntsimples}{}{}{}
+\makeevenfoot{abntsimples}{}{}{}
+\makeheadrule{abntsimples}{0pt}{0pt}
+\makefootrule{abntsimples}{0pt}{0pt}{0pt}
+
+\makepagestyle{abntchapfirst}
+\makeoddhead{abntchapfirst}{}{}{\ABNTEXfontereduzida\thepage}
+\makeevenhead{abntchapfirst}{}{}{\ABNTEXfontereduzida\thepage}
+\makeoddfoot{abntchapfirst}{}{}{}
+\makeevenfoot{abntchapfirst}{}{}{}
+\makeheadrule{abntchapfirst}{0pt}{0pt}
+\makefootrule{abntchapfirst}{0pt}{0pt}{0pt}
+
+% Caminho das figuras
+\graphicspath{{figuras/}}
+
+% Capções ABNT: "Quadro" no lugar de "Tabela" (listas e legendas)
+\renewcommand{\tablename}{Quadro}
+\renewcommand{\listtablename}{Lista de quadros}
+
+% Listagens de código (opcional)
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  columns=fullflexible
+}
+
+% --- Dados do trabalho -------------------------------------------------------
+\titulo{Desenvolvimento de uma API RESTful para captação e recomendação de potenciais doadores de sangue utilizando Domain Driven Design (DDD)}
+\autor{Gabriel Silveira de Azevedo\\ Mateus Carvalho Costa Nogueira}
+\local{Campos dos Goytacazes}
+\data{2026}
+\orientador{Mark Douglas Azevedo Jacyntho}
+\instituicao{%
+  Instituto Federal de Educação, Ciência e Tecnologia Fluminense
+  \par
+  Campus Campos Centro
+  \par
+  Curso de Bacharelado em Sistemas de Informação}
+\tipotrabalho{Monografia}
+\preambulo{Monografia apresentada ao Instituto Federal de Educação, Ciência e Tecnologia Fluminense como parte das exigências para a conclusão do Curso de Bacharelado em Sistemas de Informação.}
+
+% --- Hiperlinks --------------------------------------------------------------
+\makeatletter
+\hypersetup{
+  pdftitle={\@title},
+  pdfauthor={\@author},
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue
+}
+\makeatother
+
+% Numeração de seções até o 4º nível (ex.: 2.2.2.1)
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+
+% ============================================================================
+% ELEMENTOS PRÉ-TEXTUAIS
+% ============================================================================
+\pretextual
+
+% Capa
+\imprimircapa
+
+% Folha de rosto
+\imprimirfolhaderosto*
+
+% Folha de aprovação (preencher após a defesa)
+\begin{folhadeaprovacao}
+\begin{center}
+  {\ABNTEXchapterfont\large\imprimirautor}
+  \vspace*{\fill}
+  \begin{center}
+    \ABNTEXchapterfont\bfseries\Large\imprimirtitulo
+  \end{center}
+  \vspace*{\fill}
+  \hspace{.45\textwidth}
+  \begin{minipage}{.5\textwidth}
+    \imprimirpreambulo
+  \end{minipage}%
+  \vspace*{\fill}
+  {\large
+  Trabalho aprovado. Campos dos Goytacazes, \underline{\hspace{2cm}} de \underline{\hspace{3cm}} de 2026.}
+  \vspace*{2cm}
+  \assinatura{\textbf{\imprimirorientador} \\ Orientador}
+  \vspace*{1cm}
+  \assinatura{\textbf{Membro Titular 1} \\ Avaliador}
+  \vspace*{1cm}
+  \assinatura{\textbf{Membro Titular 2} \\ Avaliador}
+  \vspace*{\fill}
+\end{center}
+\end{folhadeaprovacao}
+
+% Lista de abreviaturas e siglas
+\begin{siglas}
+  \item[API] Application Programming Interface
+  \item[DDD] Domain Driven Design
+  \item[FIFO] First In, First Out
+  \item[JWT] JSON Web Token
+  \item[LTS] Long Term Support
+  \item[NoSQL] Not Only SQL
+  \item[OMS] Organização Mundial da Saúde
+  \item[OO] Orientação a Objetos
+  \item[OPAS] Organização Pan-Americana da Saúde
+  \item[REST] Representational State Transfer
+  \item[SOLID] Single responsibility, Open-closed, Liskov substitution, Interface segregation, Dependency inversion
+  \item[TIC] Tecnologias da Informação e Comunicação
+  \item[UML] Unified Modeling Language
+\end{siglas}
+
+% Listas de ilustrações / quadros / gráficos
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\clearpage
+
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\clearpage
+
+% Resumo em português
+\begin{resumo}
+  A transfusão sanguínea é essencial em emergências, cirurgias e tratamentos crônicos, mas o Brasil ainda enfrenta descompasso entre demanda e oferta de doadores. Este trabalho propõe o desenvolvimento de uma API RESTful para captação de doadores e recomendação de solicitações compatíveis, utilizando DDD e princípios SOLID. A pesquisa adota abordagem qualitativa, exploratória-descritiva, com mapeamento sistemático da literatura e modelagem do domínio da doação sanguínea. A solução, implementada em Java~17 com Spring Boot, MongoDB e autenticação JWT, intermedia requisitantes e doadores, considerando tipagem sanguínea, proximidade geográfica e alocação FIFO de doações às metas das solicitações.
+
+  \vspace{\onelineskip}
+  \noindent
+  \textbf{Palavras-chave}: doação de sangue; API RESTful; Domain-Driven Design; recomendação de solicitações; engenharia de software.
+\end{resumo}
+
+% Abstract
+\begin{resumo}[Abstract]
+  \begin{otherlanguage*}{english}
+    Blood transfusion is essential in emergencies, surgeries and chronic treatments, yet Brazil still faces a mismatch between demand and donor supply. This undergraduate thesis proposes a RESTful API for donor recruitment and recommendation of compatible donation requests, using DDD and SOLID principles. The research adopts a qualitative, exploratory-descriptive approach, with a systematic literature mapping and blood-donation domain modeling. The solution, implemented in Java~17 with Spring Boot, MongoDB and JWT authentication, mediates between requesters and donors, considering blood type, geographic proximity and FIFO allocation of donations to request goals.
+
+    \vspace{\onelineskip}
+    \noindent
+    \textbf{Keywords}: blood donation; RESTful API; Domain-Driven Design; request recommendation; software engineering.
+  \end{otherlanguage*}
+\end{resumo}
+
+% Sumário
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\clearpage
+
+% ============================================================================
+% ELEMENTOS TEXTUAIS
+% ============================================================================
+\textual
+% Páginas só no anverso: número no canto superior direito, sem cabeçalho decorativo
+\pagestyle{abntsimples}
+\aliaspagestyle{chapter}{abntchapfirst}
+
+\include{capitulos/01-introducao}
+\include{capitulos/02-fundamentacao}
+\include{capitulos/03-trabalhos-relacionados}
+\include{capitulos/04-metodos}
+\include{capitulos/05-estudo-de-caso}
+\include{capitulos/06-avaliacao}
+\include{capitulos/07-consideracoes}
+
+% ============================================================================
+% ELEMENTOS PÓS-TEXTUAIS
+% ============================================================================
+\postextual
+
+\bibliography{referencias}
+
+\end{document}

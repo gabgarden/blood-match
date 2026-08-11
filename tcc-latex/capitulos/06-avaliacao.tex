@@ -1,0 +1,19 @@
+\chapter{Avaliação da proposta de solução}
+
+Este capítulo descreve o plano de avaliação da API desenvolvida, alinhado ao objetivo específico O5 (avaliar a manutenibilidade da solução) e ao objetivo O4 (validar a proposta por meio de estudo de caso e implementação). Como a segunda etapa do trabalho ainda está em andamento, as seções a seguir apresentam o que será avaliado e como, e não os resultados finais, que serão consolidados na versão definitiva desta monografia.
+
+\section{Plano de avaliação}
+
+A avaliação da solução será conduzida em duas frentes complementares. A primeira, de caráter funcional, apoia-se em testes automatizados: testes unitários para as regras de negócio isoladas no domínio (por exemplo, elegibilidade do doador, compatibilidade sanguínea e a alocação FIFO do \texttt{DonationRequestFulfillmentService}) e testes de integração para os fluxos que atravessam as camadas de aplicação, persistência e segurança (como a criação de uma solicitação seguida de doações concluídas e a consequente atualização de \texttt{fulfilledBloodBags}). A segunda frente, de caráter estrutural, avalia a manutenibilidade da API à luz dos princípios SOLID e do DDD apresentados no Capítulo~2, verificando se a separação em camadas (\texttt{domain}, \texttt{application/usecase}, \texttt{interfaces/rest}, \texttt{infra/persistence} e \texttt{infra/security}) de fato isola as regras de negócio de detalhes de infraestrutura, conforme descrito no Capítulo~5.
+
+\section{Resultados}
+
+Esta seção apresentará, na versão final do trabalho, a cobertura e os resultados obtidos com a suíte de testes unitários e de integração, bem como eventuais evidências qualitativas de manutenibilidade (como a facilidade de estender um novo caso de uso ou de substituir uma implementação de infraestrutura sem alterar o domínio). No momento da entrega desta versão, a implementação da API e a suíte de testes correspondente ainda estão em desenvolvimento, de modo que os resultados quantitativos não são apresentados aqui.
+
+\section{Sugestões de melhorias}
+
+A partir dos resultados da avaliação, esta seção reunirá melhorias identificadas ao longo da validação --- por exemplo, ajustes no algoritmo de alocação de doações, na cobertura de testes de casos de borda (solicitações expiradas, doações concorrentes) ou na experiência de consumo da API evidenciada pela documentação OpenAPI. Como a avaliação ainda não foi concluída, este trabalho não antecipa melhorias específicas nesta versão.
+
+\section{Considerações sobre a avaliação}
+
+Ao final da avaliação, esta seção sintetizará em que medida a API construída atendeu aos objetivos O3, O4 e O5, discutindo a eficácia da estratégia de recomendação e de cumprimento de metas descrita no Capítulo~5 e o grau de manutenibilidade alcançado pela arquitetura em camadas orientada a DDD. Essa síntese será redigida somente após a execução do plano de avaliação descrito neste capítulo.
