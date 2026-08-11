@@ -13,7 +13,7 @@ db.donation_requests.updateMany(
 const locationUpdates = [];
 
 db.donation_requests.find({ location: { $exists: false } }).forEach((request) => {
-  const bloodCenter = db.blood_centers.findOne({ organizationId: request.bloodCenterId });
+  const bloodCenter = db.blood_centers.findOne({ organizationId: request.organizationId });
   if (bloodCenter == null) return;
 
   const organization = db.parties.findOne({

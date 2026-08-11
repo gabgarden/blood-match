@@ -1,0 +1,113 @@
+\chapter{Métodos e recursos}
+
+Neste capítulo são descritos os procedimentos metodológicos adotados para o alcance dos objetivos propostos, abordando a abordagem de pesquisa escolhida, os instrumentos utilizados na coleta e análise de informações, as ferramentas empregadas no desenvolvimento da API e o cronograma de execução do trabalho.
+
+\section{Visão geral}
+
+Para o desenvolvimento da pesquisa adotou-se a abordagem qualitativa, que se destaca por enfatizar a análise de dados não numéricos, como documentos, normativas e literatura especializada, buscando compreender o significado e a complexidade dos fenômenos investigados.
+
+\begin{citacao}
+A pesquisa qualitativa trabalha com o universo de significados, motivos, aspirações, crenças, valores e atitudes, o que corresponde a um espaço mais profundo das relações, dos processos e dos fenômenos que não pode ser reduzido à operacionalização de variáveis. \citeonline[p.~21]{minayo2001}
+\end{citacao}
+
+Para a condução do trabalho, foram traçadas etapas sequenciais, ilustradas na Figura~\ref{fig:processo-tcc} e na Figura~\ref{fig:processo-api}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figura01-processo-tcc}
+  \caption{Diagrama de processos do desenvolvimento do TCC}
+  \fonte{Elaborado pelos próprios autores (2025).}
+  \label{fig:processo-tcc}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figura02-processo-api}
+  \caption{Diagrama de processos do Desenvolvimento da API}
+  \fonte{Elaborado pelos próprios autores (2025).}
+  \label{fig:processo-api}
+\end{figure}
+
+Inicialmente, definiu-se o escopo da pesquisa, o problema, as justificativas e os objetivos que fundamentam o Capítulo~1. Em seguida, conduziu-se o levantamento bibliográfico sobre OO, SOLID e DDD, aprofundados no Capítulo~2.
+
+Paralelamente, realizou-se o mapeamento do processo de um hemocentro por meio de pesquisa documental e bibliográfica, buscando compreender o fluxo de trabalho, as regras de negócio e as necessidades do domínio da doação de sangue. Elaborou-se também um protocolo de mapeamento sistemático da literatura, cujos resultados são discutidos no Capítulo~3.
+
+Com base no conhecimento adquirido nessas etapas, realizou-se a análise do domínio sob a ótica do DDD e a definição dos requisitos funcionais e não funcionais. Na sequência, elaborou-se o projeto da solução (casos de uso e diagramas de classes) e desenvolveu-se a API aplicando SOLID, com vistas à escalabilidade, manutenibilidade e testabilidade.
+
+Por fim, os resultados foram avaliados por meio de testes unitários, seguidos da elaboração das conclusões do trabalho.
+
+\section{Instrumentos e ferramentas}
+
+Para a coleta e análise dos dados, foram utilizados instrumentos compatíveis com os objetivos e a abordagem metodológica da pesquisa, orientados pela necessidade de obter informações confiáveis e contextualizadas sobre o cenário da doação de sangue e sobre as tecnologias empregadas no desenvolvimento da API.
+
+\subsection{Pesquisa exploratória-descritiva}
+
+A presente pesquisa caracteriza-se como exploratória-descritiva, abordagem que, segundo \citeonline{gil2008}, proporciona maior familiaridade com o problema investigado e, simultaneamente, descreve as características do fenômeno estudado. Segundo \citeonline{prodanov2013}, essa combinação metodológica é especialmente adequada para estudos que envolvem questões sociais e de saúde pública, permitindo uma análise contextualizada e orientada para a intervenção.
+
+O contexto de análise adotado foi o das normativas e do cenário de atuação dos hemocentros, com atenção às demandas da região de Campos dos Goytacazes, local de moradia e estudo dos pesquisadores. Essa escolha favoreceu maior familiaridade com os aspectos sociais, culturais e institucionais que envolvem a temática, além de facilitar o acesso a dados públicos e normativas das unidades hospitalares e hemocentros locais.
+
+Segundo \citeonline{pressman2016}, o esforço inicial de compreensão do domínio e das necessidades reais dos \textit{stakeholders} é indispensável para criar uma base sólida de requisitos e evitar o desenvolvimento de sistemas inadequados à realidade operacional. Nesse sentido, utilizou-se a análise documental e bibliográfica como técnica de coleta de dados, por permitir profundidade na obtenção de informações normativas e procedimentais a partir de manuais do Ministério da Saúde, portarias vigentes e literatura acadêmica.
+
+Segundo \citeonline{marconi2003}, a pesquisa documental é composta por etapas fundamentais --- como a seleção, leitura crítica e categorização dos dados --- que garantem a sistematização e a confiabilidade das informações obtidas. \citeonline{sommerville2011} reforça que a análise de documentos atua como instrumento de captura e construção do conhecimento, sendo essencial para a engenharia de requisitos em sistemas críticos, como os voltados à saúde pública.
+
+O levantamento realizado a partir de documentos oficiais e estudos de caso sobre triagem, captação e gestão em hemocentros teve como objetivo compreender os fatores que influenciam a decisão de doar sangue, identificar barreiras e motivações entre potenciais doadores descritos na literatura, e subsidiar os requisitos da API proposta.
+
+\subsection{Desenvolvimento da API}
+
+O desenvolvimento da API foi orientado por boas práticas de engenharia de \textit{software}, com foco na escalabilidade, na manutenibilidade e na clareza estrutural do código. Adotou-se DDD e SOLID como diretrizes arquiteturais (Seções~\ref{sec:ddd} e~\ref{sec:solid}). A camada de segurança contempla autenticação baseada em \textit{JSON Web Token} (JWT), padrão amplamente adotado em APIs RESTful para autenticação sem estado (\textit{stateless}).
+
+\subsubsection{Linguagem de programação (Java)}
+
+A linguagem escolhida para a implementação foi o Java, em sua versão 17 (\textit{Long Term Support} --- LTS). Java é uma linguagem orientada a objetos, fortemente tipada e amplamente documentada na literatura \citeonline{deitel2017}. A tipagem estática do Java favorece a implementação de \textit{Value Objects} e \textit{Entities}, garantindo que erros de domínio sejam capturados em tempo de compilação. Em contrapartida, uma crítica comum ao Java é a sua verbosidade e o consumo de memória da \textit{Java Virtual Machine} (JVM), se comparado a linguagens como Go ou Python, conforme discutido por \citeonline{bloch2018}. Ainda assim, a robustez da linguagem compensa essas restrições para o contexto corporativo.
+
+\subsubsection{\textit{Framework} de desenvolvimento (Spring Boot)}
+
+Para agilizar o desenvolvimento e a configuração da infraestrutura, utilizou-se o \textit{framework} Spring Boot. Segundo \citeonline{walls2019}, o Spring Boot aplica o conceito de ``convenção sobre configuração'', permitindo que o desenvolvedor foque na lógica de negócio enquanto o \textit{framework} gerencia a injeção de dependência e a conexão com o banco de dados. Por outro lado, a facilidade do Spring pode esconder a complexidade subjacente, dificultando o \textit{debug} (depuração) caso o desenvolvedor não entenda o ciclo de vida dos \textit{beans} gerenciados pelo \textit{container}.
+
+\subsubsection{Ambiente de desenvolvimento e versionamento (Visual Studio Code e Git)}
+
+Para a codificação, utilizou-se o editor de código Visual Studio Code (VS Code), devido ao seu vasto ecossistema de extensões para Java e suporte nativo a terminais leves. Para o controle de versão, adotou-se o Git, hospedando o repositório na plataforma GitHub. Segundo \citeonline{chacon2014}, o versionamento distribuído é essencial para manter o histórico de alterações seguro e permitir ramificações (\textit{branches}) para testes de novas funcionalidades sem comprometer o código estável (\textit{main}).
+
+\section{Cronograma}
+
+\begin{table}[H]
+  \centering
+  \caption{Cronograma de execução da primeira etapa do TCC}
+  \label{tab:cronograma1}
+  \small
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X c c c c c c}
+    \toprule
+    \textbf{Atividade} & \textbf{Ago/25} & \textbf{Set/25} & \textbf{Out/25} & \textbf{Nov/25} & \textbf{Dez/25} & \textbf{Jan/26} \\
+    \midrule
+    Definição do escopo, problema e objetivos & X & X &  &  &  &  \\
+    Fundamentação teórica (OO, SOLID, DDD) &  & X & X & X &  &  \\
+    Pesquisa documental do domínio hemoterápico &  & X & X &  &  &  \\
+    Protocolo e mapeamento sistemático da literatura &  &  & X & X & X &  \\
+    Análise de domínio com DDD &  &  &  & X & X & X \\
+    Levantamento de requisitos (RF/RNF) &  &  &  &  & X & X \\
+    Redação dos Capítulos 1 a 4 & X & X & X & X & X & X \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2025).}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Cronograma de execução da segunda etapa do TCC}
+  \label{tab:cronograma2}
+  \small
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X c c c c c c}
+    \toprule
+    \textbf{Atividade} & \textbf{Fev/26} & \textbf{Mar/26} & \textbf{Abr/26} & \textbf{Mai/26} & \textbf{Jun/26} & \textbf{Jul/26} \\
+    \midrule
+    Modelagem UML (casos de uso e classes) & X & X &  &  &  &  \\
+    Implementação da API (Java / Spring Boot) &  & X & X & X &  &  \\
+    Persistência (MongoDB) e autenticação (JWT) &  &  & X & X &  &  \\
+    Motor de recomendação de doadores &  &  & X & X & X &  \\
+    Testes unitários e de integração &  &  &  & X & X &  \\
+    Avaliação da proposta e análise de resultados &  &  &  &  & X & X \\
+    Redação final (Capítulos 5 a 7) e revisão & X & X & X & X & X & X \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2025).}
+\end{table}

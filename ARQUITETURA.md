@@ -72,8 +72,8 @@ Comandos:
 | PATCH | /donation-requests/goal-blood-bags | Atualiza meta de bolsas |
 | PATCH | /donation-requests/date-limit | Atualiza prazo |
 | DELETE | /donation-requests/{requestId} | Cancela pedido |
-| GET | /requests/recommendations | Recomenda pedidos para doador |
-| POST | /requests/{id}/notify | Notifica doadores potenciais |
+| GET | /donation-requests/recommendations | Recomenda pedidos para doador |
+| POST | /donation-requests/{id}/notify | Notifica doadores potenciais |
 
 ### 4.4 Donations
 
@@ -121,11 +121,11 @@ No write path de doacao concluida:
 - CreateCompletedDonationUseCase
 - CompletePendingDonationUseCase
 
-Ambos:
+Ambos delegam para `DonationRequestFulfillmentRefresher.refresh(organizationId, currentDate)`:
 
-1. persistem a doacao
-2. carregam requests ativas do mesmo hemocentro
-3. carregam doacoes concluidas do hemocentro
+1. persistem a doacao (no use case)
+2. carregam requests ativas da mesma organization
+3. carregam doacoes concluidas da organization
 4. executam synchronize
 5. persistem requests atualizadas
 

@@ -1,6 +1,9 @@
 package bloodmatch.application.usecase.auth;
 
+import bloodmatch.application.exception.UnauthorizedException;
+import bloodmatch.application.exception.ValidationException;
 import bloodmatch.domain.repositories.UserAccountRepositoryInterface;
+import bloodmatch.domain.security.SecurityRole;
 import bloodmatch.domain.security.UserAccount;
 import bloodmatch.domain.shared.valueObjects.Email;
 import bloodmatch.infra.config.JwtProperties;
@@ -9,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationService {
@@ -24,14 +28,18 @@ public class AuthenticationService {
       JwtTokenProvider jwtTokenProvider,
       JwtProperties jwtProperties) {
 
-    if (userAccountRepository == null)
+    if (userAccountRepository == null) {
       throw new IllegalArgumentException("UserAccountRepository cannot be null");
-    if (passwordEncoder == null)
+    }
+    if (passwordEncoder == null) {
       throw new IllegalArgumentException("PasswordEncoder cannot be null");
-    if (jwtTokenProvider == null)
+    }
+    if (jwtTokenProvider == null) {
       throw new IllegalArgumentException("JwtTokenProvider cannot be null");
-    if (jwtProperties == null)
+    }
+    if (jwtProperties == null) {
       throw new IllegalArgumentException("JwtProperties cannot be null");
+    }
 
     this.userAccountRepository = userAccountRepository;
     this.passwordEncoder = passwordEncoder;
@@ -39,36 +47,44 @@ public class AuthenticationService {
     this.jwtProperties = jwtProperties;
   }
 
-  public AuthenticationResult authenticate(String email, String password) {
-    if (email == null || email.isBlank())
-      throw new IllegalArgumentException("email cannot be blank");
-    if (password == null || password.isBlank())
-      throw new IllegalArgumentException("password cannot be blank");
+  public Output authenticate(String email, String password) {
+    if (email == null || email.isBlank()) {
+      throw new ValidationException("email cannot be blank");
+    }
+    if (password == null || password.isBlank()) {
+      throw new ValidationException("password cannot be blank");
+    }
 
     UserAccount userAccount = userAccountRepository.findByEmail(new Email(email))
-        .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+        .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
-    if (!userAccount.isEnabled())
-      throw new IllegalStateException("User account is disabled");
+    if (!userAccount.isEnabled()) {
+      throw new UnauthorizedException("User account is disabled");
+    }
 
-    if (!passwordEncoder.matches(password, userAccount.getPasswordHash()))
-      throw new IllegalArgumentException("Invalid credentials");
+    if (!passwordEncoder.matches(password, userAccount.getPasswordHash())) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
 
     String accessToken = jwtTokenProvider.generateAccessToken(userAccount);
 
-    return new AuthenticationResult(
+    Set<String> roles = userAccount.getRoles().stream()
+        .map(SecurityRole::name)
+        .collect(Collectors.toSet());
+
+    return new Output(
         accessToken,
         "Bearer",
         jwtProperties.getExpirationMs(),
-        userAccount.getRoles(),
+        roles,
         userAccount.getPartyId().getValue().toString());
   }
 
-  public record AuthenticationResult(
+  public record Output(
       String accessToken,
       String tokenType,
       long expiresIn,
-      Set<bloodmatch.domain.security.SecurityRole> roles,
+      Set<String> roles,
       String partyId) {
   }
 }

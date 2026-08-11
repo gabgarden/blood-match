@@ -1,7 +1,9 @@
 package bloodmatch.application.usecase.donationrequest.recommendations;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.donationrequest.DonationRequest;
-import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
@@ -16,90 +18,94 @@ import java.util.List;
 @Service
 public class GetRecommendedRequestsUseCase {
 
-    private final DonorRepositoryInterface donorRepository;
-    private final DonationRequestRepositoryInterface donationRequestRepository;
+  private final DonorRepositoryInterface donorRepository;
+  private final DonationRequestRepositoryInterface donationRequestRepository;
 
-    public GetRecommendedRequestsUseCase(
-            DonorRepositoryInterface donorRepository,
-                        DonationRequestRepositoryInterface donationRequestRepository) {
+  public GetRecommendedRequestsUseCase(
+      DonorRepositoryInterface donorRepository,
+      DonationRequestRepositoryInterface donationRequestRepository) {
+    this.donorRepository = donorRepository;
+    this.donationRequestRepository = donationRequestRepository;
+  }
 
-        this.donorRepository = donorRepository;
-        this.donationRequestRepository = donationRequestRepository;
+  public List<OutputItem> execute(Input input) {
+    return execute(input, LocalDate.now());
+  }
+
+  public List<OutputItem> execute(Input input, LocalDate currentDate) {
+    if (input == null) {
+      throw new ValidationException("Input cannot be null");
+    }
+    if (currentDate == null) {
+      throw new ValidationException("Current date cannot be null");
     }
 
-    public List<OutputItem> execute(DomainID personId) {
-        return execute(personId, LocalDate.now());
+    DomainID personId = DomainIdParser.parse(input.personId(), "personId");
+
+    Donor donor = donorRepository.findByPartyId(personId)
+        .orElseThrow(() -> new NotFoundException("Donor role not found"));
+
+    if (!donor.isEligibleToDonate(currentDate)) {
+      return List.of();
     }
 
-    public List<OutputItem> execute(DomainID personId, LocalDate currentDate) {
+    List<DonationRequest> candidateRequests = donationRequestRepository.findActiveRequestsForDonor(
+        donor.getBloodType(),
+        donor.getPerson().getAddress(),
+        donor.getMaxRecommendationDistanceKm(),
+        currentDate);
 
-        if (personId == null)
-            throw new IllegalArgumentException("Person id cannot be null");
-
-        if (currentDate == null)
-            throw new IllegalArgumentException("Current date cannot be null");
-
-        Donor donor = donorRepository.findByPartyId(personId)
-                .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
-
-        if (!donor.isEligibleToDonate(currentDate)) {
-            return List.of();
-        }
-
-        List<DonationRequest> candidateRequests = donationRequestRepository.findActiveRequestsForDonor(
-                donor.getBloodType(),
-                donor.getPerson().getAddress(),
-                donor.getMaxRecommendationDistanceKm(),
-                currentDate);
-
-        if (candidateRequests.isEmpty()) {
-            return List.of();
-        }
-
-        return candidateRequests.stream()
-                .filter(request -> !request.isGoalReached())
-                .map(request -> toOutput(
-                        request,
-                        donor))
-                .sorted(
-                        Comparator
-                                .comparing(
-                                        OutputItem::distanceInKm,
-                                        Comparator.nullsLast(Comparator.naturalOrder()))
-                                .thenComparing(OutputItem::urgency, Comparator.reverseOrder())
-                                .thenComparing(OutputItem::dateLimit))
-                .toList();
+    if (candidateRequests.isEmpty()) {
+      return List.of();
     }
 
-    private OutputItem toOutput(
-            DonationRequest request,
-            Donor donor) {
+    return candidateRequests.stream()
+        .filter(request -> !request.isGoalReached())
+        .sorted(
+            Comparator
+                .comparing((DonationRequest request) -> distanceKm(donor, request),
+                    Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(DonationRequest::getUrgency, Comparator.reverseOrder())
+                .thenComparing(DonationRequest::getDateLimit))
+        .map(request -> toOutput(request, donor))
+        .toList();
+  }
 
-        Address addr1 = donor.getPerson().getAddress();
-        Address addr2 = request.getBloodCenter().getOrganization().getAddress();
-        Double distance = addr1.distanceTo(addr2);
+  private OutputItem toOutput(DonationRequest request, Donor donor) {
+    Double distance = distanceKm(donor, request);
+    return new OutputItem(
+        request.getId().getValue().toString(),
+        request.getBloodTypeNeeded().getType(),
+        request.getDateLimit(),
+        request.getBloodCenter().getOrganization().getName(),
+        request.getUrgency().name(),
+        distance != null ? Math.round(distance * 10.0) / 10.0 : null,
+        request.getGoalBloodBags(),
+        request.getFulfilledBloodBags(),
+        request.isGoalReached());
+  }
 
-        return new OutputItem(
-                request.getId().getValue().toString(),
-                request.getBloodTypeNeeded().getType(),
-                request.getDateLimit(),
-                request.getBloodCenter().getOrganization().getName(),
-                request.getUrgency(),
-                distance != null ? Math.round(distance * 10.0) / 10.0 : null,
-                request.getGoalBloodBags(),
-                request.getFulfilledBloodBags(),
-                request.isGoalReached());
+  private static Double distanceKm(Donor donor, DonationRequest request) {
+    Address addr1 = donor.getPerson().getAddress();
+    Address addr2 = request.getBloodCenter().getOrganization().getAddress();
+    if (addr1 == null || addr2 == null) {
+      return null;
     }
+    return addr1.distanceTo(addr2);
+  }
 
-    public record OutputItem(
-            String requestId,
-            String bloodTypeNeeded,
-            LocalDate dateLimit,
-            String bloodCenterName,
-            Urgency urgency,
-            Double distanceInKm,
-            int goalBloodBags,
-            int fulfilledBloodBags,
-            boolean goalReached) {
-    }
+  public record Input(String personId) {
+  }
+
+  public record OutputItem(
+      String requestId,
+      String bloodTypeNeeded,
+      LocalDate dateLimit,
+      String bloodCenterName,
+      String urgency,
+      Double distanceInKm,
+      int goalBloodBags,
+      int fulfilledBloodBags,
+      boolean goalReached) {
+  }
 }

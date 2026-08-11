@@ -1,5 +1,9 @@
 package bloodmatch.application.usecase.donationrequest;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
+import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -14,21 +18,29 @@ public class CancelDonationRequestUseCase {
 
   public CancelDonationRequestUseCase(
       DonationRequestRepositoryInterface donationRequestRepository) {
-    if (donationRequestRepository == null)
+    if (donationRequestRepository == null) {
       throw new IllegalArgumentException("DonationRequestRepository cannot be null");
-
+    }
     this.donationRequestRepository = donationRequestRepository;
   }
 
   @Transactional
-  public void execute(DomainID requestId) {
-    if (requestId == null)
-      throw new IllegalArgumentException("Request id cannot be null");
+  public void execute(Input input) {
+    if (input == null) {
+      throw new ValidationException("Input cannot be null");
+    }
+
+    DomainID requestId = DomainIdParser.parse(input.requestId(), "requestId");
 
     DonationRequest request = donationRequestRepository.findById(requestId)
-        .orElseThrow(() -> new IllegalArgumentException("Donation request not found"));
+        .orElseThrow(() -> new NotFoundException("Donation request not found"));
+
+    PartyOwnership.requireSameParty(request.getRequester().getParty().getId(), input.actorPartyId());
 
     request.close();
     donationRequestRepository.save(request);
+  }
+
+  public record Input(String requestId, String actorPartyId) {
   }
 }

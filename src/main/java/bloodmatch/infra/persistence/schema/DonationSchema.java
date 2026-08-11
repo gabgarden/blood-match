@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Document(collection = "donations")
-@CompoundIndex(name = "completed_blood_center_donation_date", def = "{'completed': 1, 'bloodCenterId': 1, 'donationDate': 1}")
+@CompoundIndex(name = "completed_organization_donation_date", def = "{'completed': 1, 'organizationId': 1, 'donationDate': 1}")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,7 +28,7 @@ public class DonationSchema {
   @Id
   private String id;
   private String donorPersonId;
-  private String bloodCenterId;
+  private String organizationId;
   private LocalDate donationDate;
   private boolean completed;
   private boolean pending;
@@ -40,7 +40,7 @@ public class DonationSchema {
 
     this.id = donation.getId().getValue().toString();
     this.donorPersonId = donation.getDonor().getPerson().getId().getValue().toString();
-    this.bloodCenterId = donation.getBloodCenter().getOrganization().getId().getValue().toString();
+    this.organizationId = donation.getBloodCenter().getOrganization().getId().getValue().toString();
     this.donationDate = donation.getDonationDate();
     this.completed = donation.isCompleted();
     this.pending = donation.isPending();
@@ -55,8 +55,8 @@ public class DonationSchema {
     Donor donor = donorRepository.findByPartyId(donorId)
         .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
 
-    DomainID bloodCenterPartyId = new DomainID(UUID.fromString(this.bloodCenterId));
-    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(bloodCenterPartyId)
+    DomainID organizationId = new DomainID(UUID.fromString(this.organizationId));
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
         .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
 
     return Donation.reconstitute(

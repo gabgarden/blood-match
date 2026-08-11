@@ -1,0 +1,171 @@
+\chapter{Trabalhos relacionados}
+
+Este capítulo apresenta o estudo de trabalhos relacionados, com o propósito de mapear o estado da arte referente a sistemas de apoio à doação de sangue. A investigação busca compreender como a literatura acadêmica tem abordado a captação de doadores e o uso de algoritmos de recomendação nesse cenário. Ao analisar as soluções tecnológicas já publicadas, torna-se possível identificar lacunas, justificar as escolhas arquiteturais adotadas nesta pesquisa e evidenciar a contribuição da API desenvolvida em comparação ao contexto tecnológico atual.
+
+\section{Protocolo de pesquisa}
+
+Para garantir o rigor científico na busca e seleção dos estudos, adotou-se o método de Mapeamento Sistemático da Literatura. Segundo \citeonline{petersen2008}, essa abordagem fornece uma estrutura objetiva para descobrir, categorizar e estruturar o conhecimento existente sobre um tópico específico dentro da engenharia de software. Este protocolo define os passos executados durante a pesquisa bibliográfica, assegurando que o processo seja replicável e livre de vieses de seleção. O enquadramento metodológico geral da pesquisa --- abordagem qualitativa, caráter exploratório-descritivo e instrumentos --- é apresentado no Capítulo~4. As subseções a seguir descrevem as questões norteadoras, as bases de dados consultadas e os parâmetros aplicados para a filtragem do material.
+
+\subsection{Objetivo e questões de pesquisa}
+
+O objetivo deste mapeamento sistemático da literatura é identificar, analisar e classificar as soluções tecnológicas existentes que apoiam a doação de sangue, com ênfase em sistemas que utilizam abordagens de recomendação de possíveis doadores. Desse modo, a principal questão de pesquisa que se pretende responder é:
+
+\begin{enumerate}[leftmargin=*]
+  \item Quais são os sistemas/aplicativos que auxiliam na captação de doadores de sangue?
+\end{enumerate}
+
+Além disso, visa responder subquestões a partir dos trabalhos selecionados, tais como:
+
+\begin{enumerate}[leftmargin=*, label=1.\arabic*)]
+  \item Há sistemas que utilizam algoritmos de recomendação para sugerir ações ou contatos entre doadores e instituições?
+  \item Quais são as principais funcionalidades e estratégias de incentivo implementadas em sistemas computacionais para promover a doação de sangue?
+\end{enumerate}
+
+\subsection{Instrumentos}
+
+Para identificar os trabalhos foi utilizado o Scopus. De acordo com \citeonline{elsevier2024}, Scopus é um banco de dados de resumos e citações de literatura revisada por pares, que relatam resultados da pesquisa mundial em áreas como: ciência, tecnologia, medicina, artes e humanidades. O Scopus abrange mais de 2,4 bilhões de referências citadas desde 1970 \citeonline{elsevier2025}.
+
+\subsection{Critérios de seleção e procedimentos}
+
+Foram realizadas buscas por referenciais bibliográficos, utilizando indexação de dados em bases científicas como CAPES Periódicos (\url{http://www.periodicos.capes.gov.br/}) e Scopus, com descritores como ``doação''; ``sangue''; ``sistema''; ``aplicação''; ``captação'' e ``recomendação''. Os critérios de inclusão consideraram publicações entre os anos de 2015 e 2025, em português e inglês, limitando a área temática a medicina, engenharia e ciência da computação, com foco em artigo, revisão e artigos de conferência que apresentassem fundamentação teórica sólida e aplicabilidade prática. A pesquisa foi realizada por assunto, utilizando termos de busca associados a operadores booleanos, a fim de obter resultados na base de informação do Scopus.
+
+A expressão de busca utilizada no Scopus foi definida utilizando a técnica PICO (\textit{Population}, \textit{Intervention}, \textit{Comparison}, \textit{Outcome}). \citeonline{frandsen2020} recomenda o uso de PICO para obter uma resposta precisa para a estruturação de buscas de revisões sistemáticas da literatura que incluem as facetas: população, intervenção, comparação e o resultado. O Quadro~\ref{tab:pico} apresenta a distribuição das palavras-chave da questão de pesquisa nas facetas PICO.
+
+\begin{table}[H]
+  \centering
+  \caption{Classificação das palavras-chave}
+  \label{tab:pico}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm} X X X X X}
+    \toprule
+    \textbf{Questão} & \textbf{P} & \textbf{I} & \textbf{C} & \textbf{O} & \textbf{C} \\
+    \midrule
+    a.1) Quais são os sistemas/aplicativos que auxiliam na captação de doadores de sangue?
+    & doador* OR donor*
+    & ``sangue'' OR ``blood''
+    & ---
+    & ``sistema'' OR ``system'' OR ``app'' OR ``application''
+    & ``captação'' OR ``recruitment'' OR recomend* \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2025).}
+\end{table}
+
+Já o Quadro~\ref{tab:query} representa a \textit{query} (expressão de busca) que foi utilizada para a busca dos trabalhos relacionados na base de dados do Scopus.
+
+\begin{table}[H]
+  \centering
+  \caption{Expressão de busca usada no Scopus}
+  \label{tab:query}
+  \begin{tabularx}{\textwidth}{X}
+    \toprule
+    \texttt{( TITLE-ABS-KEY ( doador* OR donor* ) AND TITLE-ABS-KEY ( sangue OR blood ) AND TITLE-ABS-KEY ( Sistema OR system OR app OR application ) AND TITLE-ABS-KEY ( Captação OR recruitment OR recomend* ) ) AND PUBYEAR > 2014 AND PUBYEAR < 2026 AND ( LIMIT-TO ( SUBJAREA , "COMP" ) OR LIMIT-TO ( SUBJAREA , "ENGI" ) OR LIMIT-TO ( SUBJAREA , "MEDI" ) ) AND ( LIMIT-TO ( LANGUAGE , "English" ) OR LIMIT-TO ( LANGUAGE , "Portuguese" ) ) AND ( LIMIT-TO ( DOCTYPE , "ar" ) OR LIMIT-TO ( DOCTYPE , "re" ) OR LIMIT-TO ( DOCTYPE , "cp" ) )} \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2025).}
+\end{table}
+
+Os critérios de inclusão (CI) e exclusão (CE) utilizados para selecionar os artigos são apresentados no Quadro~\ref{tab:criterios}.
+
+\begin{table}[H]
+  \centering
+  \caption{Critérios de inclusão e exclusão}
+  \label{tab:criterios}
+  \begin{tabularx}{\textwidth}{c X}
+    \toprule
+    \textbf{ID} & \textbf{Critério} \\
+    \midrule
+    CI1 & Texto completo disponível em PDF ou HTML via acesso institucional. \\
+    CI2 & O artigo contém informação relevante para responder às questões postuladas. \\
+    CE1 & Artigo duplicado. \\
+    CE2 & O artigo não contém informação relevante para responder às questões postuladas. \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2025).}
+\end{table}
+
+Na primeira etapa foi verificada a disponibilidade de texto completo, a partir do download via Scopus. Depois, a seleção dos artigos com texto completo envolveu a interpretação do título e resumo para verificar se atende ao critério CI2. Simultaneamente, aplicaram-se os critérios de exclusão (CE1 e CE2) de forma rigorosa, descartando as publicações que não se alinhavam ao escopo tecnológico da pesquisa ou que apresentavam duplicidade na base de dados.
+
+\section{Caracterização da pesquisa}
+
+A pesquisa foi realizada em julho de 2025 e retornou 147 documentos. O Gráfico~\ref{graf:ano} apresenta a distribuição de artigos por ano. Observa-se que a maioria dos artigos encontrados são dos anos de 2020 e 2021.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{grafico01-artigos-ano}
+  \caption{Distribuição de artigos por ano}
+  \fonte{Scopus (2025).}
+  \label{graf:ano}
+\end{figure}
+
+O Gráfico~\ref{graf:pais} apresenta a distribuição de artigos por país, cujo país com maior quantidade de publicações é os Estados Unidos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{grafico02-artigos-pais}
+  \caption{Distribuição de artigos por país}
+  \fonte{Scopus (2025).}
+  \label{graf:pais}
+\end{figure}
+
+Após a seleção, os materiais foram organizados por categorias temáticas e analisados com base em sua contribuição para a construção do referencial teórico e para o delineamento metodológico da pesquisa. Desse modo, foi utilizada a estratégia da análise de títulos e resumos dos artigos selecionados, para que os resultados possam ser auditáveis, replicáveis e úteis no suporte a pesquisas relacionadas a sistemas de captação de doadores de sangue, com o fim de que hospitais e hemocentros tenham estoques suficientes para atender às necessidades de pacientes que precisam de transfusões sanguíneas em diversas situações.
+
+Sendo assim, a lista de artigos selecionados é apresentada no Quadro~\ref{tab:artigos}.
+
+\begin{table}[H]
+  \centering
+  \caption{Lista de artigos selecionados}
+  \label{tab:artigos}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{5.2cm}}
+    \toprule
+    \textbf{Título} & \textbf{Fonte} \\
+    \midrule
+    Blood donation support application: Contributions from experts on the tool's functionality
+    & Da Silva; Praça Brasil; De Vasconcelos Filho; Brasil; Paiva; De Oliveira; Dos Santos (2021) \\
+    \addlinespace
+    Effective methods for reactivating inactive blood donors: A stratified randomised controlled study
+    & Ou-Yang; Bei; Liang; He; Chen; Fu (2020) \\
+    \addlinespace
+    Evaluation of the Wateen App in the Blood-Donation Process in Saudi Arabia
+    & Alessa (2022) \\
+    \addlinespace
+    Exploring the Blood Donation Problem in the U.S. and the Use of Emergent and Disruptive Technologies to Attract New Donors
+    & Keyser; Li; Kimber; Berman; Kerbage; Valero; Li; Ukuku (2025) \\
+    \addlinespace
+    Factors associated with blood donation among college and university students in Wuhan, China: structural equation model
+    & Ma; Yang; Gu; Ke; Du; Zheng (2024) \\
+    \addlinespace
+    Mobile applications for encouraging blood donation: A systematic review and case study
+    & Li; Valero; Keyser; Ukuku; Zheng (2023) \\
+    \addlinespace
+    Profile of apheresis donors at Professor Alberto Antunes University Hospital of the Federal University of Alagoas
+    & De Araújo Loureiro; De Lima Zielak; De Holanda Galvão Almeida; Barbosa; De Araújo (2021) \\
+    \addlinespace
+    To donate or not donate, that is the question: An analysis of the critical factors of blood donation
+    & Pereira; Sousa; De Matos; Rezende; Bueno; Dias (2016) \\
+    \addlinespace
+    Voluntary Blood Donation in Modern Healthcare: Trends, Challenges, and Opportunities
+    & Gasparovic Babic; Krsek; Baticic (2024) \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2025).}
+\end{table}
+
+\section{Resultados e discussões}
+
+A análise dos artigos selecionados permitiu identificar um conjunto relevante de soluções tecnológicas voltadas para a captação, o incentivo e a retenção de doadores de sangue, respondendo diretamente aos questionamentos levantados no protocolo de pesquisa. O levantamento revelou uma predominância de aplicativos móveis dedicados a facilitar a interação entre a população e os centros de saúde. Entre as plataformas destacadas na literatura, evidencia-se o Do-eSangue, desenvolvido com o intuito de apoiar a captação e fidelização ao integrar-se diretamente com a base de dados dos hemocentros, permitindo agendamentos e o acesso a informações personalizadas \citeonline{dasilva2021}. No cenário internacional, o Wateen, iniciativa do Ministério da Saúde da Arábia Saudita, atua de forma semelhante no recrutamento e agendamento via dispositivos móveis \citeonline{alessa2022}. Outras iniciativas relevantes incluem o Blood Hero, que explora técnicas de incentivo social para alavancar os estoques \citeonline{li2023}, e o Blood Note, focado em promover a doação por meio de testes preliminares de elegibilidade realizados diretamente pelo celular do usuário \citeonline{li2023}.
+
+No que tange à aplicação de algoritmos de recomendação ou mecanismos inteligentes de sugestão de ações, os estudos apontam para o uso de filtros dinâmicos e cruzamento de dados como alternativas eficientes de conexão. O aplicativo Do-eSangue, por exemplo, realiza o disparo de convites segmentados com base no tipo sanguíneo, na localização geográfica e na necessidade de fenótipos raros. Embora o estudo não utilize a nomenclatura estrita de ``algoritmos de recomendação'', essa filtragem avançada e baseada em critérios específicos de demanda atua, na prática, como uma recomendação direcionada de doadores \citeonline{dasilva2021}. Paralelamente, o Wateen demonstra um mecanismo ágil de correspondência ao notificar usuários específicos quando há demanda hospitalar por sua tipagem sanguínea, permitindo ainda que o próprio doador compartilhe a solicitação com sua rede de contatos, criando um fluxo orgânico e eficiente de recomendações \citeonline{alessa2022}.
+
+Além da infraestrutura técnica de conexão, os trabalhos mapeados evidenciam diversas funcionalidades e estratégias de incentivo essenciais para a promoção contínua da doação. A comunicação personalizada e direcionada surge como um fator crítico nesse cenário. \citeonline{ouyang2020} demonstraram que, para reativar doadores inativos, o contato direto via chamadas telefônicas apresenta resultados significativamente superiores ao uso de SMS, pois viabiliza um diálogo individualizado capaz de resolver barreiras pessoais e motivar o retorno. Aliado a isso, o uso estratégico de redes sociais e a disponibilização de informações abrangentes integradas aos sistemas ajudam a combater mitos, esclarecer dúvidas frequentes e detalhar os critérios de elegibilidade, aumentando a confiança da população nos serviços de saúde.
+
+Outro ponto de forte convergência entre as pesquisas é a adoção da gamificação e de recursos de fidelização. A implementação de sistemas de pontuação, medalhas virtuais (\textit{badges}) e programas de fidelidade que garantem preferência no atendimento servem como um forte apelo de reconhecimento social do voluntário, incentivando a repetição do ato solidário.
+
+Por fim, a literatura destaca que a otimização da experiência prática do doador é indispensável. Funcionalidades como o agendamento simplificado reduzem drasticamente o tempo de espera e as filas nos hemocentros, fatores que impactam diretamente na satisfação geral do usuário \citeonline{alessa2022}. Quando essas plataformas permitem que o voluntário acompanhe seu histórico de doações e acesse laudos de exames de forma unificada, consolida-se um sentimento de propósito e cuidado com a própria saúde, evidenciando o potencial da tecnologia como ferramenta de transformação na hemoterapia.
+
+\section{Considerações}
+
+O mapeamento sistemático da literatura apresentado neste capítulo permitiu traçar um panorama claro sobre o uso da tecnologia como aliada na captação e retenção de doadores de sangue. Os resultados evidenciam que a adoção de sistemas computacionais --- especialmente aplicativos móveis --- deixou de ser uma inovação distante para se tornar uma necessidade estratégica na gestão hemoterápica. Funcionalidades como o envio de notificações segmentadas, o agendamento prévio e a aplicação de técnicas de gamificação provaram ser eficazes para engajar a população e reduzir os índices de desabastecimento nos estoques.
+
+Apesar das contribuições valiosas encontradas na literatura, nota-se que grande parte dos estudos concentra sua análise nas interfaces com o usuário final e nas estratégias de marketing social, abordando de forma superficial a engenharia de software e a arquitetura estrutural que sustentam essas soluções. Existe uma lacuna no detalhamento de como as complexas regras de negócio desse domínio --- que envolvem critérios médicos de elegibilidade, tipagem sanguínea e urgência hospitalar --- são modeladas e processadas nos bastidores das aplicações.
+
+Nesse sentido, os achados desta revisão validam a proposta central deste Trabalho de Conclusão de Curso. Ao constatar que a filtragem e a recomendação direcionada são os motores do sucesso das ferramentas atuais, reforça-se a relevância de uma API RESTful especializada, estruturada sobre DDD e princípios SOLID conforme discutido no Capítulo~2. O Capítulo~5 apresenta o estudo de caso, detalhando como os requisitos, a modelagem do domínio e a implementação da solução tratam, na prática, as lacunas de engenharia de software identificadas nesta revisão.

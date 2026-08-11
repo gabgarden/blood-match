@@ -1,9 +1,8 @@
 package bloodmatch.interfaces.rest.donation.createcompleted;
 
 import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase;
+import bloodmatch.application.usecase.donation.createcompleted.CreateCompletedDonationUseCase.Input;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Create Completed Donation", description = "Create a new completed donation.")
@@ -28,31 +26,20 @@ public class CreateCompletedDonationController {
   }
 
   @PostMapping("/completed")
-  public ResponseEntity<?> create(@RequestBody CreateCompletedDonationDto payload) {
-    try {
-      if (payload == null)
-        throw new IllegalArgumentException("Request body cannot be null");
-      if (isBlank(payload.personId()))
-        throw new IllegalArgumentException("personId cannot be blank");
-      if (isBlank(payload.organizationId()))
-        throw new IllegalArgumentException("organizationId cannot be blank");
-      if (payload.donationDate() == null)
-        throw new IllegalArgumentException("donationDate cannot be null");
+  public ResponseEntity<CreateCompletedDonationResponseDto> create(
+      @RequestBody CreateCompletedDonationDto payload) {
+    requireNonNull(payload, "Request body cannot be null");
+    requireNotBlank(payload.personId(), "personId cannot be blank");
+    requireNotBlank(payload.organizationId(), "organizationId cannot be blank");
+    requireNonNull(payload.donationDate(), "donationDate cannot be null");
+    requireSamePartyOrAdmin(payload.personId());
 
-      DomainID personId = parseDomainId(payload.personId(), "personId");
-      DomainID organizationId = parseDomainId(payload.organizationId(), "organizationId");
+    var output = useCase.execute(new Input(
+        payload.personId(),
+        payload.organizationId(),
+        payload.donationDate()));
 
-      Donation donation = useCase.execute(personId, organizationId, payload.donationDate());
-
-      String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
-
-      return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-          "id", donation.getId().getValue().toString(),
-          "donationDate", donation.getDonationDate().toString(),
-          "status", status));
-
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    }
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(CreateCompletedDonationResponseDto.from(output));
   }
 }

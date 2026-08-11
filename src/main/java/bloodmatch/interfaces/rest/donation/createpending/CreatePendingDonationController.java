@@ -1,9 +1,8 @@
 package bloodmatch.interfaces.rest.donation.createpending;
 
 import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase;
+import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase.Input;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Create Pending Donation", description = "Create a new pending donation.")
@@ -28,31 +26,20 @@ public class CreatePendingDonationController {
   }
 
   @PostMapping("/create-pending")
-  public ResponseEntity<?> execute(@RequestBody CreatePendingDonationDto payload) {
-    try {
-      if (payload == null)
-        throw new IllegalArgumentException("Request body cannot be null");
-      if (isBlank(payload.organizationId()))
-        throw new IllegalArgumentException("organizationId cannot be blank");
-      if (isBlank(payload.personId()))
-        throw new IllegalArgumentException("personId cannot be blank");
-      if (payload.expectedDate() == null)
-        throw new IllegalArgumentException("expectedDate cannot be null");
+  public ResponseEntity<CreatePendingDonationResponseDto> execute(
+      @RequestBody CreatePendingDonationDto payload) {
+    requireNonNull(payload, "Request body cannot be null");
+    requireNotBlank(payload.organizationId(), "organizationId cannot be blank");
+    requireNotBlank(payload.personId(), "personId cannot be blank");
+    requireNonNull(payload.expectedDate(), "expectedDate cannot be null");
+    requireSamePartyOrAdmin(payload.personId());
 
-      DomainID organizationId = parseDomainId(payload.organizationId(), "organizationId");
-      DomainID personId = parseDomainId(payload.personId(), "personId");
+    var output = useCase.execute(new Input(
+        payload.personId(),
+        payload.organizationId(),
+        payload.expectedDate()));
 
-      Donation donation = useCase.execute(personId, organizationId, payload.expectedDate());
-
-        String status = donation.isCompleted() ? "COMPLETED" : donation.isPending() ? "PENDING" : donation.isCancelled() ? "CANCELLED" : "UNKNOWN";
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-          "id", donation.getId().getValue().toString(),
-          "expectedDate", donation.getDonationDate().toString(),
-          "status", status));
-
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    }
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(CreatePendingDonationResponseDto.from(output));
   }
 }

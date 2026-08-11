@@ -1,8 +1,9 @@
 package bloodmatch.interfaces.rest.party.registerperson;
 
+import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.usecase.party.RegisterPartyUseCase;
+import bloodmatch.application.usecase.party.RegisterPartyUseCase.PersonInput;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import bloodmatch.domain.party.Person;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Register Person", description = "Register a new person.")
@@ -26,49 +27,35 @@ public class RegisterPersonController {
   }
 
   @PostMapping("/persons")
-  public ResponseEntity<Map<String, String>> registerPerson(@RequestBody RegisterPersonDto payload) {
-    try {
-      if (payload == null)
-        throw new IllegalArgumentException("Request body cannot be null");
-      if (isBlank(payload.name()))
-        throw new IllegalArgumentException("name cannot be blank");
-      if (isBlank(payload.phoneNumber()))
-        throw new IllegalArgumentException("phoneNumber cannot be blank");
-      if (isBlank(payload.cpf()))
-        throw new IllegalArgumentException("cpf cannot be blank");
-      if (payload.birthDate() == null)
-        throw new IllegalArgumentException("birthDate cannot be null");
-      if (isBlank(payload.email()))
-        throw new IllegalArgumentException("email cannot be blank");
-      if (isBlank(payload.password()))
-        throw new IllegalArgumentException("password cannot be blank");
-      if (isBlank(payload.passwordConfirmation()))
-        throw new IllegalArgumentException("passwordConfirmation cannot be blank");
+  public ResponseEntity<RegisterPersonResponseDto> registerPerson(@RequestBody RegisterPersonDto payload) {
+    requireNonNull(payload, "Request body cannot be null");
+    requireNotBlank(payload.name(), "name cannot be blank");
+    requireNotBlank(payload.phoneNumber(), "phoneNumber cannot be blank");
+    requireNotBlank(payload.cpf(), "cpf cannot be blank");
+    requireNonNull(payload.birthDate(), "birthDate cannot be null");
+    requireNotBlank(payload.email(), "email cannot be blank");
+    requireNotBlank(payload.password(), "password cannot be blank");
+    requireNotBlank(payload.passwordConfirmation(), "passwordConfirmation cannot be blank");
 
-      if ((payload.street() != null || payload.city() != null || payload.state() != null || payload.zipCode() != null) &&
-         (isBlank(payload.street()) || isBlank(payload.city()) || isBlank(payload.state()) || isBlank(payload.zipCode())))
-        throw new IllegalArgumentException("All address fields must be provided together");
-
-      Person person = registerPartyUseCase.registerPerson(
-          payload.name(),
-          payload.phoneNumber(),
-          payload.cpf(),
-          payload.birthDate(),
-          payload.email(),
-          payload.password(),
-          payload.passwordConfirmation(),
-          payload.street(),
-          payload.city(),
-          payload.state(),
-          payload.zipCode());
-
-      return ResponseEntity.status(HttpStatus.CREATED)
-          .body(Map.of(
-              "id", person.getId().getValue().toString(),
-              "type", "PERSON"));
-
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    if ((payload.street() != null || payload.city() != null || payload.state() != null || payload.zipCode() != null)
+        && (isBlank(payload.street()) || isBlank(payload.city()) || isBlank(payload.state()) || isBlank(payload.zipCode()))) {
+      throw new ValidationException("All address fields must be provided together");
     }
+
+    var output = registerPartyUseCase.registerPerson(new PersonInput(
+        payload.name(),
+        payload.phoneNumber(),
+        payload.cpf(),
+        payload.birthDate(),
+        payload.email(),
+        payload.password(),
+        payload.passwordConfirmation(),
+        payload.street(),
+        payload.city(),
+        payload.state(),
+        payload.zipCode()));
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(RegisterPersonResponseDto.from(output));
   }
 }

@@ -1,5 +1,9 @@
 package bloodmatch.application.usecase.donation.reschedulependingdonation;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
+import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
@@ -16,25 +20,57 @@ public class ReschedulePendingDonationUseCase {
     this.donationRepository = donationRepository;
   }
 
-  public Donation execute(DomainID donationId, LocalDate newExpectedDate) {
-    return execute(donationId, newExpectedDate, LocalDate.now());
+  public Output execute(Input input) {
+    return execute(input, LocalDate.now());
   }
 
-  public Donation execute(DomainID donationId, LocalDate newExpectedDate, LocalDate currentDate) {
-    if (donationId == null)
-      throw new IllegalArgumentException("Donation id cannot be null");
-    if (newExpectedDate == null)
-      throw new IllegalArgumentException("New expected date cannot be null");
-    if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
+  public Output execute(Input input, LocalDate currentDate) {
+    if (input == null) {
+      throw new ValidationException("Request body cannot be null");
+    }
+    if (currentDate == null) {
+      throw new ValidationException("Current date cannot be null");
+    }
+
+    DomainID donationId = DomainIdParser.parse(input.donationId(), "donationId");
+    if (input.newExpectedDate() == null) {
+      throw new ValidationException("newExpectedDate cannot be null");
+    }
 
     Donation donation = donationRepository.findById(donationId)
-        .orElseThrow(() -> new IllegalArgumentException("Donation not found"));
+        .orElseThrow(() -> new NotFoundException("Donation not found"));
 
-    donation.reschedule(newExpectedDate, currentDate);
+    PartyOwnership.requireSameParty(donation.getDonor().getPerson().getId(), input.actorPartyId());
+
+    donation.reschedule(input.newExpectedDate(), currentDate);
 
     donationRepository.save(donation);
 
-    return donation;
+    return Output.from(donation);
+  }
+
+  public record Input(String donationId, LocalDate newExpectedDate, String actorPartyId) {
+  }
+
+  public record Output(String id, LocalDate expectedDate, String status) {
+    public static Output from(Donation donation) {
+      return new Output(
+          donation.getId().getValue().toString(),
+          donation.getDonationDate(),
+          statusOf(donation));
+    }
+
+    private static String statusOf(Donation donation) {
+      if (donation.isCompleted()) {
+        return "COMPLETED";
+      }
+      if (donation.isPending()) {
+        return "PENDING";
+      }
+      if (donation.isCancelled()) {
+        return "CANCELLED";
+      }
+      return "UNKNOWN";
+    }
   }
 }

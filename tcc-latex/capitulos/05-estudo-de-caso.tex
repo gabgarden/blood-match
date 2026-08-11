@@ -1,0 +1,289 @@
+\chapter{Estudo de caso: requisitos, modelagem e implementação}
+
+\section{Visão geral da solução}
+
+Este capítulo apresenta a solução tecnológica desenvolvida para apoiar o processo de captação e gerenciamento de solicitações de doação de sangue. A proposta materializa-se na construção de uma API RESTful focada exclusivamente na camada de \textit{backend}, responsável pelo gerenciamento de participantes (pessoas e organizações), solicitações de doação, registro do histórico de doadores e recomendação de solicitações compatíveis.
+
+O desenvolvimento foi orientado pelos princípios do DDD e pelos princípios SOLID, já fundamentados no Capítulo~2. Essa abordagem permitiu que a estrutura do software refletisse a realidade do domínio da hemoterapia, reduzindo o acoplamento entre os componentes e facilitando a evolução contínua do sistema. As seções seguintes detalham o levantamento de requisitos, a modelagem do sistema, a organização do domínio e da arquitetura, a implementação técnica e, por fim, a estratégia de recomendação e de cumprimento de metas, que constitui o núcleo funcional da API.
+
+\section{Levantamento de requisitos}
+
+A extração de requisitos ocorreu a partir da análise documental e bibliográfica descrita no Capítulo~4, alinhando as necessidades dos diferentes atores envolvidos no processo de doação de sangue às capacidades técnicas do sistema proposto.
+
+\subsection{Requisitos funcionais}
+
+Os requisitos funcionais representam as operações que a API disponibiliza para atender às rotinas de cadastro, gerenciamento de solicitações, recomendação e controle de doações. O Quadro~\ref{tab:rf} sintetiza as funcionalidades identificadas e implementadas, refletindo diretamente os recursos (\textit{endpoints}) expostos pela API.
+
+\begin{table}[H]
+  \centering
+  \caption{Requisitos funcionais}
+  \label{tab:rf}
+  \small
+  \begin{tabularx}{\textwidth}{c X}
+    \toprule
+    \textbf{Código} & \textbf{Descrição} \\
+    \midrule
+    RF01 & Permitir o cadastro de pessoas no sistema. \\
+    RF02 & Permitir o cadastro de organizações no sistema. \\
+    RF03 & Permitir que uma pessoa cadastrada registre um perfil de doador. \\
+    RF04 & Permitir que uma pessoa ou organização registre um perfil de requisitante. \\
+    RF05 & Permitir que uma organização cadastrada registre um perfil de banco de sangue (hemocentro). \\
+    RF06 & Permitir a autenticação de usuários por meio de credenciais válidas, emitindo um JWT. \\
+    RF07 & Permitir a atualização do nome cadastral de um participante (\textit{party}). \\
+    RF08 & Permitir a atualização do perfil do doador. \\
+    RF09 & Permitir que requisitantes criem solicitações de doação de sangue. \\
+    RF10 & Permitir a atualização da meta de bolsas de sangue de uma solicitação. \\
+    RF11 & Permitir a atualização do prazo (data-limite) de uma solicitação. \\
+    RF12 & Permitir o cancelamento de uma solicitação de doação. \\
+    RF13 & Permitir a consulta das solicitações de doação de um participante. \\
+    RF14 & Permitir a consulta das solicitações de doação recomendadas para um doador. \\
+    RF15 & Permitir a notificação de doadores potenciais elegíveis para uma solicitação. \\
+    RF16 & Permitir o registro de uma doação pendente. \\
+    RF17 & Permitir o reagendamento de uma doação pendente. \\
+    RF18 & Permitir a confirmação (conclusão) de uma doação pendente. \\
+    RF19 & Permitir o registro direto de uma doação já concluída. \\
+    RF20 & Permitir a consulta do histórico de doações de um doador. \\
+    RF21 & Permitir a consulta do resumo (\textit{summary}) de um doador. \\
+    RF22 & Permitir o ajuste da distância máxima considerada nas recomendações de um doador. \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+\subsection{Requisitos não funcionais}
+
+Além das funcionalidades diretas, foram definidos requisitos não funcionais para estabelecer os parâmetros de qualidade, segurança e arquitetura esperados. Considerando a adoção do DDD e da arquitetura em camadas, o Quadro~\ref{tab:rnf} apresenta as diretrizes técnicas estabelecidas para a solução.
+
+\begin{table}[H]
+  \centering
+  \caption{Requisitos não funcionais}
+  \label{tab:rnf}
+  \small
+  \begin{tabularx}{\textwidth}{c X}
+    \toprule
+    \textbf{Código} & \textbf{Descrição} \\
+    \midrule
+    RNF01 & O sistema deve disponibilizar seus serviços por meio de uma API RESTful utilizando o protocolo HTTP. \\
+    RNF02 & O sistema deve autenticar usuários por meio de JWT. \\
+    RNF03 & O sistema deve persistir os dados em banco de dados NoSQL (MongoDB). \\
+    RNF04 & O sistema deve permitir evolução e manutenção sem impacto significativo nas demais camadas da aplicação. \\
+    RNF05 & O sistema deve seguir uma arquitetura em camadas orientada pelos princípios do DDD. \\
+    RNF06 & O sistema deve aplicar os princípios SOLID para favorecer baixo acoplamento e alta coesão. \\
+    RNF07 & A API deve retornar respostas em formato JSON. \\
+    RNF08 & O sistema deve validar os dados recebidos antes do processamento das operações. \\
+    RNF09 & O sistema deve controlar o acesso às funcionalidades protegidas por meio de autorização baseada em perfis (\textit{roles}) de usuário. \\
+    RNF10 & O sistema deve preservar a consistência de escritas concorrentes sobre uma mesma solicitação de doação, evitando a perda de atualizações. \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+\section{Modelagem do sistema}
+
+Após a consolidação dos requisitos, procedeu-se com a modelagem do sistema para descrever as interações entre os atores e a API, permitindo visualizar o comportamento esperado da solução sob a perspectiva estrutural e de uso.
+
+\subsection{Casos de uso}
+
+A modelagem de casos de uso, em notação UML, sintetiza as operações disponíveis para os diferentes perfis de acesso. O Quadro~\ref{tab:uc} apresenta o mapeamento dos casos de uso e seus respectivos atores, incluindo tanto as operações representadas nos diagramas a seguir quanto operações complementares oferecidas pela API para os mesmos atores.
+
+\begin{table}[H]
+  \centering
+  \caption{Lista de casos de uso}
+  \label{tab:uc}
+  \small
+  \begin{tabularx}{\textwidth}{c >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{3.2cm}}
+    \toprule
+    \textbf{Código} & \textbf{Caso de uso} & \textbf{Ator principal} \\
+    \midrule
+    UC01 & Cadastrar-se como pessoa (\textit{Sign Up as Person}) & Guest \\
+    UC02 & Cadastrar-se como organização (\textit{Sign Up as Organization}) & Guest \\
+    UC03 & Autenticar (\textit{Authenticate}) & Guest \\
+    UC04 & Registrar perfil de doador & Person \\
+    UC05 & Registrar perfil de requisitante & Person / Organization \\
+    UC06 & Registrar perfil de banco de sangue & Organization \\
+    UC07 & Atualizar dados cadastrais / perfil do doador & Donor / Requester \\
+    UC08 & Registrar solicitação de doação (\textit{Register Donation Request}) & Requester \\
+    UC09 & Consultar recomendações de solicitações (\textit{Consult Recommendations}) & Donor \\
+    UC10 & Registrar doação pendente (\textit{Register Pending Donation}) & Donor \\
+    UC11 & Registrar doação realizada (\textit{Register Completed Donation}) & Donor \\
+    UC12 & Completar doação pendente (\textit{Complete a Pending Donation}) & Donor \\
+    UC13 & Consultar histórico de doações (\textit{See Donation History}) & Donor \\
+    UC14 & Gerenciar solicitações --- atualizar meta/prazo, cancelar e consultar & Requester \\
+    UC15 & Atualizar distância máxima para recomendações & Donor \\
+    UC16 & Notificar doadores potenciais elegíveis & Requester \\
+    UC17 & Reagendar doação pendente & Donor \\
+    UC18 & Consultar resumo do doador (\textit{Donor Summary}) & Donor \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+A representação gráfica dessas interações é dividida de acordo com o nível de acesso dos atores:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figura03-uc-visitante}
+  \caption{Diagrama de caso de uso de visitante}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:uc-guest}
+\end{figure}
+
+O ator \textit{Guest} representa utilizadores sem cadastro prévio, limitados às operações de criação de contas e autenticação (UC01, UC02 e UC03).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figura04-uc-requisitante}
+  \caption{Diagrama de caso de uso de requisitante}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:uc-requester}
+\end{figure}
+
+O ator \textit{Requester} concentra as permissões relacionadas à criação e à gestão de solicitações de sangue (UC08 e UC14), além do disparo de notificações a doadores potenciais quando uma solicitação precisa de maior alcance (UC16).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figura05-uc-doador}
+  \caption{Diagrama de caso de uso de doador}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:uc-donor}
+\end{figure}
+
+O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a consulta às solicitações recomendadas, o ajuste da distância máxima de recomendação, a gestão do próprio histórico hemoterápico e a consulta ao seu resumo (UC09, UC10, UC11, UC12, UC13, UC15, UC17 e UC18).
+
+\subsection{Diagramas de classes}
+
+Para representar a estrutura estática da aplicação e evidenciar a aplicação do DDD na prática --- cujos conceitos de entidade, agregado e objeto de valor já foram apresentados no Capítulo~2 ---, a modelagem de classes foi concebida em duas perspectivas distintas: conceitual e de implementação. A perspectiva conceitual mapeia o vocabulário do negócio e as relações semânticas do mundo real, omitindo métodos e tipos de dados para facilitar a validação com especialistas. Em contrapartida, a perspectiva de implementação atua como uma representação estrutural do código-fonte construído, detalhando os limites transacionais, o encapsulamento e as diretrizes arquiteturais.
+
+A Figura~\ref{fig:classe-participantes} apresenta o diagrama de classes conceitual focado nos participantes e em seus papéis (\textit{Roles}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figura06-classes-participantes}
+  \caption{Diagrama conceitual dos participantes}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:classe-participantes}
+\end{figure}
+
+Observa-se a utilização da abstração central \texttt{Party}, que atua como classe base para \texttt{Person} (Pessoa) e \texttt{Organization} (Organização). Essa modelagem reflete a flexibilidade do domínio, permitindo que as entidades assumam múltiplos papéis, como \texttt{Donor} (Doador) e \texttt{Requester} (Requisitante), eliminando a duplicidade de dados no sistema.
+
+Dando prosseguimento à representação do negócio, a Figura~\ref{fig:classe-doacao} ilustra o diagrama de classes conceitual do processo de doação.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figura07-classes-doacao}
+  \caption{Diagrama conceitual do processo de doação}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:classe-doacao}
+\end{figure}
+
+Neste nível de abstração, evidencia-se a associação semântica entre a solicitação (\texttt{DonationRequest}) e o ato de doar (\texttt{Donation}). O fluxo natural demonstra que um \texttt{Requester} origina a solicitação, que é vinculada a um \texttt{BloodCenter} e, posteriormente, recebe as doações efetivadas por um \texttt{Donor}.
+
+Elevando o rigor para o design de software, a Figura~\ref{fig:impl-request} detalha a implementação técnica do agregado \texttt{DonationRequest}. A classe é modelada como uma raiz de agregado (\texttt{<<AggregateRoot>>}), atuando como a única porta de entrada para a proteção de invariantes, como as datas-limite e a urgência da solicitação. Observa-se a aplicação da herança por meio da superclasse abstrata \texttt{DomainObject}, responsável por compor os identificadores únicos globais (\texttt{<<ValueObject>> DomainID}). Destaca-se também a dependência tracejada (\texttt{<<use>>}) com a classe \texttt{Donation}, a qual evidencia o baixo acoplamento da arquitetura: a requisição não armazena doações em memória, apenas as avalia de forma transitória por meio de parâmetros no método \texttt{acceptsDonation()}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figura08-impl-donation-request}
+  \caption{Diagrama de implementação: agregado DonationRequest}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:impl-request}
+\end{figure}
+
+Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementação do agregado \texttt{Donation}. Tratada também como uma raiz de agregado autônoma, a classe gerencia seu próprio ciclo de vida de estados (pendente, concluída, cancelada). A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação de doação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figura09-impl-donation}
+  \caption{Diagrama de implementação: agregado Donation}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:impl-donation}
+\end{figure}
+
+\section{Domínio e arquitetura}
+
+A partir das interações mapeadas, estruturou-se o núcleo da aplicação: o modelo de domínio e a organização das camadas que o protegem de dependências tecnológicas externas.
+
+\subsection{Linguagem ubíqua e organização em camadas}
+
+Conforme estabelecido nos fundamentos do DDD (Capítulo~2), a modelagem foi construída sobre uma linguagem ubíqua, garantindo que termos como \texttt{DonationRequest}, \texttt{Donor}, \texttt{Requester} e \texttt{BloodCenter} transitem com a mesma semântica tanto nas discussões de projeto quanto no código-fonte final. Essa padronização reduz ambiguidades entre a gestão de perfis de participantes e o ciclo de vida das doações. Cabe ressaltar que essa separação é tratada aqui como uma interpretação de projeto inspirada na noção de contexto delimitado (\textit{Bounded Context}), e não como uma divisão formal em módulos ou serviços independentes: o código-fonte é organizado fisicamente em um único pacote de domínio, sendo a fronteira entre as duas áreas conceituais reforçada por convenção de nomenclatura e coesão de classes, não por isolamento físico.
+
+Do ponto de vista estrutural, o código é organizado nos seguintes pacotes, cada um com uma responsabilidade específica:
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{domain}: entidades, objetos de valor e regras de negócio, livres de dependências de frameworks;
+  \item \texttt{application/usecase}: orquestração dos casos de uso, coordenando chamadas ao domínio e aos repositórios;
+  \item \texttt{interfaces/rest}: \textit{controllers} e DTOs responsáveis pela exposição HTTP da API;
+  \item \texttt{infra/persistence}: repositórios e \textit{schemas} de persistência em MongoDB;
+  \item \texttt{infra/security}: filtros de autenticação/autorização baseados em JWT.
+\end{itemize}
+
+O fluxo padrão de uma chamada percorre essas camadas em uma única direção --- \texttt{interfaces/rest} $\rightarrow$ \texttt{application/usecase} $\rightarrow$ \texttt{domain} $\rightarrow$ \texttt{infra/persistence} ---, de modo que a camada de domínio nunca dependa diretamente de detalhes de infraestrutura ou de protocolo HTTP, conforme recomendado por \citeonline{evans2003} e reforçado por \citeonline{martin2008} quanto à inversão de dependência entre módulos de alto e baixo nível.
+
+\subsection{Entidades, agregados e objetos de valor}
+
+A estrutura central do domínio foi modelada de forma hierárquica e orientada a objetos. O Quadro~\ref{tab:entidades} sintetiza as principais entidades e agregados responsáveis por garantir a consistência das transações no sistema.
+
+\begin{table}[H]
+  \centering
+  \caption{Entidades e suas responsabilidades}
+  \label{tab:entidades}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4cm} X}
+    \toprule
+    \textbf{Entidade} & \textbf{Responsabilidade} \\
+    \midrule
+    Party & Abstrai características comuns dos participantes do sistema. \\
+    Person & Representa pessoas físicas cadastradas. \\
+    Organization & Representa instituições cadastradas. \\
+    Donor & Representa o perfil de doador e suas regras de elegibilidade. \\
+    Requester & Representa o perfil requisitante. \\
+    BloodCenter & Representa o perfil de banco de sangue vinculado a uma organização. \\
+    DonationRequest & Representa uma solicitação de doação de sangue, incluindo sua meta e seu progresso. \\
+    Donation & Representa uma doação registrada no sistema. \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+A entidade \texttt{Party} foi adotada como abstração principal da hierarquia, aplicando herança para derivar \texttt{Person} e \texttt{Organization}. A partir dessas bases, o sistema utiliza polimorfismo para permitir que os participantes assumam papéis (\textit{Roles}) específicos, como \texttt{Donor}, \texttt{Requester} ou \texttt{BloodCenter}, dependendo de suas ações no sistema.
+
+As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de agregados (\textit{Aggregate Roots}), concentrando regras de negócio --- como a validação de datas-limite e a verificação de compatibilidade sanguínea --- e protegendo o estado interno dos objetos por meio do encapsulamento. Adicionalmente, conceitos imutáveis sem identidade própria, como \texttt{Address} (Endereço), \texttt{BloodType} (Tipo Sanguíneo) e \texttt{DomainID}, foram modelados como objetos de valor, na linha proposta por \citeonline{evans2003} e detalhada por \citeonline{vernon2013}, aumentando a segurança e a previsibilidade do modelo.
+
+\section{Implementação}
+
+\subsection{Persistência de dados}
+
+A persistência foi implementada sobre MongoDB, um banco de dados NoSQL orientado a documentos. Cada agregado de domínio possui um \textit{schema} de persistência correspondente (por exemplo, \texttt{DonationRequestSchema} e \texttt{DonationSchema}), responsável por converter o objeto de domínio em um documento e vice-versa por meio de métodos dedicados de mapeamento (construtor a partir do domínio e \texttt{toDomain(...)}). Essa separação evita que anotações e particularidades do banco de dados vazem para as classes de domínio, mantendo o isolamento preconizado no DDD.
+
+Um ponto de destaque é o controle de concorrência da solicitação de doação: o \texttt{DonationRequestSchema} utiliza controle de versão otimista (anotação \texttt{@Version}), de forma que duas escritas concorrentes sobre a mesma solicitação --- por exemplo, um recálculo de cumprimento de meta e uma atualização manual de prazo --- sejam detectadas pelo MongoDB. Ao identificar um conflito de versão, o repositório converte a exceção de persistência em uma \texttt{IllegalStateException}, sinalizando de forma explícita ao caso de uso que a operação deve ser reavaliada. Além disso, índices compostos foram definidos sobre campos como situação ativa, tipo sanguíneo e data-limite, bem como um índice geoespacial sobre a localização do hemocentro, otimizando as consultas de recomendação descritas na Seção~\ref{sec:recomendacao-fulfillment}.
+
+\subsection{Segurança e autenticação}
+
+O controle de acesso é implementado por meio de autenticação baseada em JWT. O endpoint público de login (\texttt{/auth/login}) valida as credenciais do usuário e emite um \textit{token} assinado, que passa a ser exigido nas demais chamadas autenticadas por meio de um filtro (\texttt{JwtAuthenticationFilter}) na camada \texttt{infra/security}. Esse filtro intercepta as requisições antes de chegarem aos \textit{controllers}, valida o \textit{token} e popula o contexto de segurança com a identidade do participante autenticado, permitindo que os casos de uso apliquem regras de autorização --- como a verificação de que apenas o próprio requisitante pode gerenciar ou notificar doadores sobre uma solicitação de sua autoria.
+
+\subsection{Serviços externos e documentação da API}
+
+A notificação de doadores é abstraída por uma interface de domínio (\texttt{NotificationServiceInterface}), permitindo múltiplas implementações na camada de infraestrutura --- como uma implementação por e-mail e uma implementação simplificada para ambiente de desenvolvimento --- sem que o caso de uso que dispara a notificação precise conhecer o mecanismo concreto de envio. Essa inversão de dependência, alinhada aos princípios SOLID discutidos no Capítulo~2, evita que o domínio fique acoplado a bibliotecas de terceiros.
+
+Para a documentação e a exploração interativa dos recursos da API, foi integrada a biblioteca \textit{springdoc-openapi}, que gera automaticamente a especificação OpenAPI a partir dos \textit{controllers} e disponibiliza uma interface de teste dos \textit{endpoints}. Essa documentação viva reduz o custo de manutenção da documentação técnica e facilita a validação manual dos fluxos descritos neste capítulo.
+
+\section{Recomendação de solicitações e cumprimento de metas}
+\label{sec:recomendacao-fulfillment}
+
+Esta seção detalha o mecanismo central da API: a recomendação de solicitações compatíveis a doadores, a notificação de doadores potenciais e o acompanhamento do cumprimento de metas de cada solicitação. Ao contrário de um simples contador incrementado a cada doação, o sistema trata o cumprimento de metas como o resultado de um algoritmo de alocação, sincronizado sempre que uma doação é concluída.
+
+\subsection{Recomendação de solicitações para o doador}
+
+O caminho de leitura é implementado pelo \texttt{GetRecommendedRequestsUseCase}, acionado pelo \textit{endpoint} \texttt{GET /donation-requests/recommendations}. Dado um doador autenticado, o caso de uso primeiro verifica sua elegibilidade para doar na data corrente (\texttt{Donor.isEligibleToDonate(...)}), considerando faixa etária e intervalo mínimo desde a última doação. Em seguida, busca no repositório as solicitações ativas compatíveis com o tipo sanguíneo do doador, dentro da distância máxima de recomendação configurada por ele (RF22) e ainda não expiradas, aproveitando o índice geoespacial descrito na Seção anterior.
+
+As solicitações candidatas que já atingiram a meta (\texttt{isGoalReached()}) são descartadas, e as demais são ordenadas por proximidade geográfica, urgência e proximidade da data-limite, de modo que o doador visualize primeiro as solicitações mais próximas, mais urgentes e mais próximas de expirar. O resultado retornado inclui, para cada solicitação recomendada, a distância estimada, a urgência, a meta de bolsas e o total já cumprido --- este último lido diretamente do campo persistido \texttt{fulfilledBloodBags}, sem qualquer recálculo nesse momento.
+
+\subsection{Notificação de doadores potenciais}
+
+Complementarmente à recomendação, o requisitante pode disparar notificações ativas por meio do \textit{endpoint} \texttt{POST /donation-requests/\{id\}/notify}, implementado pelo \texttt{NotifyPotentialDonorsUseCase}. Esse caso de uso valida que o solicitante autenticado é o dono da solicitação, que a solicitação ainda não expirou e que sua meta ainda não foi atingida; em seguida, delega ao \texttt{FindEligibleDonorsUseCase} (por meio do serviço de domínio \texttt{DonorMatchingService}) a identificação dos doadores elegíveis --- considerando compatibilidade sanguínea e elegibilidade temporal --- para, então, notificar cada doador elegível com conta ativa através do serviço de notificação descrito na Seção~5.5.3. Esse fluxo materializa, na arquitetura da API, o comportamento observado na literatura (Capítulo~3) de notificar diretamente candidatos compatíveis em vez de aguardar passivamente novas doações.
+
+\subsection{Materialização do cumprimento de metas (\texttt{fulfilledBloodBags})}
+
+Não existe um vínculo direto entre uma doação e uma solicitação específica: cada doação concluída em um hemocentro entra em um agrupamento (\textit{pool}) de doações daquela organização e é distribuída entre as solicitações ativas do mesmo hemocentro pelo \texttt{DonationRequestFulfillmentService}, seguindo uma regra de alocação \textit{First In, First Out} (FIFO) por hemocentro: as solicitações são ordenadas da mais antiga para a mais nova e, para cada doação (também ordenada cronologicamente), o serviço percorre as solicitações compatíveis --- mesmo tipo sanguíneo, dentro da janela entre a data de solicitação e a data-limite, e com meta ainda não atingida --- alocando a doação à primeira solicitação elegível. A verificação de compatibilidade entre uma doação e uma solicitação específica é encapsulada no método \texttt{DonationRequest.acceptsDonation(...)}, preservando a regra de negócio dentro do agregado.
+
+Diferentemente da estratégia inicialmente cogitada de recalcular essa alocação a cada leitura, optou-se por materializar o resultado no momento da escrita: o campo \texttt{fulfilledBloodBags} é persistido na própria solicitação e recalculado apenas quando o conjunto de doações concluídas de um hemocentro é alterado. Esse recálculo é disparado pelo \texttt{DonationRequestFulfillmentRefresher} a partir de dois casos de uso --- \texttt{CreateCompletedDonationUseCase} e \texttt{CompletePendingDonationUseCase} ---, que, após persistirem a doação, carregam as solicitações ativas e as doações concluídas da organização afetada, executam o método \texttt{synchronize(...)} do serviço de \textit{fulfillment} e persistem cada solicitação com o novo valor calculado.
+
+Essa abordagem caracteriza um contador materializado (\textit{materialized/denormalized counter}): as leituras de recomendação e de listagem de solicitações por participante apenas consultam o campo já calculado, enquanto o custo do algoritmo de alocação é pago somente nas escritas que efetivamente alteram o cenário de doações concluídas --- criação de solicitação, cancelamento e alterações de meta ou prazo não disparam o recálculo, permanecendo consistentes até a próxima doação concluída daquele hemocentro. Trata-se de uma decisão de desempenho deliberada: como as leituras (recomendações e listagens) tendem a ser bem mais frequentes do que a conclusão de doações, deslocar o custo computacional do caminho de leitura para o caminho de escrita reduz a carga da API sem comprometer a corretude do algoritmo FIFO, que continua sendo recalculado por completo --- e não incrementado ingenuamente --- a cada sincronização.

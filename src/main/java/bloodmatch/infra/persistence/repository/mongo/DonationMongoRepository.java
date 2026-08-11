@@ -11,8 +11,8 @@ public interface DonationMongoRepository extends MongoRepository<DonationSchema,
 
   List<DonationSchema> findByCompleted(boolean completed);
 
-  List<DonationSchema> findByCompletedTrueAndBloodCenterIdInOrderByDonationDateAsc(
-      List<String> bloodCenterIds);
+  List<DonationSchema> findByCompletedTrueAndOrganizationIdInOrderByDonationDateAsc(
+      List<String> organizationIds);
 
   long countByDonorPersonId(String donorPersonId);
 }

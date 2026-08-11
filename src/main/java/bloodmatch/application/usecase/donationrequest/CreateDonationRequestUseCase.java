@@ -1,5 +1,8 @@
 package bloodmatch.application.usecase.donationrequest;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
@@ -53,59 +56,42 @@ public class CreateDonationRequestUseCase {
     this.geocodingService = geocodingService;
   }
 
-  public DonationRequest execute(
-      DomainID partyId,
-      DomainID organizationId,
-      BloodType bloodTypeNeeded,
-      int goalBloodBags,
-      LocalDate dateLimit,
-      Urgency urgency,
-      String directedTo) {
-    return execute(
-        partyId,
-        organizationId,
-        bloodTypeNeeded,
-        goalBloodBags,
-        dateLimit,
-        LocalDate.now(),
-        urgency,
-        directedTo);
+  public Output execute(Input input) {
+    return execute(input, LocalDate.now());
   }
 
-  public DonationRequest execute(
-      DomainID partyId,
-      DomainID organizationId,
-      BloodType bloodTypeNeeded,
-      int goalBloodBags,
-      LocalDate dateLimit,
-      LocalDate currentDate,
-      Urgency urgency,
-      String directedTo) {
+  public Output execute(Input input, LocalDate currentDate) {
+    if (input == null) {
+      throw new ValidationException("Request body cannot be null");
+    }
+    if (currentDate == null) {
+      throw new ValidationException("Current date cannot be null");
+    }
 
-    if (partyId == null)
-      throw new IllegalArgumentException("Party id cannot be null");
-    if (organizationId == null)
-      throw new IllegalArgumentException("Organization id cannot be null");
-    if (bloodTypeNeeded == null)
-      throw new IllegalArgumentException("Blood type needed cannot be null");
-    if (goalBloodBags <= 0)
-      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
-    if (dateLimit == null)
-      throw new IllegalArgumentException("Date limit cannot be null");
-    if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
-    if (urgency == null)
-      throw new IllegalArgumentException("Urgency cannot be null");
-    if (dateLimit.isBefore(currentDate))
-      throw new IllegalArgumentException("Date limit cannot be before current date");
+    DomainID partyId = DomainIdParser.parse(input.partyId(), "partyId");
+    DomainID organizationId = DomainIdParser.parse(input.organizationId(), "organizationId");
+    BloodType bloodTypeNeeded = parseBloodType(input.bloodTypeNeeded());
+    Urgency urgency = parseUrgency(input.urgency());
+
+    if (input.goalBloodBags() == null) {
+      throw new ValidationException("goalBloodBags cannot be null");
+    }
+    if (input.goalBloodBags() <= 0) {
+      throw new ValidationException("Goal blood bags must be greater than zero");
+    }
+    if (input.dateLimit() == null) {
+      throw new ValidationException("Date limit cannot be null");
+    }
+    if (input.dateLimit().isBefore(currentDate)) {
+      throw new ValidationException("Date limit cannot be before current date");
+    }
 
     Requester requester = requesterRepository.findByPartyId(partyId)
-      .orElseThrow(() -> new IllegalArgumentException("Requester role not found"));
+        .orElseThrow(() -> new NotFoundException("Requester role not found"));
 
     BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
-      .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
+        .orElseThrow(() -> new NotFoundException("Blood center role not found"));
 
-    // Ensure blood center organization address has coordinates
     Organization organization = bloodCenter.getOrganization();
     if (organization.getAddress() != null && !organization.getAddress().hasCoordinates()) {
       organization.changeAddress(geocodingService.getCoordinatesFromAddress(organization.getAddress()));
@@ -116,13 +102,51 @@ public class CreateDonationRequestUseCase {
         requester,
         bloodCenter,
         bloodTypeNeeded,
-        goalBloodBags,
-        dateLimit,
+        input.goalBloodBags(),
+        input.dateLimit(),
         currentDate,
         urgency,
-        directedTo);
+        input.directedTo());
 
     donationRequestRepository.save(request);
-    return request;
+    return Output.from(request);
+  }
+
+  private static BloodType parseBloodType(String value) {
+    if (value == null || value.isBlank()) {
+      throw new ValidationException("bloodTypeNeeded cannot be blank");
+    }
+    try {
+      return BloodType.of(value);
+    } catch (IllegalArgumentException e) {
+      throw new ValidationException(e.getMessage());
+    }
+  }
+
+  private static Urgency parseUrgency(String value) {
+    if (value == null || value.isBlank()) {
+      throw new ValidationException("urgency cannot be blank");
+    }
+    try {
+      return Urgency.valueOf(value.trim().toUpperCase());
+    } catch (IllegalArgumentException e) {
+      throw new ValidationException("Invalid urgency");
+    }
+  }
+
+  public record Input(
+      String partyId,
+      String organizationId,
+      String bloodTypeNeeded,
+      Integer goalBloodBags,
+      LocalDate dateLimit,
+      String urgency,
+      String directedTo) {
+  }
+
+  public record Output(String id) {
+    public static Output from(DonationRequest request) {
+      return new Output(request.getId().getValue().toString());
+    }
   }
 }

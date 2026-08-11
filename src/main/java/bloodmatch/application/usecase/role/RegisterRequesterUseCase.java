@@ -1,14 +1,17 @@
 package bloodmatch.application.usecase.role;
 
+import bloodmatch.application.exception.ConflictException;
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.party.Party;
 import bloodmatch.domain.repositories.PartyRepositoryInterface;
 import bloodmatch.domain.repositories.RequesterRepositoryInterface;
 import bloodmatch.domain.repositories.UserAccountRepositoryInterface;
+import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.security.SecurityRole;
 import bloodmatch.domain.security.UserAccount;
-import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.DomainID;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,30 +43,40 @@ public class RegisterRequesterUseCase {
   }
 
   @Transactional
-  public Requester execute(DomainID partyId) {
+  public Output execute(Input input) {
+    if (input == null)
+      throw new ValidationException("Request body cannot be null");
 
-    if (partyId == null)
-      throw new IllegalArgumentException("Party id cannot be null");
+    DomainID partyId = DomainIdParser.parse(input.partyId(), "partyId");
 
     Party party = partyRepository.findById(partyId)
-        .orElseThrow(() -> new IllegalArgumentException("Party not found"));
+        .orElseThrow(() -> new NotFoundException("Party not found"));
 
     if (requesterRepository.findByPartyId(partyId).isPresent())
-      throw new IllegalStateException("Requester already registered for party");
+      throw new ConflictException("Requester already registered for party");
 
     Requester requester = new Requester(party);
     requesterRepository.save(requester);
     addRoleToUserAccount(partyId, SecurityRole.REQUESTER);
-    return requester;
+    return Output.from(requester);
   }
 
   private void addRoleToUserAccount(DomainID partyId, SecurityRole role) {
     UserAccount userAccount = userAccountRepository.findByPartyId(partyId)
-        .orElseThrow(() -> new IllegalStateException("User account not found for party"));
+        .orElseThrow(() -> new NotFoundException("User account not found for party"));
 
     Set<SecurityRole> updatedRoles = new HashSet<>(userAccount.getRoles());
     updatedRoles.add(role);
     userAccount.updateRoles(updatedRoles);
     userAccountRepository.save(userAccount);
+  }
+
+  public record Input(String partyId) {
+  }
+
+  public record Output(String id) {
+    public static Output from(Requester requester) {
+      return new Output(requester.getId().getValue().toString());
+    }
   }
 }

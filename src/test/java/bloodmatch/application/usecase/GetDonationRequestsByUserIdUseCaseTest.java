@@ -1,6 +1,8 @@
 package bloodmatch.application.usecase;
 
+import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByPartyIdUseCase;
+import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByPartyIdUseCase.Input;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
@@ -25,7 +27,8 @@ import static org.mockito.Mockito.when;
 
 class GetDonationRequestsByPartyIdUseCaseTest {
 
-  private final DonationRequestRepositoryInterface donationRequestRepository = mock(DonationRequestRepositoryInterface.class);
+  private final DonationRequestRepositoryInterface donationRequestRepository =
+      mock(DonationRequestRepositoryInterface.class);
   private final GetDonationRequestsByPartyIdUseCase useCase = new GetDonationRequestsByPartyIdUseCase(
       donationRequestRepository);
 
@@ -39,7 +42,8 @@ class GetDonationRequestsByPartyIdUseCaseTest {
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(older, newer));
 
-    List<GetDonationRequestsByPartyIdUseCase.OutputItem> result = useCase.execute(userId, now);
+    List<GetDonationRequestsByPartyIdUseCase.OutputItem> result =
+        useCase.execute(new Input(userId.getValue().toString()), now);
 
     assertEquals(2, result.size());
     assertEquals(newer.getId().getValue().toString(), result.get(0).requestId());
@@ -50,6 +54,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     assertEquals(false, result.get(0).goalReached());
     assertEquals(true, result.get(0).active());
     assertEquals(false, result.get(0).expired());
+    assertEquals("MEDIUM", result.get(0).urgency());
   }
 
   @Test
@@ -61,7 +66,8 @@ class GetDonationRequestsByPartyIdUseCaseTest {
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(cancelled));
 
-    List<GetDonationRequestsByPartyIdUseCase.OutputItem> result = useCase.execute(userId, now);
+    List<GetDonationRequestsByPartyIdUseCase.OutputItem> result =
+        useCase.execute(new Input(userId.getValue().toString()), now);
 
     assertEquals(1, result.size());
     assertEquals(0, result.get(0).fulfilledBloodBags());
@@ -79,7 +85,8 @@ class GetDonationRequestsByPartyIdUseCaseTest {
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(expired));
 
-    GetDonationRequestsByPartyIdUseCase.OutputItem result = useCase.execute(userId, currentDate).get(0);
+    GetDonationRequestsByPartyIdUseCase.OutputItem result =
+        useCase.execute(new Input(userId.getValue().toString()), currentDate).get(0);
 
     assertEquals(true, result.active());
     assertEquals(true, result.expired());
@@ -89,7 +96,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
 
   @Test
   void shouldThrowWhenUserIdIsNull() {
-    assertThrows(IllegalArgumentException.class, () -> useCase.execute(null));
+    assertThrows(ValidationException.class, () -> useCase.execute(new Input(null)));
   }
 
   private DonationRequest createRequest(LocalDate dateRequested) {
@@ -108,11 +115,10 @@ class GetDonationRequestsByPartyIdUseCaseTest {
         requester,
         bloodCenter,
         BloodType.of("A+"),
-      1,
+        1,
         dateRequested.plusDays(10),
         dateRequested,
         Urgency.MEDIUM,
         null);
   }
-
 }

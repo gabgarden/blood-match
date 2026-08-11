@@ -1,14 +1,16 @@
 package bloodmatch.application.usecase.donation.createpending;
 
+import bloodmatch.application.exception.NotFoundException;
+import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.donation.Donation;
+import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
 import bloodmatch.domain.repositories.DonationRepositoryInterface;
 import bloodmatch.domain.repositories.DonorRepositoryInterface;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
-import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
-import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
-
 
 import java.time.LocalDate;
 
@@ -27,38 +29,58 @@ public class CreatePendingDonationUseCase {
     this.donationRepository = donationRepository;
   }
 
-  public Donation execute(
-      DomainID donorId,
-      DomainID organizationId,
-      LocalDate expectedDate) {
-
-    return execute(donorId, organizationId, expectedDate, LocalDate.now());
+  public Output execute(Input input) {
+    return execute(input, LocalDate.now());
   }
 
-  public Donation execute(
-      DomainID donorId,
-      DomainID organizationId,
-      LocalDate expectedDate,
-      LocalDate currentDate) {
+  public Output execute(Input input, LocalDate currentDate) {
+    if (input == null) {
+      throw new ValidationException("Request body cannot be null");
+    }
+    if (currentDate == null) {
+      throw new ValidationException("Current date cannot be null");
+    }
 
-    if (donorId == null)
-      throw new IllegalArgumentException("Donor id cannot be null");
-    if (organizationId == null)
-      throw new IllegalArgumentException("Organization id cannot be null");
-    if (expectedDate == null)
-      throw new IllegalArgumentException("Expected date cannot be null");
-    if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
+    DomainID donorId = DomainIdParser.parse(input.personId(), "personId");
+    DomainID organizationId = DomainIdParser.parse(input.organizationId(), "organizationId");
+    if (input.expectedDate() == null) {
+      throw new ValidationException("expectedDate cannot be null");
+    }
 
     Donor donor = donorRepository.findByPartyId(donorId)
-        .orElseThrow(() -> new IllegalArgumentException("Donor role not found"));
-    
-    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
-        .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
+        .orElseThrow(() -> new NotFoundException("Donor role not found"));
 
-    Donation donation = Donation.createPending(donor, expectedDate, bloodCenter, currentDate);
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
+        .orElseThrow(() -> new NotFoundException("Blood center role not found"));
+
+    Donation donation = Donation.createPending(donor, input.expectedDate(), bloodCenter, currentDate);
     donationRepository.save(donation);
 
-    return donation;
+    return Output.from(donation);
+  }
+
+  public record Input(String personId, String organizationId, LocalDate expectedDate) {
+  }
+
+  public record Output(String id, LocalDate expectedDate, String status) {
+    public static Output from(Donation donation) {
+      return new Output(
+          donation.getId().getValue().toString(),
+          donation.getDonationDate(),
+          statusOf(donation));
+    }
+
+    private static String statusOf(Donation donation) {
+      if (donation.isCompleted()) {
+        return "COMPLETED";
+      }
+      if (donation.isPending()) {
+        return "PENDING";
+      }
+      if (donation.isCancelled()) {
+        return "CANCELLED";
+      }
+      return "UNKNOWN";
+    }
   }
 }

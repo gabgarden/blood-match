@@ -1,10 +1,8 @@
 package bloodmatch.interfaces.rest.role.registerdonor;
 
 import bloodmatch.application.usecase.role.RegisterDonorUseCase;
+import bloodmatch.application.usecase.role.RegisterDonorUseCase.Input;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import bloodmatch.domain.roles.person.donor.Donor;
-import bloodmatch.domain.shared.valueObjects.BloodType;
-import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.isBlank;
-import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.parseDomainId;
+import static bloodmatch.interfaces.rest.shared.AuthenticatedPartySupport.requireSamePartyOrAdmin;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNonNull;
+import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
 @Tag(name = "Register Donor", description = "Register a new donor role to a Person.")
@@ -29,31 +26,19 @@ public class RegisterDonorController {
   }
 
   @PostMapping("/donors")
-  public ResponseEntity<Map<String, String>> registerDonor(@RequestBody RegisterDonorDto payload) {
+  public ResponseEntity<RegisterDonorResponseDto> registerDonor(@RequestBody RegisterDonorDto payload) {
+    requireNonNull(payload, "Request body cannot be null");
+    requireNotBlank(payload.personId(), "personId cannot be blank");
+    requireNotBlank(payload.bloodType(), "bloodType cannot be blank");
+    requireNonNull(payload.weight(), "weight cannot be null");
+    requireSamePartyOrAdmin(payload.personId());
 
+    var output = registerDonorUseCase.execute(new Input(
+        payload.personId(),
+        payload.bloodType(),
+        payload.weight()));
 
-  
-    try {
-      if (payload == null)
-        throw new IllegalArgumentException("Request body cannot be null");
-      if (isBlank(payload.personId()))
-        throw new IllegalArgumentException("personId cannot be blank");
-      if (isBlank(payload.bloodType()))
-        throw new IllegalArgumentException("bloodType cannot be blank");
-      if (payload.weight() == null)
-        throw new IllegalArgumentException("weight cannot be null");
-
-      DomainID id = parseDomainId(payload.personId(), "personId");
-      Donor donor = registerDonorUseCase.execute(
-          id,
-          BloodType.of(payload.bloodType()),
-          payload.weight());
-
-      return ResponseEntity.status(HttpStatus.CREATED)
-          .body(Map.of("id", donor.getId().getValue().toString()));
-
-    } catch (IllegalArgumentException | IllegalStateException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    }
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(RegisterDonorResponseDto.from(output));
   }
 }
