@@ -47,7 +47,6 @@ export default function ProfilePage() {
   });
 
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [isSavingName, setIsSavingName] = useState(false);
   const [isSavingDonor, setIsSavingDonor] = useState(false);
   const [isSavingDistance, setIsSavingDistance] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -121,30 +120,26 @@ export default function ProfilePage() {
     return <Navigate to={resolvePostLoginPath(roles)} replace />;
   }
 
-  async function handleSaveName(event: React.FormEvent) {
-    event.preventDefault();
+  async function handleSaveNameValue(newName: string) {
     if (!partyId) {
       return;
     }
 
-    const newName = displayName.trim();
-    if (!newName) {
+    const trimmed = newName.trim();
+    if (!trimmed) {
       setErrorMessage("Informe um nome válido.");
       return;
     }
 
-    setIsSavingName(true);
     setFeedback(null);
     setErrorMessage(null);
 
     try {
-      const result = await updatePartyName(partyId, newName);
+      const result = await updatePartyName(partyId, trimmed);
       setDisplayName(result.name);
       setFeedback("Nome atualizado com sucesso.");
     } catch (error) {
       setErrorMessage(extractApiErrorMessage(error, "Não foi possível atualizar o nome."));
-    } finally {
-      setIsSavingName(false);
     }
   }
 
@@ -229,6 +224,7 @@ export default function ProfilePage() {
               isDonor={canAccessDonorArea}
               avatarIcon={avatarIcon}
               onSelectAvatarIcon={handleSelectAvatarIcon}
+              onSaveName={handleSaveNameValue}
             />
           )}
 
@@ -237,36 +233,6 @@ export default function ProfilePage() {
 
           {!isLoadingProfile && (
             <>
-              <ProfileSection
-                icon="badge"
-                title="Identidade"
-                description="Nome exibido da sua conta."
-              >
-                <form className="space-y-5" onSubmit={handleSaveName}>
-                  <div>
-                    <label htmlFor="profile-name" className={labelClass}>
-                      Nome completo
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="profile-name"
-                        className={`${fieldClass} pr-12`}
-                        value={displayName}
-                        onChange={(event) => setDisplayName(event.target.value)}
-                        placeholder="Como você deseja ser chamado"
-                        required
-                      />
-                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-sm text-gray-400">
-                        person
-                      </span>
-                    </div>
-                  </div>
-                  <AppButton type="submit" variant="danger" disabled={isSavingName} className="px-6">
-                    {isSavingName ? "Salvando..." : "Salvar nome"}
-                  </AppButton>
-                </form>
-              </ProfileSection>
-
               {canAccessDonorArea ? (
                 <>
                   <ProfileSection

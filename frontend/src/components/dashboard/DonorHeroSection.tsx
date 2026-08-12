@@ -6,6 +6,7 @@ type DonorHeroSectionProps = {
   daysRemaining: number;
   livesImpacted: number;
   recommendationCount: number;
+  avatarIcon?: string | null;
 };
 
 function initialsFromName(name: string): string {
@@ -25,9 +26,11 @@ export function DonorHeroSection({
   daysRemaining,
   livesImpacted,
   recommendationCount,
+  avatarIcon,
 }: DonorHeroSectionProps) {
   const canDonateNow = daysRemaining <= 0;
   const name = userName.trim() || "Doador";
+  const activeIcon = avatarIcon || localStorage.getItem("bloodmatch_avatar_icon") || "water_drop";
 
   return (
     <section className="relative col-span-12 lg:col-span-8 overflow-hidden rounded-[2rem] border border-surface-container-high bg-white p-6 lg:p-8">
@@ -37,7 +40,11 @@ export function DonorHeroSection({
       <div className="relative z-10 flex flex-col gap-6">
         <div className="flex items-start gap-4">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-pulse-gradient text-white shadow-md">
-            <span className="font-headline text-xl font-black tracking-wide">{initialsFromName(name)}</span>
+            {activeIcon ? (
+              <span className="material-symbols-outlined text-3xl">{activeIcon}</span>
+            ) : (
+              <span className="font-headline text-xl font-black tracking-wide">{initialsFromName(name)}</span>
+            )}
           </div>
 
           <div className="min-w-0 flex-1">

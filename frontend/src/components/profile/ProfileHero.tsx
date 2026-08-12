@@ -13,19 +13,8 @@ type ProfileHeroProps = {
   isDonor: boolean;
   avatarIcon?: string | null;
   onSelectAvatarIcon?: (iconId: string) => void;
+  onSaveName?: (newName: string) => Promise<void> | void;
 };
-
-const ROLE_LABELS: Record<string, string> = {
-  DONOR: "Doador",
-  REQUESTER: "Solicitante",
-  BLOOD_CENTER: "Hemocentro",
-  SYSTEM_ADMIN: "Admin",
-};
-
-function roleLabel(role: string): string {
-  const key = role.trim().toUpperCase();
-  return ROLE_LABELS[key] ?? key;
-}
 
 function initialsFromName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -54,22 +43,42 @@ export function ProfileHero({
   bloodType,
   phoneNumber,
   address,
-  roles,
   livesImpacted,
   daysRemaining,
   lastDonationDate,
   isDonor,
   avatarIcon,
   onSelectAvatarIcon,
+  onSaveName,
 }: ProfileHeroProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editNameInput, setEditNameInput] = useState(displayName);
+  const [isSavingName, setIsSavingName] = useState(false);
+
   const name = displayName.trim() || "Seu perfil";
   const canDonateNow = (daysRemaining ?? 0) <= 0;
 
+  async function handleNameSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = editNameInput.trim();
+    if (!trimmed || !onSaveName) return;
+
+    setIsSavingName(true);
+    try {
+      await onSaveName(trimmed);
+      setIsEditingName(false);
+    } finally {
+      setIsSavingName(false);
+    }
+  }
+
   return (
-    <section className="relative overflow-hidden rounded-[2rem] bg-white border border-surface-container-high p-6 lg:p-8">
-      <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#fff2f0]" />
-      <div className="absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-[#eaf3f7] opacity-80" />
+    <section className="relative rounded-[2rem] bg-white border border-surface-container-high p-6 lg:p-8">
+      <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
+        <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#fff2f0]" />
+        <div className="absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-[#eaf3f7] opacity-80" />
+      </div>
 
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-4">
@@ -97,7 +106,7 @@ export function ProfileHero({
                 {isPickerOpen && (
                   <>
                     <div className="fixed inset-0 z-20" onClick={() => setIsPickerOpen(false)} />
-                    <div className="absolute left-0 top-full mt-2 z-30 w-56 rounded-2xl border border-surface-container-high bg-white p-3 shadow-xl animate-in fade-in zoom-in-95 duration-150">
+                    <div className="absolute left-0 top-full mt-2 z-30 w-60 rounded-2xl border border-surface-container-high bg-white p-3 shadow-xl animate-in fade-in zoom-in-95 duration-150">
                       <div className="mb-2 flex items-center justify-between px-1">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
                           Ícone do perfil
@@ -126,26 +135,62 @@ export function ProfileHero({
 
           <div className="min-w-0 space-y-2">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary">Meu perfil</p>
-            <h1 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface truncate">
-              {name}
-            </h1>
-
-            <div className="flex flex-wrap gap-2">
-              {roles.map((role) => (
-                <span
-                  key={role}
-                  className="inline-flex items-center rounded-lg bg-surface-container-high px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-secondary"
+            
+            {isEditingName ? (
+              <form onSubmit={handleNameSubmit} className="flex flex-wrap items-center gap-2 pt-1">
+                <input
+                  type="text"
+                  value={editNameInput}
+                  onChange={(e) => setEditNameInput(e.target.value)}
+                  className="rounded-xl border border-primary bg-white px-3 py-1 text-lg font-extrabold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  placeholder="Seu nome"
+                  required
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  disabled={isSavingName}
+                  className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#920f16] disabled:opacity-50"
                 >
-                  {roleLabel(role)}
-                </span>
-              ))}
-              {bloodType && (
+                  {isSavingName ? "..." : "Salvar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingName(false)}
+                  className="rounded-xl bg-surface-container-high px-2.5 py-1.5 text-xs font-bold text-secondary hover:bg-surface-container-highest"
+                >
+                  <span className="material-symbols-outlined text-xs">close</span>
+                </button>
+              </form>
+            ) : (
+              <div className="flex items-center gap-2">
+                <h1 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface truncate">
+                  {name}
+                </h1>
+                {onSaveName && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditNameInput(displayName);
+                      setIsEditingName(true);
+                    }}
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-container-low text-secondary hover:bg-[#fff2f0] hover:text-primary transition-all border border-surface-container-high shrink-0"
+                    title="Editar nome"
+                  >
+                    <span className="material-symbols-outlined text-xs">edit</span>
+                  </button>
+                )}
+              </div>
+            )}
+
+            {bloodType && (
+              <div className="flex flex-wrap gap-2 pt-1">
                 <span className="inline-flex items-center gap-1 rounded-lg bg-[#fff2f0] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-primary">
                   <span className="material-symbols-outlined text-sm">bloodtype</span>
                   {bloodType}
                 </span>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="space-y-1 pt-1 text-sm text-text-secondary">
               {phoneNumber && (
