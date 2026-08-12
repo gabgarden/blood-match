@@ -8,18 +8,15 @@ import RecommendationsPage from "../pages/RecommendationsPage";
 import ExternalDonationPage from "../pages/ExternalDonationPage";
 import ProfilePage from "../pages/ProfilePage";
 import DonationsPage from "../pages/DonationsPage";
-import { PublicOnlyRoute, RequireAuth, RoleBasedHomeRedirect } from "./RouteGuards";
+import HomePage from "../pages/HomePage";
+import { PublicOnlyRoute, RequireAuth } from "./RouteGuards";
 import { RouteErrorPage } from "../components/ui/RouteErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     errorElement: <RouteErrorPage />,
-    element: (
-      <RequireAuth>
-        <RoleBasedHomeRedirect />
-      </RequireAuth>
-    ),
+    element: <HomePage />,
   },
   {
     path: "/login",
