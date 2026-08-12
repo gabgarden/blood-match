@@ -2,14 +2,48 @@ import { useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
-import { DonationHistory } from "../components/dashboard/DonationHistory";
-import { TodayDonationBanner } from "../components/dashboard/TodayDonationBanner";
-import { FullPageLoading, InlineAlert } from "../components/ui";
+import { DonationHistory, type DonationHistoryItem } from "../components/dashboard/DonationHistory";
+import { AppButton, FullPageLoading, InlineAlert, Modal } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useDonorDashboard } from "../hooks/useDonorDashboard";
 import { useRoleResolution } from "../hooks/useRoleResolution";
 import { hasDonorRole, hasRequesterRole, hasAdminRole } from "../routes/roleRouting";
-import { externalDonationCreatePath } from "../services/donationService";
+import { completeDonation, rescheduleDonation, externalDonationCreatePath } from "../services/donationService";
+import { extractApiErrorMessage } from "../utils/apiError";
+
+function isPendingStatus(status: string): boolean {
+  const normalized = status.trim().toUpperCase();
+  return ["SCHEDULED", "PENDING", "AGENDADO", "EM_ANDAMENTO"].includes(normalized);
+}
+
+function formatDate(input: string | null): string {
+  if (!input) return "Data não informada";
+  const parsed = new Date(input);
+  if (Number.isNaN(parsed.getTime())) return input;
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(parsed);
+}
+
+function todayIsoDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function createGoogleCalendarUrl(title: string, location: string, dateIso: string): string {
+  const cleanDate = dateIso.replace(/-/g, "");
+  const start = `${cleanDate}T090000Z`;
+  const end = `${cleanDate}T110000Z`;
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    details: `Doação agendada via BloodMatch no ${location}.`,
+    location,
+    dates: `${start}/${end}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
 
 export default function DonationsPage() {
   const navigate = useNavigate();
@@ -22,6 +56,14 @@ export default function DonationsPage() {
   const isRequesterOnly = canAccessRequesterArea && !canAccessDonorArea && !canAccessAdminArea;
 
   const [activeGuideTab, setActiveGuideTab] = useState<"before" | "after" | "clt">("before");
+  
+  // Modal de gerenciamento (Concluir / Reagendar)
+  const [selectedPending, setSelectedPending] = useState<DonationHistoryItem | null>(null);
+  const [manageMode, setManageMode] = useState<"complete" | "reschedule">("complete");
+  const [manageDate, setManageDate] = useState(todayIsoDate());
+  const [isManaging, setIsManaging] = useState(false);
+  const [manageError, setManageError] = useState<string | null>(null);
+  const [manageFeedback, setManageFeedback] = useState<string | null>(null);
 
   const {
     donorBloodType,
@@ -50,10 +92,42 @@ export default function DonationsPage() {
     navigate(externalDonationCreatePath);
   }
 
-  // Encontra a doação pendente/agendada ativa se houver
-  const pendingDonation = donationHistory.find(
-    (item) => item.status === "REGISTERED" || item.status === "PENDING" || item.status === "SCHEDULED"
-  );
+  // Encontra apenas doações genuinamente agendadas/pendentes (ex: PENDING, SCHEDULED)
+  const pendingDonation = donationHistory.find((item) => isPendingStatus(item.status));
+
+  function openManageModal(item: DonationHistoryItem, mode: "complete" | "reschedule") {
+    setSelectedPending(item);
+    setManageMode(mode);
+    setManageDate(item.donationDate?.slice(0, 10) || todayIsoDate());
+    setManageError(null);
+    setManageFeedback(null);
+  }
+
+  async function handleManageSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedPending || !manageDate) return;
+
+    setIsManaging(true);
+    setManageError(null);
+    setManageFeedback(null);
+
+    try {
+      if (manageMode === "complete") {
+        await completeDonation(selectedPending.id, manageDate);
+        setManageFeedback("Doação marcada como concluída com sucesso!");
+      } else {
+        await rescheduleDonation(selectedPending.id, manageDate);
+        setManageFeedback("Data da doação reagendada com sucesso!");
+      }
+
+      await reloadDonationHistory();
+      setTimeout(() => setSelectedPending(null), 800);
+    } catch (err) {
+      setManageError(extractApiErrorMessage(err, "Não foi possível processar a alteração."));
+    } finally {
+      setIsManaging(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d]">
@@ -64,6 +138,7 @@ export default function DonationsPage() {
         <div className="mx-auto max-w-5xl space-y-6">
           {feedback && <InlineAlert tone="success" message={feedback} />}
           {errorMessage && <InlineAlert tone="error" message={errorMessage} />}
+          {manageFeedback && !selectedPending && <InlineAlert tone="success" message={manageFeedback} />}
 
           {/* Banner Hero das Doações */}
           <section className="relative overflow-hidden rounded-[2rem] bg-white border border-surface-container-high p-6 lg:p-8">
@@ -80,7 +155,7 @@ export default function DonationsPage() {
                   Sua Jornada de Solidariedade
                 </h1>
                 <p className="text-sm text-text-secondary max-w-xl leading-relaxed">
-                  Acompanhe doações agendadas, registre comprovantes externos e veja seu histórico de bolsas doadas.
+                  Acompanhe doações agendadas, gerencie datas, registre comprovantes e consulte o histórico de bolsas doadas.
                 </p>
               </div>
 
@@ -123,20 +198,94 @@ export default function DonationsPage() {
             </div>
           </section>
 
-          {/* Doação Agendada Ativa (Caso Exista) */}
-          {pendingDonation && (
-            <section className="space-y-3">
-              <h2 className="font-headline text-xl font-extrabold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl">event_upcoming</span>
-                Doação Agendada em Andamento
-              </h2>
-              <TodayDonationBanner
-                hospitalName={pendingDonation.location}
-                expectedDate={pendingDonation.donationDate ? pendingDonation.donationDate.slice(0, 10).split("-").reverse().join("/") : undefined}
-                bloodType={donorBloodType}
-              />
-            </section>
-          )}
+          {/* Doação Agendada Ativa (Se houver agendamento pendente) */}
+          <section className="space-y-3">
+            <h2 className="font-headline text-xl font-extrabold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-xl">event_upcoming</span>
+              Doação Agendada em Andamento
+            </h2>
+
+            {pendingDonation ? (
+              <div className="overflow-hidden rounded-[2rem] border border-amber-200 bg-gradient-to-r from-amber-50/80 via-white to-amber-50/80 p-6 shadow-sm">
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-md">
+                      <span className="material-symbols-outlined text-3xl">event_available</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-amber-100 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-800 border border-amber-200">
+                          Agendamento Ativo
+                        </span>
+                        <span className="text-xs font-bold text-secondary">
+                          Tipo {donorBloodType}
+                        </span>
+                      </div>
+
+                      <h3 className="font-headline text-xl font-extrabold text-on-surface">
+                        {pendingDonation.location}
+                      </h3>
+
+                      <p className="text-sm font-semibold text-text-secondary">
+                        Data Prevista: <strong className="text-on-surface font-black">{formatDate(pendingDonation.donationDate)}</strong>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Ações da Doação Agendada */}
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => openManageModal(pendingDonation, "complete")}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-base">check_circle</span>
+                      Concluir Doação
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => openManageModal(pendingDonation, "reschedule")}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-white border border-surface-container-high px-4 py-2.5 text-xs font-bold text-on-surface hover:bg-surface-container-low transition-colors shadow-xs"
+                    >
+                      <span className="material-symbols-outlined text-base text-secondary">edit_calendar</span>
+                      Reagendar
+                    </button>
+
+                    {pendingDonation.donationDate && (
+                      <a
+                        href={createGoogleCalendarUrl(
+                          `Doação de Sangue (${donorBloodType})`,
+                          pendingDonation.location,
+                          pendingDonation.donationDate.slice(0, 10)
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-100 px-3 py-2.5 text-xs font-bold hover:bg-blue-100 transition-colors"
+                        title="Adicionar ao Google Agenda"
+                      >
+                        <span className="material-symbols-outlined text-base">calendar_add_on</span>
+                        Google Agenda
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-[2rem] border border-dashed border-surface-container-highest bg-white p-6 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-low text-secondary">
+                  <span className="material-symbols-outlined text-2xl">event_busy</span>
+                </div>
+                <p className="mt-3 font-headline text-base font-bold text-on-surface">
+                  Nenhum agendamento pendente
+                </p>
+                <p className="mt-1 text-xs text-text-secondary">
+                  Você está sem agendamentos ativos no momento. Acesse a aba <strong>Dashboard</strong> para encontrar recomendações compatíveis!
+                </p>
+              </div>
+            )}
+          </section>
 
           {/* Seção de Guia & Orientações Médicas */}
           <section className="rounded-[2rem] border border-surface-container-high bg-white p-6 shadow-sm">
@@ -187,7 +336,7 @@ export default function DonationsPage() {
             {activeGuideTab === "before" && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="rounded-2xl bg-surface-container-low p-4 border border-surface-container-high">
-                  <span className="material-symbols-outlined text-primary text-2xl mb-1">local_drinking</span>
+                  <span className="material-symbols-outlined text-primary text-2xl mb-1">water_drop</span>
                   <h4 className="font-headline text-sm font-bold text-on-surface">Hidratação abundante</h4>
                   <p className="mt-1 text-xs text-text-secondary leading-relaxed">
                     Beba pelo menos 500ml de água antes de sair de casa para facilitar a coleta.
@@ -262,6 +411,46 @@ export default function DonationsPage() {
           />
         </div>
       </main>
+
+      {/* Modal de Concluir / Reagendar doação agendada */}
+      <Modal
+        open={!!selectedPending}
+        onClose={() => setSelectedPending(null)}
+        title={manageMode === "complete" ? "Concluir Doação Agendada" : "Reagendar Data da Doação"}
+        description={selectedPending ? `${selectedPending.location}` : undefined}
+      >
+        <form className="space-y-4" onSubmit={handleManageSubmit}>
+          {manageError && <InlineAlert tone="error" message={manageError} />}
+          {manageFeedback && <InlineAlert tone="success" message={manageFeedback} />}
+
+          <div>
+            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-secondary">
+              {manageMode === "complete" ? "Data real de conclusão" : "Nova data prevista"}
+            </label>
+            <input
+              type="date"
+              value={manageDate}
+              onChange={(e) => setManageDate(e.target.value)}
+              className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 text-sm focus:ring-0 focus:bg-surface-container-lowest focus:border-l-4 focus:border-primary transition-all"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <AppButton
+              type="button"
+              variant="secondary"
+              onClick={() => setSelectedPending(null)}
+              disabled={isManaging}
+            >
+              Cancelar
+            </AppButton>
+            <AppButton type="submit" variant="danger" disabled={isManaging}>
+              {isManaging ? "Salvando..." : manageMode === "complete" ? "Confirmar Conclusão" : "Confirmar Reagendamento"}
+            </AppButton>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
