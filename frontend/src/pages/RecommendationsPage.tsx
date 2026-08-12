@@ -1,17 +1,20 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { AccessDenied } from "../components/AccessDenied";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
 import { RecommendationCard } from "../components/dashboard/RecommendationCard";
+import { ScheduleDonationModal } from "../components/dashboard/ScheduleDonationModal";
 import { FullPageLoading, InlineAlert } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
-import { useDonorDashboard } from "../hooks/useDonorDashboard";
+import { useDonorDashboard, type Recommendation } from "../hooks/useDonorDashboard";
 import { useRoleResolution } from "../hooks/useRoleResolution";
 import { hasAdminRole, hasDonorRole, hasRequesterRole } from "../routes/roleRouting";
 
 export default function RecommendationsPage() {
   const { roles, partyId, logout } = useAuth();
+  const [schedulingRecommendation, setSchedulingRecommendation] = useState<Recommendation | null>(null);
+  const [isSubmittingSchedule, setIsSubmittingSchedule] = useState(false);
 
   const normalizedRoles = useMemo(() => roles, [roles]);
   const isResolvingRoles = useRoleResolution(normalizedRoles);
@@ -36,6 +39,23 @@ export default function RecommendationsPage() {
     () => recommendations.filter((item) => item.urgency === "CRITICAL").length,
     [recommendations],
   );
+
+  function handleOpenScheduleModal(requestId: string) {
+    const rec = recommendations.find((item) => item.id === requestId);
+    if (rec) {
+      setSchedulingRecommendation(rec);
+    }
+  }
+
+  async function handleConfirmSchedule(requestId: string, expectedDate: string) {
+    setIsSubmittingSchedule(true);
+    try {
+      await acceptDonation(requestId, expectedDate);
+      setSchedulingRecommendation(null);
+    } finally {
+      setIsSubmittingSchedule(false);
+    }
+  }
 
   if (isResolvingRoles) {
     return <FullPageLoading message="Carregando permissões..." />;
@@ -116,7 +136,7 @@ export default function RecommendationsPage() {
                   goalBloodBags={recommendation.goalBloodBags}
                   fulfilledBloodBags={recommendation.fulfilledBloodBags}
                   goalReached={recommendation.goalReached}
-                  onAccept={acceptDonation}
+                  onAccept={handleOpenScheduleModal}
                 />
               ))}
             </section>
@@ -156,6 +176,14 @@ export default function RecommendationsPage() {
           )}
         </div>
       </main>
+
+      <ScheduleDonationModal
+        isOpen={!!schedulingRecommendation}
+        recommendation={schedulingRecommendation}
+        onClose={() => setSchedulingRecommendation(null)}
+        onConfirm={handleConfirmSchedule}
+        isSubmitting={isSubmittingSchedule}
+      />
     </div>
   );
 }

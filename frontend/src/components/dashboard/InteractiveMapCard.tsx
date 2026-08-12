@@ -4,6 +4,7 @@ import type { Recommendation } from "../../hooks/useDonorDashboard";
 
 type InteractiveMapCardProps = {
   recommendations: Recommendation[];
+  onSchedule?: (requestId: string) => void;
 };
 
 // Coordenadas base (Campos dos Goytacazes - RJ, centro dos hemocentros do sistema)
@@ -87,10 +88,11 @@ function createCustomIcon(color: string, pulse: boolean) {
   });
 }
 
-export function InteractiveMapCard({ recommendations }: InteractiveMapCardProps) {
+export function InteractiveMapCard({ recommendations, onSchedule }: InteractiveMapCardProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const [selectedCenter, setSelectedCenter] = useState<{
+    requestId: string;
     name: string;
     bloodType: string;
     urgency: "LOW" | "MEDIUM" | "CRITICAL";
@@ -141,6 +143,7 @@ export function InteractiveMapCard({ recommendations }: InteractiveMapCardProps)
 
       marker.on("click", () => {
         setSelectedCenter({
+          requestId: item.id,
           name: item.bloodCenterName,
           bloodType: item.bloodTypeNeeded,
           urgency: item.urgency,
@@ -242,26 +245,38 @@ export function InteractiveMapCard({ recommendations }: InteractiveMapCardProps)
               )}
             </div>
 
-            {/* Botões de Navegação "Como Chegar" */}
-            <div className="mt-3 flex gap-2">
-              <a
-                href={googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary py-2 px-3 text-xs font-bold text-white shadow-sm hover:bg-[#920f16] transition-colors"
-              >
-                <span className="material-symbols-outlined text-sm">navigation</span>
-                Google Maps
-              </a>
-              <a
-                href={wazeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#33ccff] py-2 px-3 text-xs font-bold text-slate-900 shadow-sm hover:bg-[#28b8e6] transition-colors"
-              >
-                <span className="material-symbols-outlined text-sm">near_me</span>
-                Waze
-              </a>
+            {/* Botões de Ação: Agendar Doação & Navegação */}
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              {onSchedule && (
+                <button
+                  type="button"
+                  onClick={() => onSchedule(selectedCenter.requestId)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary py-2 px-3 text-xs font-bold text-white shadow-sm hover:bg-[#920f16] transition-colors"
+                >
+                  <span className="material-symbols-outlined text-sm">event_available</span>
+                  Agendar doação
+                </button>
+              )}
+              <div className="flex flex-1 gap-2">
+                <a
+                  href={googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl bg-surface-container-low border border-surface-container-high py-2 px-2 text-xs font-bold text-on-surface hover:bg-surface-container-high transition-colors text-center"
+                >
+                  <span className="material-symbols-outlined text-sm text-primary">navigation</span>
+                  Google Maps
+                </a>
+                <a
+                  href={wazeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl bg-[#33ccff]/10 border border-[#33ccff]/30 py-2 px-2 text-xs font-bold text-slate-800 hover:bg-[#33ccff]/20 transition-colors text-center"
+                >
+                  <span className="material-symbols-outlined text-sm text-[#00a3cc]">near_me</span>
+                  Waze
+                </a>
+              </div>
             </div>
           </div>
         )}

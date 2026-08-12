@@ -114,7 +114,7 @@ export default function DonorDashboardPage() {
               </section>
 
               {/* Mapa Interativo de Hemocentros e Urgências */}
-              <InteractiveMapCard recommendations={recommendations} />
+              <InteractiveMapCard recommendations={recommendations} onSchedule={handleOpenScheduleModal} />
 
               {/* Semáforo de Estoque por Tipo Sanguíneo */}
               <BloodStockSemaphoreWidget />
