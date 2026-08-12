@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { RecommendationCard } from "../components/dashboard/RecommendationCard";
 import { useAuth } from "../context/AuthContext";
@@ -8,8 +8,9 @@ import { DonorHeroSection } from "../components/dashboard/DonorHeroSection";
 import { LastDonationCard } from "../components/dashboard/LastDonationCard";
 import { InteractiveMapCard } from "../components/dashboard/InteractiveMapCard";
 import { BloodStockSemaphoreWidget } from "../components/dashboard/BloodStockSemaphoreWidget";
+import { ScheduleDonationModal } from "../components/dashboard/ScheduleDonationModal";
 import { DonationHistory } from "../components/dashboard/DonationHistory";
-import { useDonorDashboard } from "../hooks/useDonorDashboard";
+import { useDonorDashboard, type Recommendation } from "../hooks/useDonorDashboard";
 import { FullPageLoading, InlineAlert } from "../components/ui";
 import { useRoleResolution } from "../hooks/useRoleResolution";
 import { hasAdminRole, hasDonorRole, hasRequesterRole } from "../routes/roleRouting";
@@ -18,6 +19,8 @@ import { externalDonationCreatePath } from "../services/donationService";
 export default function DonorDashboardPage() {
   const navigate = useNavigate();
   const { roles, partyId, logout } = useAuth();
+  const [schedulingRecommendation, setSchedulingRecommendation] = useState<Recommendation | null>(null);
+  const [isSubmittingSchedule, setIsSubmittingSchedule] = useState(false);
 
   const normalizedRoles = useMemo(() => roles, [roles]);
   const isResolvingRoles = useRoleResolution(normalizedRoles);
@@ -59,6 +62,23 @@ export default function DonorDashboardPage() {
 
   function handleCreateExternalDonation() {
     navigate(externalDonationCreatePath);
+  }
+
+  function handleOpenScheduleModal(requestId: string) {
+    const rec = recommendations.find((item) => item.id === requestId);
+    if (rec) {
+      setSchedulingRecommendation(rec);
+    }
+  }
+
+  async function handleConfirmSchedule(requestId: string, expectedDate: string) {
+    setIsSubmittingSchedule(true);
+    try {
+      await acceptDonation(requestId, expectedDate);
+      setSchedulingRecommendation(null);
+    } finally {
+      setIsSubmittingSchedule(false);
+    }
   }
 
   if (isRequesterOnly) {
@@ -153,7 +173,7 @@ export default function DonorDashboardPage() {
                         goalBloodBags={recommendation.goalBloodBags}
                         fulfilledBloodBags={recommendation.fulfilledBloodBags}
                         goalReached={recommendation.goalReached}
-                        onAccept={acceptDonation}
+                        onAccept={handleOpenScheduleModal}
                       />
                     ))}
                   </div>
@@ -214,6 +234,14 @@ export default function DonorDashboardPage() {
           )}
         </div>
       </main>
+
+      <ScheduleDonationModal
+        isOpen={!!schedulingRecommendation}
+        recommendation={schedulingRecommendation}
+        onClose={() => setSchedulingRecommendation(null)}
+        onConfirm={handleConfirmSchedule}
+        isSubmitting={isSubmittingSchedule}
+      />
     </div>
   );
 }

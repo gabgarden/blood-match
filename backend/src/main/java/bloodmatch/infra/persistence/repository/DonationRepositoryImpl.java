@@ -61,7 +61,7 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     if (donorId == null)
       throw new IllegalArgumentException("Donor id cannot be null");
 
-    return mongoRepository.countByDonorPersonId(donorId.getValue().toString());
+    return mongoRepository.countByDonorPersonIdAndCompletedTrue(donorId.getValue().toString());
   }
 
   @Override

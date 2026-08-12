@@ -4,21 +4,21 @@ export function RequestGuide() {
   const steps = [
     {
       number: 1,
-      title: "Verifique o Tipo Sanguíneo",
+      title: "Tipo Sanguíneo do Paciente",
       description:
-        "Garanta que o tipo sanguíneo selecionado é o correto para evitar desperdício de logística.",
+        "Selecione o tipo sanguíneo necessário. O sistema fará a compatibilização inteligente e notificará automaticamente doadores compatíveis da região.",
     },
     {
       number: 2,
-      title: "Hemocentro correto",
+      title: "Hemocentro de Atendimento",
       description:
-        "Busque o hemocentro pelo nome e confira cidade/UF antes de publicar. Só o local selecionado receberá as doações.",
+        "Escolha a instituição cadastrada onde a coleta será feita. As doações recebidas no local abaterão a meta da requisição por ordem de chegada (FIFO).",
     },
     {
       number: 3,
       title: "Impacto da Urgência",
       description:
-        "Requisições críticas têm prioridade nas recomendações para doadores compatíveis na região.",
+        "Requisições com urgência Crítica ganham destaque prioritário no mapa e no topo da lista de recomendações dos doadores elegíveis.",
     },
   ];
 

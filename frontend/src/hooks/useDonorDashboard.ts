@@ -231,15 +231,26 @@ export function useDonorDashboard({ partyId, hasDonorRole }: DonorDashboardParam
     loadRecommendations();
   }, [hasDonorRole, partyId]);
 
-  async function acceptDonation(requestId: string) {
+  const hasPendingDonation = donationHistory.some(
+    (item) => item.status === "REGISTERED" || item.status === "PENDING",
+  );
+
+  async function acceptDonation(requestId: string, expectedDate?: string) {
     if (!partyId) {
+      return;
+    }
+
+    if (hasPendingDonation) {
+      setErrorMessage(
+        "Você já possui uma doação agendada. Conclua ou reagende a doação atual antes de criar um novo agendamento.",
+      );
       return;
     }
 
     const recommendation = recommendations.find((item) => item.id === requestId);
     if (!recommendation?.organizationId) {
       setErrorMessage(
-        "Esta recomendação não inclui o hemocentro. Atualize a página ou registre pela Doação Externa.",
+        "Esta recomendação não inclui o hemocentro. Atualize a página ou tente novamente.",
       );
       return;
     }
@@ -250,9 +261,10 @@ export function useDonorDashboard({ partyId, hasDonorRole }: DonorDashboardParam
       await createPendingDonation({
         personId: partyId,
         organizationId: recommendation.organizationId,
-        expectedDate: todayIsoDate(),
+        expectedDate: expectedDate || todayIsoDate(),
       });
       setFeedback("Doação pendente agendada com sucesso.");
+      await reloadDonationHistory();
     } catch (error) {
       setErrorMessage(extractApiErrorMessage(error, "Erro ao processar o agendamento."));
     }
@@ -271,6 +283,7 @@ export function useDonorDashboard({ partyId, hasDonorRole }: DonorDashboardParam
     lastDonationHospitalName,
     lastDonationId,
     donationHistory,
+    hasPendingDonation,
     isLoadingDonationHistory,
     donationHistoryError,
     reloadDonationHistory,

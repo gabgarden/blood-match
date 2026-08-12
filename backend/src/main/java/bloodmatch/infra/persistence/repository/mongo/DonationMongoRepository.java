@@ -15,4 +15,6 @@ public interface DonationMongoRepository extends MongoRepository<DonationSchema,
       List<String> organizationIds);
 
   long countByDonorPersonId(String donorPersonId);
+
+  long countByDonorPersonIdAndCompletedTrue(String donorPersonId);
 }
