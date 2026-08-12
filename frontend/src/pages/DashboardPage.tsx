@@ -8,8 +8,6 @@ import { DonorHeroSection } from "../components/dashboard/DonorHeroSection";
 import { LastDonationCard } from "../components/dashboard/LastDonationCard";
 import { InteractiveMapCard } from "../components/dashboard/InteractiveMapCard";
 import { ScheduleDonationModal } from "../components/dashboard/ScheduleDonationModal";
-import { DonationHistory } from "../components/dashboard/DonationHistory";
-import { TodayDonationBanner } from "../components/dashboard/TodayDonationBanner";
 import { CommunityImpactSection } from "../components/dashboard/CommunityImpactSection";
 import { useDonorDashboard, type Recommendation } from "../hooks/useDonorDashboard";
 import { FullPageLoading, InlineAlert } from "../components/ui";
@@ -42,10 +40,6 @@ export default function DonorDashboardPage() {
     lastDonationDate,
     lastDonationHospitalName,
     lastDonationId,
-    donationHistory,
-    isLoadingDonationHistory,
-    donationHistoryError,
-    reloadDonationHistory,
     acceptDonation,
   } = useDonorDashboard({ partyId, hasDonorRole: canAccessDonorDashboard });
 
@@ -95,15 +89,8 @@ export default function DonorDashboardPage() {
         <div className="mx-auto max-w-[1400px] space-y-6">
           {feedback && <InlineAlert tone="success" message={feedback} />}
           {errorMessage && <InlineAlert tone="error" message={errorMessage} />}
-
-          {canAccessDonorDashboard && (
+          {canAccessDonorDashboard && (
             <>
-              {/* Banner de Check-in do Dia */}
-              <TodayDonationBanner
-                hospitalName={lastDonationHospitalName || "Hemocentro de Campos"}
-                bloodType={donorBloodType}
-              />
-
               <section className="grid grid-cols-12 gap-6">
                 <DonorHeroSection
                   userName={displayName}
@@ -218,15 +205,6 @@ export default function DonorDashboardPage() {
                     </div>
                   </div>
                 )}
-
-                <DonationHistory
-                  items={donationHistory}
-                  isLoading={isLoadingDonationHistory}
-                  errorMessage={donationHistoryError}
-                  onChanged={() => {
-                    void reloadDonationHistory();
-                  }}
-                />
               </section>
             </>
           )}

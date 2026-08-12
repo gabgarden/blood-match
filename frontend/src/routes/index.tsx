@@ -7,6 +7,7 @@ import RegisterPage from "../pages/RegisterPage";
 import RecommendationsPage from "../pages/RecommendationsPage";
 import ExternalDonationPage from "../pages/ExternalDonationPage";
 import ProfilePage from "../pages/ProfilePage";
+import DonationsPage from "../pages/DonationsPage";
 import { PublicOnlyRoute, RequireAuth, RoleBasedHomeRedirect } from "./RouteGuards";
 import { RouteErrorPage } from "../components/ui/RouteErrorPage";
 
@@ -53,6 +54,15 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <RecommendationsPage />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: "/donations",
+    errorElement: <RouteErrorPage />,
+    element: (
+      <RequireAuth>
+        <DonationsPage />
       </RequireAuth>
     ),
   },

@@ -4,11 +4,11 @@ import { hasDonorRole, hasRequesterRole, hasAdminRole } from "../../routes/roleR
 
 type DonorDashboardSidebarProps = {
   onLogout: () => void;
-  activeItem?: "donor-dashboard" | "requests" | "new-request" | "external-donation" | "profile";
+  activeItem?: "donor-dashboard" | "donations" | "requests" | "new-request" | "external-donation" | "profile";
 };
 
 type MenuItem = {
-  key: "donor-dashboard" | "requests" | "new-request" | "profile";
+  key: "donor-dashboard" | "donations" | "requests" | "new-request" | "profile";
   icon: string;
   label: string;
   path: string;
@@ -26,7 +26,10 @@ export function DonorDashboardSidebar({
 
   const menuItems: MenuItem[] = [
     ...(showDonorDashboard
-      ? ([{ key: "donor-dashboard", icon: "dashboard", label: "Dashboard", path: "/dashboard" }] as MenuItem[])
+      ? ([
+          { key: "donor-dashboard", icon: "dashboard", label: "Dashboard", path: "/dashboard" },
+          { key: "donations", icon: "water_drop", label: "Minhas Doações", path: "/donations" },
+        ] as MenuItem[])
       : []),
     ...(canAccessRequesterArea || canAccessAdminArea
       ? ([
