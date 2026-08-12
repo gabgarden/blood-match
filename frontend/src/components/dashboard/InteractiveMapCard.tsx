@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import type { Recommendation } from "../../hooks/useDonorDashboard";
 
@@ -91,6 +91,7 @@ function createCustomIcon(color: string, pulse: boolean) {
 export function InteractiveMapCard({ recommendations, onSchedule }: InteractiveMapCardProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const [filterMode, setFilterMode] = useState<"ALL" | "CRITICAL" | "PENDING">("ALL");
   const [selectedCenter, setSelectedCenter] = useState<{
     requestId: string;
     name: string;
@@ -101,6 +102,16 @@ export function InteractiveMapCard({ recommendations, onSchedule }: InteractiveM
     fulfilled: number;
     goal: number;
   } | null>(null);
+
+  const filteredRecommendations = useMemo(() => {
+    if (filterMode === "CRITICAL") {
+      return recommendations.filter((r) => r.urgency === "CRITICAL");
+    }
+    if (filterMode === "PENDING") {
+      return recommendations.filter((r) => !r.goalReached);
+    }
+    return recommendations;
+  }, [recommendations, filterMode]);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -130,8 +141,8 @@ export function InteractiveMapCard({ recommendations, onSchedule }: InteractiveM
       }
     });
 
-    // Adicionar pinos para cada recomendação/hemocentro
-    recommendations.forEach((item, idx) => {
+    // Adicionar pinos para cada recomendação/hemocentro filtrado
+    filteredRecommendations.forEach((item: Recommendation, idx: number) => {
       const [lat, lng] = getCoordinatesForItem(item, idx);
       const config = getUrgencyConfig(item.urgency);
       const icon = createCustomIcon(config.color, config.pulse);
@@ -156,11 +167,11 @@ export function InteractiveMapCard({ recommendations, onSchedule }: InteractiveM
     });
 
     // Ajustar zoom para conter todos os pinos se houver mais de 1
-    if (recommendations.length > 0) {
-      const bounds = recommendations.map((item, idx) => getCoordinatesForItem(item, idx));
+    if (filteredRecommendations.length > 0) {
+      const bounds = filteredRecommendations.map((item: Recommendation, idx: number) => getCoordinatesForItem(item, idx));
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
     }
-  }, [recommendations]);
+  }, [filteredRecommendations]);
 
   const selectedConfig = selectedCenter ? getUrgencyConfig(selectedCenter.urgency) : null;
   const googleMapsUrl = selectedCenter
@@ -200,6 +211,46 @@ export function InteractiveMapCard({ recommendations, onSchedule }: InteractiveM
             Normal
           </span>
         </div>
+      </div>
+
+      {/* Filtros Rápidos Inteligentes */}
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <button
+          type="button"
+          onClick={() => setFilterMode("ALL")}
+          className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${
+            filterMode === "ALL"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-surface-container-low text-secondary hover:bg-surface-container-high"
+          }`}
+        >
+          Todos os locais ({recommendations.length})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setFilterMode("CRITICAL")}
+          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold transition-all ${
+            filterMode === "CRITICAL"
+              ? "bg-red-600 text-white shadow-xs"
+              : "bg-red-50 text-red-700 hover:bg-red-100"
+          }`}
+        >
+          <span className="h-2 w-2 rounded-full bg-red-400 animate-pulse"></span>
+          Apenas Urgência Crítica
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setFilterMode("PENDING")}
+          className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${
+            filterMode === "PENDING"
+              ? "bg-emerald-600 text-white shadow-xs"
+              : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+          }`}
+        >
+          Com meta pendente
+        </button>
       </div>
 
       {/* Container do Mapa Leaflet */}

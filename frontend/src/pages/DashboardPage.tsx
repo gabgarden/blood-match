@@ -9,6 +9,8 @@ import { LastDonationCard } from "../components/dashboard/LastDonationCard";
 import { InteractiveMapCard } from "../components/dashboard/InteractiveMapCard";
 import { ScheduleDonationModal } from "../components/dashboard/ScheduleDonationModal";
 import { DonationHistory } from "../components/dashboard/DonationHistory";
+import { TodayDonationBanner } from "../components/dashboard/TodayDonationBanner";
+import { CommunityImpactSection } from "../components/dashboard/CommunityImpactSection";
 import { useDonorDashboard, type Recommendation } from "../hooks/useDonorDashboard";
 import { FullPageLoading, InlineAlert } from "../components/ui";
 import { useRoleResolution } from "../hooks/useRoleResolution";
@@ -96,6 +98,12 @@ export default function DonorDashboardPage() {
 
           {canAccessDonorDashboard && (
             <>
+              {/* Banner de Check-in do Dia */}
+              <TodayDonationBanner
+                hospitalName={lastDonationHospitalName || "Hemocentro de Campos"}
+                bloodType={donorBloodType}
+              />
+
               <section className="grid grid-cols-12 gap-6">
                 <DonorHeroSection
                   userName={displayName}
@@ -114,6 +122,9 @@ export default function DonorDashboardPage() {
 
               {/* Mapa Interativo de Hemocentros e Urgências */}
               <InteractiveMapCard recommendations={recommendations} onSchedule={handleOpenScheduleModal} />
+
+              {/* Painel de Transparência e Impacto da Comunidade */}
+              <CommunityImpactSection />
 
               <section className="space-y-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
