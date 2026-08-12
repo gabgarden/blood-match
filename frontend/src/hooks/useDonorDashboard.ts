@@ -19,6 +19,8 @@ export type Recommendation = {
   goalBloodBags: number | null;
   fulfilledBloodBags: number | null;
   goalReached: boolean;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 type RecommendationApiItem = {
@@ -33,6 +35,8 @@ type RecommendationApiItem = {
   goalBloodBags?: number | string;
   fulfilledBloodBags?: number | string;
   goalReached?: boolean;
+  latitude?: number | string | null;
+  longitude?: number | string | null;
 };
 
 function toNumberOrNull(value: number | string | null | undefined): number | null {
@@ -76,6 +80,8 @@ function normalizeRecommendation(item: RecommendationApiItem, index: number): Re
     goalBloodBags: toNumberOrNull(item.goalBloodBags),
     fulfilledBloodBags: toNumberOrNull(item.fulfilledBloodBags),
     goalReached: item.goalReached === true,
+    latitude: toNumberOrNull(item.latitude),
+    longitude: toNumberOrNull(item.longitude),
   };
 }
 

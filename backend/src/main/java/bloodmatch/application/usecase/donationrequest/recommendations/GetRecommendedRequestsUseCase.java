@@ -73,6 +73,10 @@ public class GetRecommendedRequestsUseCase {
 
   private OutputItem toOutput(DonationRequest request, Donor donor) {
     Double distance = distanceKm(donor, request);
+    Address address = request.getBloodCenter().getOrganization().getAddress();
+    Double latitude = address != null ? address.getLatitude() : null;
+    Double longitude = address != null ? address.getLongitude() : null;
+
     return new OutputItem(
         request.getId().getValue().toString(),
         request.getBloodCenter().getOrganization().getId().getValue().toString(),
@@ -83,7 +87,9 @@ public class GetRecommendedRequestsUseCase {
         distance != null ? Math.round(distance * 10.0) / 10.0 : null,
         request.getGoalBloodBags(),
         request.getFulfilledBloodBags(),
-        request.isGoalReached());
+        request.isGoalReached(),
+        latitude,
+        longitude);
   }
 
   private static Double distanceKm(Donor donor, DonationRequest request) {
@@ -108,6 +114,8 @@ public class GetRecommendedRequestsUseCase {
       Double distanceInKm,
       int goalBloodBags,
       int fulfilledBloodBags,
-      boolean goalReached) {
+      boolean goalReached,
+      Double latitude,
+      Double longitude) {
   }
 }

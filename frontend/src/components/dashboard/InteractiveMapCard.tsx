@@ -24,12 +24,15 @@ const KNOWN_COORDINATES: Record<string, [number, number]> = {
   "Hospital Escola Álvaro Alvim": [-21.76425, -41.33512],
 };
 
-function getCoordinates(name: string, index: number): [number, number] {
-  const known = KNOWN_COORDINATES[name.trim()];
+function getCoordinatesForItem(item: Recommendation, index: number): [number, number] {
+  if (item.latitude != null && item.longitude != null) {
+    return [item.latitude, item.longitude];
+  }
+  const known = KNOWN_COORDINATES[item.bloodCenterName.trim()];
   if (known) {
     return known;
   }
-  // Offset leve se for um novo hemocentro
+  // Offset leve se for um novo hemocentro sem coordenadas no banco
   const angle = (index * 2 * Math.PI) / 8;
   const radius = 0.015;
   return [BASE_LAT + Math.sin(angle) * radius, BASE_LNG + Math.cos(angle) * radius];
@@ -127,7 +130,7 @@ export function InteractiveMapCard({ recommendations }: InteractiveMapCardProps)
 
     // Adicionar pinos para cada recomendação/hemocentro
     recommendations.forEach((item, idx) => {
-      const [lat, lng] = getCoordinates(item.bloodCenterName, idx);
+      const [lat, lng] = getCoordinatesForItem(item, idx);
       const config = getUrgencyConfig(item.urgency);
       const icon = createCustomIcon(config.color, config.pulse);
 
@@ -151,7 +154,7 @@ export function InteractiveMapCard({ recommendations }: InteractiveMapCardProps)
 
     // Ajustar zoom para conter todos os pinos se houver mais de 1
     if (recommendations.length > 0) {
-      const bounds = recommendations.map((item, idx) => getCoordinates(item.bloodCenterName, idx));
+      const bounds = recommendations.map((item, idx) => getCoordinatesForItem(item, idx));
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
     }
   }, [recommendations]);

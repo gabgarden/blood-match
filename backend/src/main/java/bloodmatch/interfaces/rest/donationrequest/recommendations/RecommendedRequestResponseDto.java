@@ -17,7 +17,9 @@ public record RecommendedRequestResponseDto(
     @Schema(description = "Distance in km") Double distanceInKm,
     @Schema(description = "Goal blood bags") int goalBloodBags,
     @Schema(description = "Fulfilled blood bags") int fulfilledBloodBags,
-    @Schema(description = "Whether goal was reached") boolean goalReached) {
+    @Schema(description = "Whether goal was reached") boolean goalReached,
+    @Schema(description = "Latitude coordinate") Double latitude,
+    @Schema(description = "Longitude coordinate") Double longitude) {
 
   public static RecommendedRequestResponseDto from(OutputItem item) {
     return new RecommendedRequestResponseDto(
@@ -30,6 +32,8 @@ public record RecommendedRequestResponseDto(
         item.distanceInKm(),
         item.goalBloodBags(),
         item.fulfilledBloodBags(),
-        item.goalReached());
+        item.goalReached(),
+        item.latitude(),
+        item.longitude());
   }
 }
