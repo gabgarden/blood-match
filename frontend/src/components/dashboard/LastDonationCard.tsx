@@ -58,7 +58,7 @@ export function LastDonationCard({
           </div>
         ) : (
           <p className="mt-3 text-sm text-white/85">
-            Ainda não há doações registradas nesta conta. Você pode registrar uma doação externa a qualquer momento.
+            Ainda não há doações registradas nesta conta.
           </p>
         )}
 

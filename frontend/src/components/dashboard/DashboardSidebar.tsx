@@ -62,16 +62,6 @@ export function DonorDashboardSidebar({
       </nav>
 
       <div className="space-y-2 border-t border-surface-container-high pt-4">
-        {canAccessDonorDashboard && (
-          <Link
-            to="/donations/external/new"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-bold text-white shadow-lg shadow-primary/20"
-          >
-            <span className="material-symbols-outlined">add</span>
-            Doação Externa
-          </Link>
-        )}
-
         <button
           type="button"
           onClick={onLogout}

@@ -86,13 +86,6 @@ export function DonorHeroSection({
             <span className="material-symbols-outlined text-base text-secondary">manage_accounts</span>
             Editar perfil
           </Link>
-          <Link
-            to="/donations/external/new"
-            className="inline-flex items-center gap-1 rounded-xl bg-[#fff2f0] px-4 py-2.5 text-sm font-bold text-primary transition-colors hover:bg-[#ffe4e1]"
-          >
-            <span className="material-symbols-outlined text-base">add</span>
-            Doação externa
-          </Link>
           {canDonateNow && (
             <Link
               to="/dashboard/recommendations"

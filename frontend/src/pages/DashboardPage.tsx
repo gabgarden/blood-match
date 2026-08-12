@@ -180,12 +180,6 @@ export default function DonorDashboardPage() {
                           </p>
                         </div>
                       </div>
-                      <Link
-                        to="/donations/external/new"
-                        className="inline-flex items-center justify-center gap-1 rounded-xl bg-[#fff2f0] px-4 py-2.5 text-sm font-bold text-primary"
-                      >
-                        Registrar doação externa
-                      </Link>
                     </div>
                   </div>
                 )}
