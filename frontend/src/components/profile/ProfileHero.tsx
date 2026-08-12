@@ -80,8 +80,8 @@ export function ProfileHero({
         <div className="absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-[#eaf3f7] opacity-80" />
       </div>
 
-      <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex items-start gap-4">
+      <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-start gap-4 min-w-0 flex-1">
           <div className="relative flex flex-col items-center shrink-0">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-pulse-gradient text-white shadow-md">
               {avatarIcon ? (
@@ -210,28 +210,28 @@ export function ProfileHero({
         </div>
 
         {isDonor && (
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full lg:w-auto lg:shrink-0">
-            <div className="rounded-2xl bg-surface-container-low px-2.5 py-3 sm:px-3.5 sm:py-4 text-center">
-              <p className="font-headline text-xl sm:text-2xl font-black text-primary">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5 shrink-0 self-center">
+            <div className="rounded-2xl bg-surface-container-low px-2 py-2.5 sm:px-3 sm:py-3.5 text-center min-w-[4rem] sm:min-w-[5rem]">
+              <p className="font-headline text-lg sm:text-2xl font-black text-primary">
                 {typeof livesImpacted === "number" ? livesImpacted : "—"}
               </p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-secondary">Vidas</p>
+              <p className="mt-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-secondary">Vidas</p>
             </div>
-            <div className="rounded-2xl bg-surface-container-low px-2.5 py-3 sm:px-3.5 sm:py-4 text-center">
+            <div className="rounded-2xl bg-surface-container-low px-2 py-2.5 sm:px-3 sm:py-3.5 text-center min-w-[4rem] sm:min-w-[5rem]">
               {canDonateNow ? (
-                <p className="font-headline text-base sm:text-lg font-black text-primary leading-tight">Pronto</p>
+                <p className="font-headline text-sm sm:text-lg font-black text-primary leading-tight">Pronto</p>
               ) : (
-                <p className="font-headline text-xl sm:text-2xl font-black text-on-surface">{daysRemaining}</p>
+                <p className="font-headline text-lg sm:text-2xl font-black text-on-surface">{daysRemaining}</p>
               )}
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-secondary">
+              <p className="mt-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-secondary">
                 {canDonateNow ? "Para doar" : "Dias"}
               </p>
             </div>
-            <div className="rounded-2xl bg-surface-container-low px-2.5 py-3 sm:px-3.5 sm:py-4 text-center">
-              <p className="font-headline text-xs sm:text-sm font-black text-on-surface leading-snug">
+            <div className="rounded-2xl bg-surface-container-low px-2 py-2.5 sm:px-3 sm:py-3.5 text-center min-w-[4rem] sm:min-w-[5rem]">
+              <p className="font-headline text-[10px] sm:text-xs font-black text-on-surface leading-tight truncate">
                 {formatDate(lastDonationDate)}
               </p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-secondary">Última</p>
+              <p className="mt-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-secondary">Última</p>
             </div>
           </div>
         )}

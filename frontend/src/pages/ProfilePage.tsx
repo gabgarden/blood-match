@@ -236,13 +236,6 @@ export default function ProfilePage() {
             <>
               {canAccessDonorArea ? (
                 <>
-                  <DonorBadgesSection
-                    bloodType={bloodType}
-                    livesImpacted={livesImpacted}
-                    daysRemaining={daysRemaining}
-                    lastDonationDate={lastDonationDate}
-                  />
-
                   <ProfileSection
                     icon="bloodtype"
                     title="Dados de doação"
@@ -347,6 +340,13 @@ export default function ProfilePage() {
                       </AppButton>
                     </form>
                   </ProfileSection>
+
+                  <DonorBadgesSection
+                    bloodType={bloodType}
+                    livesImpacted={livesImpacted}
+                    daysRemaining={daysRemaining}
+                    lastDonationDate={lastDonationDate}
+                  />
                 </>
               ) : (
                 <ProfileSection
