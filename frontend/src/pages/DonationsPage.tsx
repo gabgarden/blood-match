@@ -160,14 +160,21 @@ export default function DonationsPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleCreateExternalDonation}
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-[#920f16] transition-colors"
-                >
-                  <span className="material-symbols-outlined text-base">add</span>
-                  Registrar Doação Externa
-                </button>
+                {isEligibleToDonate ? (
+                  <button
+                    type="button"
+                    onClick={handleCreateExternalDonation}
+                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-[#920f16] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-base">add</span>
+                    Registrar Doação Externa
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-xs font-bold text-amber-800">
+                    <span className="material-symbols-outlined text-sm">hourglass_top</span>
+                    <span>Intervalo de descanso ativo ({waitingDays} {waitingDays === 1 ? "dia" : "dias"})</span>
+                  </div>
+                )}
               </div>
             </div>
 

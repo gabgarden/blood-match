@@ -4,6 +4,7 @@ type LastDonationCardProps = {
   lastDonationDate: string | null;
   lastDonationHospitalName: string | null;
   hasDonation: boolean;
+  isEligibleToDonate?: boolean;
   onCreateExternalDonation: () => void;
 };
 
@@ -28,6 +29,7 @@ export function LastDonationCard({
   lastDonationDate,
   lastDonationHospitalName,
   hasDonation,
+  isEligibleToDonate = true,
   onCreateExternalDonation,
 }: LastDonationCardProps) {
   const formattedDate = formatDate(lastDonationDate);
@@ -62,14 +64,21 @@ export function LastDonationCard({
           </p>
         )}
 
-        <AppButton
-          variant="light"
-          fullWidth
-          className="mt-8"
-          onClick={onCreateExternalDonation}
-        >
-          {hasDonation ? "Registrar outra doação" : "Registrar doação externa"}
-        </AppButton>
+        {isEligibleToDonate ? (
+          <AppButton
+            variant="light"
+            fullWidth
+            className="mt-8"
+            onClick={onCreateExternalDonation}
+          >
+            {hasDonation ? "Registrar outra doação" : "Registrar doação externa"}
+          </AppButton>
+        ) : (
+          <div className="mt-8 flex items-center justify-center gap-2 rounded-xl bg-white/15 px-4 py-3 text-xs font-bold text-white backdrop-blur-md border border-white/20">
+            <span className="material-symbols-outlined text-sm">hourglass_top</span>
+            <span>Intervalo de descanso ativo</span>
+          </div>
+        )}
       </div>
     </section>
   );

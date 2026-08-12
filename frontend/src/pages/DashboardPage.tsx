@@ -103,6 +103,7 @@ export default function DonorDashboardPage() {
                   lastDonationDate={lastDonationDate}
                   lastDonationHospitalName={lastDonationHospitalName}
                   hasDonation={!!lastDonationId}
+                  isEligibleToDonate={isEligibleToDonate}
                   onCreateExternalDonation={handleCreateExternalDonation}
                 />
               </section>

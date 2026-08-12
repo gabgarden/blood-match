@@ -34,55 +34,52 @@ function formatDate(input: string | null): string {
 
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
-    month: "short",
+    month: "long",
     year: "numeric",
   }).format(parsed);
 }
 
-function getStatusVisual(status: string): { label: string; className: string } {
+function isPendingStatus(status: string): boolean {
+  const normalized = status.trim().toUpperCase();
+  return ["SCHEDULED", "PENDING", "AGENDADO", "EM_ANDAMENTO"].includes(normalized);
+}
+
+function getStatusBadge(status: string) {
   const normalized = status.trim().toUpperCase();
 
   if (["COMPLETED", "CONCLUIDO", "CONCLUÍDO", "DONE"].includes(normalized)) {
     return {
       label: "Concluída",
-      className: "bg-emerald-100 text-emerald-700",
+      bgClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      icon: "check_circle",
     };
   }
 
   if (["SCHEDULED", "PENDING", "AGENDADO", "EM_ANDAMENTO"].includes(normalized)) {
     return {
-      label: "Pendente",
-      className: "bg-amber-100 text-amber-700",
+      label: "Pendente / Agendada",
+      bgClass: "bg-amber-50 text-amber-800 border-amber-200",
+      icon: "schedule",
     };
   }
 
   if (["CANCELLED", "CANCELED", "CANCELADO"].includes(normalized)) {
     return {
       label: "Cancelada",
-      className: "bg-rose-100 text-rose-700",
-    };
-  }
-
-  if (normalized === "REGISTERED") {
-    return {
-      label: "Registrada",
-      className: "bg-surface-container-high text-secondary",
+      bgClass: "bg-rose-50 text-rose-700 border-rose-200",
+      icon: "cancel",
     };
   }
 
   return {
-    label: status || "Registrada",
-    className: "bg-surface-container-high text-secondary",
+    label: "Registrada",
+    bgClass: "bg-slate-100 text-slate-700 border-slate-200",
+    icon: "verified",
   };
 }
 
 function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
-}
-
-function isPendingStatus(status: string): boolean {
-  const normalized = status.trim().toUpperCase();
-  return ["SCHEDULED", "PENDING", "AGENDADO", "EM_ANDAMENTO"].includes(normalized);
 }
 
 export function DonationHistory({ items, isLoading, errorMessage, onChanged }: DonationHistoryProps) {
@@ -102,10 +99,7 @@ export function DonationHistory({ items, isLoading, errorMessage, onChanged }: D
   }
 
   function closeManage() {
-    if (isSubmitting) {
-      return;
-    }
-
+    if (isSubmitting) return;
     setSelectedDonation(null);
     setActionError(null);
     setActionFeedback(null);
@@ -132,16 +126,14 @@ export function DonationHistory({ items, isLoading, errorMessage, onChanged }: D
       }
 
       onChanged?.();
-      setTimeout(() => {
-        setSelectedDonation(null);
-      }, 700);
+      setTimeout(() => setSelectedDonation(null), 700);
     } catch (error) {
       setActionError(
         extractApiErrorMessage(
           error,
           mode === "complete"
-            ? "Não foi possível concluir a doação. Ela pode já estar concluída."
-            : "Não foi possível reagendar. Só doações pendentes podem ser reagendadas.",
+            ? "Não foi possível concluir a doação."
+            : "Não foi possível reagendar.",
         ),
       );
     } finally {
@@ -150,89 +142,98 @@ export function DonationHistory({ items, isLoading, errorMessage, onChanged }: D
   }
 
   return (
-    <section className="space-y-4">
-      <div>
-        <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-surface">Histórico de doações</h2>
-        <p className="mt-1 text-sm text-text-secondary">
-          Conclua ou reagende doações pendentes quando necessário.
-        </p>
+    <section className="space-y-4 rounded-[2rem] border border-surface-container-high bg-white p-6 shadow-sm">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-headline text-xl font-extrabold tracking-tight text-on-surface flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-xl">history</span>
+            Histórico Completo de Doações
+          </h2>
+          <p className="mt-0.5 text-xs text-text-secondary">
+            Registro detalhado de todas as suas doações e comprovantes salvos.
+          </p>
+        </div>
       </div>
 
       {actionFeedback && !selectedDonation && <InlineAlert tone="success" message={actionFeedback} />}
 
       {isLoading && (
-        <div className="rounded-[2rem] border border-surface-container-high bg-white p-10 text-center">
+        <div className="rounded-2xl border border-surface-container-high bg-surface-container-lowest p-8 text-center">
           <span className="material-symbols-outlined animate-spin text-3xl text-primary">progress_activity</span>
-          <p className="mt-3 text-sm text-text-secondary">Carregando histórico...</p>
+          <p className="mt-2 text-xs text-text-secondary">Carregando histórico...</p>
         </div>
       )}
 
       {!isLoading && errorMessage && <InlineAlert tone="error" message={errorMessage} />}
 
       {!isLoading && !errorMessage && items.length === 0 && (
-        <div className="rounded-[2rem] border border-dashed border-surface-container-highest bg-white px-6 py-12 text-center">
+        <div className="rounded-2xl border border-dashed border-surface-container-highest p-8 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff2f0] text-primary">
             <span className="material-symbols-outlined text-2xl">water_drop</span>
           </div>
-          <p className="mt-4 font-headline text-lg font-bold text-on-surface">Nenhuma doação registrada</p>
-          <p className="mt-1 text-sm text-text-secondary">
-            Seu histórico aparece aqui após agendar ou registrar uma doação.
+          <p className="mt-3 font-headline text-base font-bold text-on-surface">Nenhuma doação registrada</p>
+          <p className="mt-1 text-xs text-text-secondary">
+            Seu histórico de bolsas doadas aparecerá listado aqui.
           </p>
         </div>
       )}
 
       {!isLoading && !errorMessage && items.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="divide-y divide-surface-container-high border-t border-surface-container-high mt-4">
           {items.map((item) => {
-            const statusVisual = getStatusVisual(item.status);
+            const badge = getStatusBadge(item.status);
             const pending = isPendingStatus(item.status);
 
             return (
-              <article
+              <div
                 key={item.id}
-                className="flex flex-col gap-4 rounded-[1.75rem] border border-surface-container-high bg-white p-5"
+                className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between transition-colors hover:bg-surface-container-low/50 px-2 rounded-xl"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff2f0]">
-                      <span className="material-symbols-outlined text-base text-primary">local_hospital</span>
-                    </div>
-                    <p className="truncate text-sm font-bold text-on-surface">{item.location}</p>
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-primary">
+                    <span className="material-symbols-outlined text-xl">local_hospital</span>
                   </div>
 
-                  <span
-                    className={`shrink-0 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${statusVisual.className}`}
-                  >
-                    {statusVisual.label}
+                  <div className="min-w-0">
+                    <p className="truncate font-headline text-sm font-bold text-on-surface">
+                      {item.location}
+                    </p>
+                    <p className="text-xs text-text-secondary flex items-center gap-1 mt-0.5">
+                      <span className="material-symbols-outlined text-xs">calendar_today</span>
+                      {formatDate(item.donationDate)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold border ${badge.bgClass}`}>
+                    <span className="material-symbols-outlined text-sm">{badge.icon}</span>
+                    {badge.label}
                   </span>
-                </div>
 
-                <div className="rounded-xl bg-surface-container-low px-3 py-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">Data</p>
-                  <p className="mt-0.5 text-sm font-bold text-on-surface">{formatDate(item.donationDate)}</p>
+                  {/* Ações aparecem APENAS se a doação for realmente PENDENTE */}
+                  {pending && (
+                    <div className="flex items-center gap-2">
+                      <AppButton
+                        type="button"
+                        variant="secondary"
+                        className="text-xs py-1.5 px-3"
+                        onClick={() => openManage(item, "complete")}
+                      >
+                        Concluir
+                      </AppButton>
+                      <AppButton
+                        type="button"
+                        variant="secondary"
+                        className="text-xs py-1.5 px-3"
+                        onClick={() => openManage(item, "reschedule")}
+                      >
+                        Reagendar
+                      </AppButton>
+                    </div>
+                  )}
                 </div>
-
-                <div className="mt-auto grid grid-cols-2 gap-2">
-                  <AppButton
-                    type="button"
-                    variant="secondary"
-                    className="text-xs py-2"
-                    disabled={!pending}
-                    onClick={() => openManage(item, "complete")}
-                  >
-                    Concluir
-                  </AppButton>
-                  <AppButton
-                    type="button"
-                    variant="secondary"
-                    className="text-xs py-2"
-                    disabled={!pending}
-                    onClick={() => openManage(item, "reschedule")}
-                  >
-                    Reagendar
-                  </AppButton>
-                </div>
-              </article>
+              </div>
             );
           })}
         </div>
