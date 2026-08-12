@@ -23,3 +23,29 @@ body {
   backdrop-filter: blur(20px);
   background-color: rgba(249, 249, 251, 0.8);
 }
+
+/* Custom Leaflet Styling for BloodMatch */
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background-color: #ffffff !important;
+  color: #b91c1c !important;
+  border-bottom: 1px solid #f3f3f5 !important;
+  font-weight: bold !important;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background-color: #fff2f0 !important;
+  color: #920f16 !important;
+}
+
+.leaflet-container {
+  font-family: 'Public Sans', sans-serif !important;
+}
