@@ -50,3 +50,39 @@ cp .env.production .env
 
 docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d --build
 ```
+
+---
+
+## 🔑 Credenciais e Logins de Teste (Seed Data)
+
+> **Senha padrão para todos os usuários:** `Senha12345!`
+
+### 🩸 Doadores de Sangue (Pessoas Físicas)
+
+| Nome | E-mail / Login | Tipo Sanguíneo |
+|---|---|---|
+| Ana Silva | `ana.silva@blood.local` | `O-` |
+| Bruno Santos | `bruno.santos@blood.local` | `O+` |
+| Carla Oliveira | `carla.oliveira@blood.local` | `A-` |
+| Daniel Costa | `daniel.costa@blood.local` | `A+` |
+| Fernanda Lima | `fernanda.lima@blood.local` | `B-` |
+| Gabriel Almeida | `gabriel.almeida@blood.local` | `B+` |
+| Helena Rocha | `helena.rocha@blood.local` | `AB-` |
+| Igor Pereira | `igor.pereira@blood.local` | `AB+` |
+| Juliana Martins | `juliana.martins@blood.local` | `O+` |
+| Lucas Ferreira | `lucas.ferreira@blood.local` | `A+` |
+
+### 🏥 Hemocentros / Hospitais (Organizações)
+
+| Nome da Instituição | E-mail / Login |
+|---|---|
+| Hospital Ferreira Machado | `hemo1@blood.local` |
+| Hemocentro Regional de Campos | `hemo2@blood.local` |
+| Hospital Geral Benê (Beneficência Portuguesa) | `hemo3@blood.local` |
+| Núcleo Medicina Transfusional (Banco de Sangue) | `hemo4@blood.local` |
+| Santa Casa de Misericórdia de Campos | `hemo5@blood.local` |
+| Hospital Unimed Campos | `hemo6@blood.local` |
+| Hospital dos Plantadores de Cana | `hemo7@blood.local` |
+| Hospital Geral de Guarus | `hemo8@blood.local` |
+| Hospital Geral Dr. Beda | `hemo9@blood.local` |
+| Hospital Escola Álvaro Alvim | `hemo10@blood.local` |
