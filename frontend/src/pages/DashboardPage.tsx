@@ -6,6 +6,8 @@ import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar"
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
 import { DonorHeroSection } from "../components/dashboard/DonorHeroSection";
 import { LastDonationCard } from "../components/dashboard/LastDonationCard";
+import { InteractiveMapCard } from "../components/dashboard/InteractiveMapCard";
+import { BloodStockSemaphoreWidget } from "../components/dashboard/BloodStockSemaphoreWidget";
 import { DonationHistory } from "../components/dashboard/DonationHistory";
 import { useDonorDashboard } from "../hooks/useDonorDashboard";
 import { FullPageLoading, InlineAlert } from "../components/ui";
@@ -90,6 +92,12 @@ export default function DonorDashboardPage() {
                   onCreateExternalDonation={handleCreateExternalDonation}
                 />
               </section>
+
+              {/* Mapa Interativo de Hemocentros e Urgências */}
+              <InteractiveMapCard recommendations={recommendations} />
+
+              {/* Semáforo de Estoque por Tipo Sanguíneo */}
+              <BloodStockSemaphoreWidget />
 
               <section className="space-y-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
