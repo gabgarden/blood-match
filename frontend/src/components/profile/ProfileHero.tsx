@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { AvatarIconSelector } from "./AvatarIconSelector";
+
 type ProfileHeroProps = {
   displayName: string;
   bloodType: string | null;
@@ -9,6 +12,7 @@ type ProfileHeroProps = {
   lastDonationDate: string | null;
   isDonor: boolean;
   avatarIcon?: string | null;
+  onSelectAvatarIcon?: (iconId: string) => void;
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -56,7 +60,9 @@ export function ProfileHero({
   lastDonationDate,
   isDonor,
   avatarIcon,
+  onSelectAvatarIcon,
 }: ProfileHeroProps) {
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
   const name = displayName.trim() || "Seu perfil";
   const canDonateNow = (daysRemaining ?? 0) <= 0;
 
@@ -67,11 +73,54 @@ export function ProfileHero({
 
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-pulse-gradient text-white shadow-md">
-            {avatarIcon ? (
-              <span className="material-symbols-outlined text-3xl">{avatarIcon}</span>
-            ) : (
-              <span className="font-headline text-xl font-black tracking-wide">{initialsFromName(name)}</span>
+          <div className="relative flex flex-col items-center shrink-0">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-pulse-gradient text-white shadow-md">
+              {avatarIcon ? (
+                <span className="material-symbols-outlined text-3xl">{avatarIcon}</span>
+              ) : (
+                <span className="font-headline text-xl font-black tracking-wide">{initialsFromName(name)}</span>
+              )}
+            </div>
+
+            {onSelectAvatarIcon && (
+              <div className="relative mt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsPickerOpen((prev) => !prev)}
+                  className="flex items-center gap-1 rounded-full border border-surface-container-high bg-surface-container-low px-2.5 py-0.5 text-[11px] font-bold text-secondary transition-all hover:bg-[#fff2f0] hover:text-primary hover:border-[#f5d5d1] shadow-xs"
+                  title="Alterar ícone do perfil"
+                >
+                  <span className="material-symbols-outlined text-xs">edit</span>
+                  <span>Alterar</span>
+                </button>
+
+                {isPickerOpen && (
+                  <>
+                    <div className="fixed inset-0 z-20" onClick={() => setIsPickerOpen(false)} />
+                    <div className="absolute left-0 top-full mt-2 z-30 w-56 rounded-2xl border border-surface-container-high bg-white p-3 shadow-xl animate-in fade-in zoom-in-95 duration-150">
+                      <div className="mb-2 flex items-center justify-between px-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">
+                          Ícone do perfil
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setIsPickerOpen(false)}
+                          className="rounded-lg p-0.5 text-gray-400 hover:bg-surface-container-low hover:text-gray-600"
+                        >
+                          <span className="material-symbols-outlined text-sm">close</span>
+                        </button>
+                      </div>
+                      <AvatarIconSelector
+                        selectedIcon={avatarIcon || "water_drop"}
+                        onSelectIcon={(iconId) => {
+                          onSelectAvatarIcon(iconId);
+                          setIsPickerOpen(false);
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
 

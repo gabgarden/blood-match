@@ -17,8 +17,6 @@ import { fetchDonorHeroSummary, updatePartyName } from "../services/partyService
 import { updateDonorProfile, updateDonorRecommendationDistance } from "../services/profileService";
 import { extractApiErrorMessage } from "../utils/apiError";
 
-import { AvatarIconSelector } from "../components/profile/AvatarIconSelector";
-
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const fieldClass =
@@ -230,6 +228,7 @@ export default function ProfilePage() {
               lastDonationDate={lastDonationDate}
               isDonor={canAccessDonorArea}
               avatarIcon={avatarIcon}
+              onSelectAvatarIcon={handleSelectAvatarIcon}
             />
           )}
 
@@ -240,39 +239,32 @@ export default function ProfilePage() {
             <>
               <ProfileSection
                 icon="badge"
-                title="Identidade & Ícone"
-                description="Nome exibido e ícone minimalista da sua conta."
+                title="Identidade"
+                description="Nome exibido da sua conta."
               >
-                <div className="space-y-6">
-                  <AvatarIconSelector
-                    selectedIcon={avatarIcon}
-                    onSelectIcon={handleSelectAvatarIcon}
-                  />
-
-                  <form className="space-y-5 border-t border-surface-container-low pt-5" onSubmit={handleSaveName}>
-                    <div>
-                      <label htmlFor="profile-name" className={labelClass}>
-                        Nome completo
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="profile-name"
-                          className={`${fieldClass} pr-12`}
-                          value={displayName}
-                          onChange={(event) => setDisplayName(event.target.value)}
-                          placeholder="Como você deseja ser chamado"
-                          required
-                        />
-                        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-sm text-gray-400">
-                          person
-                        </span>
-                      </div>
+                <form className="space-y-5" onSubmit={handleSaveName}>
+                  <div>
+                    <label htmlFor="profile-name" className={labelClass}>
+                      Nome completo
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="profile-name"
+                        className={`${fieldClass} pr-12`}
+                        value={displayName}
+                        onChange={(event) => setDisplayName(event.target.value)}
+                        placeholder="Como você deseja ser chamado"
+                        required
+                      />
+                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-sm text-gray-400">
+                        person
+                      </span>
                     </div>
-                    <AppButton type="submit" variant="danger" disabled={isSavingName} className="px-6">
-                      {isSavingName ? "Salvando..." : "Salvar nome"}
-                    </AppButton>
-                  </form>
-                </div>
+                  </div>
+                  <AppButton type="submit" variant="danger" disabled={isSavingName} className="px-6">
+                    {isSavingName ? "Salvando..." : "Salvar nome"}
+                  </AppButton>
+                </form>
               </ProfileSection>
 
               {canAccessDonorArea ? (
