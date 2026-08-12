@@ -10,18 +10,18 @@ type InteractiveMapCardProps = {
 const BASE_LAT = -21.7545;
 const BASE_LNG = -41.3244;
 
-// Mapeamento determinístico de posições para hemocentros conhecidos
+// Mapeamento de coordenadas geográficas reais de hospitais e hemocentros em Campos dos Goytacazes - RJ
 const KNOWN_COORDINATES: Record<string, [number, number]> = {
-  "Hospital Ferreira Machado": [-21.7512, -41.3190],
-  "Hemocentro Regional de Campos": [-21.7525, -41.3195],
-  "Hospital Geral Benê (Beneficência Portuguesa)": [-21.7570, -41.3260],
-  "Núcleo Medicina Transfusional (Banco de Sangue)": [-21.7620, -41.3230],
-  "Santa Casa de Misericórdia de Campos": [-21.7650, -41.3320],
-  "Hospital Unimed Campos": [-21.7610, -41.3290],
-  "Hospital dos Plantadores de Cana": [-21.7580, -41.3210],
-  "Hospital Geral de Guarus": [-21.7390, -41.3390],
-  "Hospital Geral Dr. Beda": [-21.7530, -41.3270],
-  "Hospital Escola Álvaro Alvim": [-21.7640, -41.3350],
+  "Hospital Ferreira Machado": [-21.75122, -41.31905],
+  "Hemocentro Regional de Campos": [-21.75250, -41.31930],
+  "Hospital Geral Benê (Beneficência Portuguesa)": [-21.75698, -41.32623],
+  "Núcleo Medicina Transfusional (Banco de Sangue)": [-21.75412, -41.32785],
+  "Santa Casa de Misericórdia de Campos": [-21.76185, -41.32352],
+  "Hospital Unimed Campos": [-21.76542, -41.33235],
+  "Hospital dos Plantadores de Cana": [-21.75841, -41.32142],
+  "Hospital Geral de Guarus": [-21.73885, -41.33925],
+  "Hospital Geral Dr. Beda": [-21.75382, -41.32765],
+  "Hospital Escola Álvaro Alvim": [-21.76425, -41.33512],
 };
 
 function getCoordinates(name: string, index: number): [number, number] {
