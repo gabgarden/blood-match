@@ -49,7 +49,6 @@ export default function ProfilePage() {
 
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSavingDonor, setIsSavingDonor] = useState(false);
-  const [isSavingDistance, setIsSavingDistance] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -144,7 +143,7 @@ export default function ProfilePage() {
     }
   }
 
-  async function handleSaveDonorProfile(event: React.FormEvent) {
+  async function handleSaveAllPreferences(event: React.FormEvent) {
     event.preventDefault();
     if (!partyId) {
       return;
@@ -152,7 +151,12 @@ export default function ProfilePage() {
 
     const parsedWeight = Number(weight);
     if (!bloodType || Number.isNaN(parsedWeight) || parsedWeight <= 0) {
-      setErrorMessage("Informe tipo sanguíneo e um peso válido.");
+      setErrorMessage("Informe tipo sanguíneo e um peso corporal válido.");
+      return;
+    }
+
+    if (!distanceValid) {
+      setErrorMessage("Informe um raio máximo de geolocalização válido.");
       return;
     }
 
@@ -166,37 +170,13 @@ export default function ProfilePage() {
         bloodType,
         weight: parsedWeight,
       });
-      setFeedback("Dados de doação atualizados.");
+      const distanceResult = await updateDonorRecommendationDistance(partyId, parsedDistance);
+      setMaxDistanceInKm(String(distanceResult.maxDistanceInKm));
+      setFeedback("Configurações e preferências atualizadas com sucesso.");
     } catch (error) {
-      setErrorMessage(extractApiErrorMessage(error, "Não foi possível atualizar o perfil de doador."));
+      setErrorMessage(extractApiErrorMessage(error, "Não foi possível salvar as configurações."));
     } finally {
       setIsSavingDonor(false);
-    }
-  }
-
-  async function handleSaveDistance(event: React.FormEvent) {
-    event.preventDefault();
-    if (!partyId) {
-      return;
-    }
-
-    if (!distanceValid) {
-      setErrorMessage("Informe uma distância máxima válida em km.");
-      return;
-    }
-
-    setIsSavingDistance(true);
-    setFeedback(null);
-    setErrorMessage(null);
-
-    try {
-      const result = await updateDonorRecommendationDistance(partyId, parsedDistance);
-      setMaxDistanceInKm(String(result.maxDistanceInKm));
-      setFeedback("Raio de recomendações atualizado.");
-    } catch (error) {
-      setErrorMessage(extractApiErrorMessage(error, "Não foi possível atualizar a distância."));
-    } finally {
-      setIsSavingDistance(false);
     }
   }
 
@@ -236,108 +216,126 @@ export default function ProfilePage() {
             <>
               {canAccessDonorArea ? (
                 <>
+                  {/* Card Único de Configurações e Preferências */}
                   <ProfileSection
-                    icon="bloodtype"
-                    title="Dados de doação"
-                    description="Tipo sanguíneo e peso usados para elegibilidade e matching."
+                    icon="tune"
+                    title="Configurações & Preferências de Doador"
+                    description="Gerencie seu tipo sanguíneo, peso corporal e raio máximo de geolocalização."
                   >
-                    <form className="space-y-6" onSubmit={handleSaveDonorProfile}>
-                      <div>
-                        <p className={labelClass}>Tipo sanguíneo</p>
-                        <div className="grid grid-cols-4 gap-3">
-                          {bloodTypes.map((type) => (
-                            <button
-                              key={type}
-                              type="button"
-                              onClick={() => setBloodType(type)}
-                              className={`flex items-center justify-center rounded-xl p-3 transition-all ${
-                                bloodType === type
-                                  ? "bg-primary text-white shadow-md"
-                                  : "bg-surface-container-low text-primary hover:bg-[#fff2f0]"
-                              }`}
-                            >
-                              <span className="font-headline text-lg font-black">{type}</span>
-                            </button>
-                          ))}
+                    <form className="space-y-8" onSubmit={handleSaveAllPreferences}>
+                      {/* Bloco 1: Dados de Saúde & Elegibilidade */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 border-b border-surface-container-high pb-2">
+                          <span className="material-symbols-outlined text-primary text-lg">bloodtype</span>
+                          <h3 className="font-headline text-sm font-extrabold text-on-surface uppercase tracking-wider">
+                            Saúde & Elegibilidade
+                          </h3>
+                        </div>
+
+                        <div>
+                          <p className={labelClass}>Tipo Sanguíneo</p>
+                          <div className="grid grid-cols-4 gap-2.5 sm:grid-cols-8">
+                            {bloodTypes.map((type) => (
+                              <button
+                                key={type}
+                                type="button"
+                                onClick={() => setBloodType(type)}
+                                className={`flex flex-col items-center justify-center rounded-xl p-3 transition-all ${
+                                  bloodType === type
+                                    ? "bg-primary text-white shadow-md ring-2 ring-primary/30"
+                                    : "bg-surface-container-low text-primary hover:bg-[#fff2f0] border border-surface-container-high"
+                                }`}
+                              >
+                                <span className="font-headline text-base sm:text-lg font-black">{type}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="max-w-xs">
+                          <label htmlFor="profile-weight" className={labelClass}>
+                            Peso Corporal (kg)
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="profile-weight"
+                              className={`${fieldClass} pr-12`}
+                              type="number"
+                              min="1"
+                              step="0.1"
+                              value={weight}
+                              onChange={(event) => setWeight(event.target.value)}
+                              placeholder="Ex: 72.5"
+                              required
+                            />
+                            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
+                              kg
+                            </span>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="max-w-xs">
-                        <label htmlFor="profile-weight" className={labelClass}>
-                          Peso (kg)
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="profile-weight"
-                            className={`${fieldClass} pr-12`}
-                            type="number"
-                            min="1"
-                            step="0.1"
-                            value={weight}
-                            onChange={(event) => setWeight(event.target.value)}
-                            placeholder="Ex: 72.5"
-                            required
-                          />
-                          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
-                            kg
+                      {/* Bloco 2: Alcance & Geolocalização */}
+                      <div className="space-y-4 pt-2">
+                        <div className="flex items-center justify-between border-b border-surface-container-high pb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-primary text-lg">radar</span>
+                            <h3 className="font-headline text-sm font-extrabold text-on-surface uppercase tracking-wider">
+                              Raio de Geolocalização
+                            </h3>
+                          </div>
+                          <span className="font-headline text-xl font-black text-primary">
+                            {distanceValid ? `${parsedDistance} km` : "—"}
                           </span>
                         </div>
-                      </div>
 
-                      <AppButton type="submit" variant="danger" disabled={isSavingDonor} className="px-6">
-                        {isSavingDonor ? "Salvando..." : "Salvar dados de doação"}
-                      </AppButton>
-                    </form>
-                  </ProfileSection>
+                        <p className="text-xs text-text-secondary">
+                          Pedidos e hemocentros fora desse raio não aparecerão nas suas recomendações.
+                        </p>
 
-                  <ProfileSection
-                    icon="radar"
-                    title="Raio de recomendações"
-                    description="Pedidos fora desse raio não aparecem nas suas recomendações."
-                  >
-                    <form className="space-y-6" onSubmit={handleSaveDistance}>
-                      <div>
-                        <div className="mb-3 flex items-end justify-between gap-3">
-                          <label htmlFor="profile-distance" className={labelClass + " mb-0"}>
-                            Distância máxima
-                          </label>
-                          <p className="font-headline text-2xl font-black text-primary">
-                            {distanceValid ? `${parsedDistance} km` : "—"}
-                          </p>
-                        </div>
+                        <div>
+                          <input
+                            id="profile-distance"
+                            type="range"
+                            min={5}
+                            max={150}
+                            step={5}
+                            value={distanceValid ? parsedDistance : 30}
+                            onChange={(event) => setMaxDistanceInKm(event.target.value)}
+                            className="w-full accent-[#ae131a]"
+                          />
 
-                        <input
-                          id="profile-distance"
-                          type="range"
-                          min={5}
-                          max={150}
-                          step={5}
-                          value={distanceValid ? parsedDistance : 30}
-                          onChange={(event) => setMaxDistanceInKm(event.target.value)}
-                          className="w-full accent-[#ae131a]"
-                        />
-
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {DISTANCE_PRESETS.map((preset) => (
-                            <button
-                              key={preset}
-                              type="button"
-                              onClick={() => setMaxDistanceInKm(String(preset))}
-                              className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
-                                Number(maxDistanceInKm) === preset
-                                  ? "bg-primary text-white"
-                                  : "bg-surface-container-high text-secondary hover:bg-surface-container-highest"
-                              }`}
-                            >
-                              {preset} km
-                            </button>
-                          ))}
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {DISTANCE_PRESETS.map((preset) => (
+                              <button
+                                key={preset}
+                                type="button"
+                                onClick={() => setMaxDistanceInKm(String(preset))}
+                                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                                  Number(maxDistanceInKm) === preset
+                                    ? "bg-primary text-white shadow-xs"
+                                    : "bg-surface-container-low text-secondary border border-surface-container-high hover:bg-surface-container-high"
+                                }`}
+                              >
+                                {preset} km
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
 
-                      <AppButton type="submit" variant="danger" disabled={isSavingDistance || !distanceValid} className="px-6">
-                        {isSavingDistance ? "Salvando..." : "Salvar raio"}
-                      </AppButton>
+                      {/* Botão de Salvar Unificado */}
+                      <div className="pt-4 border-t border-surface-container-high flex justify-end">
+                        <AppButton
+                          type="submit"
+                          variant="danger"
+                          disabled={isSavingDonor || !distanceValid}
+                          className="px-8 py-3 text-sm font-bold shadow-md"
+                        >
+                          <span className="material-symbols-outlined text-base mr-1">save</span>
+                          {isSavingDonor ? "Salvando..." : "Salvar Configurações"}
+                        </AppButton>
+                      </div>
                     </form>
                   </ProfileSection>
 
