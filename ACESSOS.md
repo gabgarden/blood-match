@@ -19,11 +19,12 @@ Guia rápido de URLs, portas, endpoints e configurações de acesso do projeto *
 
 Subindo com `docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d --build`:
 
-| Serviço | Porta Interna | Porta Host | Descrição |
+| Serviço | URL / Endereço Direto | Porta Host | Descrição |
 |---|---|---|---|
-| **Nginx Proxy** | `80` | `8082` | Proxy reverso Nginx servindo o frontend SPA |
-| **Backend API** | `8080` | `8080` | Container da API Java Spring Boot |
-| **Frontend SPA** | `80` | *(Interna)* | Container React estático servido pelo Nginx |
+| **Frontend SPA (Nginx)** | [http://179.198.120.172:8082](http://179.198.120.172:8082) | `8082` | Proxy reverso Nginx servindo o frontend SPA |
+| **Backend API** | [http://179.198.120.172:8080](http://179.198.120.172:8080) | `8080` | Container da API Java Spring Boot |
+| **Swagger UI (Produção)** | [http://179.198.120.172:8080/swagger-ui.html](http://179.198.120.172:8080/swagger-ui.html) | `8080` | Documentação interativa Swagger na VPS |
+| **Domínio Customizado** | `http://meubloodmatch.com` | `80` / `443` | Roteado via Nginx principal da VPS |
 
 ---
 
@@ -45,6 +46,7 @@ docker compose up --build
 ### Produção VPS (Hostinger):
 ```bash
 cp .env.production.example .env.production
+cp .env.production .env
 
 docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d --build
 ```
