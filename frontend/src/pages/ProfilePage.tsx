@@ -17,6 +17,8 @@ import { fetchDonorHeroSummary, updatePartyName } from "../services/partyService
 import { updateDonorProfile, updateDonorRecommendationDistance } from "../services/profileService";
 import { extractApiErrorMessage } from "../utils/apiError";
 
+import { AvatarIconSelector } from "../components/profile/AvatarIconSelector";
+
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const fieldClass =
@@ -42,6 +44,9 @@ export default function ProfilePage() {
   const [livesImpacted, setLivesImpacted] = useState<number | null>(null);
   const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
   const [lastDonationDate, setLastDonationDate] = useState<string | null>(null);
+  const [avatarIcon, setAvatarIcon] = useState<string>(() => {
+    return localStorage.getItem("bloodmatch_avatar_icon") || "water_drop";
+  });
 
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSavingName, setIsSavingName] = useState(false);
@@ -49,6 +54,12 @@ export default function ProfilePage() {
   const [isSavingDistance, setIsSavingDistance] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  function handleSelectAvatarIcon(iconId: string) {
+    setAvatarIcon(iconId);
+    localStorage.setItem("bloodmatch_avatar_icon", iconId);
+    setFeedback("Ícone do perfil atualizado com sucesso.");
+  }
 
   const hasAnyRole = useMemo(
     () => canAccessDonorArea || canAccessRequesterArea || canAccessBloodCenter || roles.length > 0,
@@ -218,6 +229,7 @@ export default function ProfilePage() {
               daysRemaining={daysRemaining}
               lastDonationDate={lastDonationDate}
               isDonor={canAccessDonorArea}
+              avatarIcon={avatarIcon}
             />
           )}
 
@@ -228,32 +240,39 @@ export default function ProfilePage() {
             <>
               <ProfileSection
                 icon="badge"
-                title="Identidade"
-                description="Nome exibido na plataforma e nas comunicações."
+                title="Identidade & Ícone"
+                description="Nome exibido e ícone minimalista da sua conta."
               >
-                <form className="space-y-5" onSubmit={handleSaveName}>
-                  <div>
-                    <label htmlFor="profile-name" className={labelClass}>
-                      Nome completo
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="profile-name"
-                        className={`${fieldClass} pr-12`}
-                        value={displayName}
-                        onChange={(event) => setDisplayName(event.target.value)}
-                        placeholder="Como você deseja ser chamado"
-                        required
-                      />
-                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-sm text-gray-400">
-                        person
-                      </span>
+                <div className="space-y-6">
+                  <AvatarIconSelector
+                    selectedIcon={avatarIcon}
+                    onSelectIcon={handleSelectAvatarIcon}
+                  />
+
+                  <form className="space-y-5 border-t border-surface-container-low pt-5" onSubmit={handleSaveName}>
+                    <div>
+                      <label htmlFor="profile-name" className={labelClass}>
+                        Nome completo
+                      </label>
+                      <div className="relative">
+                        <input
+                          id="profile-name"
+                          className={`${fieldClass} pr-12`}
+                          value={displayName}
+                          onChange={(event) => setDisplayName(event.target.value)}
+                          placeholder="Como você deseja ser chamado"
+                          required
+                        />
+                        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-sm text-gray-400">
+                          person
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <AppButton type="submit" variant="danger" disabled={isSavingName} className="px-6">
-                    {isSavingName ? "Salvando..." : "Salvar nome"}
-                  </AppButton>
-                </form>
+                    <AppButton type="submit" variant="danger" disabled={isSavingName} className="px-6">
+                      {isSavingName ? "Salvando..." : "Salvar nome"}
+                    </AppButton>
+                  </form>
+                </div>
               </ProfileSection>
 
               {canAccessDonorArea ? (

@@ -8,6 +8,7 @@ type ProfileHeroProps = {
   daysRemaining: number | null;
   lastDonationDate: string | null;
   isDonor: boolean;
+  avatarIcon?: string | null;
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -54,6 +55,7 @@ export function ProfileHero({
   daysRemaining,
   lastDonationDate,
   isDonor,
+  avatarIcon,
 }: ProfileHeroProps) {
   const name = displayName.trim() || "Seu perfil";
   const canDonateNow = (daysRemaining ?? 0) <= 0;
@@ -66,7 +68,11 @@ export function ProfileHero({
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-4">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-pulse-gradient text-white shadow-md">
-            <span className="font-headline text-xl font-black tracking-wide">{initialsFromName(name)}</span>
+            {avatarIcon ? (
+              <span className="material-symbols-outlined text-3xl">{avatarIcon}</span>
+            ) : (
+              <span className="font-headline text-xl font-black tracking-wide">{initialsFromName(name)}</span>
+            )}
           </div>
 
           <div className="min-w-0 space-y-2">
