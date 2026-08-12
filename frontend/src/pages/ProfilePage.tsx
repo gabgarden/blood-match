@@ -16,6 +16,7 @@ import {
 import { fetchDonorHeroSummary, updatePartyName } from "../services/partyService";
 import { updateDonorProfile, updateDonorRecommendationDistance } from "../services/profileService";
 import { extractApiErrorMessage } from "../utils/apiError";
+import { DonorBadgesSection } from "../components/profile/DonorBadgesSection";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -235,6 +236,13 @@ export default function ProfilePage() {
             <>
               {canAccessDonorArea ? (
                 <>
+                  <DonorBadgesSection
+                    bloodType={bloodType}
+                    livesImpacted={livesImpacted}
+                    daysRemaining={daysRemaining}
+                    lastDonationDate={lastDonationDate}
+                  />
+
                   <ProfileSection
                     icon="bloodtype"
                     title="Dados de doação"
