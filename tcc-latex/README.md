@@ -18,6 +18,12 @@ tcc-latex/
 │   ├── 05-estudo-de-caso.tex
 │   ├── 06-avaliacao.tex
 │   └── 07-consideracoes.tex
+├── apendices/
+│   ├── A-regras-dominio.tex
+│   ├── B-agregados.tex
+│   ├── C-fulfillment-matching.tex
+│   ├── D-dip-caso-uso.tex
+│   └── codigo/                    # trechos Java das listagens
 └── figuras/
 ```
 
@@ -31,13 +37,18 @@ Ordem dos capítulos (orientação da banca):
 6. Avaliação  
 7. Considerações finais  
 
+Apêndices (código-fonte elaborado pelos autores — NBR 14724):
+
+- **A** — tipagem sanguínea e elegibilidade do doador  
+- **B** — invariantes dos agregados `DonationRequest` e `Donation`  
+- **C** — alocação FIFO e matching de doadores  
+- **D** — inversão de dependência (repositório + caso de uso)  
 
 ## O que já está pronto
 
 - Capa, folha de rosto, folha de aprovação, listas, resumo/abstract e sumário
-- Capítulos **1 a 4** integralmente convertidos
-- Capítulo **5** até a modelagem de domínio (seções 5.5 e 5.6 marcadas como TODO)
-- Capítulos **6 e 7** com estrutura pronta para preenchimento
+- Capítulos **1 a 7** preenchidos (avaliação e considerações finais com resultados da suíte de testes)
+- Apêndices **A–D** com listagens dos trechos de código mais relevantes (domínio, agregados, FIFO/matching e DIP)
 - Referências em BibTeX com citações autor-data (`\citeonline{...}`)
 - Fontes de ilustrações no formato exigido pela NBR 14724:2024  
   (`Elaborado pelos próprios autores`)

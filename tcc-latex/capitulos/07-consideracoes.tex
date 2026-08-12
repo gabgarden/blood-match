@@ -1,15 +1,56 @@
 \chapter{Considerações finais}
 
-Este capítulo retomará, na versão final do trabalho, a problemática apresentada na Introdução à luz dos resultados obtidos com o desenvolvimento e a avaliação da API. Como a avaliação descrita no Capítulo~6 ainda está em andamento, as seções a seguir estruturam o raciocínio que orientará essas considerações, sem antecipar conclusões sobre resultados ainda não obtidos.
+Este capítulo retoma a problemática apresentada na Introdução à luz do sistema desenvolvido (Capítulo~5) e dos resultados da avaliação (Capítulo~6), discutindo o alcance dos objetivos, as principais contribuições do trabalho e direcionamentos para pesquisas e evoluções futuras.
 
 \section{Alcance dos objetivos}
 
-Os objetivos específicos O1 (mapeamento do processo de doação com DDD) e O2 (identificação de sistemas similares) já foram integralmente endereçados, respectivamente, pela modelagem de domínio apresentada no Capítulo~5 e pelo mapeamento sistemático da literatura conduzido no Capítulo~3. O objetivo O3 (mecanismos de recomendação e notificação) foi implementado e descrito na Seção~5.6, restando avaliar seu comportamento em cenários mais amplos. Os objetivos O4 (validação por estudo de caso) e O5 (avaliação de manutenibilidade) dependem diretamente do plano de avaliação do Capítulo~6; o alcance desses dois últimos objetivos será formalmente discutido nesta seção após a conclusão dos testes e da análise de manutenibilidade.
+O objetivo geral --- desenvolver uma API RESTful para apoiar a captação de doadores a partir de solicitações de unidades de saúde e pacientes, intermediando demanda e oferta com recomendação de solicitações compatíveis --- foi alcançado por meio da implementação descrita no Capítulo~5 e da validação automatizada relatada no Capítulo~6.
+
+Quanto aos objetivos específicos:
+
+\begin{itemize}[leftmargin=*]
+  \item[\textbf{O1}] O processo da doação sanguínea foi mapeado com técnicas de DDD, resultando na hierarquia de participantes (\codigo{Party}, \codigo{Person}, \codigo{Organization}), nos papéis (\codigo{Donor}, \codigo{Requester}, \codigo{BloodCenter}) e nos agregados \codigo{DonationRequest} e \codigo{Donation}, detalhados no Capítulo~5.
+  \item[\textbf{O2}] Sistemas e abordagens similares foram identificados e discutidos no mapeamento sistemático da literatura (Capítulo~3), orientando decisões de recomendação, notificação e gestão de solicitações.
+  \item[\textbf{O3}] Os mecanismos de recomendação de solicitações a doadores e de notificação a candidatos elegíveis foram implementados --- \codigo{GetRecommendedRequestsUseCase}, \codigo{FindEligibleDonorsUseCase}, \codigo{DonorMatchingService} e \codigo{NotifyPotentialDonorsUseCase} --- e cobertos por testes automatizados de domínio e de aplicação.
+  \item[\textbf{O4}] A proposta foi validada pelo estudo de caso e pela implementação da API, com evidência empírica dada pela execução bem-sucedida de 105 testes automatizados (100\% de sucesso), conforme o Quadro~\ref{tab:resultado-testes}.
+  \item[\textbf{O5}] A manutenibilidade foi avaliada qualitativamente a partir da arquitetura em camadas orientada a DDD/SOLID e da testabilidade das regras críticas sem acoplamento obrigatório à infraestrutura, conforme discutido na Seção~6.5.
+\end{itemize}
+
+Em síntese, os cinco objetivos específicos foram atendidos no escopo definido para este trabalho de conclusão de curso.
 
 \section{Principais contribuições}
 
-Do ponto de vista acadêmico, este trabalho contribui com um mapeamento sistemático da literatura sobre sistemas de captação de doadores de sangue (Capítulo~3) e com um estudo de caso detalhado de aplicação de DDD e princípios SOLID a um domínio de saúde pública com regras de elegibilidade e compatibilidade sanguínea. Do ponto de vista tecnológico, a principal contribuição é a própria API RESTful, incluindo a estratégia de recomendação de solicitações e a materialização do cumprimento de metas por meio de alocação FIFO (Seção~5.6), que pode servir de referência para soluções semelhantes. As contribuições específicas de cada frente serão detalhadas nesta seção conforme os resultados do Capítulo~6 forem consolidados.
+Do ponto de vista acadêmico, este trabalho contribui com: (i) um mapeamento sistemático da literatura sobre sistemas de captação de doadores de sangue (Capítulo~3); (ii) um estudo de caso detalhado de aplicação de DDD e princípios SOLID a um domínio de saúde pública com regras de elegibilidade, compatibilidade tipológica e proximidade geográfica; e (iii) uma avaliação explícita da solução por meio de suíte automatizada, tornando verificáveis as regras centrais do domínio.
+
+Do ponto de vista tecnológico, a principal contribuição é a API RESTful \textit{BloodMatch}, incluindo:
+
+\begin{itemize}[leftmargin=*]
+  \item a estratégia de recomendação de solicitações compatíveis ao doador;
+  \item a materialização do cumprimento de metas por alocação FIFO de doações concluídas às solicitações ativas do hemocentro;
+  \item o modelo de autorização baseado em JWT e papéis, com verificação de \textit{ownership};
+  \item a organização em camadas que isola o domínio de persistência e de protocolo HTTP, facilitando evolução e testes.
+\end{itemize}
+
+Esses artefatos podem servir de referência para soluções semelhantes voltadas à captação e ao matching entre doadores e solicitações.
+
+\section{Limitações}
+
+Apesar dos resultados positivos, reconhecem-se limitações. A avaliação funcional privilegiou testes unitários e de integração com \textit{mocks}, sem mensuração sistemática de cobertura percentual de linhas/branches nem baterias de carga em produção. O recálculo de \codigo{fulfilledBloodBags} permanece concentrado nos fluxos de conclusão de doação, deixando uma janela de inconsistência até a próxima sincronização quando apenas meta, prazo ou cancelamento são alterados. Além disso, o estudo de caso não inclui avaliação formal de usabilidade com usuários finais de hemocentros.
 
 \section{Trabalhos futuros}
 
-Como direcionamentos para evoluções futuras, destacam-se: (i) a extensão do recálculo de \texttt{fulfilledBloodBags} para eventos além da conclusão de doações (criação, cancelamento e alteração de solicitações), reduzindo a janela de inconsistência descrita na Seção~5.6; (ii) a evolução do algoritmo de recomendação para considerar critérios adicionais, como o histórico de resposta do doador a notificações anteriores; (iii) a extração de módulos mais explicitamente isolados para os contextos delimitados hoje tratados apenas por convenção de nomenclatura (Seção~5.4.1); e (iv) a ampliação da suíte de testes automatizados e da avaliação de manutenibilidade para outras versões da API, à medida que novas funcionalidades forem incorporadas.
+Como direcionamentos para evoluções futuras, destacam-se:
+
+\begin{itemize}[leftmargin=*]
+  \item estender o recálculo de \codigo{fulfilledBloodBags} para criação, cancelamento e alteração de solicitações, reduzindo a janela de inconsistência descrita na Seção~\ref{sec:recomendacao-fulfillment};
+  \item evoluir o algoritmo de recomendação com critérios adicionais (por exemplo, histórico de resposta a notificações);
+  \item extrair módulos mais explicitamente isolados para contextos delimitados hoje tratados por convenção de pacotes (Seção~5.4);
+  \item ampliar a suíte com Testcontainers, métricas JaCoCo e testes de contrato/carga;
+  \item aprofundar a integração com processos reais de hemocentros e avaliar impacto na conversão de solicitações em doações efetivas.
+\end{itemize}
+
+\section{Considerações finais}
+
+O descompasso entre demanda e oferta de sangue, contextualizado na Introdução, motiva soluções tecnológicas que aproximem requisitantes e doadores com critérios clinicamente relevantes --- tipagem, elegibilidade e proximidade. Este trabalho respondeu a essa necessidade com uma API RESTful orientada ao domínio da doação sanguínea, validada por implementação e por 105 testes automatizados sem falhas.
+
+Conclui-se que a combinação de DDD, SOLID e testes automatizados favoreceu não apenas a entrega funcional dos requisitos, mas também a confiança na corretude das regras críticas e a perspectiva de manutenção evolutiva da solução. Espera-se que os artefatos e os resultados aqui apresentados subsidiem trabalhos futuros e inspirem aprimoramentos em sistemas de apoio à captação de doadores de sangue.

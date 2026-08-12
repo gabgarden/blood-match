@@ -1,0 +1,27 @@
+% !TeX root = ../main.tex
+\chapter{Cumprimento de metas FIFO e matching de doadores}
+\label{ap:fulfillment}
+
+Este apêndice documenta o núcleo algorítmico da solução: a alocação \textit{First In, First Out} (FIFO) de doações concluídas às solicitações ativas de um hemocentro e o serviço de domínio que identifica doadores elegíveis para notificação.
+
+\section{Alocação FIFO de doações}
+
+A Listagem~\ref{lst:fifo} sintetiza \codigo{calculate} e \codigo{distributeDonations} do \codigo{DonationRequestFulfillmentService}. Solicitações e doações são ordenadas cronologicamente; cada doação percorre as solicitações do mesmo hemocentro e é atribuída à primeira que a aceita (\codigo{acceptsDonation}) e ainda não atingiu a meta --- o \texttt{break} encerra a busca, concretizando a política FIFO.
+
+\lstinputlisting[
+  language=Java,
+  caption={Alocação FIFO em \texttt{DonationRequestFulfillmentService}},
+  label={lst:fifo}
+]{apendices/codigo/FulfillmentDistributeDonations.java}
+\fonte{Elaborado pelos próprios autores (2026).}
+
+\section{Identificação de doadores elegíveis}
+
+A Listagem~\ref{lst:matching} apresenta \codigo{DonorMatchingService.findEligibleDonors}, que compõe compatibilidade tipológica (\codigo{canBeFulfilledBy}), elegibilidade temporal (\codigo{isEligibleToDonate}) e proximidade geográfica limitada pela distância máxima configurada pelo doador.
+
+\lstinputlisting[
+  language=Java,
+  caption={Método \texttt{DonorMatchingService.findEligibleDonors}},
+  label={lst:matching}
+]{apendices/codigo/DonorMatchingService.java}
+\fonte{Elaborado pelos próprios autores (2026).}

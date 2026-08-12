@@ -6,11 +6,13 @@ Plataforma de matching entre doadores e solicitações de sangue.
 blood-match/
 ├── backend/          # Spring Boot (Java 17) + MongoDB
 ├── frontend/         # React + Vite + TypeScript
+├── infrastructure/     # Configurações de infraestrutura (Nginx)
 ├── docs/             # Contratos e estratégias
 ├── scripts/          # Seed e migrações
 ├── insomnia/         # Coleção de API
 ├── tcc-latex/        # TCC
 ├── docker-compose.yml
+├── docker-compose.prod.yml
 └── .env.example
 ```
 
@@ -26,7 +28,7 @@ cp .env.example .env
 # edite MONGODB_URI, JWT_SECRET, GMAIL_*, GOOGLE_MAPS_API_KEY
 ```
 
-## Subir com Docker Compose
+## Subir com Docker Compose (Desenvolvimento)
 
 ```bash
 docker compose up --build
@@ -38,14 +40,17 @@ docker compose up --build
 
 O browser chama a API em `VITE_API_BASE_URL` (padrão `http://localhost:8080`).
 
-### Build de produção (frontend estático + API)
+### Build de produção (VPS / Hostinger)
 
 ```bash
-docker compose -f docker-compose.prod.yml up --build
+cp .env.production.example .env.production
+# edite JWT_SECRET e senhas no arquivo .env.production
+
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d --build
 ```
 
-- Frontend (nginx): http://localhost:3000  
-- Backend: http://localhost:8080  
+- App / Nginx Proxy: http://localhost:8082  
+- Backend API: http://localhost:8080  
 
 ## Desenvolvimento local (sem Docker)
 

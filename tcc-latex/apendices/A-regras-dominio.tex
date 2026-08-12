@@ -1,0 +1,27 @@
+% !TeX root = ../main.tex
+\chapter{Regras de domínio: tipagem sanguínea e elegibilidade}
+\label{ap:regras-dominio}
+
+Este apêndice apresenta trechos do código-fonte que materializam regras centrais do domínio da doação sanguínea: a compatibilidade tipológica, encapsulada no objeto de valor \codigo{BloodType}, e a elegibilidade temporal do doador, encapsulada na entidade \codigo{Donor}. Ambos os trechos pertencem à camada \codigo{domain} e não dependem de infraestrutura.
+
+\section{Compatibilidade tipológica}
+
+A Listagem~\ref{lst:bloodtype-candonateto} reproduz o método \codigo{canDonateTo} do objeto de valor \codigo{BloodType}. A regra é expressa por um \textit{switch} sobre o tipo do doador, retornando \texttt{true} somente quando o receptor é clinicamente compatível. O caso \texttt{O-} doa para qualquer tipo; o caso \texttt{AB+} doa apenas para \texttt{AB+}.
+
+\lstinputlisting[
+  language=Java,
+  caption={Método \texttt{BloodType.canDonateTo}},
+  label={lst:bloodtype-candonateto}
+]{apendices/codigo/BloodTypeCanDonateTo.java}
+\fonte{Elaborado pelos próprios autores (2026).}
+
+\section{Elegibilidade do doador}
+
+A Listagem~\ref{lst:donor-eligible} apresenta a verificação de elegibilidade: faixa etária entre 16 e 69~anos e intervalo mínimo desde a última doação, definido por \codigo{DonationPolicy}. Se não houver doação prévia, o doador é considerado elegível do ponto de vista temporal.
+
+\lstinputlisting[
+  language=Java,
+  caption={Métodos \texttt{Donor.hasValidAge} e \texttt{Donor.isEligibleToDonate}},
+  label={lst:donor-eligible}
+]{apendices/codigo/DonorIsEligibleToDonate.java}
+\fonte{Elaborado pelos próprios autores (2026).}
