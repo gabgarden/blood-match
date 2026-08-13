@@ -1,20 +1,23 @@
 import RegisterForm from "../components/RegisterForm";
 import { Link } from "react-router-dom";
+import { BackButton } from "../components/ui/BackButton";
 
 export default function RegisterPage() {
   return (
     <div className="bg-surface text-on-surface min-h-[100dvh]">
 
       {/* Header */}
-      <header className="sticky top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 h-16 bg-[#f9f9fb] backdrop-blur-md bg-opacity-80">
-        <div className="text-2xl font-extrabold text-primary headline-font tracking-tight">
-          Bloodmatch
+      <header className="sticky top-0 left-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 py-4 h-16 bg-[#f9f9fb] backdrop-blur-md bg-opacity-80 border-b border-gray-200/60">
+        <div className="flex items-center gap-3">
+          <BackButton fallbackPath="/" label="Voltar para a página inicial" variant="outline" />
+          <div className="text-xl sm:text-2xl font-extrabold text-primary headline-font tracking-tight">
+            Bloodmatch
+          </div>
         </div>
 
-        <div className="hidden md:flex gap-6 items-center">
-        
-          <Link to="/login" className="bg-primary text-white px-5 py-2 rounded-full font-bold shadow-sm hover:scale-95 transition-transform">
-            Login 
+        <div className="flex gap-4 items-center">
+          <Link to="/login" className="bg-primary text-white px-4 py-2 text-xs sm:text-sm rounded-full font-bold shadow-sm hover:scale-95 transition-transform">
+            Entrar
           </Link>
         </div>
       </header>

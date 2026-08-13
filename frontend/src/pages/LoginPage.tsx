@@ -3,7 +3,7 @@ import { isAxiosError } from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/authService";
-import { AppButton, AppCard, InlineAlert } from "../components/ui";
+import { AppButton, AppCard, BackButton, InlineAlert } from "../components/ui";
 import { resolvePostLoginPath } from "../routes/roleRouting";
 import { extractApiErrorMessage } from "../utils/apiError";
 
@@ -53,7 +53,10 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-surface flex items-center justify-center px-4 py-8">
+    <main className="min-h-screen bg-surface flex flex-col items-center justify-center px-4 py-8 relative">
+      <div className="w-full max-w-md mb-4 flex items-center justify-start">
+        <BackButton fallbackPath="/" label="Voltar para a página inicial" variant="outline" />
+      </div>
       <AppCard className="w-full max-w-md p-8 shadow-xl">
         <header className="text-center mb-8">
           <h1 className="text-3xl font-extrabold headline-font text-primary">Bloodmatch</h1>
