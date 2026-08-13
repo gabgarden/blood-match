@@ -45,7 +45,7 @@ public class GetRecommendedRequestsUseCase {
     Donor donor = donorRepository.findByPartyId(personId)
         .orElseThrow(() -> new NotFoundException("Donor role not found"));
 
-    if (!donor.isEligibleToDonate(currentDate)) {
+    if (!input.includeNonEligible() && !donor.isEligibleToDonate(currentDate)) {
       return List.of();
     }
 
@@ -101,7 +101,10 @@ public class GetRecommendedRequestsUseCase {
     return addr1.distanceTo(addr2);
   }
 
-  public record Input(String personId) {
+  public record Input(String personId, boolean includeNonEligible) {
+    public Input(String personId) {
+      this(personId, false);
+    }
   }
 
   public record OutputItem(

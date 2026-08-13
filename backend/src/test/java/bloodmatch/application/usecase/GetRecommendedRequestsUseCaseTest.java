@@ -53,6 +53,26 @@ class GetRecommendedRequestsUseCaseTest {
   }
 
   @Test
+  void shouldRecommendRequestsWhenDonorIsNotEligibleAndIncludeNonEligibleIsTrue() {
+    LocalDate currentDate = LocalDate.of(2026, 4, 17);
+    DomainID donorId = DomainID.generate();
+
+    Donor donor = createDonor(currentDate);
+    donor.registerDonation(currentDate.minusMonths(1), currentDate);
+
+    DonationRequest request = createRequest(currentDate);
+
+    when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
+    when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
+
+    List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
+        new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString(), true), currentDate);
+
+    assertEquals(1, result.size());
+    assertEquals("Blood Center", result.get(0).bloodCenterName());
+  }
+
+  @Test
   void shouldRecommendEligibleRequestsWithOutstandingGoal() {
     LocalDate currentDate = LocalDate.of(2026, 4, 17);
     DomainID donorId = DomainID.generate();

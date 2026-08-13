@@ -89,83 +89,7 @@ function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-const DEFAULT_CONSULTATION_RECOMMENDATIONS: Recommendation[] = [
-  {
-    id: "consult-1",
-    organizationId: "org-hemocentro-campos-1",
-    bloodCenterName: "Hemocentro Regional de Campos",
-    bloodTypeNeeded: "O-",
-    dateLimit: "",
-    urgency: "CRITICAL",
-    distanceInKm: 1.2,
-    goalBloodBags: 20,
-    fulfilledBloodBags: 8,
-    goalReached: false,
-    latitude: -21.7525,
-    longitude: -41.3193,
-  },
-  {
-    id: "consult-2",
-    organizationId: "org-hemocentro-campos-2",
-    bloodCenterName: "Hospital Ferreira Machado",
-    bloodTypeNeeded: "A+",
-    dateLimit: "",
-    urgency: "MEDIUM",
-    distanceInKm: 1.8,
-    goalBloodBags: 15,
-    fulfilledBloodBags: 10,
-    goalReached: false,
-    latitude: -21.7512,
-    longitude: -41.3191,
-  },
-  {
-    id: "consult-3",
-    organizationId: "org-hemocentro-campos-3",
-    bloodCenterName: "Hospital Geral Dr. Beda",
-    bloodTypeNeeded: "O+",
-    dateLimit: "",
-    urgency: "CRITICAL",
-    distanceInKm: 2.5,
-    goalBloodBags: 12,
-    fulfilledBloodBags: 4,
-    goalReached: false,
-    latitude: -21.7538,
-    longitude: -41.3277,
-  },
-  {
-    id: "consult-4",
-    organizationId: "org-hemocentro-campos-4",
-    bloodCenterName: "Santa Casa de Misericórdia de Campos",
-    bloodTypeNeeded: "B+",
-    dateLimit: "",
-    urgency: "LOW",
-    distanceInKm: 3.1,
-    goalBloodBags: 10,
-    fulfilledBloodBags: 7,
-    goalReached: false,
-    latitude: -21.7618,
-    longitude: -41.3235,
-  },
-];
 
-function getCachedRecommendations(partyId: string): Recommendation[] | null {
-  try {
-    const raw = localStorage.getItem(`bloodmatch_cached_recommendations_${partyId}`);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Recommendation[];
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
-function setCachedRecommendations(partyId: string, data: Recommendation[]) {
-  try {
-    localStorage.setItem(`bloodmatch_cached_recommendations_${partyId}`, JSON.stringify(data));
-  } catch {
-    // Ignore quota errors
-  }
-}
 
 type DonorDashboardParams = {
   partyId: string | null;
@@ -298,31 +222,12 @@ export function useDonorDashboard({ partyId, hasDonorRole }: DonorDashboardParam
 
       try {
         const response = await api.get<RecommendationApiItem[]>("/donation-requests/recommendations", {
-          params: { personId: currentPartyId },
+          params: { personId: currentPartyId, includeNonEligible: true },
         });
 
-        const normalized = response.data.map(normalizeRecommendation);
-
-        if (normalized.length > 0) {
-          setRecommendations(normalized);
-          setCachedRecommendations(currentPartyId, normalized);
-        } else {
-          // Backend returned [] (e.g. donor is in non-eligible resting window)
-          // Try loading last known cached recommendations or regional fallback list
-          const cached = getCachedRecommendations(currentPartyId);
-          if (cached) {
-            setRecommendations(cached);
-          } else {
-            setRecommendations(DEFAULT_CONSULTATION_RECOMMENDATIONS);
-          }
-        }
-      } catch {
-        const cached = getCachedRecommendations(currentPartyId);
-        if (cached) {
-          setRecommendations(cached);
-        } else {
-          setRecommendations(DEFAULT_CONSULTATION_RECOMMENDATIONS);
-        }
+        setRecommendations(response.data.map(normalizeRecommendation));
+      } catch (error) {
+        setErrorMessage(extractApiErrorMessage(error, "Não foi possível carregar as recomendações agora."));
       } finally {
         setIsLoadingRecommendations(false);
       }

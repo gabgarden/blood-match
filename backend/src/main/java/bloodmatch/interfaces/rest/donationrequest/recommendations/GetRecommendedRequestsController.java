@@ -26,11 +26,13 @@ public class GetRecommendedRequestsController {
   }
 
   @GetMapping("/recommendations")
-  public ResponseEntity<List<RecommendedRequestResponseDto>> getByQuery(@RequestParam String personId) {
+  public ResponseEntity<List<RecommendedRequestResponseDto>> getByQuery(
+      @RequestParam String personId,
+      @RequestParam(required = false, defaultValue = "false") boolean includeNonEligible) {
     requireNotBlank(personId, "personId cannot be blank");
     requireSamePartyOrAdmin(personId);
 
-    List<RecommendedRequestResponseDto> body = useCase.execute(new Input(personId)).stream()
+    List<RecommendedRequestResponseDto> body = useCase.execute(new Input(personId, includeNonEligible)).stream()
         .map(RecommendedRequestResponseDto::from)
         .toList();
 
