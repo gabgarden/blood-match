@@ -49,7 +49,7 @@ export default function HomePage() {
             to={dashboardPath}
             className="underline font-bold hover:text-red-100 transition-colors inline-flex items-center gap-1"
           >
-            Ir para o Meu Dashboard
+            Ir para a Central do Doador
             <span className="material-symbols-outlined text-sm">arrow_forward</span>
           </Link>
         </div>

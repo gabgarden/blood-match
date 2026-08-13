@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { AccessDenied } from "../components/AccessDenied";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
+import { MobileBottomNav } from "../components/dashboard/MobileBottomNav";
 import { RecommendationCard } from "../components/dashboard/RecommendationCard";
 import { ScheduleDonationModal } from "../components/dashboard/ScheduleDonationModal";
 import { FullPageLoading, InlineAlert } from "../components/ui";
@@ -80,7 +81,7 @@ export default function RecommendationsPage() {
       <DonorDashboardSidebar onLogout={logout} activeItem="donor-dashboard" />
       <DonorDashboardTopbar title="Recomendações" onLogout={logout} />
 
-      <main className="pt-20 px-4 pb-10 lg:ml-64 lg:px-8">
+      <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-10">
         <div className="mx-auto max-w-[1400px] space-y-6">
           {feedback && <InlineAlert tone="success" message={feedback} />}
           {errorMessage && <InlineAlert tone="error" message={errorMessage} />}
@@ -94,8 +95,9 @@ export default function RecommendationsPage() {
                   className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-secondary hover:text-primary"
                 >
                   <span className="material-symbols-outlined text-sm">arrow_back</span>
-                  Dashboard
+                  Central do Doador
                 </Link>
+
                 <h1 className="mt-2 font-headline text-3xl font-extrabold tracking-tight text-on-surface">
                   Todas as recomendações
                 </h1>
@@ -184,6 +186,9 @@ export default function RecommendationsPage() {
         onConfirm={handleConfirmSchedule}
         isSubmitting={isSubmittingSchedule}
       />
+
+      <MobileBottomNav activeItem="donor-dashboard" />
     </div>
+
   );
 }

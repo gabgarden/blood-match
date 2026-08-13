@@ -27,7 +27,7 @@ export function DonorDashboardSidebar({
   const menuItems: MenuItem[] = [
     ...(showDonorDashboard
       ? ([
-          { key: "donor-dashboard", icon: "dashboard", label: "Dashboard", path: "/dashboard" },
+          { key: "donor-dashboard", icon: "home_health", label: "Central do Doador", path: "/dashboard" },
           { key: "donations", icon: "water_drop", label: "Minhas Doações", path: "/donations" },
         ] as MenuItem[])
       : []),

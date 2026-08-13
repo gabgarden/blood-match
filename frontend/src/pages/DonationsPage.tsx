@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
+import { MobileBottomNav } from "../components/dashboard/MobileBottomNav";
 import { DonationHistory, type DonationHistoryItem } from "../components/dashboard/DonationHistory";
 import { AppButton, FullPageLoading, InlineAlert, Modal } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
@@ -134,7 +135,7 @@ export default function DonationsPage() {
       <DonorDashboardSidebar onLogout={logout} activeItem="donations" />
       <DonorDashboardTopbar title="Minhas Doações" onLogout={logout} />
 
-      <main className="pt-20 px-4 pb-10 lg:ml-64 lg:px-8">
+      <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-10">
         <div className="mx-auto max-w-5xl space-y-6">
           {feedback && <InlineAlert tone="success" message={feedback} />}
           {errorMessage && <InlineAlert tone="error" message={errorMessage} />}
@@ -288,8 +289,9 @@ export default function DonationsPage() {
                   Nenhum agendamento pendente
                 </p>
                 <p className="mt-1 text-xs text-text-secondary">
-                  Você está sem agendamentos ativos no momento. Acesse a aba <strong>Dashboard</strong> para encontrar recomendações compatíveis!
+                  Você está sem agendamentos ativos no momento. Acesse a <strong>Central do Doador</strong> para encontrar recomendações compatíveis!
                 </p>
+
               </div>
             )}
           </section>
@@ -458,6 +460,8 @@ export default function DonationsPage() {
           </div>
         </form>
       </Modal>
+
+      <MobileBottomNav activeItem="donations" />
     </div>
   );
 }

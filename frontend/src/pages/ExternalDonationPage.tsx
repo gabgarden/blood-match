@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { AccessDenied } from "../components/AccessDenied";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
+import { MobileBottomNav } from "../components/dashboard/MobileBottomNav";
 import {
   AppCard,
   AppButton,
@@ -104,7 +105,7 @@ export default function ExternalDonationPage() {
       <DonorDashboardSidebar onLogout={logout} activeItem="external-donation" />
       <DonorDashboardTopbar title="Registrar Doação Externa" onLogout={logout} />
 
-      <main className="pt-20 px-4 pb-8 lg:ml-64 lg:px-8">
+      <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-8">
         <div className="mx-auto max-w-[900px]">
           <AppCard className="p-8 lg:p-10 bg-white border-0">
             <h1 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface">
@@ -179,6 +180,8 @@ export default function ExternalDonationPage() {
           </AppCard>
         </div>
       </main>
+
+      <MobileBottomNav activeItem="external-donation" />
     </div>
   );
 }

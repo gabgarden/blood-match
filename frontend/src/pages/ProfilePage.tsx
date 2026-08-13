@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
+import { MobileBottomNav } from "../components/dashboard/MobileBottomNav";
 import { ProfileHero } from "../components/profile/ProfileHero";
 import { ProfileSection } from "../components/profile/ProfileSection";
 import { AppButton, FullPageLoading, InlineAlert } from "../components/ui";
@@ -185,7 +186,7 @@ export default function ProfilePage() {
       <DonorDashboardSidebar onLogout={logout} activeItem="profile" />
       <DonorDashboardTopbar title="Meu Perfil" onLogout={logout} />
 
-      <main className="pt-20 px-4 pb-10 lg:ml-64 lg:px-8">
+      <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-10">
         <div className="mx-auto max-w-4xl space-y-6">
           {isLoadingProfile ? (
             <div className="rounded-[2rem] border border-surface-container-high bg-white p-10 text-center">
@@ -364,6 +365,8 @@ export default function ProfilePage() {
           )}
         </div>
       </main>
+
+      <MobileBottomNav activeItem="profile" />
     </div>
   );
 }

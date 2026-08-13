@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
+import { MobileBottomNav } from "../components/dashboard/MobileBottomNav";
 import { RequestCard } from "../components/requests/RequestCard";
 import { AppButton, FullPageLoading, InlineAlert, Modal } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
@@ -181,7 +182,7 @@ export default function RequestsPage() {
       <DonorDashboardSidebar onLogout={logout} activeItem="requests" />
       <DonorDashboardTopbar title="Suas Requisições" onLogout={logout} />
 
-      <main className="pt-20 px-4 pb-10 lg:ml-64 lg:px-8">
+      <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-10">
         <div className="mx-auto max-w-[1400px] space-y-6">
           <section className="relative overflow-hidden rounded-[2rem] border border-surface-container-high bg-white p-6 lg:p-8">
             <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#fff2f0]" />
@@ -356,6 +357,8 @@ export default function RequestsPage() {
           </AppButton>
         </div>
       </Modal>
+
+      <MobileBottomNav activeItem="requests" />
     </div>
   );
 }

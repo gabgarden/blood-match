@@ -48,7 +48,7 @@ export function DonorHeroSection({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary">Dashboard do doador</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary">Central do Doador</p>
             <h1 className="mt-1 font-headline text-3xl font-extrabold tracking-tight text-on-surface truncate sm:text-4xl">
               Olá, {name}
             </h1>

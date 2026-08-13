@@ -4,6 +4,7 @@ import { RecommendationCard } from "../components/dashboard/RecommendationCard";
 import { useAuth } from "../context/AuthContext";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
+import { MobileBottomNav } from "../components/dashboard/MobileBottomNav";
 import { DonorHeroSection } from "../components/dashboard/DonorHeroSection";
 import { LastDonationCard } from "../components/dashboard/LastDonationCard";
 import { InteractiveMapCard } from "../components/dashboard/InteractiveMapCard";
@@ -84,9 +85,9 @@ export default function DonorDashboardPage() {
   return (
     <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d]">
       <DonorDashboardSidebar onLogout={logout} activeItem="donor-dashboard" />
-      <DonorDashboardTopbar title="Dashboard" onLogout={logout} />
+      <DonorDashboardTopbar title="Central do Doador" onLogout={logout} />
 
-      <main className="pt-20 px-4 pb-10 lg:ml-64 lg:px-8">
+      <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-10">
         <div className="mx-auto max-w-[1400px] space-y-6">
           {feedback && <InlineAlert tone="success" message={feedback} />}
           {errorMessage && <InlineAlert tone="error" message={errorMessage} />}
@@ -234,6 +235,8 @@ export default function DonorDashboardPage() {
         onConfirm={handleConfirmSchedule}
         isSubmitting={isSubmittingSchedule}
       />
+
+      <MobileBottomNav activeItem="donor-dashboard" />
     </div>
   );
 }

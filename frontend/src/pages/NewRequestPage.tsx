@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
+import { MobileBottomNav } from "../components/dashboard/MobileBottomNav";
 import { FullPageLoading, InlineAlert, type BloodCenterSelection } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { CreateRequestForm } from "../components/requests/CreateRequestForm";
@@ -104,7 +105,7 @@ export default function NewRequestPage() {
       <DonorDashboardSidebar onLogout={logout} activeItem="new-request" />
       <DonorDashboardTopbar title="Nova Requisição" onLogout={logout} />
 
-      <main className="pt-24 px-8 pb-16 lg:ml-64">
+      <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-16">
         <div className="max-w-5xl mx-auto">
           {successMessage && <InlineAlert tone="success" message={successMessage} className="mb-6" />}
 
@@ -141,6 +142,8 @@ export default function NewRequestPage() {
           </div>
         </div>
       </main>
+
+      <MobileBottomNav activeItem="new-request" />
     </div>
   );
 }
