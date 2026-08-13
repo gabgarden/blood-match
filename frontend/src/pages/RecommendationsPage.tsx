@@ -97,34 +97,40 @@ export default function RecommendationsPage() {
                   <span className="material-symbols-outlined text-sm">arrow_back</span>
                   Central do Doador
                 </Link>
-
                 <h1 className="mt-2 font-headline text-3xl font-extrabold tracking-tight text-on-surface">
                   Todas as recomendações
                 </h1>
                 <p className="mt-2 text-sm text-text-secondary">
                   {isEligibleToDonate
                     ? `Compatíveis com ${donorBloodType}${criticalCount > 0 ? ` · ${criticalCount} crítica${criticalCount === 1 ? "" : "s"}` : ""}.`
-                    : `Você não está elegível para doar. Aguarde ${waitingDays} ${waitingDays === 1 ? "dia" : "dias"}.`}
+                    : `Modo Consulta · Faltam ${waitingDays} ${waitingDays === 1 ? "dia" : "dias"} para você voltar a doar.`}
                 </p>
               </div>
 
-              {isEligibleToDonate && (
-                <div className="rounded-2xl bg-surface-container-low px-4 py-3 text-center">
-                  <p className="font-headline text-2xl font-black text-primary">{recommendations.length}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">Matches</p>
-                </div>
-              )}
+              <div className="rounded-2xl bg-surface-container-low px-4 py-3 text-center">
+                <p className="font-headline text-2xl font-black text-primary">{recommendations.length}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">Solicitações</p>
+              </div>
             </div>
           </section>
 
-          {isEligibleToDonate && isLoadingRecommendations && (
+          {!isEligibleToDonate && (
+            <div className="rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4 flex items-center gap-3 text-amber-900 shadow-xs">
+              <span className="material-symbols-outlined text-amber-600 text-xl shrink-0">info</span>
+              <p className="text-xs font-semibold leading-relaxed">
+                Você está em intervalo de descanso ({waitingDays} {waitingDays === 1 ? "dia restante" : "dias restantes"}), mas pode consultar todas as solicitações e pré-agendar doações para o seu dia de liberação!
+              </p>
+            </div>
+          )}
+
+          {isLoadingRecommendations && (
             <div className="rounded-[2rem] border border-surface-container-high bg-white p-10 text-center">
               <span className="material-symbols-outlined animate-spin text-3xl text-primary">progress_activity</span>
               <p className="mt-3 text-sm text-text-secondary">Carregando recomendações...</p>
             </div>
           )}
 
-          {isEligibleToDonate && !isLoadingRecommendations && recommendations.length > 0 && (
+          {!isLoadingRecommendations && recommendations.length > 0 && (
             <section className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {recommendations.map((recommendation) => (
                 <RecommendationCard
@@ -144,7 +150,7 @@ export default function RecommendationsPage() {
             </section>
           )}
 
-          {isEligibleToDonate && !isLoadingRecommendations && recommendations.length === 0 && (
+          {!isLoadingRecommendations && recommendations.length === 0 && (
             <section className="rounded-[2rem] border border-dashed border-surface-container-highest bg-white px-6 py-14 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container-low text-secondary">
                 <span className="material-symbols-outlined text-3xl">travel_explore</span>
@@ -160,22 +166,6 @@ export default function RecommendationsPage() {
               </Link>
             </section>
           )}
-
-          {!isEligibleToDonate && (
-            <section className="rounded-[2rem] border border-surface-container-high bg-white p-6 sm:p-8">
-              <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-secondary">
-                  <span className="material-symbols-outlined">hourglass_top</span>
-                </div>
-                <div>
-                  <p className="font-headline text-lg font-bold text-on-surface">Intervalo de segurança</p>
-                  <p className="mt-1 text-sm text-text-secondary">
-                    Faltam {waitingDays} {waitingDays === 1 ? "dia" : "dias"} para você voltar a doar.
-                  </p>
-                </div>
-              </div>
-            </section>
-          )}
         </div>
       </main>
 
@@ -185,10 +175,10 @@ export default function RecommendationsPage() {
         onClose={() => setSchedulingRecommendation(null)}
         onConfirm={handleConfirmSchedule}
         isSubmitting={isSubmittingSchedule}
+        daysRemaining={waitingDays}
       />
 
       <MobileBottomNav activeItem="donor-dashboard" />
     </div>
-
   );
 }

@@ -5,6 +5,8 @@ import type { Recommendation } from "../../hooks/useDonorDashboard";
 type InteractiveMapCardProps = {
   recommendations: Recommendation[];
   onSchedule?: (requestId: string) => void;
+  isEligibleToDonate?: boolean;
+  daysRemaining?: number;
 };
 
 // Coordenadas base (Campos dos Goytacazes - RJ, centro dos hemocentros do sistema)
@@ -88,7 +90,12 @@ function createCustomIcon(color: string, pulse: boolean) {
   });
 }
 
-export function InteractiveMapCard({ recommendations, onSchedule }: InteractiveMapCardProps) {
+export function InteractiveMapCard({
+  recommendations,
+  onSchedule,
+  isEligibleToDonate = true,
+  daysRemaining = 0,
+}: InteractiveMapCardProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const [filterMode, setFilterMode] = useState<"ALL" | "CRITICAL" | "PENDING">("ALL");
@@ -212,6 +219,18 @@ export function InteractiveMapCard({ recommendations, onSchedule }: InteractiveM
           </span>
         </div>
       </div>
+
+      {!isEligibleToDonate && daysRemaining > 0 && (
+        <div className="mb-4 flex items-center gap-3 rounded-2xl bg-amber-50/90 border border-amber-200/80 p-4 text-amber-900 shadow-xs">
+          <span className="material-symbols-outlined text-amber-600 text-2xl shrink-0">hourglass_top</span>
+          <div className="text-xs leading-relaxed">
+            <p className="font-extrabold text-sm text-amber-950">Aviso de Elegibilidade (Período de Descanso)</p>
+            <p className="text-amber-800 mt-0.5">
+              Faltam <strong>{daysRemaining} {daysRemaining === 1 ? "dia" : "dias"}</strong> para você poder doar novamente. Todas as solicitações e hemocentros ativos continuam visíveis no mapa para consulta!
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Filtros Rápidos Inteligentes */}
       <div className="flex flex-wrap items-center gap-2 mb-3">

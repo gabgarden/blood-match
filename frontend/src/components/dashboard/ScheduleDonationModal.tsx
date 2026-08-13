@@ -7,10 +7,17 @@ type ScheduleDonationModalProps = {
   onClose: () => void;
   onConfirm: (requestId: string, expectedDate: string) => void;
   isSubmitting?: boolean;
+  daysRemaining?: number;
 };
 
 function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function addDaysIsoDate(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
 }
 
 function createGoogleCalendarUrl(title: string, details: string, location: string, dateIso: string): string {
@@ -33,8 +40,10 @@ export function ScheduleDonationModal({
   onClose,
   onConfirm,
   isSubmitting = false,
+  daysRemaining = 0,
 }: ScheduleDonationModalProps) {
-  const [expectedDate, setExpectedDate] = useState(todayIsoDate());
+  const minDate = daysRemaining > 0 ? addDaysIsoDate(daysRemaining) : todayIsoDate();
+  const [expectedDate, setExpectedDate] = useState(minDate);
   const [isSuccess, setIsSuccess] = useState(false);
 
   if (!isOpen || !recommendation) {
@@ -144,12 +153,18 @@ export function ScheduleDonationModal({
                 <input
                   id="expectedDate"
                   type="date"
-                  min={todayIsoDate()}
+                  min={minDate}
                   value={expectedDate}
                   onChange={(e) => setExpectedDate(e.target.value)}
                   required
                   className="w-full rounded-xl border border-surface-container-high bg-white px-4 py-3 text-sm font-bold text-on-surface shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
+                {daysRemaining > 0 && (
+                  <p className="mt-2 text-xs text-amber-700 font-semibold bg-amber-50 p-2.5 rounded-xl border border-amber-100 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm shrink-0 text-amber-600">hourglass_top</span>
+                    <span>Como você está em intervalo de descanso ({daysRemaining} dias restantes), a data mínima permitida foi definida para o seu primeiro dia de aptidão ({minDate.split("-").reverse().join("/")}).</span>
+                  </p>
+                )}
               </div>
 
               <p className="text-xs text-text-secondary leading-relaxed">

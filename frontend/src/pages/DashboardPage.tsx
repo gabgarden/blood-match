@@ -111,7 +111,12 @@ export default function DonorDashboardPage() {
               </section>
 
               {/* Mapa Interativo de Hemocentros e Urgências */}
-              <InteractiveMapCard recommendations={recommendations} onSchedule={handleOpenScheduleModal} />
+              <InteractiveMapCard
+                recommendations={recommendations}
+                onSchedule={handleOpenScheduleModal}
+                isEligibleToDonate={isEligibleToDonate}
+                daysRemaining={waitingDays}
+              />
 
               {/* Painel de Transparência e Impacto da Comunidade */}
               <CommunityImpactSection />
@@ -123,20 +128,25 @@ export default function DonorDashboardPage() {
                       <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-surface">
                         Recomendações
                       </h2>
-                      {isEligibleToDonate && criticalCount > 0 && (
+                      {criticalCount > 0 && (
                         <span className="rounded-lg bg-[#fff2f0] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
                           {criticalCount} crítica{criticalCount === 1 ? "" : "s"}
+                        </span>
+                      )}
+                      {!isEligibleToDonate && (
+                        <span className="rounded-lg bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                          Modo Consulta
                         </span>
                       )}
                     </div>
                     <p className="mt-1 text-sm text-text-secondary">
                       {isEligibleToDonate
                         ? `Pedidos compatíveis com ${donorBloodType}, priorizados por proximidade e urgência.`
-                        : `Você volta a receber recomendações em ${waitingDays} ${waitingDays === 1 ? "dia" : "dias"}.`}
+                        : `Solicitações ativas na sua região. Você estará liberado para doar em ${waitingDays} ${waitingDays === 1 ? "dia" : "dias"}.`}
                     </p>
                   </div>
 
-                  {isEligibleToDonate && recommendations.length > 0 && (
+                  {recommendations.length > 0 && (
                     <Link
                       to="/dashboard/recommendations"
                       className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline"
@@ -147,7 +157,16 @@ export default function DonorDashboardPage() {
                   )}
                 </div>
 
-                {isEligibleToDonate && isLoadingRecommendations && (
+                {!isEligibleToDonate && (
+                  <div className="rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4 flex items-center gap-3 text-amber-900 shadow-xs">
+                    <span className="material-symbols-outlined text-amber-600 text-xl shrink-0">info</span>
+                    <p className="text-xs font-semibold leading-relaxed">
+                      Você está em período de descanso ({waitingDays} {waitingDays === 1 ? "dia restante" : "dias restantes"}), mas pode consultar todas as solicitações abaixo e pré-agendar doações para datas futuras!
+                    </p>
+                  </div>
+                )}
+
+                {isLoadingRecommendations && (
                   <div className="rounded-[2rem] border border-surface-container-high bg-white p-10 text-center">
                     <span className="material-symbols-outlined animate-spin text-3xl text-primary">
                       progress_activity
@@ -156,7 +175,7 @@ export default function DonorDashboardPage() {
                   </div>
                 )}
 
-                {isEligibleToDonate && !isLoadingRecommendations && featuredRecommendations.length > 0 && (
+                {!isLoadingRecommendations && featuredRecommendations.length > 0 && (
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {featuredRecommendations.map((recommendation) => (
                       <RecommendationCard
@@ -176,7 +195,7 @@ export default function DonorDashboardPage() {
                   </div>
                 )}
 
-                {isEligibleToDonate && !isLoadingRecommendations && featuredRecommendations.length === 0 && (
+                {!isLoadingRecommendations && featuredRecommendations.length === 0 && (
                   <div className="rounded-[2rem] border border-dashed border-surface-container-highest bg-white px-6 py-12 text-center">
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-low text-secondary">
                       <span className="material-symbols-outlined text-2xl">travel_explore</span>
@@ -187,25 +206,6 @@ export default function DonorDashboardPage() {
                     <p className="mx-auto mt-1 max-w-md text-sm text-text-secondary">
                       Assim que houver pedidos compatíveis no seu raio, eles aparecem aqui.
                     </p>
-                  </div>
-                )}
-
-                {!isEligibleToDonate && (
-                  <div className="rounded-[2rem] border border-surface-container-high bg-white p-6 sm:p-8">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-secondary">
-                          <span className="material-symbols-outlined">hourglass_top</span>
-                        </div>
-                        <div>
-                          <p className="font-headline text-lg font-bold text-on-surface">Intervalo de segurança</p>
-                          <p className="mt-1 text-sm text-text-secondary">
-                            Faltam <span className="font-bold text-on-surface">{waitingDays}</span>{" "}
-                            {waitingDays === 1 ? "dia" : "dias"} para você voltar a doar.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 )}
               </section>
@@ -234,6 +234,7 @@ export default function DonorDashboardPage() {
         onClose={() => setSchedulingRecommendation(null)}
         onConfirm={handleConfirmSchedule}
         isSubmitting={isSubmittingSchedule}
+        daysRemaining={waitingDays}
       />
 
       <MobileBottomNav activeItem="donor-dashboard" />
