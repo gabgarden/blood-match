@@ -57,16 +57,16 @@ export default function HomePage() {
 
       {/* Header / Navbar */}
       <header className="sticky top-0 z-40 glass-panel border-b border-gray-200/60 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-pulse-gradient flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-              <span className="material-symbols-outlined text-white text-2xl">bloodtype</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-pulse-gradient flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-white text-xl sm:text-2xl">bloodtype</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-extrabold headline-font tracking-tight text-primary">
+              <span className="text-xl sm:text-2xl font-extrabold headline-font tracking-tight text-primary">
                 BloodMatch
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-secondary -mt-1">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-secondary -mt-1">
                 Conectando Vidas
               </span>
             </div>
@@ -89,21 +89,22 @@ export default function HomePage() {
           </nav>
 
           {/* Action Buttons: Login & Register */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <Link
               to="/login"
               id="home-login-btn"
-              className="px-5 py-2.5 rounded-xl font-semibold text-sm text-primary hover:bg-red-50 border border-transparent hover:border-red-200 transition-all duration-200"
+              className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-primary hover:bg-red-50 border border-transparent hover:border-red-200 transition-all duration-200"
             >
               Entrar
             </Link>
             <Link
               to="/register"
               id="home-register-btn"
-              className="px-5 py-2.5 rounded-xl font-semibold text-sm text-white bg-pulse-gradient shadow-md hover:shadow-lg hover:opacity-95 transition-all duration-200 flex items-center gap-2"
+              className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-pulse-gradient shadow-md hover:shadow-lg hover:opacity-95 transition-all duration-200 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
             >
-              <span>Cadastrar-se</span>
-              <span className="material-symbols-outlined text-lg">person_add</span>
+              <span>Cadastrar</span>
+              <span className="hidden sm:inline">-se</span>
+              <span className="material-symbols-outlined text-base sm:text-lg">person_add</span>
             </Link>
           </div>
         </div>
@@ -112,56 +113,59 @@ export default function HomePage() {
       {/* Main Content */}
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 bg-gradient-to-b from-red-50/50 via-surface to-surface">
+        <section className="relative overflow-hidden pt-8 pb-16 lg:pt-20 lg:pb-28 bg-gradient-to-b from-red-50/50 via-surface to-surface">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-12 gap-12 items-center">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Left Column Text */}
-              <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-100/80 border border-red-200 text-primary text-xs font-bold uppercase tracking-wider shadow-xs">
-                  <span className="material-symbols-outlined text-base">favorite</span>
-                  Plataforma Inteligente de Doação de Sangue
+              <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
+                <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-red-100/90 border border-red-200 text-primary text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-xs max-w-full">
+                  <span className="material-symbols-outlined text-sm sm:text-base shrink-0">favorite</span>
+                  <span className="truncate sm:whitespace-normal">Plataforma Inteligente de Doação de Sangue</span>
                 </div>
 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold headline-font text-on-surface leading-[1.15]">
-                  Sua doação faz o sangue certo chegar a quem <span className="text-primary underline decoration-red-300 decoration-wavy underline-offset-8">mais precisa</span>.
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold headline-font text-on-surface leading-tight sm:leading-[1.15]">
+                  Sua doação faz o sangue certo chegar a quem{" "}
+                  <span className="inline-block text-primary underline decoration-red-300 decoration-wavy underline-offset-4 sm:underline-offset-8">
+                    mais precisa
+                  </span>.
                 </h1>
 
-                <p className="text-lg text-secondary max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                <p className="text-sm sm:text-lg text-secondary max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
                   O BloodMatch conecta doadores voluntários diretamente a solicitações urgentes de sangue e hemocentros. Receba alertas de compatibilidade, agende doações e acompanhe o impacto real da sua solidariedade.
                 </p>
 
                 {/* Hero CTAs */}
-                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
                   <Link
                     to="/register"
-                    className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-white bg-pulse-gradient shadow-lg hover:shadow-red-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-base"
+                    className="w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl font-bold text-white bg-pulse-gradient shadow-lg hover:shadow-red-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
                   >
                     <span>Quero Ser Doador</span>
-                    <span className="material-symbols-outlined">arrow_forward</span>
+                    <span className="material-symbols-outlined text-lg">arrow_forward</span>
                   </Link>
 
                   <Link
                     to="/login"
-                    className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-gray-800 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-2 text-base"
+                    className="w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl font-bold text-gray-800 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
                   >
-                    <span className="material-symbols-outlined text-primary">login</span>
+                    <span className="material-symbols-outlined text-primary text-lg">login</span>
                     <span>Já Tenho Conta</span>
                   </Link>
                 </div>
 
                 {/* Trust Badges */}
-                <div className="pt-6 border-t border-gray-200/80 grid grid-cols-3 gap-4 text-center lg:text-left">
-                  <div>
-                    <p className="text-2xl lg:text-3xl font-extrabold headline-font text-primary">100%</p>
-                    <p className="text-xs text-secondary font-medium">Voluntário & Gratuito</p>
+                <div className="pt-6 border-t border-gray-200/80 grid grid-cols-3 gap-2 sm:gap-4 text-center lg:text-left">
+                  <div className="bg-white/60 sm:bg-transparent p-2 sm:p-0 rounded-xl">
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold headline-font text-primary">100%</p>
+                    <p className="text-[10px] sm:text-xs text-secondary font-medium leading-tight mt-0.5">Voluntário & Gratuito</p>
                   </div>
-                  <div>
-                    <p className="text-2xl lg:text-3xl font-extrabold headline-font text-primary">Em Tempo Real</p>
-                    <p className="text-xs text-secondary font-medium">Alertas de Urgência</p>
+                  <div className="bg-white/60 sm:bg-transparent p-2 sm:p-0 rounded-xl">
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold headline-font text-primary">Em Tempo Real</p>
+                    <p className="text-[10px] sm:text-xs text-secondary font-medium leading-tight mt-0.5">Alertas Urgentes</p>
                   </div>
-                  <div>
-                    <p className="text-2xl lg:text-3xl font-extrabold headline-font text-primary">ABO / Rh</p>
-                    <p className="text-xs text-secondary font-medium">Match Inteligente</p>
+                  <div className="bg-white/60 sm:bg-transparent p-2 sm:p-0 rounded-xl">
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold headline-font text-primary">ABO / Rh</p>
+                    <p className="text-[10px] sm:text-xs text-secondary font-medium leading-tight mt-0.5">Match Inteligente</p>
                   </div>
                 </div>
               </div>
