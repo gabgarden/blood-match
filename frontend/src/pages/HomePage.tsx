@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { resolvePostLoginPath } from "../routes/roleRouting";
+import { OtherCausesSection } from "../components/OtherCausesSection";
 
 type BloodTypeKey = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 
@@ -81,6 +82,9 @@ export default function HomePage() {
             </a>
             <a href="#vantagens" className="hover:text-primary transition-colors">
               Por Que Doar
+            </a>
+            <a href="#outras-causas" className="hover:text-primary transition-colors font-semibold text-primary">
+              Outras Causas
             </a>
           </nav>
 
@@ -439,6 +443,9 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Section: Outras Causas Informativo */}
+        <OtherCausesSection />
+
         {/* Section: Call to Action Banner */}
         <section className="py-16 bg-gradient-to-r from-red-800 via-primary to-red-700 text-white relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
@@ -497,6 +504,11 @@ export default function HomePage() {
               <li>
                 <a href="#vantagens" className="hover:text-white transition-colors">
                   Por Que Doar
+                </a>
+              </li>
+              <li>
+                <a href="#outras-causas" className="hover:text-white transition-colors">
+                  Outras Causas (Aférese, Medula, Órgãos)
                 </a>
               </li>
             </ul>

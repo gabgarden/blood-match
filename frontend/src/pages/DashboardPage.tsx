@@ -14,6 +14,7 @@ import { FullPageLoading, InlineAlert } from "../components/ui";
 import { useRoleResolution } from "../hooks/useRoleResolution";
 import { hasAdminRole, hasDonorRole, hasRequesterRole } from "../routes/roleRouting";
 import { externalDonationCreatePath } from "../services/donationService";
+import { OtherCausesSection } from "../components/OtherCausesSection";
 
 export default function DonorDashboardPage() {
   const navigate = useNavigate();
@@ -207,6 +208,11 @@ export default function DonorDashboardPage() {
                   </div>
                 )}
               </section>
+
+              {/* Seção Informativa de Outras Causas */}
+              <div className="rounded-[2rem] overflow-hidden border border-surface-container-high shadow-sm bg-white">
+                <OtherCausesSection />
+              </div>
             </>
           )}
 

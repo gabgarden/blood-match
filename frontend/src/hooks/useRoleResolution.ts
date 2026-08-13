@@ -7,11 +7,9 @@ export function useRoleResolution(roles: string[]): boolean {
 
   useEffect(() => {
     if (roles.length > 0) {
-      setIsResolvingRoles(false);
       return;
     }
 
-    setIsResolvingRoles(true);
     const timer = window.setTimeout(() => {
       setIsResolvingRoles(false);
     }, ROLE_RESOLUTION_DELAY_MS);
@@ -21,5 +19,5 @@ export function useRoleResolution(roles: string[]): boolean {
     };
   }, [roles]);
 
-  return isResolvingRoles;
-}
+  return roles.length > 0 ? false : isResolvingRoles;
+}

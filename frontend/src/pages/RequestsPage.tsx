@@ -129,20 +129,6 @@ export default function RequestsPage() {
     }
   }
 
-  if (isResolvingRoles) {
-    return <FullPageLoading message="Carregando permissões..." />;
-  }
-
-  if (!canAccessRequesterArea && !canAccessAdminArea) {
-    return (
-      <main className="min-h-screen bg-surface p-6">
-        <div className="mx-auto max-w-3xl">
-          <AccessDenied title="Área de Requisições indisponível" />
-        </div>
-      </main>
-    );
-  }
-
   const availableBloodTypes = useMemo(() => {
     const dynamicTypes = Array.from(
       new Set(
@@ -174,6 +160,21 @@ export default function RequestsPage() {
   }, [requestCards, selectedBloodType, statusFilter]);
 
   const pendingDeleteRequest = requestCards.find((request) => request.id === pendingDeleteId) ?? null;
+
+  if (isResolvingRoles) {
+    return <FullPageLoading message="Carregando permissões..." />;
+  }
+
+  if (!canAccessRequesterArea && !canAccessAdminArea) {
+    return (
+      <main className="min-h-screen bg-surface p-6">
+        <div className="mx-auto max-w-3xl">
+          <AccessDenied title="Área de Requisições indisponível" />
+        </div>
+      </main>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d]">

@@ -1,4 +1,4 @@
-export const AVATAR_ICONS = [
+const AVATAR_ICONS = [
   { id: "water_drop", label: "Gota", icon: "water_drop" },
   { id: "favorite", label: "Coração", icon: "favorite" },
   { id: "medical_services", label: "Cruz Médica", icon: "medical_services" },

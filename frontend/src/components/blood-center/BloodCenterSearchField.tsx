@@ -55,7 +55,7 @@ export function BloodCenterSearchField({
     if (value) {
       setQuery(value.name);
     }
-  }, [value?.organizationId, value?.name]);
+  }, [value]);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {

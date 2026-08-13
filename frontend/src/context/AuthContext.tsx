@@ -16,18 +16,12 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<AuthSession | null>(() =>
+    authService.isAuthenticated() ? authService.getSession() : null,
+  );
+  const [isLoading] = useState(false);
 
   useEffect(() => {
-    if (authService.isAuthenticated()) {
-      setSession(authService.getSession());
-    } else {
-      setSession(null);
-    }
-
-    setIsLoading(false);
-
     const handleSessionExpired = () => {
       setSession(null);
     };
@@ -64,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
 
