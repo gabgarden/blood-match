@@ -2,8 +2,8 @@ package bloodmatch.application.usecase.role;
 
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.usecase.role.searchbloodcenters.SearchBloodCentersUseCase;
-import bloodmatch.domain.repositories.BloodCenterDirectoryEntry;
-import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterDirectoryEntry;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterRepositoryInterface;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

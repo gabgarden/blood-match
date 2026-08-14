@@ -1,4 +1,4 @@
-package bloodmatch.domain.repositories;
+package bloodmatch.domain.roles.organization.bloodcenter;
 
 /**
  * Lightweight directory projection for blood-center search results.

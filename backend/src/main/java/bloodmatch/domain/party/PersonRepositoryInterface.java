@@ -1,6 +1,5 @@
-package bloodmatch.domain.repositories;
+package bloodmatch.domain.party;
 
-import bloodmatch.domain.party.Person;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.util.Optional;

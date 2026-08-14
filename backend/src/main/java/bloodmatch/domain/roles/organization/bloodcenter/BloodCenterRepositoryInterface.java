@@ -1,6 +1,5 @@
-package bloodmatch.domain.repositories;
+package bloodmatch.domain.roles.organization.bloodcenter;
 
-import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.util.List;

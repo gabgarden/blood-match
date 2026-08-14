@@ -1,7 +1,7 @@
 package bloodmatch.infra.persistence.repository;
 
-import bloodmatch.domain.repositories.RequesterRepositoryInterface;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
+import bloodmatch.domain.roles.requester.RequesterRepositoryInterface;
+import bloodmatch.domain.party.PartyRepositoryInterface;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.persistence.repository.mongo.RequesterMongoRepository;

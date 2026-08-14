@@ -9,7 +9,7 @@ import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
+import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.BloodType;

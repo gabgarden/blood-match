@@ -6,8 +6,8 @@ import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.application.shared.PartyOwnership;
 import bloodmatch.application.usecase.donation.fulfillment.DonationRequestFulfillmentRefresher;
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
-import bloodmatch.domain.repositories.DonorRepositoryInterface;
+import bloodmatch.domain.donation.DonationRepositoryInterface;
+import bloodmatch.domain.roles.person.donor.DonorRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
 

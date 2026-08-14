@@ -1,7 +1,7 @@
 package bloodmatch.infra.persistence.schema;
 
 import bloodmatch.domain.party.Person;
-import bloodmatch.domain.repositories.PersonRepositoryInterface;
+import bloodmatch.domain.party.PersonRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.shared.valueObjects.BloodType;

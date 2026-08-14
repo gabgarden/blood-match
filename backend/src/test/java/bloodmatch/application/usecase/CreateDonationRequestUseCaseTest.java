@@ -5,10 +5,10 @@ import bloodmatch.application.usecase.donationrequest.CreateDonationRequestUseCa
 import bloodmatch.application.usecase.donationrequest.CreateDonationRequestUseCase.Input;
 import bloodmatch.domain.services.GeocodingServiceInterface;
 import bloodmatch.domain.party.Person;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
-import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
-import bloodmatch.domain.repositories.RequesterRepositoryInterface;
+import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterRepositoryInterface;
+import bloodmatch.domain.party.PartyRepositoryInterface;
+import bloodmatch.domain.roles.requester.RequesterRepositoryInterface;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.shared.valueObjects.Address;

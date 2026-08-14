@@ -1,6 +1,6 @@
 package bloodmatch.infra.persistence.repository;
 
-import bloodmatch.domain.repositories.UserAccountRepositoryInterface;
+import bloodmatch.domain.security.UserAccountRepositoryInterface;
 import bloodmatch.domain.security.UserAccount;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.Email;

@@ -1,6 +1,5 @@
-package bloodmatch.domain.repositories;
+package bloodmatch.domain.roles.requester;
 
-import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.util.Optional;

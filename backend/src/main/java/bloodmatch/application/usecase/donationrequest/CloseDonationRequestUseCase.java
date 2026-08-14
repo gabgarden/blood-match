@@ -4,7 +4,7 @@ import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.donationrequest.DonationRequest;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
+import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import org.springframework.stereotype.Service;

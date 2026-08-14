@@ -2,8 +2,8 @@ package bloodmatch.application.usecase.donation.fulfillment;
 
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
+import bloodmatch.domain.donation.DonationRepositoryInterface;
+import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
 import bloodmatch.domain.services.DonationRequestFulfillmentService;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;

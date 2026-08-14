@@ -2,8 +2,8 @@ package bloodmatch.application.usecase.donationrequest;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.matching.DonorMatchingService;
-import bloodmatch.domain.repositories.DonationRequestRepositoryInterface;
-import bloodmatch.domain.repositories.DonorRepositoryInterface;
+import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
+import bloodmatch.domain.roles.person.donor.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.interfaces.DonorRecommendationPolicyInterface;

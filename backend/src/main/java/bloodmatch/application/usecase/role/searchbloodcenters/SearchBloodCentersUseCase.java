@@ -1,8 +1,8 @@
 package bloodmatch.application.usecase.role.searchbloodcenters;
 
 import bloodmatch.application.exception.ValidationException;
-import bloodmatch.domain.repositories.BloodCenterDirectoryEntry;
-import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterDirectoryEntry;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterRepositoryInterface;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

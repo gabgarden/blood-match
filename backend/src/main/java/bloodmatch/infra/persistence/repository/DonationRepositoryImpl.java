@@ -1,9 +1,9 @@
 package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
-import bloodmatch.domain.repositories.DonorRepositoryInterface;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterRepositoryInterface;
+import bloodmatch.domain.donation.DonationRepositoryInterface;
+import bloodmatch.domain.roles.person.donor.DonorRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.persistence.repository.mongo.DonationMongoRepository;
 import bloodmatch.infra.persistence.schema.DonationSchema;

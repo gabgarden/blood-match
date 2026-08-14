@@ -1,7 +1,7 @@
 package bloodmatch.infra.persistence.schema;
 
 import bloodmatch.domain.party.Party;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
+import bloodmatch.domain.party.PartyRepositoryInterface;
 import bloodmatch.domain.roles.requester.Requester;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import lombok.AllArgsConstructor;

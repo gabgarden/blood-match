@@ -1,7 +1,7 @@
 package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.party.Party;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
+import bloodmatch.domain.party.PartyRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.persistence.repository.mongo.PartyMongoRepository;
 import bloodmatch.infra.persistence.schema.PartySchema;

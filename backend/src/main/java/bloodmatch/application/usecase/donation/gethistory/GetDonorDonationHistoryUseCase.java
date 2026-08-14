@@ -3,7 +3,7 @@ package bloodmatch.application.usecase.donation.gethistory;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.repositories.DonationRepositoryInterface;
+import bloodmatch.domain.donation.DonationRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
 

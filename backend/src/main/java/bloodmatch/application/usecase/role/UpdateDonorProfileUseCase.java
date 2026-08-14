@@ -3,7 +3,7 @@ package bloodmatch.application.usecase.role;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
-import bloodmatch.domain.repositories.DonorRepositoryInterface;
+import bloodmatch.domain.roles.person.donor.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;

@@ -1,8 +1,8 @@
 package bloodmatch.infra.persistence.repository;
 
-import bloodmatch.domain.repositories.BloodCenterDirectoryEntry;
-import bloodmatch.domain.repositories.BloodCenterRepositoryInterface;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterDirectoryEntry;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterRepositoryInterface;
+import bloodmatch.domain.party.PartyRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.persistence.repository.mongo.BloodCenterMongoRepository;

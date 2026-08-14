@@ -1,7 +1,7 @@
 package bloodmatch.application.usecase.auth;
 
 import bloodmatch.application.exception.UnauthorizedException;
-import bloodmatch.domain.repositories.UserAccountRepositoryInterface;
+import bloodmatch.domain.security.UserAccountRepositoryInterface;
 import bloodmatch.domain.security.SecurityRole;
 import bloodmatch.domain.security.UserAccount;
 import bloodmatch.domain.shared.valueObjects.DomainID;

@@ -4,7 +4,7 @@ import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.usecase.role.UpdateDonorRecommendationDistanceUseCase.Input;
 import bloodmatch.application.usecase.role.UpdateDonorRecommendationDistanceUseCase.Output;
 import bloodmatch.domain.party.Person;
-import bloodmatch.domain.repositories.DonorRepositoryInterface;
+import bloodmatch.domain.roles.person.donor.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CPF;

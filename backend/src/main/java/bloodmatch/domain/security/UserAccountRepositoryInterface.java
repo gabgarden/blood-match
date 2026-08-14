@@ -1,6 +1,5 @@
-package bloodmatch.domain.repositories;
+package bloodmatch.domain.security;
 
-import bloodmatch.domain.security.UserAccount;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.Email;
 

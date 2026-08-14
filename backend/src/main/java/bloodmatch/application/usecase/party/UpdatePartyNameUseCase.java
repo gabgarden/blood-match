@@ -4,7 +4,7 @@ import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.party.Party;
-import bloodmatch.domain.repositories.PartyRepositoryInterface;
+import bloodmatch.domain.party.PartyRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
