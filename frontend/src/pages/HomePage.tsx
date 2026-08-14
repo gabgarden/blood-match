@@ -30,6 +30,82 @@ const RECEIVE_FROM_MAP: Record<BloodTypeKey, BloodTypeKey[]> = {
   "AB+": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
 };
 
+type BloodTypeDetail = {
+  badge: string;
+  badgeClass: string;
+  rarityBrazil: string;
+  coveragePercent: number;
+  description: string;
+  systemRole: string;
+};
+
+const BLOOD_TYPE_DETAILS: Record<BloodTypeKey, BloodTypeDetail> = {
+  "O-": {
+    badge: "Doador Universal de Hemácias",
+    badgeClass: "bg-red-100 text-red-800 border-red-200",
+    rarityBrazil: "~3% da população",
+    coveragePercent: 100,
+    description: "Crucial em UTIs e emergências graves quando não há tempo para tipagem prévia.",
+    systemRole: "Item estratégico de prioridade máxima na busca ativa da rede BloodMatch.",
+  },
+  "O+": {
+    badge: "Tipo Mais Comum no Brasil",
+    badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
+    rarityBrazil: "~36% da população",
+    coveragePercent: 82,
+    description: "Compatível com todos os receptores Rh positivos (O+, A+, B+, AB+).",
+    systemRole: "Representa a maior parcela das solicitações diárias nos hemocentros parceiros.",
+  },
+  "A+": {
+    badge: "Alta Demanda Hospitalar",
+    badgeClass: "bg-red-100 text-red-700 border-red-200",
+    rarityBrazil: "~34% da população",
+    coveragePercent: 42,
+    description: "Essencial para pacientes A+ e AB+ em tratamentos de rotina e cirurgias.",
+    systemRole: "Importante para manutenção contínua dos estoques cirúrgicos municipais.",
+  },
+  "A-": {
+    badge: "Doador Raro e Estratégico",
+    badgeClass: "bg-purple-100 text-purple-800 border-purple-200",
+    rarityBrazil: "~3% da população",
+    coveragePercent: 85,
+    description: "Pode doar para A+, A-, AB+ e AB-. Vital para receptores Rh negativos.",
+    systemRole: "Ativa alertas prioritários em doadores cadastrados ao surgir um pedido.",
+  },
+  "B+": {
+    badge: "Especificidade de Grupo B",
+    badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
+    rarityBrazil: "~8% da população",
+    coveragePercent: 12,
+    description: "Atende pacientes B+ e AB+. Pode receber doações dos grupos O e B.",
+    systemRole: "Garante suporte transfusional constante para tratamentos hematológicos.",
+  },
+  "B-": {
+    badge: "Tipo Sanguíneo Raro",
+    badgeClass: "bg-purple-100 text-purple-800 border-purple-200",
+    rarityBrazil: "~2% da população",
+    coveragePercent: 55,
+    description: "Atende B+, B-, AB+ e AB-. Pouquíssimos doadores compatíveis no país.",
+    systemRole: "Convocações ativas imediatas via SMS/Push para doadores cadastrados.",
+  },
+  "AB+": {
+    badge: "Receptor Universal",
+    badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    rarityBrazil: "~2.5% da população",
+    coveragePercent: 3,
+    description: "Pode receber sangue de QUALQUER tipo ABO/Rh com total segurança imunológica.",
+    systemRole: "Doadores AB+ são incentivados à doação de plasma e aférese de plaquetas.",
+  },
+  "AB-": {
+    badge: "Tipo Sanguíneo Raríssimo",
+    badgeClass: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    rarityBrazil: "< 1% da população",
+    coveragePercent: 5,
+    description: "O grupo ABO com menor número de doadores ativos em território nacional.",
+    systemRole: "Alertas de alta sensibilidade para mobilização de doadores raros.",
+  },
+};
+
 export default function HomePage() {
   const { isAuthenticated, roles } = useAuth();
   const [selectedBloodType, setSelectedBloodType] = useState<BloodTypeKey>("O-");
@@ -37,6 +113,7 @@ export default function HomePage() {
   const dashboardPath = resolvePostLoginPath(roles);
   const canDonateTo = DONATE_TO_MAP[selectedBloodType];
   const canReceiveFrom = RECEIVE_FROM_MAP[selectedBloodType];
+  const currentDetail = BLOOD_TYPE_DETAILS[selectedBloodType];
 
   return (
     <div className="min-h-screen bg-surface font-body text-on-surface flex flex-col">
@@ -170,66 +247,135 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right Column Graphic / Cards */}
-              <div className="lg:col-span-5 relative">
+              {/* Right Column Interactive Compatibility Simulator Card */}
+              <div id="compatibilidade" className="lg:col-span-5 relative scroll-mt-24">
                 <div className="relative mx-auto max-w-md lg:max-w-none">
                   {/* Decorative background glow */}
                   <div className="absolute -top-6 -left-6 w-72 h-72 bg-red-400/20 rounded-full blur-3xl pointer-events-none" />
                   <div className="absolute -bottom-6 -right-6 w-72 h-72 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
-                  {/* Glass Card Showcase */}
-                  <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/60 space-y-6">
-                    <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-red-100 text-primary flex items-center justify-center font-bold text-xl">
-                          O-
+                  {/* Interactive Compatibility Card */}
+                  <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-6 sm:p-7 shadow-2xl border border-white/60 space-y-5">
+                    {/* Header */}
+                    <div className="flex items-center justify-between gap-2 pb-3 border-b border-gray-100">
+                      <div>
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-wider">
+                          <span className="material-symbols-outlined text-base">analytics</span>
+                          <span>Simulador de Compatibilidade</span>
                         </div>
-                        <div>
-                          <h3 className="font-bold text-gray-900">Doador Universal</h3>
-                          <p className="text-xs text-gray-500">Compatível com todos os grupos</p>
-                        </div>
+                        <h3 className="font-extrabold text-base text-gray-900 mt-0.5">
+                          Selecione seu Tipo Sanguíneo:
+                        </h3>
                       </div>
-                      <span className="px-3 py-1 bg-red-50 text-primary text-xs font-extrabold rounded-full animate-pulse">
-                        Urgência Alta
+                      <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-red-50 text-primary border border-red-100 shrink-0">
+                        {currentDetail.rarityBrazil}
                       </span>
                     </div>
 
-                    <div className="bg-surface-container-low rounded-2xl p-4 space-y-3">
-                      <div className="flex justify-between items-center text-xs font-semibold text-gray-600">
-                        <span>Status dos Estoques de Sangue</span>
-                        <span className="text-red-600 font-bold">Nível Crítico</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                        <div className="bg-red-600 h-2.5 rounded-full w-[35%]" />
-                      </div>
-                      <p className="text-[11px] text-gray-500 flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm text-red-500">warning</span>
-                        Hemocentros da região necessitam doações O- e A- esta semana.
-                      </p>
+                    {/* Interactive Blood Type Selector Pills */}
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {BLOOD_TYPES.map((bt) => {
+                        const isSelected = selectedBloodType === bt;
+                        return (
+                          <button
+                            key={bt}
+                            onClick={() => setSelectedBloodType(bt)}
+                            type="button"
+                            className={`py-2 rounded-xl font-black text-xs transition-all duration-200 flex items-center justify-center gap-1 ${
+                              isSelected
+                                ? "bg-primary text-white shadow-md scale-105 ring-2 ring-red-300"
+                                : "bg-gray-100/80 text-gray-700 hover:bg-red-50 hover:text-primary"
+                            }`}
+                          >
+                            <span>{bt}</span>
+                          </button>
+                        );
+                      })}
                     </div>
 
-                    <div className="space-y-3 pt-2">
-                      <div className="flex items-center gap-3 p-3 bg-red-50/50 rounded-xl border border-red-100">
-                        <span className="material-symbols-outlined text-primary">notifications_active</span>
-                        <div className="text-xs">
-                          <p className="font-bold text-gray-900">Notificações Diretas</p>
-                          <p className="text-gray-600">Receba alertas quando seu sangue puder salvar alguém.</p>
+                    {/* Selected Blood Type Main Showcase */}
+                    <div className="bg-surface-container-low rounded-2xl p-4 space-y-3.5 border border-gray-100">
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-pulse-gradient text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
+                          {selectedBloodType}
+                        </div>
+                        <div className="space-y-1">
+                          <span className={`inline-block px-2.5 py-0.5 text-[10px] font-extrabold rounded-full border ${currentDetail.badgeClass}`}>
+                            {currentDetail.badge}
+                          </span>
+                          <p className="text-xs text-gray-600 font-medium leading-tight">
+                            {currentDetail.description}
+                          </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
-                        <span className="material-symbols-outlined text-blue-600">verified</span>
-                        <div className="text-xs">
-                          <p className="font-bold text-gray-900">Validação Oficial</p>
-                          <p className="text-gray-600">Registre doações e ganhe histórico verificado.</p>
+
+                      {/* Coverage Progress Bar */}
+                      <div className="space-y-1.5 pt-1">
+                        <div className="flex justify-between items-center text-[11px] font-bold text-gray-700">
+                          <span>Alcance Transfusional na População</span>
+                          <span className="text-primary font-black">{currentDetail.coveragePercent}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200/80 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-primary h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${currentDetail.coveragePercent}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* System Role Note */}
+                      <div className="flex items-start gap-2 text-[11px] text-gray-600 bg-white/80 p-2.5 rounded-xl border border-gray-200/60">
+                        <span className="material-symbols-outlined text-primary text-sm shrink-0 mt-0.5">verified</span>
+                        <span className="leading-tight">{currentDetail.systemRole}</span>
+                      </div>
+                    </div>
+
+                    {/* Compatibility Quick Grid */}
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      {/* Can donate to */}
+                      <div className="p-3 bg-red-50/60 rounded-2xl border border-red-100/80 space-y-1.5">
+                        <span className="text-[10px] font-bold uppercase text-primary tracking-wider block">
+                          Pode Doar Para ({canDonateTo.length})
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {canDonateTo.map((bt) => (
+                            <span
+                              key={bt}
+                              className="px-2 py-0.5 rounded-md bg-white text-primary font-extrabold text-[11px] border border-red-200 shadow-xs"
+                            >
+                              {bt}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Can receive from */}
+                      <div className="p-3 bg-emerald-50/60 rounded-2xl border border-emerald-100/80 space-y-1.5">
+                        <span className="text-[10px] font-bold uppercase text-emerald-700 tracking-wider block">
+                          Pode Receber De ({canReceiveFrom.length})
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {canReceiveFrom.map((bt) => (
+                            <span
+                              key={bt}
+                              className="px-2 py-0.5 rounded-md bg-white text-emerald-800 font-extrabold text-[11px] border border-emerald-200 shadow-xs"
+                            >
+                              {bt}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     </div>
 
+                    {/* CTA Button */}
                     <Link
                       to="/register"
-                      className="block w-full text-center py-3 bg-gray-900 hover:bg-black text-white font-semibold text-sm rounded-xl transition-all shadow-md"
+                      className="w-full text-center py-3 bg-gray-900 hover:bg-black text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 group"
                     >
-                      Cadastrar Tipo Sanguíneo
+                      <span>Cadastrar como Doador {selectedBloodType}</span>
+                      <span className="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">
+                        arrow_forward
+                      </span>
                     </Link>
                   </div>
                 </div>
@@ -299,106 +445,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Interactive Section: Compatibilidade Sanguínea */}
-        <section id="compatibilidade" className="py-20 bg-white border-y border-gray-200/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-14">
-              <h2 className="text-xs font-bold text-primary uppercase tracking-widest mb-2">
-                Guia Biológico de Doação
-              </h2>
-              <p className="text-3xl sm:text-4xl font-extrabold headline-font text-on-surface">
-                Descubra com quem você é compatível
-              </p>
-              <p className="mt-4 text-base text-secondary">
-                Clique no seu tipo sanguíneo abaixo para ver para quem você pode doar e de quem pode receber sangue.
-              </p>
-            </div>
 
-            {/* Selector Grid */}
-            <div className="flex flex-wrap justify-center gap-3 mb-10">
-              {BLOOD_TYPES.map((bt) => {
-                const isSelected = selectedBloodType === bt;
-                return (
-                  <button
-                    key={bt}
-                    onClick={() => setSelectedBloodType(bt)}
-                    className={`px-5 py-3 rounded-2xl font-extrabold text-base transition-all duration-200 flex items-center gap-1.5 shadow-xs ${
-                      isSelected
-                        ? "bg-primary text-white scale-110 shadow-md ring-4 ring-red-100"
-                        : "bg-surface-container-low text-gray-700 hover:bg-red-50 hover:text-primary"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-lg">water_drop</span>
-                    <span>{bt}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Results Display */}
-            <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-              {/* Can donate to */}
-              <div className="bg-surface p-6 sm:p-8 rounded-3xl border border-gray-200/80 shadow-sm space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-red-100 text-primary flex items-center justify-center">
-                    <span className="material-symbols-outlined">output</span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-900">Pode Doar Para</h3>
-                    <p className="text-xs text-gray-500">Receptores compatíveis para {selectedBloodType}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {canDonateTo.map((bt) => (
-                    <span
-                      key={bt}
-                      className="px-4 py-2 rounded-xl bg-white border border-red-200 text-primary font-bold text-sm shadow-xs"
-                    >
-                      {bt}
-                    </span>
-                  ))}
-                </div>
-
-                {selectedBloodType === "O-" && (
-                  <p className="text-xs text-red-700 font-semibold bg-red-50 p-3 rounded-xl border border-red-100">
-                    💡 O- é o doador universal de hemácias! Seu sangue pode ser transfundido em qualquer pessoa em situações de emergência.
-                  </p>
-                )}
-              </div>
-
-              {/* Can receive from */}
-              <div className="bg-surface p-6 sm:p-8 rounded-3xl border border-gray-200/80 shadow-sm space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                    <span className="material-symbols-outlined">input</span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-900">Pode Receber De</h3>
-                    <p className="text-xs text-gray-500">Doadores compatíveis para {selectedBloodType}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {canReceiveFrom.map((bt) => (
-                    <span
-                      key={bt}
-                      className="px-4 py-2 rounded-xl bg-white border border-emerald-200 text-emerald-800 font-bold text-sm shadow-xs"
-                    >
-                      {bt}
-                    </span>
-                  ))}
-                </div>
-
-                {selectedBloodType === "AB+" && (
-                  <p className="text-xs text-emerald-700 font-semibold bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-                    💡 AB+ é o receptor universal! Pode receber sangue de qualquer tipo ABO/Rh com segurança.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Section: Vantagens */}
         <section id="vantagens" className="py-20 bg-surface">
