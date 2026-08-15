@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/authService";
 import { AppButton, AppCard, BackButton, InlineAlert } from "../components/ui";
 import { resolvePostLoginPath } from "../routes/roleRouting";
-import { extractApiErrorMessage } from "../utils/apiError";
+import { extractApiErrorMessage, isUnconfirmedAccountError } from "../utils/apiError";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -15,7 +15,9 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     const notice = authService.consumePostLoginNotice();
@@ -29,11 +31,31 @@ export default function LoginPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
+  async function handleResendConfirmation() {
+    if (!form.email.trim()) {
+      setErrorMessage("Informe o e-mail para reenviar a confirmação.");
+      return;
+    }
+
+    setIsResending(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const result = await authService.resendConfirmation(form.email.trim());
+      setSuccessMessage(result.message);
+    } catch (error) {
+      setErrorMessage(extractApiErrorMessage(error, "Não foi possível reenviar o e-mail agora."));
+    } finally {
+      setIsResending(false);
+    }
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    // Login flow: authenticate, then return user to intended protected route.
     event.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
+    setNeedsEmailConfirmation(false);
     setIsSubmitting(true);
 
     try {
@@ -42,7 +64,10 @@ export default function LoginPage() {
         (location.state as { from?: string } | null)?.from ?? resolvePostLoginPath(session.roles);
       navigate(redirectPath, { replace: true });
     } catch (error) {
-      if (isAxiosError(error) && error.response?.status === 401) {
+      if (isUnconfirmedAccountError(error)) {
+        setNeedsEmailConfirmation(true);
+        setErrorMessage("Confirme seu e-mail antes de entrar.");
+      } else if (isAxiosError(error) && error.response?.status === 401) {
         setErrorMessage("E-mail ou senha inválidos.");
       } else {
         setErrorMessage(extractApiErrorMessage(error, "Não foi possível entrar. Tente novamente em instantes."));
@@ -65,6 +90,19 @@ export default function LoginPage() {
 
         {successMessage && <InlineAlert className="mb-4" tone="success" message={successMessage} />}
         {errorMessage && <InlineAlert className="mb-4" tone="error" message={errorMessage} />}
+
+        {needsEmailConfirmation && (
+          <AppButton
+            type="button"
+            variant="secondary"
+            fullWidth
+            className="mb-4"
+            disabled={isResending}
+            onClick={handleResendConfirmation}
+          >
+            {isResending ? "Reenviando..." : "Reenviar e-mail de confirmação"}
+          </AppButton>
+        )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>

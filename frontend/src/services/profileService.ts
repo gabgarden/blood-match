@@ -4,10 +4,21 @@ type CreateDonorPayload = {
   personId: string;
   bloodType: string;
   weight: number;
+  lastDonationDate?: string;
 };
 
 export async function createDonorProfile(payload: CreateDonorPayload) {
-  const response = await api.post("/donors", payload);
+  const body: CreateDonorPayload = {
+    personId: payload.personId,
+    bloodType: payload.bloodType,
+    weight: payload.weight,
+  };
+
+  if (payload.lastDonationDate) {
+    body.lastDonationDate = payload.lastDonationDate;
+  }
+
+  const response = await api.post("/donors", body);
   return response.data;
 }
 

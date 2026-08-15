@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { authService } from "../services/authService";
+import { completePendingProfiles, clearPendingProfiles } from "../services/pendingProfiles";
 import type { AuthSession, LoginCredentials } from "../types/auth";
 
 type AuthContextValue = {
@@ -35,7 +36,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (credentials: LoginCredentials) => {
     const nextSession = await authService.login(credentials);
     setSession(nextSession);
-    return nextSession;
+
+    try {
+      const didCreateRoles = await completePendingProfiles(nextSession.partyId);
+      if (!didCreateRoles) {
+        return nextSession;
+      }
+
+      const refreshedSession = await authService.login(credentials);
+      clearPendingProfiles();
+      setSession(refreshedSession);
+      return refreshedSession;
+    } catch (error) {
+      throw error;
+    }
   }, []);
 
   const logout = useCallback(() => {

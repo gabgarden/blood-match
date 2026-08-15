@@ -29,4 +29,5 @@ export type ApiResponse = {
   type?: string;
   error?: string;
   message?: string;
+  emailConfirmationRequired?: boolean;
 };

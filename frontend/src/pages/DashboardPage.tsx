@@ -13,7 +13,9 @@ import { CommunityImpactSection } from "../components/dashboard/CommunityImpactS
 import { useDonorDashboard, type Recommendation } from "../hooks/useDonorDashboard";
 import { FullPageLoading, InlineAlert } from "../components/ui";
 import { useRoleResolution } from "../hooks/useRoleResolution";
-import { hasAdminRole, hasDonorRole, hasRequesterRole } from "../routes/roleRouting";
+import { hasAdminRole, hasBloodCenterRole, hasDonorRole, hasRequesterRole } from "../routes/roleRouting";
+import { BloodStockSemaphoreWidget } from "../components/dashboard/BloodStockSemaphoreWidget";
+import { useRegionalBloodStock } from "../hooks/useRegionalBloodStock";
 import { externalDonationCreatePath } from "../services/donationService";
 import { OtherCausesSection } from "../components/OtherCausesSection";
 
@@ -28,7 +30,9 @@ export default function DonorDashboardPage() {
   const canAccessDonorDashboard = hasDonorRole(normalizedRoles);
   const canAccessRequesterArea = hasRequesterRole(normalizedRoles);
   const canAccessAdminArea = hasAdminRole(normalizedRoles);
-  const isRequesterOnly = canAccessRequesterArea && !canAccessDonorDashboard && !canAccessAdminArea;
+  const canAccessBloodCenter = hasBloodCenterRole(normalizedRoles);
+  const isRequesterOnly = canAccessRequesterArea && !canAccessDonorDashboard && !canAccessAdminArea && !canAccessBloodCenter;
+  const isBloodCenterHome = canAccessBloodCenter && !canAccessDonorDashboard && !canAccessAdminArea;
 
   const {
     recommendations,
@@ -44,6 +48,12 @@ export default function DonorDashboardPage() {
     lastDonationId,
     acceptDonation,
   } = useDonorDashboard({ partyId, hasDonorRole: canAccessDonorDashboard });
+
+  const {
+    levels: stockLevels,
+    isLoading: isLoadingStock,
+    errorMessage: stockError,
+  } = useRegionalBloodStock(canAccessDonorDashboard);
 
   const waitingDays = Math.max(daysRemaining, 0);
   const isEligibleToDonate = waitingDays <= 0;
@@ -68,14 +78,17 @@ export default function DonorDashboardPage() {
     }
   }
 
-  async function handleConfirmSchedule(requestId: string, expectedDate: string) {
+  async function handleConfirmSchedule(requestId: string, expectedDate: string, expectedTime?: string) {
     setIsSubmittingSchedule(true);
     try {
-      await acceptDonation(requestId, expectedDate);
-      setSchedulingRecommendation(null);
+      return await acceptDonation(requestId, expectedDate, expectedTime);
     } finally {
       setIsSubmittingSchedule(false);
     }
+  }
+
+  if (isBloodCenterHome) {
+    return <Navigate to="/blood-center" replace />;
   }
 
   if (isRequesterOnly) {
@@ -91,7 +104,8 @@ export default function DonorDashboardPage() {
         <div className="mx-auto max-w-[1400px] space-y-6">
           {feedback && <InlineAlert tone="success" message={feedback} />}
           {errorMessage && <InlineAlert tone="error" message={errorMessage} />}
-          {canAccessDonorDashboard && (
+
+          {canAccessDonorDashboard && (
             <>
               <section className="grid grid-cols-12 gap-6">
                 <DonorHeroSection
@@ -116,6 +130,12 @@ export default function DonorDashboardPage() {
                 onSchedule={handleOpenScheduleModal}
                 isEligibleToDonate={isEligibleToDonate}
                 daysRemaining={waitingDays}
+              />
+
+              <BloodStockSemaphoreWidget
+                levels={stockLevels.map((level) => ({ type: level.bloodType, percentage: level.percentage }))}
+                isLoading={isLoadingStock}
+                errorMessage={stockError}
               />
 
               {/* Painel de Transparência e Impacto da Comunidade */}

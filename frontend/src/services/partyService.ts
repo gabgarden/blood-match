@@ -29,6 +29,8 @@ type DonorSummaryResponse = {
   lastDonationDate?: string | null;
   daysRemaining?: number | null;
   livesImpacted?: number | null;
+  weight?: number | null;
+  weightUpdatedAt?: string | null;
 };
 
 export type DonorHeroSummary = {
@@ -40,7 +42,22 @@ export type DonorHeroSummary = {
   daysRemaining: number | null;
   livesImpacted: number | null;
   lastDonationDate: string | null;
+  weight: number | null;
+  weightUpdatedAt: string | null;
 };
+
+function toFiniteNumberOrNull(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return null;
+}
 
 export async function fetchDonorHeroSummary(personId: string): Promise<DonorHeroSummary | null> {
   try {
@@ -55,6 +72,8 @@ export async function fetchDonorHeroSummary(personId: string): Promise<DonorHero
       daysRemaining: typeof data.daysRemaining === "number" ? data.daysRemaining : null,
       livesImpacted: typeof data.livesImpacted === "number" ? data.livesImpacted : null,
       lastDonationDate: data.lastDonationDate ?? null,
+      weight: toFiniteNumberOrNull(data.weight),
+      weightUpdatedAt: data.weightUpdatedAt ?? null,
     };
   } catch (error) {
     // Workaround: backend às vezes responde 401 "Unauthorized" neste endpoint com JWT válido.

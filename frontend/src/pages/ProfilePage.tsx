@@ -28,6 +28,23 @@ const labelClass = "block font-label text-sm font-semibold text-secondary upperc
 
 const DISTANCE_PRESETS = [10, 20, 30, 50, 100];
 
+function formatWeightKg(weight: number): string {
+  return `${new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(weight)} kg`;
+}
+
+function formatUpdatedAt(value: string | null): string {
+  if (!value) {
+    return "ainda não informado";
+  }
+
+  const [year, month, day] = value.slice(0, 10).split("-");
+  if (!year || !month || !day) {
+    return "ainda não informado";
+  }
+
+  return `Atualizado em ${day}/${month}/${year}`;
+}
+
 export default function ProfilePage() {
   const { roles, partyId, logout } = useAuth();
   const isResolvingRoles = useRoleResolution(roles);
@@ -37,7 +54,9 @@ export default function ProfilePage() {
 
   const [displayName, setDisplayName] = useState("");
   const [bloodType, setBloodType] = useState("O+");
-  const [weight, setWeight] = useState("");
+  const [registeredWeight, setRegisteredWeight] = useState<number | null>(null);
+  const [weightUpdatedAt, setWeightUpdatedAt] = useState<string | null>(null);
+  const [weightDraft, setWeightDraft] = useState("");
   const [maxDistanceInKm, setMaxDistanceInKm] = useState("30");
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [address, setAddress] = useState<string | null>(null);
@@ -93,6 +112,9 @@ export default function ProfilePage() {
             setLivesImpacted(summary.livesImpacted);
             setDaysRemaining(summary.daysRemaining);
             setLastDonationDate(summary.lastDonationDate);
+            setRegisteredWeight(summary.weight);
+            setWeightUpdatedAt(summary.weightUpdatedAt);
+            setWeightDraft(summary.weight != null ? String(summary.weight) : "");
           }
         }
       } catch (error) {
@@ -150,9 +172,9 @@ export default function ProfilePage() {
       return;
     }
 
-    const parsedWeight = Number(weight);
-    if (!bloodType || Number.isNaN(parsedWeight) || parsedWeight <= 0) {
-      setErrorMessage("Informe tipo sanguíneo e um peso corporal válido.");
+    const parsedWeight = Number(weightDraft.replace(",", "."));
+    if (!bloodType || Number.isNaN(parsedWeight) || parsedWeight < 50) {
+      setErrorMessage("Informe tipo sanguíneo e um peso de no mínimo 50 kg.");
       return;
     }
 
@@ -172,6 +194,9 @@ export default function ProfilePage() {
         weight: parsedWeight,
       });
       const distanceResult = await updateDonorRecommendationDistance(partyId, parsedDistance);
+      setRegisteredWeight(parsedWeight);
+      setWeightUpdatedAt(new Date().toISOString().slice(0, 10));
+      setWeightDraft(String(parsedWeight));
       setMaxDistanceInKm(String(distanceResult.maxDistanceInKm));
       setFeedback("Configurações e preferências atualizadas com sucesso.");
     } catch (error) {
@@ -217,7 +242,6 @@ export default function ProfilePage() {
             <>
               {canAccessDonorArea ? (
                 <>
-                  {/* Card Único de Configurações e Preferências */}
                   <ProfileSection
                     icon="tune"
                     title="Configurações & Preferências de Doador"
@@ -253,26 +277,33 @@ export default function ProfilePage() {
                           </div>
                         </div>
 
-                        <div className="max-w-xs">
-                          <label htmlFor="profile-weight" className={labelClass}>
-                            Peso Corporal (kg)
-                          </label>
-                          <div className="relative">
+                        <div className="rounded-2xl border border-surface-container-high bg-surface-container-low p-4 max-w-sm space-y-3">
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-secondary">
+                              Peso cadastrado
+                            </p>
+                            <p className="font-headline text-3xl font-black text-on-surface">
+                              {registeredWeight != null ? formatWeightKg(registeredWeight) : "—"}
+                            </p>
+                            <p className="mt-1 text-xs text-text-secondary">{formatUpdatedAt(weightUpdatedAt)}</p>
+                            <p className="mt-1 text-xs text-text-secondary">
+                              Atualize se seu peso mudou. O mínimo para doar é 50 kg.
+                            </p>
+                          </div>
+                          <label htmlFor="profile-weight" className="block text-xs font-bold text-secondary">
+                            Novo valor
                             <input
                               id="profile-weight"
-                              className={`${fieldClass} pr-12`}
+                              className={`${fieldClass} mt-1`}
                               type="number"
-                              min="1"
+                              min="50"
                               step="0.1"
-                              value={weight}
-                              onChange={(event) => setWeight(event.target.value)}
+                              value={weightDraft}
+                              onChange={(event) => setWeightDraft(event.target.value)}
                               placeholder="Ex: 72.5"
                               required
                             />
-                            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
-                              kg
-                            </span>
-                          </div>
+                          </label>
                         </div>
                       </div>
 

@@ -1,23 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Recommendation } from "../../hooks/useDonorDashboard";
+import { fetchDonationSlots, type DonationSlot } from "../../services/bloodCenterService";
 
 type ScheduleDonationModalProps = {
   isOpen: boolean;
   recommendation: Recommendation | null;
   onClose: () => void;
-  onConfirm: (requestId: string, expectedDate: string) => void;
+  onConfirm: (requestId: string, expectedDate: string, expectedTime?: string) => Promise<boolean> | boolean | void;
   isSubmitting?: boolean;
   daysRemaining?: number;
 };
 
 function todayIsoDate(): string {
-  return new Date().toISOString().slice(0, 10);
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function addDaysIsoDate(days: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function createGoogleCalendarUrl(title: string, details: string, location: string, dateIso: string): string {
@@ -44,17 +52,99 @@ export function ScheduleDonationModal({
 }: ScheduleDonationModalProps) {
   const minDate = daysRemaining > 0 ? addDaysIsoDate(daysRemaining) : todayIsoDate();
   const [expectedDate, setExpectedDate] = useState(minDate);
+  const [expectedTime, setExpectedTime] = useState<string>("");
+  const [slots, setSlots] = useState<DonationSlot[]>([]);
+  const [hasSchedule, setHasSchedule] = useState(false);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [slotsError, setSlotsError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    setExpectedDate(minDate);
+    setExpectedTime("");
+    setSlots([]);
+    setHasSchedule(false);
+    setSlotsError(null);
+    setIsSuccess(false);
+  }, [isOpen, recommendation?.id, minDate]);
+
+  useEffect(() => {
+    if (!isOpen || !recommendation?.organizationId || !expectedDate) {
+      return;
+    }
+
+    const organizationId = recommendation.organizationId;
+    let cancelled = false;
+
+    async function loadSlots() {
+      setIsLoadingSlots(true);
+      setSlotsError(null);
+      setExpectedTime("");
+
+      try {
+        const response = await fetchDonationSlots(organizationId, expectedDate);
+        if (cancelled) {
+          return;
+        }
+        setHasSchedule(response.hasSchedule);
+        setSlots(response.slots);
+      } catch {
+        if (cancelled) {
+          return;
+        }
+        setHasSchedule(false);
+        setSlots([]);
+        setSlotsError("Não foi possível carregar os horários. A data será enviada como intenção.");
+      } finally {
+        if (!cancelled) {
+          setIsLoadingSlots(false);
+        }
+      }
+    }
+
+    loadSlots();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, recommendation?.organizationId, expectedDate]);
 
   if (!isOpen || !recommendation) {
     return null;
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!recommendation) return;
-    await onConfirm(recommendation.id, expectedDate);
-    setIsSuccess(true);
+  const showTimePicker = hasSchedule && slots.length > 0;
+  const dateOnlyNote =
+    slotsError ||
+    (!isLoadingSlots && !hasSchedule
+      ? "Este hemocentro ainda confirma o horário no local. Enviaremos só a data por enquanto."
+      : !isLoadingSlots && hasSchedule && slots.length === 0
+        ? "Não há horários disponíveis nesta data."
+        : null);
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!recommendation) {
+      return;
+    }
+
+    if (showTimePicker && !expectedTime) {
+      return;
+    }
+
+    const ok = await onConfirm(
+      recommendation.id,
+      expectedDate,
+      showTimePicker ? expectedTime : undefined,
+    );
+
+    if (ok !== false) {
+      setIsSuccess(true);
+    }
   }
 
   function handleCloseModal() {
@@ -66,7 +156,7 @@ export function ScheduleDonationModal({
     `Doação de Sangue (${recommendation.bloodTypeNeeded}) - BloodMatch`,
     `Doação agendada no ${recommendation.bloodCenterName} para o tipo ${recommendation.bloodTypeNeeded}.`,
     recommendation.bloodCenterName,
-    expectedDate
+    expectedDate,
   );
 
   return (
@@ -82,7 +172,9 @@ export function ScheduleDonationModal({
                 {isSuccess ? "Doação Agendada!" : "Agendar Doação Pendente"}
               </h3>
               <p className="text-xs text-text-secondary">
-                {isSuccess ? "Sua intenção de doação foi salva com sucesso." : "Confirme a data prevista para comparecer ao hemocentro."}
+                {isSuccess
+                  ? "Sua intenção de doação foi salva com sucesso."
+                  : "Confirme a data prevista para comparecer ao hemocentro."}
               </p>
             </div>
           </div>
@@ -101,10 +193,11 @@ export function ScheduleDonationModal({
           <div className="mt-6 space-y-5">
             <div className="rounded-2xl bg-emerald-50/70 border border-emerald-100 p-4 space-y-2">
               <p className="text-sm font-bold text-emerald-800">
-                🎉 Tudo pronto! Lembre-se de beber bastante água e levar documento original com foto.
+                Tudo pronto! Lembre-se de beber bastante água e levar documento original com foto.
               </p>
               <p className="text-xs text-emerald-700">
-                Data marcada: <strong className="font-extrabold">{expectedDate.split("-").reverse().join("/")}</strong> no {recommendation.bloodCenterName}.
+                Data marcada: <strong className="font-extrabold">{expectedDate.split("-").reverse().join("/")}</strong>
+                {expectedTime ? ` às ${expectedTime}` : ""} no {recommendation.bloodCenterName}.
               </p>
             </div>
 
@@ -132,17 +225,13 @@ export function ScheduleDonationModal({
           <>
             <div className="mt-6 rounded-2xl bg-surface-container-low p-4 border border-surface-container-high space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-secondary">
-                  Hemocentro / Hospital
-                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-secondary">Hemocentro / Hospital</span>
                 <span className="inline-flex items-center gap-1 rounded-md bg-red-100 px-2 py-0.5 text-xs font-extrabold text-primary">
                   <span className="material-symbols-outlined text-sm">bloodtype</span>
                   {recommendation.bloodTypeNeeded}
                 </span>
               </div>
-              <p className="font-headline text-base font-bold text-on-surface">
-                {recommendation.bloodCenterName}
-              </p>
+              <p className="font-headline text-base font-bold text-on-surface">{recommendation.bloodCenterName}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -155,20 +244,69 @@ export function ScheduleDonationModal({
                   type="date"
                   min={minDate}
                   value={expectedDate}
-                  onChange={(e) => setExpectedDate(e.target.value)}
+                  onChange={(event) => setExpectedDate(event.target.value)}
                   required
                   className="w-full rounded-xl border border-surface-container-high bg-white px-4 py-3 text-sm font-bold text-on-surface shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 {daysRemaining > 0 && (
                   <p className="mt-2 text-xs text-amber-700 font-semibold bg-amber-50 p-2.5 rounded-xl border border-amber-100 flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-sm shrink-0 text-amber-600">hourglass_top</span>
-                    <span>Como você está em intervalo de descanso ({daysRemaining} dias restantes), a data mínima permitida foi definida para o seu primeiro dia de aptidão ({minDate.split("-").reverse().join("/")}).</span>
+                    <span>
+                      Como você está em intervalo de descanso ({daysRemaining} dias restantes), a data mínima permitida
+                      foi definida para o seu primeiro dia de aptidão ({minDate.split("-").reverse().join("/")}).
+                    </span>
                   </p>
                 )}
               </div>
 
+              {isLoadingSlots && (
+                <p className="text-xs text-text-secondary inline-flex items-center gap-1.5">
+                  <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+                  Buscando horários disponíveis...
+                </p>
+              )}
+
+              {showTimePicker && (
+                <div>
+                  <p className="block text-xs font-bold uppercase tracking-wider text-secondary mb-1.5">Horário</p>
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    {slots.map((slot) => {
+                      const disabled = slot.available === 0;
+                      const selected = expectedTime === slot.startTime;
+                      return (
+                        <button
+                          key={`${slot.startTime}-${slot.endTime}`}
+                          type="button"
+                          disabled={disabled}
+                          onClick={() => setExpectedTime(slot.startTime)}
+                          className={`rounded-xl px-2 py-2 text-xs font-bold transition-all ${
+                            selected
+                              ? "bg-primary text-white shadow-sm"
+                              : disabled
+                                ? "bg-surface-container-low text-gray-400 cursor-not-allowed"
+                                : "bg-white border border-surface-container-high text-on-surface hover:border-primary"
+                          }`}
+                        >
+                          {slot.startTime}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {!expectedTime && (
+                    <p className="mt-2 text-xs text-amber-700">Selecione um horário disponível.</p>
+                  )}
+                </div>
+              )}
+
+              {dateOnlyNote && !showTimePicker && !isLoadingSlots && (
+                <p className="text-xs text-text-secondary leading-relaxed rounded-xl bg-surface-container-low p-3">
+                  {dateOnlyNote}
+                </p>
+              )}
+
               <p className="text-xs text-text-secondary leading-relaxed">
-                Ao agendar, sua intenção de doação é registrada. Após realizar a doação no local, o hemocentro ou você poderão confirmar a conclusão.
+                Ao agendar, sua intenção de doação é registrada. Após realizar a doação no local, o hemocentro ou você
+                poderão confirmar a conclusão.
               </p>
 
               <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -182,7 +320,7 @@ export function ScheduleDonationModal({
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isLoadingSlots || (showTimePicker && !expectedTime)}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-[#920f16] transition-colors disabled:opacity-50"
                 >
                   {isSubmitting ? (

@@ -1,13 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { hasDonorRole, hasRequesterRole, hasAdminRole } from "../../routes/roleRouting";
+import { hasAdminRole, hasBloodCenterRole, hasDonorRole, hasRequesterRole } from "../../routes/roleRouting";
+import type { DashboardNavItem } from "../../types/dashboardNav";
 
 type MobileBottomNavProps = {
-  activeItem?: "donor-dashboard" | "donations" | "requests" | "new-request" | "external-donation" | "profile";
+  activeItem?: DashboardNavItem;
 };
 
 type MenuItem = {
-  key: string;
+  key: DashboardNavItem;
   icon: string;
   label: string;
   path: string;
@@ -16,26 +17,39 @@ type MenuItem = {
 export function MobileBottomNav({ activeItem }: MobileBottomNavProps) {
   const location = useLocation();
   const { roles } = useAuth();
-  const canAccessRequesterArea = hasRequesterRole(roles);
-  const canAccessDonorDashboard = hasDonorRole(roles);
-  const canAccessAdminArea = hasAdminRole(roles);
-  const showDonorDashboard = canAccessDonorDashboard || canAccessAdminArea;
+  const canAccessRequesterArea = hasRequesterRole(roles) || hasAdminRole(roles);
+  const canAccessDonorDashboard = hasDonorRole(roles) || hasAdminRole(roles);
+  const canAccessBloodCenter = hasBloodCenterRole(roles) || hasAdminRole(roles);
 
-  const menuItems: MenuItem[] = [
-    ...(showDonorDashboard
-      ? [
-          { key: "donor-dashboard", icon: "home_health", label: "Central", path: "/dashboard" },
-          { key: "donations", icon: "water_drop", label: "Doações", path: "/donations" },
-        ]
-      : []),
-    ...(canAccessRequesterArea || canAccessAdminArea
-      ? [
-          { key: "requests", icon: "assignment", label: "Requisições", path: "/requests" },
-          { key: "new-request", icon: "add_circle", label: "Nova", path: "/requests/new" },
-        ]
-      : []),
-    { key: "profile", icon: "person", label: "Perfil", path: "/profile" },
-  ];
+  const menuItems: MenuItem[] = [];
+
+  if (canAccessDonorDashboard) {
+    menuItems.push({ key: "donor-dashboard", icon: "home_health", label: "Central", path: "/dashboard" });
+    menuItems.push({
+      key: "recommendations",
+      icon: "volunteer_activism",
+      label: "Requisições",
+      path: "/dashboard/recommendations",
+    });
+  }
+
+  if (canAccessBloodCenter) {
+    menuItems.push({ key: "blood-center", icon: "local_hospital", label: "Hemocentro", path: "/blood-center" });
+  }
+
+  if (canAccessRequesterArea && menuItems.length < 4) {
+    menuItems.push({ key: "requests", icon: "assignment", label: "Suas Req.", path: "/requests" });
+  }
+
+  if (canAccessDonorDashboard && menuItems.length < 4) {
+    menuItems.push({ key: "donations", icon: "water_drop", label: "Doações", path: "/donations" });
+  }
+
+  if (canAccessRequesterArea && menuItems.length < 4) {
+    menuItems.push({ key: "new-request", icon: "add_circle", label: "Nova", path: "/requests/new" });
+  }
+
+  menuItems.push({ key: "profile", icon: "person", label: "Perfil", path: "/profile" });
 
   return (
     <nav

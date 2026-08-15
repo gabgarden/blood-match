@@ -19,7 +19,12 @@ export function hasAdminRole(roles: string[]): boolean {
 }
 
 export function isRequesterOnly(roles: string[]): boolean {
-  return hasRequesterRole(roles) && !hasDonorRole(roles) && !hasAdminRole(roles);
+  return (
+    hasRequesterRole(roles) &&
+    !hasDonorRole(roles) &&
+    !hasAdminRole(roles) &&
+    !hasBloodCenterRole(roles)
+  );
 }
 
 export function resolvePostLoginPath(roles: string[]): string {
@@ -31,12 +36,12 @@ export function resolvePostLoginPath(roles: string[]): string {
     return "/dashboard";
   }
 
-  if (hasRequesterRole(roles)) {
-    return "/requests";
+  if (hasBloodCenterRole(roles)) {
+    return "/blood-center";
   }
 
-  if (hasBloodCenterRole(roles)) {
-    return "/dashboard";
+  if (hasRequesterRole(roles)) {
+    return "/requests";
   }
 
   return "/dashboard";

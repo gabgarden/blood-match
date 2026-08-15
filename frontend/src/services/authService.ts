@@ -1,6 +1,16 @@
 import axios from "axios";
 import { API_BASE_URL } from "../config/api";
 import type { AuthSession, LoginCredentials, LoginResponse } from "../types/auth";
+import { translateKnownApiMessage } from "../utils/apiError";
+
+export type ConfirmEmailResponse = {
+  message: string;
+  email: string | null;
+};
+
+export type ResendConfirmationResponse = {
+  message: string;
+};
 
 const AUTH_SESSION_KEY = "bloodmatch.auth.session";
 const POST_LOGIN_NOTICE_KEY = "bloodmatch.auth.notice";
@@ -148,5 +158,30 @@ export const authService = {
 
   setPostLoginNotice(message: string): void {
     sessionStorage.setItem(POST_LOGIN_NOTICE_KEY, message);
+  },
+
+  async confirmEmail(token: string): Promise<ConfirmEmailResponse> {
+    const { data } = await axios.post<{ message?: string; email?: string }>(
+      `${API_BASE_URL}/auth/confirm-email`,
+      { token },
+      { headers: { "Content-Type": "application/json" } },
+    );
+    return {
+      message: translateKnownApiMessage(data?.message?.trim() || "Email confirmed"),
+      email: typeof data?.email === "string" ? data.email : null,
+    };
+  },
+
+  async resendConfirmation(email: string): Promise<ResendConfirmationResponse> {
+    const { data } = await axios.post<{ message?: string }>(
+      `${API_BASE_URL}/auth/resend-confirmation`,
+      { email },
+      { headers: { "Content-Type": "application/json" } },
+    );
+    return {
+      message: translateKnownApiMessage(
+        data?.message?.trim() || "If the email is registered and pending confirmation, a new message was sent.",
+      ),
+    };
   },
 };

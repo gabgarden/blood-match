@@ -63,6 +63,7 @@ export type CreatePendingDonationPayload = {
   organizationId: string;
   personId: string;
   expectedDate: string;
+  expectedTime?: string;
 };
 
 export type CreateCompletedDonationPayload = {
@@ -172,7 +173,17 @@ export async function createDonationRequest(payload: CreateDonationRequestPayloa
 }
 
 export async function createPendingDonation(payload: CreatePendingDonationPayload) {
-  const response = await api.post("/donations/create-pending", payload);
+  const body: CreatePendingDonationPayload = {
+    organizationId: payload.organizationId,
+    personId: payload.personId,
+    expectedDate: payload.expectedDate,
+  };
+
+  if (payload.expectedTime) {
+    body.expectedTime = payload.expectedTime;
+  }
+
+  const response = await api.post("/donations/create-pending", body);
   return response.data;
 }
 

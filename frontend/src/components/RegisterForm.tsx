@@ -4,15 +4,11 @@ import { TypeToggle } from "./TypeToggle";
 import { AccountCredentialsFields } from "./register/AccountCredentialsFields";
 import { AddressFields } from "./register/AddressFields";
 import { PartyIdentityFields } from "./register/PartyIdentityFields";
-import { ProfileIntentFields } from "./register/ProfileIntentFields";
+import { ProfileIntentFields, type DonatedRecently, type OrganizationKind } from "./register/ProfileIntentFields";
 import type { PartyType } from "./register/PartyIdentityFields";
-import {
-  createBloodCenterProfile,
-  createDonorProfile,
-  createRequesterProfile,
-} from "../services/profileService";
 import { registerOrganization, registerPerson } from "../services/partyService";
-import type { AddressFields as AddressPayload, ApiResponse } from "../types/party";
+import { savePendingProfiles } from "../services/pendingProfiles";
+import type { AddressFields as AddressPayload } from "../types/party";
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/authService";
 import { AppButton, InlineAlert } from "./ui";
@@ -30,18 +26,22 @@ type RegisterFormState = {
   confirmPassword: string;
   bloodType: string;
   weight: string;
+  lastDonationDate: string;
   street: string;
   city: string;
   state: string;
   zipCode: string;
 };
 
-function getCreatedPartyId(response: ApiResponse): string | null {
-  return response.id ?? null;
-}
-
 function onlyDigits(value: string): string {
   return value.replace(/\D/g, "");
+}
+
+function toLocalIsoDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function buildAddressPayload(form: RegisterFormState): AddressPayload | { error: string } | null {
@@ -73,6 +73,8 @@ export default function RegisterForm() {
   const [type, setType] = useState<PartyType>("person");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [donatedRecently, setDonatedRecently] = useState<DonatedRecently>("no");
+  const [organizationKind, setOrganizationKind] = useState<OrganizationKind | "">("");
   const [form, setForm] = useState<RegisterFormState>({
     name: "",
     phoneNumber: "",
@@ -84,11 +86,19 @@ export default function RegisterForm() {
     confirmPassword: "",
     bloodType: "O+",
     weight: "",
+    lastDonationDate: "",
     street: "",
     city: "",
     state: "",
     zipCode: "",
   });
+
+  const todayIso = toLocalIsoDate(new Date());
+  const lastDonationMin = (() => {
+    const date = new Date();
+    date.setDate(date.getDate() - 90);
+    return toLocalIsoDate(date);
+  })();
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -104,28 +114,15 @@ export default function RegisterForm() {
     setType(nextType);
   }
 
-  async function createPersonProfiles(partyId: string) {
-    const parsedWeight = Number(form.weight);
-    if (!form.bloodType || Number.isNaN(parsedWeight) || parsedWeight <= 0) {
-      throw new Error("Informe tipo sanguíneo e peso válido para criar os perfis iniciais.");
+  function handleDonatedRecentlyChange(value: DonatedRecently) {
+    setDonatedRecently(value);
+    if (value === "no") {
+      setForm((prev) => ({ ...prev, lastDonationDate: "" }));
     }
-
-    await createDonorProfile({
-      personId: partyId,
-      bloodType: form.bloodType,
-      weight: parsedWeight,
-    });
-
-    await createRequesterProfile(partyId);
-  }
-
-  async function createOrganizationProfiles(partyId: string) {
-    await createBloodCenterProfile(partyId);
-    await createRequesterProfile(partyId);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    // Register flow: create party → login → register roles → re-login (JWT não atualiza no registro de papel).
+    // Register flow: create party → save pending roles → check-email (sem auto-login).
     event.preventDefault();
     setErrorMessage(null);
 
@@ -139,6 +136,22 @@ export default function RegisterForm() {
       return;
     }
 
+    if (type === "person") {
+      const parsedWeight = Number(form.weight);
+      if (!form.bloodType || Number.isNaN(parsedWeight) || parsedWeight < 50) {
+        setErrorMessage("Informe tipo sanguíneo e peso de no mínimo 50 kg.");
+        return;
+      }
+
+      if (donatedRecently === "yes" && !form.lastDonationDate) {
+        setErrorMessage("Informe a data da última doação.");
+        return;
+      }
+    } else if (!organizationKind) {
+      setErrorMessage("Selecione se a instituição é um banco de sangue ou um hospital.");
+      return;
+    }
+
     const address = buildAddressPayload(form);
     if (address && "error" in address) {
       setErrorMessage(address.error);
@@ -148,7 +161,6 @@ export default function RegisterForm() {
     setIsSubmitting(true);
 
     try {
-      // Garante que token antigo não contamine o fluxo público de cadastro.
       authService.logout();
 
       const normalizedEmail = form.email.trim();
@@ -177,22 +189,35 @@ export default function RegisterForm() {
               ...addressFields,
             });
 
-      await login({ email: normalizedEmail, password: form.password });
+      if (type === "person") {
+        const parsedWeight = Number(form.weight);
+        savePendingProfiles({
+          email: normalizedEmail,
+          partyType: "person",
+          donor: {
+            bloodType: form.bloodType,
+            weight: parsedWeight,
+            lastDonationDate: donatedRecently === "yes" ? form.lastDonationDate : undefined,
+          },
+        });
+      } else {
+        savePendingProfiles({
+          email: normalizedEmail,
+          partyType: "organization",
+          registerAsBloodCenter: true,
+        });
+      }
 
-      const createdPartyId = getCreatedPartyId(response);
-      if (!createdPartyId) {
-        setErrorMessage("Cadastro criado, mas não foi possível identificar o partyId para criar os perfis iniciais.");
+      if (response.emailConfirmationRequired !== false) {
+        navigate("/register/check-email", {
+          replace: true,
+          state: { email: normalizedEmail },
+        });
         return;
       }
 
-      if (type === "person") {
-        await createPersonProfiles(createdPartyId);
-      } else {
-        await createOrganizationProfiles(createdPartyId);
-      }
-
-      const refreshedSession = await login({ email: normalizedEmail, password: form.password });
-      navigate(resolvePostLoginPath(refreshedSession.roles), { replace: true });
+      const session = await login({ email: normalizedEmail, password: form.password });
+      navigate(resolvePostLoginPath(session.roles), { replace: true });
     } catch (error) {
       setErrorMessage(extractApiErrorMessage(error, "Erro ao registrar. Verifique os dados e tente novamente."));
     } finally {
@@ -246,7 +271,14 @@ export default function RegisterForm() {
           accountType={type}
           bloodType={form.bloodType}
           weight={form.weight}
+          donatedRecently={donatedRecently}
+          lastDonationDate={form.lastDonationDate}
+          lastDonationMin={lastDonationMin}
+          lastDonationMax={todayIso}
+          organizationKind={organizationKind}
           onFieldChange={handleProfileFieldChange}
+          onDonatedRecentlyChange={handleDonatedRecentlyChange}
+          onOrganizationKindChange={setOrganizationKind}
           labelStyle={labelStyle}
           inputStyle={inputStyle}
         />

@@ -11,7 +11,14 @@ function isAuthPublicPath(): boolean {
   const pathname = window.location.pathname.replace(/\/+$/, "");
   const loginPath = getAppPath("login").replace(/\/+$/, "");
   const registerPath = getAppPath("register").replace(/\/+$/, "");
-  return pathname === loginPath || pathname === registerPath;
+  const checkEmailPath = getAppPath("register/check-email").replace(/\/+$/, "");
+  const confirmEmailPath = getAppPath("confirm-email").replace(/\/+$/, "");
+  return (
+    pathname === loginPath ||
+    pathname === registerPath ||
+    pathname === checkEmailPath ||
+    pathname === confirmEmailPath
+  );
 }
 
 function shouldForceLogoutOn401(error: unknown): boolean {

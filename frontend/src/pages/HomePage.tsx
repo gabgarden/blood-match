@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { resolvePostLoginPath } from "../routes/roleRouting";
 import { OtherCausesSection } from "../components/OtherCausesSection";
+import { EligibilitySection } from "../components/EligibilitySection";
 
 type BloodTypeKey = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 
@@ -153,6 +154,9 @@ export default function HomePage() {
           <nav className="hidden md:flex items-center space-x-8 font-medium text-sm text-gray-700">
             <a href="#como-funciona" className="hover:text-primary transition-colors">
               Como Funciona
+            </a>
+            <a href="#quem-pode-doar" className="hover:text-primary transition-colors">
+              Quem pode doar
             </a>
             <a href="#compatibilidade" className="hover:text-primary transition-colors">
               Compatibilidade
@@ -445,7 +449,7 @@ export default function HomePage() {
           </div>
         </section>
 
-
+        <EligibilitySection />
 
         {/* Section: Vantagens */}
         <section id="vantagens" className="py-20 bg-surface">
@@ -545,6 +549,11 @@ export default function HomePage() {
               <li>
                 <a href="#como-funciona" className="hover:text-white transition-colors">
                   Como Funciona
+                </a>
+              </li>
+              <li>
+                <a href="#quem-pode-doar" className="hover:text-white transition-colors">
+                  Quem pode doar
                 </a>
               </li>
               <li>

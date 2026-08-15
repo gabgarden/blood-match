@@ -48,11 +48,10 @@ export default function RecommendationsPage() {
     }
   }
 
-  async function handleConfirmSchedule(requestId: string, expectedDate: string) {
+  async function handleConfirmSchedule(requestId: string, expectedDate: string, expectedTime?: string) {
     setIsSubmittingSchedule(true);
     try {
-      await acceptDonation(requestId, expectedDate);
-      setSchedulingRecommendation(null);
+      return await acceptDonation(requestId, expectedDate, expectedTime);
     } finally {
       setIsSubmittingSchedule(false);
     }
@@ -78,7 +77,7 @@ export default function RecommendationsPage() {
 
   return (
     <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d]">
-      <DonorDashboardSidebar onLogout={logout} activeItem="donor-dashboard" />
+      <DonorDashboardSidebar onLogout={logout} activeItem="recommendations" />
       <DonorDashboardTopbar title="Recomendações" onLogout={logout} />
 
       <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-10">
@@ -178,7 +177,7 @@ export default function RecommendationsPage() {
         daysRemaining={waitingDays}
       />
 
-      <MobileBottomNav activeItem="donor-dashboard" />
+      <MobileBottomNav activeItem="recommendations" />
     </div>
   );
 }

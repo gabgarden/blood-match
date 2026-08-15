@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { hasDonorRole, hasRequesterRole, hasAdminRole } from "../../routes/roleRouting";
+import { hasAdminRole, hasBloodCenterRole, hasDonorRole, hasRequesterRole } from "../../routes/roleRouting";
+import type { DashboardNavItem } from "../../types/dashboardNav";
 
 type DonorDashboardSidebarProps = {
   onLogout: () => void;
-  activeItem?: "donor-dashboard" | "donations" | "requests" | "new-request" | "external-donation" | "profile";
+  activeItem?: DashboardNavItem;
 };
 
 type MenuItem = {
-  key: "donor-dashboard" | "donations" | "requests" | "new-request" | "profile";
+  key: DashboardNavItem;
   icon: string;
   label: string;
   path: string;
@@ -22,6 +23,7 @@ export function DonorDashboardSidebar({
   const canAccessRequesterArea = hasRequesterRole(roles);
   const canAccessDonorDashboard = hasDonorRole(roles);
   const canAccessAdminArea = hasAdminRole(roles);
+  const canAccessBloodCenter = hasBloodCenterRole(roles) || canAccessAdminArea;
   const showDonorDashboard = canAccessDonorDashboard || canAccessAdminArea;
 
   const menuItems: MenuItem[] = [
@@ -30,6 +32,12 @@ export function DonorDashboardSidebar({
           { key: "donor-dashboard", icon: "home_health", label: "Central do Doador", path: "/dashboard" },
           { key: "donations", icon: "water_drop", label: "Minhas Doações", path: "/donations" },
         ] as MenuItem[])
+      : []),
+    ...(canAccessDonorDashboard
+      ? ([{ key: "recommendations", icon: "volunteer_activism", label: "Requisições", path: "/dashboard/recommendations" }] as MenuItem[])
+      : []),
+    ...(canAccessBloodCenter
+      ? ([{ key: "blood-center", icon: "local_hospital", label: "Hemocentro", path: "/blood-center" }] as MenuItem[])
       : []),
     ...(canAccessRequesterArea || canAccessAdminArea
       ? ([
@@ -50,7 +58,7 @@ export function DonorDashboardSidebar({
       <nav className="flex flex-grow flex-col gap-1.5">
         {menuItems.map((item) => (
           <Link
-            key={item.label}
+            key={item.key}
             to={item.path}
             className={`flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-all ${
               item.key === activeItem

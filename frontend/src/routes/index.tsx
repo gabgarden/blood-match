@@ -9,6 +9,9 @@ import ExternalDonationPage from "../pages/ExternalDonationPage";
 import ProfilePage from "../pages/ProfilePage";
 import DonationsPage from "../pages/DonationsPage";
 import HomePage from "../pages/HomePage";
+import CheckEmailPage from "../pages/CheckEmailPage";
+import ConfirmEmailPage from "../pages/ConfirmEmailPage";
+import BloodCenterPage from "../pages/BloodCenterPage";
 import { PublicOnlyRoute, RequireAuth } from "./RouteGuards";
 import { RouteErrorPage } from "../components/ui/RouteErrorPage";
 
@@ -35,6 +38,20 @@ export const router = createBrowserRouter([
         <RegisterPage />
       </PublicOnlyRoute>
     ),
+  },
+  {
+    path: "/register/check-email",
+    errorElement: <RouteErrorPage />,
+    element: (
+      <PublicOnlyRoute>
+        <CheckEmailPage />
+      </PublicOnlyRoute>
+    ),
+  },
+  {
+    path: "/confirm-email",
+    errorElement: <RouteErrorPage />,
+    element: <ConfirmEmailPage />,
   },
   {
     path: "/dashboard",
@@ -96,6 +113,15 @@ export const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <ProfilePage />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: "/blood-center",
+    errorElement: <RouteErrorPage />,
+    element: (
+      <RequireAuth>
+        <BloodCenterPage />
       </RequireAuth>
     ),
   },
