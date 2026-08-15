@@ -1,15 +1,18 @@
 package bloodmatch.infra.external.notification;
 
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailConfirmationMailer {
+
+  private static final Logger log = LoggerFactory.getLogger(EmailConfirmationMailer.class);
 
   private final JavaMailSender mailSender;
   private final String senderEmail;
@@ -21,14 +24,22 @@ public class EmailConfirmationMailer {
     this.senderEmail = senderEmail;
   }
 
-  @Async
+  /**
+   * Sends synchronously so SMTP failures appear in the request/resend logs.
+   * Registration already completed before this runs.
+   */
   public void sendConfirmationEmail(String recipientEmail, String recipientName, String confirmationUrl) {
     if (recipientEmail == null || recipientEmail.isBlank()
         || confirmationUrl == null || confirmationUrl.isBlank()) {
+      log.warn("Skipping confirmation e-mail: missing recipient or confirmation URL");
       return;
     }
     if (mailSender == null) {
-      System.err.println("Skipping confirmation e-mail: JavaMailSender is not available");
+      log.error("Skipping confirmation e-mail to {}: JavaMailSender is not available", recipientEmail);
+      return;
+    }
+    if (senderEmail == null || senderEmail.isBlank()) {
+      log.error("Skipping confirmation e-mail to {}: spring.mail.username is blank", recipientEmail);
       return;
     }
 
@@ -65,8 +76,9 @@ public class EmailConfirmationMailer {
 
       helper.setText(htmlBody, true);
       mailSender.send(message);
+      log.info("Confirmation e-mail sent to {}", recipientEmail);
     } catch (Exception e) {
-      System.err.println("Erro ao montar/enviar e-mail de confirmação para " + recipientEmail + ": " + e.getMessage());
+      log.error("Failed to send confirmation e-mail to {}: {}", recipientEmail, e.getMessage(), e);
     }
   }
 }
