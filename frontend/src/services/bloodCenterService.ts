@@ -134,7 +134,36 @@ function normalizeItem(item: unknown): InventoryLevel | null {
   };
 }
 
-export function completeInventoryItems(items: InventoryLevel[]): InventoryLevel[] {
+export function isWeekday(value: string): value is Weekday {
+  return (WEEKDAYS as readonly string[]).includes(value);
+}
+
+function normalizeWindow(item: unknown): ScheduleWindow | null {
+  const record = asRecord(item);
+  if (!record) {
+    return null;
+  }
+
+  const rawDay = readString(record.dayOfWeek)?.toUpperCase();
+  if (!rawDay || !isWeekday(rawDay)) {
+    return null;
+  }
+
+  const startTime = (readString(record.startTime) ?? "08:00").slice(0, 5);
+  const endTime = (readString(record.endTime) ?? "12:00").slice(0, 5);
+  const slotDurationMinutes = readNumber(record.slotDurationMinutes, 30);
+  const capacity = readNumber(record.capacity, 4);
+
+  return {
+    dayOfWeek: rawDay,
+    startTime,
+    endTime,
+    slotDurationMinutes: slotDurationMinutes > 0 ? slotDurationMinutes : 30,
+    capacity: capacity > 0 ? capacity : 4,
+  };
+}
+
+function completeInventoryItems(items: InventoryLevel[]): InventoryLevel[] {
   const byType = new Map(items.map((item) => [item.bloodType, item]));
   return BLOOD_TYPES.map((bloodType) => byType.get(bloodType) ?? { bloodType, percentage: 0 });
 }
