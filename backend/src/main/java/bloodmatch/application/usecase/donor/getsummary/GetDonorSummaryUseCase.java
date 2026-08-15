@@ -57,7 +57,9 @@ public class GetDonorSummaryUseCase {
         donor.getPerson().getAddress().getFullAddressAsString(),
         lastDonationDate,
         daysRemaining,
-        livesImpacted);
+        livesImpacted,
+        donor.getWeight(),
+        donor.getWeightUpdatedAt());
   }
 
   private int calculateDaysRemaining(LocalDate lastDonationDate, LocalDate currentDate) {
@@ -84,6 +86,8 @@ public class GetDonorSummaryUseCase {
       String address,
       LocalDate lastDonationDate,
       int daysRemaining,
-      long livesImpacted) {
+      long livesImpacted,
+      Double weight,
+      LocalDate weightUpdatedAt) {
   }
 }

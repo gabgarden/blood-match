@@ -15,6 +15,7 @@ public class Donor extends PersonRole {
     private BloodType bloodType;
     private LocalDate lastDonationDate;
     private double weight;
+    private LocalDate weightUpdatedAt;
     private double maxRecommendationDistanceKm;
 
     public Donor(Person person, BloodType bloodType, double weight) {
@@ -29,6 +30,7 @@ public class Donor extends PersonRole {
 
         this.bloodType = bloodType;
         this.weight = weight;
+        this.weightUpdatedAt = LocalDate.now();
         this.maxRecommendationDistanceKm = DEFAULT_MAX_RECOMMENDATION_DISTANCE_KM;
     }
 
@@ -44,17 +46,21 @@ public class Donor extends PersonRole {
 
     this.bloodType = bloodType;
     this.weight = weight;
+    this.weightUpdatedAt = LocalDate.now();
     this.maxRecommendationDistanceKm = DEFAULT_MAX_RECOMMENDATION_DISTANCE_KM;
   }
 
   public static Donor reconstitute(Person person, BloodType bloodType, double weight, LocalDate lastDonationDate,
-      Double maxRecommendationDistanceKm, DomainID id) {
+      Double maxRecommendationDistanceKm, DomainID id, LocalDate weightUpdatedAt) {
     Donor donor = new Donor(person, bloodType, weight, id);
     if (lastDonationDate != null) {
       donor.registerDonation(lastDonationDate, lastDonationDate);
     }
     if (maxRecommendationDistanceKm != null) {
       donor.updateMaxRecommendationDistanceKm(maxRecommendationDistanceKm);
+    }
+    if (weightUpdatedAt != null) {
+      donor.weightUpdatedAt = weightUpdatedAt;
     }
     return donor;
   }
@@ -112,6 +118,10 @@ public class Donor extends PersonRole {
             throw new IllegalArgumentException("Minimum weight is 50kg");
         }
 
+        if (Double.compare(this.weight, weight) != 0) {
+            this.weightUpdatedAt = LocalDate.now();
+        }
+
         this.bloodType = bloodType;
         this.weight = weight;
     }
@@ -134,6 +144,10 @@ public class Donor extends PersonRole {
 
     public double getWeight() {
         return weight;
+    }
+
+    public LocalDate getWeightUpdatedAt() {
+        return weightUpdatedAt;
     }
 
     public double getMaxRecommendationDistanceKm() {

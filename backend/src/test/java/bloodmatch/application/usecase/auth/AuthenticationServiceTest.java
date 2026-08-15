@@ -83,8 +83,9 @@ class AuthenticationServiceTest {
     when(userAccountRepository.findByEmail(new Email("user@bloodmatch.com")))
         .thenReturn(Optional.of(userAccount));
 
-    assertThrows(UnauthorizedException.class,
+    UnauthorizedException ex = assertThrows(UnauthorizedException.class,
         () -> authenticationService.authenticate("user@bloodmatch.com", "plain-password"));
+    assertEquals("Email not confirmed", ex.getMessage());
   }
 
   @Test

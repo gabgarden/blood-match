@@ -12,4 +12,6 @@ public interface UserAccountMongoRepository extends MongoRepository<UserAccountS
   Optional<UserAccountSchema> findByEmail(String email);
 
   Optional<UserAccountSchema> findByPartyId(String partyId);
+
+  Optional<UserAccountSchema> findByEmailConfirmationToken(String emailConfirmationToken);
 }

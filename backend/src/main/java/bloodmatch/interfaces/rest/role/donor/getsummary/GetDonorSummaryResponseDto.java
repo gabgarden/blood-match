@@ -14,7 +14,9 @@ public record GetDonorSummaryResponseDto(
     @Schema(description = "Full address") String address,
     @Schema(description = "Last donation date", format = "date") LocalDate lastDonationDate,
     @Schema(description = "Days remaining until eligible to donate again") int daysRemaining,
-    @Schema(description = "Estimated lives impacted by past donations") long livesImpacted) {
+    @Schema(description = "Estimated lives impacted by past donations") long livesImpacted,
+    @Schema(description = "Donor weight in kilograms") Double weight,
+    @Schema(description = "Date the donor weight was last updated", format = "date") LocalDate weightUpdatedAt) {
 
   public static GetDonorSummaryResponseDto from(Output output) {
     return new GetDonorSummaryResponseDto(
@@ -25,6 +27,8 @@ public record GetDonorSummaryResponseDto(
         output.address(),
         output.lastDonationDate(),
         output.daysRemaining(),
-        output.livesImpacted());
+        output.livesImpacted(),
+        output.weight(),
+        output.weightUpdatedAt());
   }
 }

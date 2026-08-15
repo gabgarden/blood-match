@@ -59,7 +59,7 @@ public class AuthenticationService {
         .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
     if (!userAccount.isEnabled()) {
-      throw new UnauthorizedException("User account is disabled");
+      throw new UnauthorizedException("Email not confirmed");
     }
 
     if (!passwordEncoder.matches(password, userAccount.getPasswordHash())) {

@@ -38,6 +38,15 @@ public class UserAccountRepositoryImpl implements UserAccountRepositoryInterface
   }
 
   @Override
+  public Optional<UserAccount> findByEmailConfirmationToken(String token) {
+    if (token == null || token.isBlank())
+      return Optional.empty();
+
+    return mongoRepository.findByEmailConfirmationToken(token)
+        .map(UserAccountSchema::toDomain);
+  }
+
+  @Override
   public void save(UserAccount userAccount) {
     if (userAccount == null)
       throw new IllegalArgumentException("UserAccount cannot be null");

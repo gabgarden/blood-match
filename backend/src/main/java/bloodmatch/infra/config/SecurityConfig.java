@@ -20,6 +20,7 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 
 @Configuration
 @EnableWebSecurity
@@ -68,6 +69,9 @@ public class SecurityConfig {
                 "/v3/api-docs",
                 "/v3/api-docs/**").permitAll()
             .requestMatchers(POST, "/auth/login").permitAll()
+            .requestMatchers(GET, "/auth/confirm-email").permitAll()
+            .requestMatchers(POST, "/auth/confirm-email").permitAll()
+            .requestMatchers(POST, "/auth/resend-confirmation").permitAll()
             .requestMatchers(POST, "/parties/persons").permitAll()
             .requestMatchers(POST, "/parties/organizations").permitAll()
 
@@ -102,6 +106,20 @@ public class SecurityConfig {
                 .hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/requesters").authenticated()
             .requestMatchers(GET, "/blood-centers/search")
+                .hasAnyAuthority("DONOR", "REQUESTER", "BLOOD_CENTER", "SYSTEM_ADMIN")
+            .requestMatchers(GET, "/blood-centers/inventory")
+                .hasAnyAuthority("DONOR", "REQUESTER", "BLOOD_CENTER", "SYSTEM_ADMIN")
+            .requestMatchers(PUT, "/blood-centers/inventory")
+                .hasAnyAuthority("BLOOD_CENTER", "SYSTEM_ADMIN")
+            .requestMatchers(GET, "/blood-centers/appointments")
+                .hasAnyAuthority("BLOOD_CENTER", "SYSTEM_ADMIN")
+            .requestMatchers(GET, "/blood-centers/schedule")
+                .hasAnyAuthority("BLOOD_CENTER", "SYSTEM_ADMIN")
+            .requestMatchers(PUT, "/blood-centers/schedule")
+                .hasAnyAuthority("BLOOD_CENTER", "SYSTEM_ADMIN")
+            .requestMatchers(GET, "/blood-centers/*/inventory")
+                .hasAnyAuthority("DONOR", "REQUESTER", "BLOOD_CENTER", "SYSTEM_ADMIN")
+            .requestMatchers(GET, "/blood-centers/*/slots")
                 .hasAnyAuthority("DONOR", "REQUESTER", "BLOOD_CENTER", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/blood-centers").authenticated()
             .requestMatchers(GET, "/donors/*/summary").authenticated()

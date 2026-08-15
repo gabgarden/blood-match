@@ -16,6 +16,8 @@ public class UserAccount extends DomainObject {
   private String passwordHash;
   private Set<SecurityRole> roles;
   private boolean enabled;
+  private String confirmationToken;
+  private LocalDateTime confirmationTokenExpiresAt;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
@@ -41,6 +43,8 @@ public class UserAccount extends DomainObject {
       String passwordHash,
       Set<SecurityRole> roles,
       boolean enabled,
+      String confirmationToken,
+      LocalDateTime confirmationTokenExpiresAt,
       LocalDateTime createdAt,
       LocalDateTime updatedAt) {
 
@@ -49,6 +53,8 @@ public class UserAccount extends DomainObject {
     this.passwordHash = requirePasswordHash(passwordHash);
     this.roles = copyRoles(roles);
     this.enabled = enabled;
+    this.confirmationToken = confirmationToken;
+    this.confirmationTokenExpiresAt = confirmationTokenExpiresAt;
     this.createdAt = requireTimestamp(createdAt, "createdAt");
     this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
   }
@@ -61,7 +67,9 @@ public class UserAccount extends DomainObject {
       Set<SecurityRole> roles,
       boolean enabled,
       LocalDateTime createdAt,
-      LocalDateTime updatedAt) {
+      LocalDateTime updatedAt,
+      String confirmationToken,
+      LocalDateTime confirmationTokenExpiresAt) {
 
     if (id == null)
       throw new IllegalArgumentException("User id cannot be null");
@@ -72,6 +80,8 @@ public class UserAccount extends DomainObject {
         passwordHash,
         roles,
         enabled,
+        confirmationToken,
+        confirmationTokenExpiresAt,
         createdAt,
         updatedAt);
     userAccount.setId(id);
@@ -96,6 +106,14 @@ public class UserAccount extends DomainObject {
 
   public boolean isEnabled() {
     return enabled;
+  }
+
+  public String getConfirmationToken() {
+    return confirmationToken;
+  }
+
+  public LocalDateTime getConfirmationTokenExpiresAt() {
+    return confirmationTokenExpiresAt;
   }
 
   public LocalDateTime getCreatedAt() {
@@ -123,6 +141,39 @@ public class UserAccount extends DomainObject {
 
   public void enable() {
     this.enabled = true;
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public void startEmailConfirmation(String token, LocalDateTime expiresAt) {
+    if (token == null || token.isBlank())
+      throw new IllegalArgumentException("Confirmation token cannot be blank");
+    if (expiresAt == null)
+      throw new IllegalArgumentException("Token expiry cannot be null");
+
+    this.enabled = false;
+    this.confirmationToken = token;
+    this.confirmationTokenExpiresAt = expiresAt;
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public void confirmEmail(String token) {
+    if (token == null || token.isBlank()
+        || this.confirmationToken == null
+        || !this.confirmationToken.equals(token)) {
+      throw new IllegalArgumentException("Invalid confirmation token");
+    }
+    if (this.confirmationTokenExpiresAt == null
+        || LocalDateTime.now().isAfter(this.confirmationTokenExpiresAt)) {
+      throw new IllegalArgumentException("Confirmation token expired");
+    }
+
+    enable();
+    clearConfirmationToken();
+  }
+
+  public void clearConfirmationToken() {
+    this.confirmationToken = null;
+    this.confirmationTokenExpiresAt = null;
     this.updatedAt = LocalDateTime.now();
   }
 

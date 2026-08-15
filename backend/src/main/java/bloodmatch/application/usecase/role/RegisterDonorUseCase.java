@@ -18,6 +18,7 @@ import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -70,7 +71,15 @@ public class RegisterDonorUseCase {
       personRepository.save(person);
     }
 
-    Donor donor = new Donor(person, bloodType, input.weight());
+    Donor donor;
+    try {
+      donor = new Donor(person, bloodType, input.weight());
+      if (input.lastDonationDate() != null) {
+        donor.registerDonation(input.lastDonationDate());
+      }
+    } catch (IllegalArgumentException e) {
+      throw new ValidationException(e.getMessage());
+    }
     donorRepository.save(donor);
     addRoleToUserAccount(personId, SecurityRole.DONOR);
     return Output.from(donor);
@@ -94,7 +103,7 @@ public class RegisterDonorUseCase {
     userAccountRepository.save(userAccount);
   }
 
-  public record Input(String personId, String bloodType, double weight) {
+  public record Input(String personId, String bloodType, double weight, LocalDate lastDonationDate) {
   }
 
   public record Output(String id) {

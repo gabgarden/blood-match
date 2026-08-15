@@ -36,7 +36,8 @@ public class RegisterDonorController {
     var output = registerDonorUseCase.execute(new Input(
         payload.personId(),
         payload.bloodType(),
-        payload.weight()));
+        payload.weight(),
+        payload.lastDonationDate()));
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(RegisterDonorResponseDto.from(output));

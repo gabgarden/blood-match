@@ -30,6 +30,7 @@ public class DonorSchema {
   private String personId;
   private String bloodType;
   private Double weight;
+  private LocalDate weightUpdatedAt;
   private LocalDate lastDonationDate;
   private Double maxRecommendationDistanceKm;
 
@@ -44,6 +45,7 @@ public class DonorSchema {
     this.personId = donor.getPerson().getId().getValue().toString();
     this.bloodType = donor.getBloodType().getType();
     this.weight = donor.getWeight();
+    this.weightUpdatedAt = donor.getWeightUpdatedAt();
     this.lastDonationDate = donor.getLastDonationDate();
     this.maxRecommendationDistanceKm = donor.getMaxRecommendationDistanceKm();
 
@@ -60,6 +62,6 @@ public class DonorSchema {
 
     DomainID donorId = new DomainID(UUID.fromString(this.id));
     return Donor.reconstitute(person, BloodType.of(bloodType), weight, lastDonationDate,
-        maxRecommendationDistanceKm, donorId);
+        maxRecommendationDistanceKm, donorId, weightUpdatedAt);
   }
 }

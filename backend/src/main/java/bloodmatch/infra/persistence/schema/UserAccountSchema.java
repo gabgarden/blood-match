@@ -34,6 +34,8 @@ public class UserAccountSchema {
   private String passwordHash;
   private Set<String> roles;
   private Boolean enabled;
+  private String emailConfirmationToken;
+  private LocalDateTime emailConfirmationTokenExpiresAt;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
@@ -49,6 +51,8 @@ public class UserAccountSchema {
         .map(Enum::name)
         .collect(Collectors.toSet());
     this.enabled = userAccount.isEnabled();
+    this.emailConfirmationToken = userAccount.getConfirmationToken();
+    this.emailConfirmationTokenExpiresAt = userAccount.getConfirmationTokenExpiresAt();
     this.createdAt = userAccount.getCreatedAt();
     this.updatedAt = userAccount.getUpdatedAt();
   }
@@ -69,6 +73,8 @@ public class UserAccountSchema {
         parsedRoles,
         Boolean.TRUE.equals(this.enabled),
         this.createdAt,
-        this.updatedAt);
+        this.updatedAt,
+        this.emailConfirmationToken,
+        this.emailConfirmationTokenExpiresAt);
   }
 }

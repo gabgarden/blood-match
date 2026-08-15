@@ -11,5 +11,7 @@ public interface UserAccountRepositoryInterface {
 
   Optional<UserAccount> findByPartyId(DomainID partyId);
 
+  Optional<UserAccount> findByEmailConfirmationToken(String token);
+
   void save(UserAccount userAccount);
 }

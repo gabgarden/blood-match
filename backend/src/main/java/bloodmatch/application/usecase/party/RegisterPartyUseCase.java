@@ -2,6 +2,7 @@ package bloodmatch.application.usecase.party;
 
 import bloodmatch.application.exception.ConflictException;
 import bloodmatch.application.exception.ValidationException;
+import bloodmatch.application.shared.EmailConfirmationTokens;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
 import bloodmatch.domain.party.PartyRepositoryInterface;
@@ -13,11 +14,14 @@ import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.Email;
 import bloodmatch.domain.shared.valueObjects.PhoneNumber;
+import bloodmatch.infra.external.notification.EmailConfirmationMailer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Service
@@ -27,12 +31,18 @@ public class RegisterPartyUseCase {
   private final PersonRepositoryInterface personRepository;
   private final UserAccountRepositoryInterface userAccountRepository;
   private final PasswordEncoder passwordEncoder;
+  private final EmailConfirmationMailer emailConfirmationMailer;
+  private final boolean requireEmailConfirmation;
+  private final String publicUrl;
 
   public RegisterPartyUseCase(
       PartyRepositoryInterface partyRepository,
       PersonRepositoryInterface personRepository,
       UserAccountRepositoryInterface userAccountRepository,
-      PasswordEncoder passwordEncoder) {
+      PasswordEncoder passwordEncoder,
+      EmailConfirmationMailer emailConfirmationMailer,
+      @Value("${app.require-email-confirmation:false}") boolean requireEmailConfirmation,
+      @Value("${app.public-url:http://localhost:5173}") String publicUrl) {
 
     if (partyRepository == null)
       throw new IllegalArgumentException("PartyRepository cannot be null");
@@ -42,11 +52,16 @@ public class RegisterPartyUseCase {
       throw new IllegalArgumentException("UserAccountRepository cannot be null");
     if (passwordEncoder == null)
       throw new IllegalArgumentException("PasswordEncoder cannot be null");
+    if (emailConfirmationMailer == null)
+      throw new IllegalArgumentException("EmailConfirmationMailer cannot be null");
 
     this.partyRepository = partyRepository;
     this.personRepository = personRepository;
     this.userAccountRepository = userAccountRepository;
     this.passwordEncoder = passwordEncoder;
+    this.emailConfirmationMailer = emailConfirmationMailer;
+    this.requireEmailConfirmation = requireEmailConfirmation;
+    this.publicUrl = publicUrl;
   }
 
   @Transactional
@@ -73,9 +88,9 @@ public class RegisterPartyUseCase {
         userEmail,
         passwordEncoder.encode(input.password()),
         Collections.emptySet());
-    userAccountRepository.save(userAccount);
+    persistAccount(userAccount, person.getName());
 
-    return Output.from(person);
+    return Output.from(person, requireEmailConfirmation);
   }
 
   @Transactional
@@ -101,9 +116,24 @@ public class RegisterPartyUseCase {
         userEmail,
         passwordEncoder.encode(input.password()),
         Collections.emptySet());
+    persistAccount(userAccount, organization.getName());
+
+    return Output.from(organization, requireEmailConfirmation);
+  }
+
+  private void persistAccount(UserAccount userAccount, String recipientName) {
     userAccountRepository.save(userAccount);
 
-    return Output.from(organization);
+    if (!requireEmailConfirmation)
+      return;
+
+    String token = EmailConfirmationTokens.generate();
+    userAccount.startEmailConfirmation(token, EmailConfirmationTokens.expiresAt(LocalDateTime.now()));
+    userAccountRepository.save(userAccount);
+    emailConfirmationMailer.sendConfirmationEmail(
+        userAccount.getEmail().getValue(),
+        recipientName,
+        EmailConfirmationTokens.confirmationLink(publicUrl, token));
   }
 
   private void validateCredentials(String email, String password, String passwordConfirmation) {
@@ -151,13 +181,13 @@ public class RegisterPartyUseCase {
       String zipCode) {
   }
 
-  public record Output(String id, String type) {
-    public static Output from(Person person) {
-      return new Output(person.getId().getValue().toString(), "PERSON");
+  public record Output(String id, String type, boolean emailConfirmationRequired) {
+    public static Output from(Person person, boolean emailConfirmationRequired) {
+      return new Output(person.getId().getValue().toString(), "PERSON", emailConfirmationRequired);
     }
 
-    public static Output from(Organization organization) {
-      return new Output(organization.getId().getValue().toString(), "ORGANIZATION");
+    public static Output from(Organization organization, boolean emailConfirmationRequired) {
+      return new Output(organization.getId().getValue().toString(), "ORGANIZATION", emailConfirmationRequired);
     }
   }
 }
