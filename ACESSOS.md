@@ -24,7 +24,11 @@ Subindo com `docker compose -f docker-compose.yml -f docker-compose.prod.yml --e
 | **Frontend SPA (Nginx)** | [http://179.198.120.172:8082](http://179.198.120.172:8082) | `8082` | Proxy reverso Nginx servindo o frontend SPA |
 | **Backend API** | [http://179.198.120.172:8080](http://179.198.120.172:8080) | `8080` | Container da API Java Spring Boot |
 | **Swagger UI (Produção)** | [http://179.198.120.172:8080/swagger-ui.html](http://179.198.120.172:8080/swagger-ui.html) | `8080` | Documentação interativa Swagger na VPS |
-| **Domínio Customizado** | `http://meubloodmatch.com` | `80` / `443` | Roteado via Nginx principal da VPS |
+| **Domínio Customizado** | [http://bloodmatch.com.br](http://bloodmatch.com.br) | `80` / `443` | Roteado pelo Nginx Principal da VPS para a porta 8082 |
+| **API em Produção** | [http://bloodmatch.com.br:8080](http://bloodmatch.com.br:8080) | `8080` | API Java Spring Boot |
+
+> ⚠️ **Coexistência na VPS (`sales-system` vs `blood-match`):**  
+> Como o sistema `sales-system` já utiliza as portas padrão `80` e `443` na VPS, o **BloodMatch** roda no container Docker expondo a porta interna **`8082`**. O Nginx principal instalado na VPS roteia as requisições baseando-se no domínio (`server_name bloodmatch.com.br`).
 
 ---
 
