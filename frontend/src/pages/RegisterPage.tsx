@@ -4,7 +4,7 @@ import { BackButton } from "../components/ui/BackButton";
 
 export default function RegisterPage() {
   return (
-    <div className="bg-surface text-on-surface min-h-[100dvh]">
+    <div className="bg-surface text-on-surface min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden">
 
       {/* Header */}
       <header className="sticky top-0 left-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 py-4 h-16 bg-[#f9f9fb] backdrop-blur-md bg-opacity-80 border-b border-gray-200/60">
@@ -23,10 +23,10 @@ export default function RegisterPage() {
       </header>
 
       {/* Main */}
-      <main className="mx-auto w-full max-w-6xl items-start gap-6 px-4 py-4 lg:flex lg:min-h-[calc(100dvh-4rem)] lg:items-center lg:justify-between lg:py-6">
+      <main className="mx-auto w-full max-w-6xl items-start gap-6 px-4 py-4 lg:flex lg:h-[calc(100dvh-4rem)] lg:items-stretch lg:justify-between lg:overflow-hidden lg:py-6">
 
-        {/* LEFT SIDE */}
-        <div className="hidden flex-1 lg:block">
+        {/* LEFT SIDE — fixed on desktop while form scrolls */}
+        <div className="hidden flex-1 lg:flex lg:h-full lg:items-center lg:overflow-hidden">
 
           <div className="space-y-4">
             <span className="inline-flex items-center gap-2 px-3 py-1 bg-red-100 text-primary rounded-full text-xs font-bold uppercase tracking-widest headline-font">
@@ -59,35 +59,36 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* RIGHT SIDE (FORM CARD) */}
-        <div className="w-full max-w-xl lg:ml-8 lg:max-w-lg xl:ml-10 xl:max-w-xl bg-white p-4 lg:p-5 rounded-[2rem] shadow-xl border border-gray-200">
+        {/* RIGHT SIDE (FORM CARD) — scrolls independently on desktop */}
+        <div className="w-full max-w-xl lg:ml-8 lg:max-w-lg xl:ml-10 xl:max-w-xl lg:h-full lg:overflow-y-auto lg:overscroll-contain">
+          <div className="bg-white p-4 lg:p-5 rounded-[2rem] shadow-xl border border-gray-200">
+            <div className="space-y-5">
 
-          <div className="space-y-5">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold headline-font">
+                  Criar Conta
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Selecione seu tipo de conta e preencha os dados.
+                </p>
+              </div>
 
-            <div className="text-center">
-              <h2 className="text-2xl font-bold headline-font">
-                Criar Conta
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Selecione seu tipo de conta e preencha os dados.
+              {/* FORM */}
+              <RegisterForm />
+
+              <p className="text-center text-xs text-gray-500 leading-relaxed px-2">
+                Ao clicar em registrar, você concorda com nossos{" "}
+                <span className="text-primary font-bold underline">
+                  Termos de Uso
+                </span>{" "}
+                e{" "}
+                <span className="text-primary font-bold underline">
+                  Política de Privacidade
+                </span>
+                .
               </p>
+
             </div>
-
-            {/* FORM */}
-            <RegisterForm />
-
-            <p className="text-center text-xs text-gray-500 leading-relaxed px-2">
-              Ao clicar em registrar, você concorda com nossos{" "}
-              <span className="text-primary font-bold underline">
-                Termos de Uso
-              </span>{" "}
-              e{" "}
-              <span className="text-primary font-bold underline">
-                Política de Privacidade
-              </span>
-              .
-            </p>
-
           </div>
         </div>
       </main>
