@@ -9,6 +9,7 @@ import bloodmatch.infra.persistence.repository.mongo.DonationMongoRepository;
 import bloodmatch.infra.persistence.schema.DonationSchema;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,6 +90,51 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
         .toList();
 
     return mongoRepository.findByCompletedTrueAndOrganizationIdInOrderByDonationDateAsc(ids)
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
+  public List<Donation> findPendingByOrganizationId(DomainID organizationId) {
+    if (organizationId == null)
+      throw new IllegalArgumentException("Organization id cannot be null");
+
+    return mongoRepository.findByPendingTrueAndOrganizationId(organizationId.getValue().toString())
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
+  public List<Donation> findPendingByOrganizationIdAndDate(DomainID organizationId, LocalDate date) {
+    if (organizationId == null)
+      throw new IllegalArgumentException("Organization id cannot be null");
+    if (date == null)
+      throw new IllegalArgumentException("Date cannot be null");
+
+    return mongoRepository
+        .findByPendingTrueAndOrganizationIdAndDonationDate(organizationId.getValue().toString(), date)
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
+  public List<Donation> findPendingByOrganizationIdAndDateRange(
+      DomainID organizationId,
+      LocalDate from,
+      LocalDate to) {
+    if (organizationId == null)
+      throw new IllegalArgumentException("Organization id cannot be null");
+    if (from == null)
+      throw new IllegalArgumentException("from cannot be null");
+    if (to == null)
+      throw new IllegalArgumentException("to cannot be null");
+
+    return mongoRepository
+        .findByPendingTrueAndOrganizationIdAndDonationDateBetween(
+            organizationId.getValue().toString(), from, to)
         .stream()
         .map(this::toDomain)
         .toList();

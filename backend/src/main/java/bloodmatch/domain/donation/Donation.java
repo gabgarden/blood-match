@@ -6,11 +6,13 @@ import bloodmatch.domain.shared.entity.DomainObject;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Donation extends DomainObject {
 
   private Donor donor;
   private LocalDate donationDate;
+  private LocalTime expectedTime;
   private BloodCenter bloodCenter;
   private boolean cancelled;
   private boolean completed;
@@ -20,10 +22,19 @@ public class Donation extends DomainObject {
       Donor donor,
       LocalDate donationDate,
       BloodCenter bloodCenter) {
+    this(donor, donationDate, bloodCenter, null);
+  }
+
+  private Donation(
+      Donor donor,
+      LocalDate donationDate,
+      BloodCenter bloodCenter,
+      LocalTime expectedTime) {
     this.id = DomainID.generate();
     this.donor = donor;
     this.donationDate = donationDate;
     this.bloodCenter = bloodCenter;
+    this.expectedTime = expectedTime;
   }
 
   public static Donation createPending(
@@ -31,6 +42,15 @@ public class Donation extends DomainObject {
       LocalDate expectedDate,
       BloodCenter bloodCenter,
       LocalDate currentDate) {
+    return createPending(donor, expectedDate, bloodCenter, currentDate, null);
+  }
+
+  public static Donation createPending(
+      Donor donor,
+      LocalDate expectedDate,
+      BloodCenter bloodCenter,
+      LocalDate currentDate,
+      LocalTime expectedTime) {
 
     if (donor == null)
       throw new IllegalArgumentException("Donor cannot be null");
@@ -46,7 +66,8 @@ public class Donation extends DomainObject {
     Donation donation = new Donation(
         donor,
         expectedDate,
-        bloodCenter);
+        bloodCenter,
+        expectedTime);
 
     donation.pending = true;
     donation.completed = false;
@@ -88,6 +109,18 @@ public class Donation extends DomainObject {
       boolean isCompleted,
       boolean isPending,
       boolean isCancelled) {
+    return reconstitute(id, donor, donationDate, bloodCenter, isCompleted, isPending, isCancelled, null);
+  }
+
+  public static Donation reconstitute(
+      DomainID id,
+      Donor donor,
+      LocalDate donationDate,
+      BloodCenter bloodCenter,
+      boolean isCompleted,
+      boolean isPending,
+      boolean isCancelled,
+      LocalTime expectedTime) {
 
     if (id == null)
       throw new IllegalArgumentException("Donation id cannot be null");
@@ -100,7 +133,7 @@ public class Donation extends DomainObject {
 
     validateStatusFlags(isCompleted, isPending, isCancelled);
 
-    Donation donation = new Donation(donor, donationDate, bloodCenter);
+    Donation donation = new Donation(donor, donationDate, bloodCenter, expectedTime);
 
     donation.setId(id);
     donation.completed = isCompleted;
@@ -143,6 +176,10 @@ public class Donation extends DomainObject {
   }
 
   public void reschedule(LocalDate newExpectedDate, LocalDate currentDate) {
+    reschedule(newExpectedDate, currentDate, this.expectedTime);
+  }
+
+  public void reschedule(LocalDate newExpectedDate, LocalDate currentDate, LocalTime newExpectedTime) {
     if (newExpectedDate == null)
       throw new IllegalArgumentException("New expected date cannot be null");
     if (currentDate == null)
@@ -153,6 +190,7 @@ public class Donation extends DomainObject {
       throw new IllegalArgumentException("New expected date cannot be in the past");
 
     this.donationDate = newExpectedDate;
+    this.expectedTime = newExpectedTime;
   }
 
   public void cancel() {
@@ -183,6 +221,10 @@ public class Donation extends DomainObject {
 
   public LocalDate getDonationDate() {
     return donationDate;
+  }
+
+  public LocalTime getExpectedTime() {
+    return expectedTime;
   }
 
   public BloodCenter getBloodCenter() {

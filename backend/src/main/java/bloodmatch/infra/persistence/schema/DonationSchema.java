@@ -11,14 +11,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Document(collection = "donations")
-@CompoundIndex(name = "completed_organization_donation_date", def = "{'completed': 1, 'organizationId': 1, 'donationDate': 1}")
+@CompoundIndexes({
+    @CompoundIndex(name = "completed_organization_donation_date", def = "{'completed': 1, 'organizationId': 1, 'donationDate': 1}"),
+    @CompoundIndex(name = "pending_organization_donation_date_time", def = "{'pending': 1, 'organizationId': 1, 'donationDate': 1, 'expectedTime': 1}")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,6 +35,7 @@ public class DonationSchema {
   private String donorPersonId;
   private String organizationId;
   private LocalDate donationDate;
+  private LocalTime expectedTime;
   private boolean completed;
   private boolean pending;
   private boolean cancelled;
@@ -42,6 +48,7 @@ public class DonationSchema {
     this.donorPersonId = donation.getDonor().getPerson().getId().getValue().toString();
     this.organizationId = donation.getBloodCenter().getOrganization().getId().getValue().toString();
     this.donationDate = donation.getDonationDate();
+    this.expectedTime = donation.getExpectedTime();
     this.completed = donation.isCompleted();
     this.pending = donation.isPending();
     this.cancelled = donation.isCancelled();
@@ -66,6 +73,7 @@ public class DonationSchema {
       bloodCenter,
       this.completed,
       this.pending,
-      this.cancelled);
+      this.cancelled,
+      this.expectedTime);
   }
 }

@@ -52,6 +52,13 @@ public class BloodCenterRepositoryImpl implements BloodCenterRepositoryInterface
   }
 
   @Override
+  public List<BloodCenter> findAll() {
+    return mongoRepository.findAll().stream()
+        .map(schema -> schema.toDomain(partyRepository))
+        .toList();
+  }
+
+  @Override
   public List<BloodCenterDirectoryEntry> searchByOrganizationName(String query, int limit) {
     if (query == null || query.isBlank()) {
       throw new IllegalArgumentException("query cannot be blank");

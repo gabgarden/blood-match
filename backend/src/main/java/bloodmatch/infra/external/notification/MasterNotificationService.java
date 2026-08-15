@@ -1,6 +1,8 @@
 package bloodmatch.infra.external.notification;
 
+import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.security.UserAccount;
 import bloodmatch.domain.services.NotificationServiceInterface;
@@ -27,5 +29,15 @@ public class MasterNotificationService implements NotificationServiceInterface {
         consoleService.notifyDonorAboutRequest(donor, account, request);
         
         emailService.notifyDonorAboutRequest(donor, account, request);
+    }
+
+    @Override
+    public void notifyBloodCenterAboutAppointment(
+            BloodCenter bloodCenter,
+            UserAccount bloodCenterAccount,
+            Donor donor,
+            Donation donation) {
+        consoleService.notifyBloodCenterAboutAppointment(bloodCenter, bloodCenterAccount, donor, donation);
+        emailService.notifyBloodCenterAboutAppointment(bloodCenter, bloodCenterAccount, donor, donation);
     }
 }

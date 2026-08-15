@@ -2,6 +2,7 @@ package bloodmatch.interfaces.rest.donation.createpending;
 
 import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase;
 import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase.Input;
+import bloodmatch.application.shared.TimeFormats;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,8 @@ public class CreatePendingDonationController {
     var output = useCase.execute(new Input(
         payload.personId(),
         payload.organizationId(),
-        payload.expectedDate()));
+        payload.expectedDate(),
+        TimeFormats.parseOptionalHourMinute(payload.expectedTime(), "expectedTime")));
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CreatePendingDonationResponseDto.from(output));

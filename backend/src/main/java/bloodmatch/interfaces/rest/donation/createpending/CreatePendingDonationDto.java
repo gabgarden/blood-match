@@ -7,5 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record CreatePendingDonationDto(
     @Schema(description = "UUID of the organization where the donation is scheduled.", format = "uuid", example = "c56a4180-65aa-42ec-a945-5fd21dec0538", requiredMode = Schema.RequiredMode.REQUIRED) String organizationId,
     @Schema(description = "UUID of the donor.", format = "uuid", example = "550e8400-e29b-41d4-a716-446655440000", requiredMode = Schema.RequiredMode.REQUIRED) String personId,
-    @Schema(description = "Expected donation date.", format = "date", example = "2026-08-01", requiredMode = Schema.RequiredMode.REQUIRED) LocalDate expectedDate) {
+    @Schema(description = "Expected donation date.", format = "date", example = "2026-08-01", requiredMode = Schema.RequiredMode.REQUIRED) LocalDate expectedDate,
+    @Schema(description = "Optional expected time in HH:mm. Required when the blood center has slots for that date.", example = "08:00", requiredMode = Schema.RequiredMode.NOT_REQUIRED) String expectedTime) {
 }

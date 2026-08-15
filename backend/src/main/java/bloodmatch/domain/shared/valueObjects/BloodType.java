@@ -7,6 +7,9 @@ import java.util.Objects;
 
 public class BloodType {
 
+        public static final List<String> ALL_TYPE_VALUES = List.of(
+                        "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-");
+
         private static final Map<String, BloodType> TYPES = Map.of(
                         "O-", new BloodType("O-"),
                         "O+", new BloodType("O+"),
@@ -36,6 +39,10 @@ public class BloodType {
                         throw new IllegalArgumentException("Invalid blood type");
 
                 return bloodType;
+        }
+
+        public static List<BloodType> all() {
+                return ALL_TYPE_VALUES.stream().map(BloodType::of).toList();
         }
 
         public String getType() {

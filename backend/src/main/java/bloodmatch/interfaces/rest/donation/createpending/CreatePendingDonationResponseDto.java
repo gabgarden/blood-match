@@ -1,5 +1,6 @@
 package bloodmatch.interfaces.rest.donation.createpending;
 
+import bloodmatch.application.shared.TimeFormats;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record CreatePendingDonationResponseDto(
     @Schema(description = "Donation UUID", format = "uuid") String id,
     @Schema(description = "Expected donation date", format = "date") String expectedDate,
+    @Schema(description = "Expected donation time in HH:mm, if scheduled against a slot") String expectedTime,
     @Schema(description = "Donation status", example = "PENDING") String status) {
 
   public static CreatePendingDonationResponseDto from(
@@ -14,6 +16,7 @@ public record CreatePendingDonationResponseDto(
     return new CreatePendingDonationResponseDto(
         output.id(),
         output.expectedDate().toString(),
+        TimeFormats.format(output.expectedTime()),
         output.status());
   }
 }

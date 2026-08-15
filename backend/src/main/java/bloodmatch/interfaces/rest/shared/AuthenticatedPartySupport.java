@@ -25,6 +25,19 @@ public final class AuthenticatedPartySupport {
   }
 
   /**
+   * JWT party id of the authenticated caller (never bypassed for SYSTEM_ADMIN).
+   * Used by blood-center "me" endpoints where the organization is the token party.
+   */
+  public static String authenticatedPartyId() {
+    Authentication authentication = requireAuthentication();
+    JwtPrincipal principal = requirePrincipal(authentication);
+    if (principal.partyId() == null || principal.partyId().isBlank()) {
+      throw new ForbiddenException("Forbidden");
+    }
+    return principal.partyId();
+  }
+
+  /**
    * Party id used for resource ownership checks in use cases.
    * Returns {@code null} when the caller is SYSTEM_ADMIN (bypass).
    */

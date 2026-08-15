@@ -11,6 +11,8 @@ public interface BloodCenterRepositoryInterface {
 
   void save(BloodCenter bloodCenter);
 
+  List<BloodCenter> findAll();
+
   /**
    * Case-insensitive partial name search over organizations that have a blood-center role.
    */
