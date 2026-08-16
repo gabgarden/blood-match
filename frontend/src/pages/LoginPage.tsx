@@ -84,7 +84,7 @@ export default function LoginPage() {
       </div>
       <AppCard className="w-full max-w-md p-8 shadow-xl">
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold headline-font text-primary">Bloodmatch</h1>
+          <h1 className="text-3xl font-extrabold headline-font text-primary">BloodMatch</h1>
           <p className="mt-2 text-sm text-gray-600">Faça login para ajudar a salvar vidas.</p>
         </header>
 

@@ -11,7 +11,7 @@ export default function RegisterPage() {
         <div className="flex items-center gap-3">
           <BackButton fallbackPath="/" label="Voltar para a página inicial" variant="outline" />
           <div className="text-xl sm:text-2xl font-extrabold text-primary headline-font tracking-tight">
-            Bloodmatch
+            BloodMatch
           </div>
         </div>
 
@@ -65,11 +65,11 @@ export default function RegisterPage() {
             <div className="space-y-5">
 
               <div className="text-center">
-                <h2 className="text-2xl font-bold headline-font">
-                  Criar Conta
+                <h2 className="text-3xl font-extrabold headline-font text-primary">
+                  BloodMatch
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Selecione seu tipo de conta e preencha os dados.
+                <p className="mt-2 text-sm text-gray-600">
+                  Crie sua conta para ajudar a salvar vidas.
                 </p>
               </div>
 

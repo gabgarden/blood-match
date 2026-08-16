@@ -19,7 +19,7 @@ export function RouteErrorPage() {
   return (
     <main className="min-h-screen bg-surface px-6 py-10 grid place-items-center">
       <section className="w-full max-w-lg rounded-[2rem] border border-red-100 bg-white p-8 shadow-xl">
-        <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#ae131a]">Bloodmatch</p>
+        <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#ae131a]">BloodMatch</p>
         <h1 className="mt-3 headline-font text-3xl font-extrabold tracking-tight text-[#1a1c1d]">
           {title}
         </h1>
