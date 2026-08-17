@@ -15,6 +15,11 @@ public interface DonationMongoRepository extends MongoRepository<DonationSchema,
   List<DonationSchema> findByCompletedTrueAndOrganizationIdInOrderByDonationDateAsc(
       List<String> organizationIds);
 
+  List<DonationSchema> findByCompletedTrueAndOrganizationIdAndDonationDateBetweenOrderByDonationDateAsc(
+      String organizationId,
+      LocalDate startDate,
+      LocalDate endDate);
+
   List<DonationSchema> findByPendingTrueAndOrganizationId(String organizationId);
 
   List<DonationSchema> findByPendingTrueAndOrganizationIdAndDonationDate(

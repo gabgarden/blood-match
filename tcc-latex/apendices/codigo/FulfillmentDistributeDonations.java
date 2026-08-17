@@ -1,47 +1,37 @@
-public Map<DomainID, DonationRequestFulfillmentStatusRecord> calculate(
+public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
+        BloodCenter bloodCenter,
+        LocalDate startDate,
+        LocalDate endDate,
         List<DonationRequest> requests,
-        List<Donation> donations,
-        LocalDate currentDate) {
+        List<Donation> donations) {
 
-    requests = new ArrayList<>(requests);
-    requests.sort(
-        Comparator.comparing(DonationRequest::getDateRequested)
-            .thenComparing(request -> request.getId().getValue()));
+    List<DonationRequest> centerRequests = requests.stream()
+        .filter(request -> sameBloodCenter(request.getBloodCenter(), bloodCenter))
+        .sorted(REQUEST_ORDER)
+        .toList();
 
-    donations = new ArrayList<>(donations);
-    donations.sort(
-        Comparator.comparing(Donation::getDonationDate)
-            .thenComparing(donation -> donation.getId().getValue()));
+    List<Donation> centerDonations = donations.stream()
+        .filter(donation -> sameBloodCenter(donation.getBloodCenter(), bloodCenter))
+        .filter(donation -> inRange(donation.getDonationDate(), startDate, endDate))
+        .sorted(DONATION_ORDER)
+        .toList();
 
-    Map<DomainID, Integer> fulfilled = initialize(requests);
-    Map<DomainID, List<DonationRequest>> requestsByBloodCenter = requests.stream()
-        .collect(Collectors.groupingBy(request -> request.getBloodCenter().getId()));
+    Map<DomainID, Integer> fulfilled = new LinkedHashMap<>();
+    for (DonationRequest request : centerRequests) {
+        fulfilled.put(request.getId(), 0);
+    }
 
-    distributeDonations(requestsByBloodCenter, donations, currentDate, fulfilled);
-    return buildResult(requests, fulfilled);
-}
-
-private void distributeDonations(
-        Map<DomainID, List<DonationRequest>> requestsByBloodCenter,
-        List<Donation> donations,
-        LocalDate currentDate,
-        Map<DomainID, Integer> fulfilled) {
-
-    for (Donation donation : donations) {
-        List<DonationRequest> requestsAtBloodCenter = requestsByBloodCenter.getOrDefault(
-            donation.getBloodCenter().getId(),
-            List.of());
-
-        for (DonationRequest request : requestsAtBloodCenter) {
-            if (!request.acceptsDonation(donation, currentDate))
+    for (Donation donation : centerDonations) {
+        for (DonationRequest request : centerRequests) {
+            if (!request.acceptsDonation(donation, endDate))
                 continue;
-
-            int currentFulfilled = fulfilled.get(request.getId());
-            if (currentFulfilled >= request.getGoalBloodBags())
+            int current = fulfilled.get(request.getId());
+            if (current >= request.getGoalBloodBags())
                 continue;
-
-            fulfilled.put(request.getId(), currentFulfilled + 1);
+            fulfilled.put(request.getId(), current + 1);
             break;
         }
     }
+
+    return buildResult(centerRequests, fulfilled);
 }

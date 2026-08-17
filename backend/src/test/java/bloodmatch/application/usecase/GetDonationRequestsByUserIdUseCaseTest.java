@@ -10,6 +10,8 @@ import bloodmatch.domain.party.Person;
 import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.roles.requester.Requester;
+import bloodmatch.domain.services.DonationRequestFulfillmentService;
+import bloodmatch.domain.services.records.DonationRequestFulfillmentStatusRecord;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
@@ -19,9 +21,12 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,8 +34,11 @@ class GetDonationRequestsByPartyIdUseCaseTest {
 
   private final DonationRequestRepositoryInterface donationRequestRepository =
       mock(DonationRequestRepositoryInterface.class);
+  private final DonationRequestFulfillmentService fulfillmentService =
+      mock(DonationRequestFulfillmentService.class);
   private final GetDonationRequestsByPartyIdUseCase useCase = new GetDonationRequestsByPartyIdUseCase(
-      donationRequestRepository);
+      donationRequestRepository,
+      fulfillmentService);
 
   @Test
   void shouldReturnRequestsOrderedByDateRequestedDesc() {
@@ -41,6 +49,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     DonationRequest newer = createRequest(now.minusDays(1));
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(older, newer));
+    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(Map.of());
 
     List<GetDonationRequestsByPartyIdUseCase.OutputItem> result =
         useCase.execute(new Input(userId.getValue().toString()), now);
@@ -65,6 +74,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     cancelled.close();
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(cancelled));
+    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(Map.of());
 
     List<GetDonationRequestsByPartyIdUseCase.OutputItem> result =
         useCase.execute(new Input(userId.getValue().toString()), now);
@@ -81,9 +91,10 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     LocalDate currentDate = LocalDate.of(2026, 4, 23);
     DomainID userId = DomainID.generate();
     DonationRequest expired = createRequest(currentDate.minusDays(12));
-    expired.setFulfilledBloodBags(1);
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(expired));
+    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(
+        Map.of(expired.getId(), new DonationRequestFulfillmentStatusRecord(1, true)));
 
     GetDonationRequestsByPartyIdUseCase.OutputItem result =
         useCase.execute(new Input(userId.getValue().toString()), currentDate).get(0);

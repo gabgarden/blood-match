@@ -1,7 +1,9 @@
 package bloodmatch.domain.services;
 
 import bloodmatch.domain.donation.Donation;
+import bloodmatch.domain.donation.DonationRepositoryInterface;
 import bloodmatch.domain.donationrequest.DonationRequest;
+import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
 import bloodmatch.domain.party.Person;
@@ -15,10 +17,15 @@ import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+
+import static org.mockito.Mockito.mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,7 +44,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DonationRequestFulfillmentFifoTest {
 
   private static final LocalDate TODAY = LocalDate.of(2026, 7, 24);
-  private final DonationRequestFulfillmentService service = new DonationRequestFulfillmentService();
+  private static final LocalDate START = TODAY.minusYears(1);
+  private final DonationRequestFulfillmentService service = new DonationRequestFulfillmentService(
+      mock(DonationRequestRepositoryInterface.class),
+      mock(DonationRepositoryInterface.class));
 
   // --- FIFO básico ---
 
@@ -400,7 +410,20 @@ class DonationRequestFulfillmentFifoTest {
   private Map<DomainID, DonationRequestFulfillmentStatusRecord> calculate(
       List<DonationRequest> requests,
       List<Donation> donations) {
-    return service.calculate(requests, donations, TODAY);
+    Set<BloodCenter> centers = new LinkedHashSet<>();
+    for (DonationRequest request : requests) {
+      centers.add(request.getBloodCenter());
+    }
+    if (centers.isEmpty()) {
+      for (Donation donation : donations) {
+        centers.add(donation.getBloodCenter());
+      }
+    }
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result = new HashMap<>();
+    for (BloodCenter center : centers) {
+      result.putAll(service.fill(center, START, TODAY, requests, donations));
+    }
+    return result;
   }
 
   private void assertFulfilled(
@@ -436,7 +459,7 @@ class DonationRequestFulfillmentFifoTest {
       Urgency urgency) {
     return DonationRequest.reconstitute(
         id(id), requester(), center, BloodType.of(neededBloodType), goal,
-        requestedAt, limit, active, urgency, null, 0, null);
+        requestedAt, limit, active, urgency, null, null);
   }
 
   private Donation donation(long id, BloodCenter center, String donorBloodType, LocalDate date) {

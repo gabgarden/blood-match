@@ -1,136 +1,198 @@
 package bloodmatch.domain.services;
 
 import bloodmatch.domain.donation.Donation;
+import bloodmatch.domain.donation.DonationRepositoryInterface;
 import bloodmatch.domain.donationrequest.DonationRequest;
-import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
+import bloodmatch.domain.roles.organization.bloodcenter.BloodCenter;
 import bloodmatch.domain.services.records.DonationRequestFulfillmentStatusRecord;
+import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-
+/**
+ * Snapshot in-memory of how completed donations fill requests at one blood
+ * center. Nothing is persisted; callers pass a date window and receive
+ * counters for that snapshot.
+ */
 @Service
 public class DonationRequestFulfillmentService {
 
-        public Map<DomainID, DonationRequestFulfillmentStatusRecord> synchronize(
-                        List<DonationRequest> requests,
-                        List<Donation> donations,
-                        LocalDate currentDate) {
+  private static final Comparator<DonationRequest> REQUEST_ORDER =
+      Comparator.comparing(DonationRequest::getDateRequested)
+          .thenComparing(request -> request.getId().getValue());
 
-                Map<DomainID, DonationRequestFulfillmentStatusRecord> result = calculate(
-                                requests,
-                                donations,
-                                currentDate);
+  private static final Comparator<Donation> DONATION_ORDER =
+      Comparator.comparing(Donation::getDonationDate)
+          .thenComparing(donation -> donation.getId().getValue());
 
-                for (DonationRequest request : requests) {
-                        DonationRequestFulfillmentStatusRecord status = result.get(request.getId());
-                        request.setFulfilledBloodBags(
-                                        status != null ? status.fulfilledBloodBags() : 0);
-                }
+  private final DonationRequestRepositoryInterface requestRepository;
+  private final DonationRepositoryInterface donationRepository;
 
-                return result;
-        }
+  public DonationRequestFulfillmentService(
+      DonationRequestRepositoryInterface requestRepository,
+      DonationRepositoryInterface donationRepository) {
+    if (requestRepository == null)
+      throw new IllegalArgumentException("DonationRequestRepository cannot be null");
+    if (donationRepository == null)
+      throw new IllegalArgumentException("DonationRepository cannot be null");
+    this.requestRepository = requestRepository;
+    this.donationRepository = donationRepository;
+  }
 
-    public Map<DomainID, DonationRequestFulfillmentStatusRecord> calculate(
-            List<DonationRequest> requests,
-            List<Donation> donations,
-            LocalDate currentDate) {
+  /**
+   * Loads every request and completed donation of the blood center in
+   * {@code [startDate, endDate]} and allocates FIFO in memory.
+   */
+  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
+      BloodCenter bloodCenter,
+      LocalDate startDate,
+      LocalDate endDate) {
+    requireWindow(bloodCenter, startDate, endDate);
 
-        requests = new ArrayList<>(requests);
-        requests.sort(
-                Comparator.comparing(DonationRequest::getDateRequested)
-                        .thenComparing(request -> request.getId().getValue()));
+    DomainID organizationId = bloodCenter.getOrganization().getId();
+    List<DonationRequest> requests = requestRepository.findByOrganizationId(organizationId);
+    LocalDate from = earliest(startDate, requests);
+    List<Donation> donations =
+        donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
+            organizationId, from, endDate);
 
-        donations = new ArrayList<>(donations);
-        donations.sort(
-                Comparator.comparing(Donation::getDonationDate)
-                        .thenComparing(donation -> donation.getId().getValue()));
+    return fill(bloodCenter, from, endDate, requests, donations);
+  }
 
-        Map<DomainID, Integer> fulfilled = initialize(requests);
-        Map<DomainID, List<DonationRequest>> requestsByBloodCenter = requests.stream()
-                .collect(Collectors.groupingBy(request -> request.getBloodCenter().getId()));
+  /**
+   * Snapshot for every distinct blood center present in {@code requests}.
+   * Each center is loaded in full so FIFO stays correct across all requests
+   * at that hemocentro, not only the ones already in hand.
+   */
+  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
+      List<DonationRequest> requests,
+      LocalDate startDate,
+      LocalDate endDate) {
+    if (requests == null)
+      throw new IllegalArgumentException("Requests cannot be null");
+    if (startDate == null)
+      throw new IllegalArgumentException("Start date cannot be null");
+    if (endDate == null)
+      throw new IllegalArgumentException("End date cannot be null");
 
-        distributeDonations(
-                requestsByBloodCenter,
-                donations,
-                currentDate,
-                fulfilled);
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result = new HashMap<>();
+    Set<DomainID> seenOrganizations = new LinkedHashSet<>();
+    for (DonationRequest request : requests) {
+      BloodCenter bloodCenter = request.getBloodCenter();
+      DomainID organizationId = bloodCenter.getOrganization().getId();
+      if (!seenOrganizations.add(organizationId))
+        continue;
+      result.putAll(fill(bloodCenter, startDate, endDate));
+    }
+    return result;
+  }
 
-        return buildResult(
-                requests,
-                fulfilled);
+  /**
+   * Same allocation as {@link #fill(BloodCenter, LocalDate, LocalDate)}, using
+   * an already loaded snapshot. Used by tests and by callers that already
+   * grouped data by blood center.
+   */
+  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
+      BloodCenter bloodCenter,
+      LocalDate startDate,
+      LocalDate endDate,
+      List<DonationRequest> requests,
+      List<Donation> donations) {
+    requireWindow(bloodCenter, startDate, endDate);
+    if (requests == null)
+      throw new IllegalArgumentException("Requests cannot be null");
+    if (donations == null)
+      throw new IllegalArgumentException("Donations cannot be null");
+
+    List<DonationRequest> centerRequests = new ArrayList<>();
+    for (DonationRequest request : requests) {
+      if (sameBloodCenter(request.getBloodCenter(), bloodCenter)) {
+        centerRequests.add(request);
+      }
+    }
+    centerRequests.sort(REQUEST_ORDER);
+
+    List<Donation> centerDonations = new ArrayList<>();
+    for (Donation donation : donations) {
+      if (!sameBloodCenter(donation.getBloodCenter(), bloodCenter))
+        continue;
+      if (!inRange(donation.getDonationDate(), startDate, endDate))
+        continue;
+      centerDonations.add(donation);
+    }
+    centerDonations.sort(DONATION_ORDER);
+
+    Map<DomainID, Integer> fulfilled = new LinkedHashMap<>();
+    for (DonationRequest request : centerRequests) {
+      fulfilled.put(request.getId(), 0);
     }
 
-    private Map<DomainID, Integer> initialize(
-            List<DonationRequest> requests) {
+    for (Donation donation : centerDonations) {
+      for (DonationRequest request : centerRequests) {
+        if (!request.acceptsDonation(donation, endDate))
+          continue;
 
-        Map<DomainID, Integer> fulfilled = new HashMap<>();
+        int current = fulfilled.get(request.getId());
+        if (current >= request.getGoalBloodBags())
+          continue;
 
-        for (DonationRequest request : requests) {
-            fulfilled.put(request.getId(), 0);
-        }
-
-        return fulfilled;
+        fulfilled.put(request.getId(), current + 1);
+        break;
+      }
     }
 
-    private void distributeDonations(
-            Map<DomainID, List<DonationRequest>> requestsByBloodCenter,
-            List<Donation> donations,
-            LocalDate currentDate,
-            Map<DomainID, Integer> fulfilled) {
-
-        for (Donation donation : donations) {
-
-            List<DonationRequest> requestsAtBloodCenter = requestsByBloodCenter.getOrDefault(
-                    donation.getBloodCenter().getId(),
-                    List.of());
-
-            for (DonationRequest request : requestsAtBloodCenter) {
-
-                if (!request.acceptsDonation(donation, currentDate))
-                    continue;
-
-                int currentFulfilled =
-                        fulfilled.get(request.getId());
-
-                if (currentFulfilled >= request.getGoalBloodBags())
-                    continue;
-
-                fulfilled.put(
-                        request.getId(),
-                        currentFulfilled + 1);
-
-                break;
-            }
-        }
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result = new HashMap<>();
+    for (DonationRequest request : centerRequests) {
+      int bags = fulfilled.get(request.getId());
+      result.put(
+          request.getId(),
+          new DonationRequestFulfillmentStatusRecord(
+              bags,
+              bags >= request.getGoalBloodBags()));
     }
+    return result;
+  }
 
-    private Map<DomainID, DonationRequestFulfillmentStatusRecord> buildResult(
-            List<DonationRequest> requests,
-            Map<DomainID, Integer> fulfilled) {
-
-        Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
-                new HashMap<>();
-
-        for (DonationRequest request : requests) {
-
-            int fulfilledBloodBags =
-                    fulfilled.get(request.getId());
-
-            result.put(
-                    request.getId(),
-                    new DonationRequestFulfillmentStatusRecord(
-                            fulfilledBloodBags,
-                            fulfilledBloodBags >= request.getGoalBloodBags()));
-        }
-
-        return result;
+  private static LocalDate earliest(LocalDate startDate, List<DonationRequest> requests) {
+    LocalDate from = startDate;
+    for (DonationRequest request : requests) {
+      if (request.getDateRequested().isBefore(from)) {
+        from = request.getDateRequested();
+      }
     }
+    return from;
+  }
+
+  private static boolean sameBloodCenter(BloodCenter left, BloodCenter right) {
+    return left.getOrganization().getId().equals(right.getOrganization().getId());
+  }
+
+  private static boolean inRange(LocalDate date, LocalDate startDate, LocalDate endDate) {
+    return !date.isBefore(startDate) && !date.isAfter(endDate);
+  }
+
+  private static void requireWindow(
+      BloodCenter bloodCenter,
+      LocalDate startDate,
+      LocalDate endDate) {
+    if (bloodCenter == null)
+      throw new IllegalArgumentException("Blood center cannot be null");
+    if (startDate == null)
+      throw new IllegalArgumentException("Start date cannot be null");
+    if (endDate == null)
+      throw new IllegalArgumentException("End date cannot be null");
+    if (endDate.isBefore(startDate))
+      throw new IllegalArgumentException("End date cannot be before start date");
+  }
 }

@@ -17,7 +17,7 @@ A Listagem~\ref{lst:donation-repo} apresenta a interface \codigo{DonationReposit
 
 \section{Orquestração no caso de uso}
 
-A Listagem~\ref{lst:complete-pending} mostra o método \codigo{execute} de \codigo{CompletePendingDonationUseCase}. O fluxo valida a entrada, carrega a doação via repositório, verifica \textit{ownership}, delega a transição de estado ao agregado (\codigo{donation.complete}), atualiza o doador e dispara o recálculo do cumprimento de metas (\codigo{fulfillmentRefresher.refresh}).
+A Listagem~\ref{lst:complete-pending} mostra o método \codigo{execute} de \codigo{CompletePendingDonationUseCase}. O fluxo valida a entrada, carrega a doação via repositório, verifica \textit{ownership}, delega a transição de estado ao agregado (\codigo{donation.complete}), atualiza o doador e persiste a doação concluída. O cumprimento de metas não é gravado nesse momento: a leitura seguinte monta o \textit{snapshot} FIFO a partir do banco.
 
 \lstinputlisting[
   language=Java,

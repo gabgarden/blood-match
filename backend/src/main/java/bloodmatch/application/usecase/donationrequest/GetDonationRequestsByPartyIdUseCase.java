@@ -4,21 +4,27 @@ import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
+import bloodmatch.domain.services.DonationRequestFulfillmentService;
+import bloodmatch.domain.services.records.DonationRequestFulfillmentStatusRecord;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GetDonationRequestsByPartyIdUseCase {
 
   private final DonationRequestRepositoryInterface donationRequestRepository;
+  private final DonationRequestFulfillmentService fulfillmentService;
 
   public GetDonationRequestsByPartyIdUseCase(
-      DonationRequestRepositoryInterface donationRequestRepository) {
+      DonationRequestRepositoryInterface donationRequestRepository,
+      DonationRequestFulfillmentService fulfillmentService) {
     this.donationRequestRepository = donationRequestRepository;
+    this.fulfillmentService = fulfillmentService;
   }
 
   public List<OutputItem> execute(Input input) {
@@ -38,18 +44,26 @@ public class GetDonationRequestsByPartyIdUseCase {
     List<DonationRequest> userRequests =
         donationRequestRepository.findByRequesterPartyId(partyId);
 
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot =
+        fulfillmentService.fill(userRequests, currentDate, currentDate);
+
     return userRequests.stream()
         .sorted(
             Comparator.comparing(DonationRequest::getDateRequested)
                 .reversed()
                 .thenComparing(request -> request.getId().getValue()))
-        .map(request -> toOutput(request, currentDate))
+        .map(request -> toOutput(request, currentDate, snapshot))
         .toList();
   }
 
-  private OutputItem toOutput(DonationRequest request, LocalDate currentDate) {
-    int fulfilledBloodBags = request.getFulfilledBloodBags();
-    boolean goalReached = request.isGoalReached();
+  private OutputItem toOutput(
+      DonationRequest request,
+      LocalDate currentDate,
+      Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot) {
+    DonationRequestFulfillmentStatusRecord status = snapshot.getOrDefault(
+        request.getId(),
+        new DonationRequestFulfillmentStatusRecord(0, false));
+    int fulfilledBloodBags = status.fulfilledBloodBags();
 
     return new OutputItem(
         request.getId().getValue().toString(),
@@ -64,7 +78,7 @@ public class GetDonationRequestsByPartyIdUseCase {
         request.getGoalBloodBags(),
         fulfilledBloodBags,
         Math.max(0, request.getGoalBloodBags() - fulfilledBloodBags),
-        goalReached);
+        status.goalReached());
   }
 
   public record Input(String partyId) {

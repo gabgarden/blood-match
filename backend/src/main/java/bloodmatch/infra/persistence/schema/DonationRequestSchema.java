@@ -39,7 +39,6 @@ public class DonationRequestSchema {
   private String organizationId;
   private String bloodTypeNeeded;
   private int goalBloodBags;
-  private int fulfilledBloodBags;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
   private boolean active;
@@ -58,7 +57,6 @@ public class DonationRequestSchema {
     this.organizationId = donationRequest.getBloodCenter().getOrganization().getId().getValue().toString();
     this.bloodTypeNeeded = donationRequest.getBloodTypeNeeded().getType();
     this.goalBloodBags = donationRequest.getGoalBloodBags();
-    this.fulfilledBloodBags = donationRequest.getFulfilledBloodBags();
     this.dateRequested = donationRequest.getDateRequested();
     this.dateLimit = donationRequest.getDateLimit();
     this.active = donationRequest.isActive();
@@ -96,7 +94,6 @@ public class DonationRequestSchema {
         this.active,
         Urgency.valueOf(this.urgency),
         this.directedTo,
-        this.fulfilledBloodBags,
         this.version);
   }
 }

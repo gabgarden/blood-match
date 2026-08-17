@@ -128,6 +128,17 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
   }
 
   @Override
+  public List<DonationRequest> findByOrganizationId(DomainID organizationId) {
+    if (organizationId == null)
+      throw new IllegalArgumentException("Organization id cannot be null");
+
+    return mongoRepository.findByOrganizationId(organizationId.getValue().toString())
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
   public void deleteById(DomainID id) {
     if (id == null)
       throw new IllegalArgumentException("Donation request id cannot be null");

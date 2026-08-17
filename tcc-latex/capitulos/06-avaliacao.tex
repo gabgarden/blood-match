@@ -11,7 +11,7 @@ A solução implementada materializa-se em uma API RESTful em Java~17 com Spring
   \item gestão do ciclo de vida das solicitações de doação (criação, consulta, atualização de meta e prazo, cancelamento e notificação de elegíveis);
   \item registro e acompanhamento de doações (pendentes, concluídas, reagendamento e histórico);
   \item recomendação de solicitações compatíveis ao doador, considerando tipagem sanguínea, elegibilidade temporal e proximidade geográfica;
-  \item materialização do cumprimento de metas (\codigo{fulfilledBloodBags}) por alocação FIFO de doações concluídas às solicitações ativas do mesmo hemocentro;
+  \item cumprimento de metas por \textit{snapshot} em memória: alocação FIFO de doações concluídas às solicitações do mesmo hemocentro, sem campo persistido;
   \item busca autenticada de hemocentros por nome, retornando o identificador da organização utilizado nas operações de escrita.
 \end{itemize}
 
@@ -77,7 +77,7 @@ A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-A ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da materialização de \codigo{fulfilledBloodBags} por FIFO, bem como o controle de acesso baseado em JWT e papéis.
+A ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação FIFO de \codigo{fulfilledBloodBags} por \textit{snapshot}, bem como o controle de acesso baseado em JWT e papéis.
 
 Ressalta-se que a maior parte dos testes de domínio e de aplicação não depende de uma instância MongoDB ativa: repositórios e serviços externos são substituídos por \textit{mocks}, o que favorece a repetibilidade e reduz o custo de execução. Os testes que sobem o contexto Spring Boot (\textit{smoke} e autorização HTTP) validam a montagem da aplicação e a barreira de segurança sem exigir, nos cenários cobertos, a persistência real de documentos.
 
@@ -100,7 +100,6 @@ A partir da avaliação, identificam-se melhorias desejáveis para evoluções f
 
 \begin{itemize}[leftmargin=*]
   \item ampliar testes de integração com persistência real (por exemplo, Testcontainers com MongoDB) para cobrir concorrência otimista (\codigo{@Version}) e agregações de busca de hemocentros;
-  \item estender o recálculo de \codigo{fulfilledBloodBags} a eventos além da conclusão de doações (criação, cancelamento e alteração de meta/prazo), conforme discutido na Seção~\ref{sec:recomendacao-fulfillment};
   \item incorporar métricas de cobertura de código (por exemplo, JaCoCo) como indicador complementar à taxa de sucesso da suíte;
   \item formalizar testes de contrato da API (OpenAPI) e cenários de carga para recomendações geoespaciais em volumes maiores de dados.
 \end{itemize}

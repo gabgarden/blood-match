@@ -22,8 +22,6 @@ public Output execute(Input input, LocalDate currentDate) {
 
     donorRepository.save(donation.getDonor());
     donationRepository.save(donation);
-    fulfillmentRefresher.refresh(
-        donation.getBloodCenter().getOrganization().getId(), currentDate);
 
     return Output.from(donation);
 }

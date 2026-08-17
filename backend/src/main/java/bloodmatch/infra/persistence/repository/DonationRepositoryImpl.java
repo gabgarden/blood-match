@@ -96,6 +96,26 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
   }
 
   @Override
+  public List<Donation> findCompletedDonationsByOrganizationIdAndDateRange(
+      DomainID organizationId,
+      LocalDate startDate,
+      LocalDate endDate) {
+    if (organizationId == null)
+      throw new IllegalArgumentException("Organization id cannot be null");
+    if (startDate == null)
+      throw new IllegalArgumentException("Start date cannot be null");
+    if (endDate == null)
+      throw new IllegalArgumentException("End date cannot be null");
+
+    return mongoRepository
+        .findByCompletedTrueAndOrganizationIdAndDonationDateBetweenOrderByDonationDateAsc(
+            organizationId.getValue().toString(), startDate, endDate)
+        .stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
   public List<Donation> findPendingByOrganizationId(DomainID organizationId) {
     if (organizationId == null)
       throw new IllegalArgumentException("Organization id cannot be null");

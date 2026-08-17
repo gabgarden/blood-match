@@ -16,7 +16,6 @@ public class DonationRequest extends DomainObject {
   private BloodCenter bloodCenter;
   private BloodType bloodTypeNeeded;
   private int goalBloodBags;
-  private int fulfilledBloodBags;
   private LocalDate dateRequested;
   private LocalDate dateLimit;
   private boolean active;
@@ -40,7 +39,6 @@ public class DonationRequest extends DomainObject {
     this.bloodCenter = bloodCenter;
     this.bloodTypeNeeded = bloodTypeNeeded;
     this.goalBloodBags = goalBloodBags;
-    this.fulfilledBloodBags = 0;
     this.dateRequested = currentDate;
     this.dateLimit = dateLimit;
     this.active = true;
@@ -125,7 +123,6 @@ public class DonationRequest extends DomainObject {
         isActive,
         urgency,
         directedTo,
-        0,
         null);
   }
 
@@ -140,34 +137,6 @@ public class DonationRequest extends DomainObject {
       boolean isActive,
       Urgency urgency,
       String directedTo,
-      Long version) {
-    return reconstitute(
-        id,
-        requester,
-        bloodCenter,
-        bloodTypeNeeded,
-        goalBloodBags,
-        dateRequested,
-        dateLimit,
-        isActive,
-        urgency,
-        directedTo,
-        0,
-        version);
-  }
-
-  public static DonationRequest reconstitute(
-      DomainID id,
-      Requester requester,
-      BloodCenter bloodCenter,
-      BloodType bloodTypeNeeded,
-      int goalBloodBags,
-      LocalDate dateRequested,
-      LocalDate dateLimit,
-      boolean isActive,
-      Urgency urgency,
-      String directedTo,
-      int fulfilledBloodBags,
       Long version) {
 
     if (id == null)
@@ -186,8 +155,6 @@ public class DonationRequest extends DomainObject {
       throw new IllegalArgumentException("Limit date cannot be null");
     if (urgency == null)
       throw new IllegalArgumentException("Urgency cannot be null");
-    if (fulfilledBloodBags < 0)
-      throw new IllegalArgumentException("Fulfilled blood bags cannot be negative");
 
     DonationRequest request = new DonationRequest(
         requester,
@@ -202,7 +169,6 @@ public class DonationRequest extends DomainObject {
     request.setId(id);
     request.dateRequested = dateRequested;
     request.active = isActive;
-    request.fulfilledBloodBags = fulfilledBloodBags;
     request.version = version;
 
     return request;
@@ -261,26 +227,6 @@ public class DonationRequest extends DomainObject {
   public int getGoalBloodBags() {
     return goalBloodBags;
   }
-
-  public int getFulfilledBloodBags() {
-    return fulfilledBloodBags;
-  }
-
-  public void setFulfilledBloodBags(int fulfilledBloodBags) {
-    if (fulfilledBloodBags < 0)
-      throw new IllegalArgumentException("Fulfilled blood bags cannot be negative");
-
-    this.fulfilledBloodBags = fulfilledBloodBags;
-  }
-
-  public void incrementFulfilledBloodBags() {
-    this.fulfilledBloodBags++;
-  }
-
-  public boolean isGoalReached() {
-    return fulfilledBloodBags >= goalBloodBags;
-  }
-
 
   public void setGoalBloodBags(int goalBloodBags) {
     if (goalBloodBags <= 0)

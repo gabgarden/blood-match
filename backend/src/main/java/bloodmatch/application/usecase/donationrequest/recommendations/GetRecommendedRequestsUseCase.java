@@ -7,6 +7,8 @@ import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.DonorRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
+import bloodmatch.domain.services.DonationRequestFulfillmentService;
+import bloodmatch.domain.services.records.DonationRequestFulfillmentStatusRecord;
 import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
@@ -14,18 +16,22 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GetRecommendedRequestsUseCase {
 
   private final DonorRepositoryInterface donorRepository;
   private final DonationRequestRepositoryInterface donationRequestRepository;
+  private final DonationRequestFulfillmentService fulfillmentService;
 
   public GetRecommendedRequestsUseCase(
       DonorRepositoryInterface donorRepository,
-      DonationRequestRepositoryInterface donationRequestRepository) {
+      DonationRequestRepositoryInterface donationRequestRepository,
+      DonationRequestFulfillmentService fulfillmentService) {
     this.donorRepository = donorRepository;
     this.donationRequestRepository = donationRequestRepository;
+    this.fulfillmentService = fulfillmentService;
   }
 
   public List<OutputItem> execute(Input input) {
@@ -59,23 +65,30 @@ public class GetRecommendedRequestsUseCase {
       return List.of();
     }
 
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot =
+        fulfillmentService.fill(candidateRequests, currentDate, currentDate);
+
     return candidateRequests.stream()
-        .filter(request -> !request.isGoalReached())
+        .filter(request -> !statusOf(snapshot, request).goalReached())
         .sorted(
             Comparator
                 .comparing((DonationRequest request) -> distanceKm(donor, request),
                     Comparator.nullsLast(Comparator.naturalOrder()))
                 .thenComparing(DonationRequest::getUrgency, Comparator.reverseOrder())
                 .thenComparing(DonationRequest::getDateLimit))
-        .map(request -> toOutput(request, donor))
+        .map(request -> toOutput(request, donor, snapshot))
         .toList();
   }
 
-  private OutputItem toOutput(DonationRequest request, Donor donor) {
+  private OutputItem toOutput(
+      DonationRequest request,
+      Donor donor,
+      Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot) {
     Double distance = distanceKm(donor, request);
     Address address = request.getBloodCenter().getOrganization().getAddress();
     Double latitude = address != null ? address.getLatitude() : null;
     Double longitude = address != null ? address.getLongitude() : null;
+    DonationRequestFulfillmentStatusRecord status = statusOf(snapshot, request);
 
     return new OutputItem(
         request.getId().getValue().toString(),
@@ -86,10 +99,18 @@ public class GetRecommendedRequestsUseCase {
         request.getUrgency().name(),
         distance != null ? Math.round(distance * 10.0) / 10.0 : null,
         request.getGoalBloodBags(),
-        request.getFulfilledBloodBags(),
-        request.isGoalReached(),
+        status.fulfilledBloodBags(),
+        status.goalReached(),
         latitude,
         longitude);
+  }
+
+  private static DonationRequestFulfillmentStatusRecord statusOf(
+      Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot,
+      DonationRequest request) {
+    return snapshot.getOrDefault(
+        request.getId(),
+        new DonationRequestFulfillmentStatusRecord(0, false));
   }
 
   private static Double distanceKm(Donor donor, DonationRequest request) {

@@ -11,7 +11,9 @@ import bloodmatch.domain.roles.person.donor.DonorRepositoryInterface;
 import bloodmatch.domain.security.UserAccountRepositoryInterface;
 import bloodmatch.domain.roles.person.donor.Donor;
 import bloodmatch.domain.security.UserAccount;
+import bloodmatch.domain.services.DonationRequestFulfillmentService;
 import bloodmatch.domain.services.NotificationServiceInterface;
+import bloodmatch.domain.services.records.DonationRequestFulfillmentStatusRecord;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import org.springframework.stereotype.Service;
 
@@ -26,17 +28,20 @@ public class NotifyPotentialDonorsUseCase {
   private final UserAccountRepositoryInterface userAccountRepository;
   private final DonorMatchingService matchingService;
   private final NotificationServiceInterface notificationService;
+  private final DonationRequestFulfillmentService fulfillmentService;
 
   public NotifyPotentialDonorsUseCase(
       DonationRequestRepositoryInterface requestRepository,
       DonorRepositoryInterface donorRepository,
       UserAccountRepositoryInterface userAccountRepository,
-      NotificationServiceInterface notificationService) {
+      NotificationServiceInterface notificationService,
+      DonationRequestFulfillmentService fulfillmentService) {
 
     this.requestRepository = requestRepository;
     this.donorRepository = donorRepository;
     this.userAccountRepository = userAccountRepository;
     this.notificationService = notificationService;
+    this.fulfillmentService = fulfillmentService;
 
     this.matchingService = new DonorMatchingService();
   }
@@ -65,7 +70,10 @@ public class NotifyPotentialDonorsUseCase {
           "Cannot notify donors. The donation request has already expired.");
     }
 
-    if (request.isGoalReached()) {
+    DonationRequestFulfillmentStatusRecord status =
+        fulfillmentService.fill(request.getBloodCenter(), currentDate, currentDate)
+            .getOrDefault(request.getId(), new DonationRequestFulfillmentStatusRecord(0, false));
+    if (status.goalReached()) {
       throw new ValidationException(
           "Cannot notify donors. The goal for this request has already been reached.");
     }

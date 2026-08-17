@@ -26,7 +26,7 @@ Do ponto de vista tecnológico, a principal contribuição é a API RESTful \tex
 
 \begin{itemize}[leftmargin=*]
   \item a estratégia de recomendação de solicitações compatíveis ao doador;
-  \item a materialização do cumprimento de metas por alocação FIFO de doações concluídas às solicitações ativas do hemocentro;
+  \item o cumprimento de metas por \textit{snapshot} em memória, com alocação FIFO de doações concluídas às solicitações do hemocentro;
   \item o modelo de autorização baseado em JWT e papéis, com verificação de \textit{ownership};
   \item a organização em camadas que isola o domínio de persistência e de protocolo HTTP, facilitando evolução e testes.
 \end{itemize}
@@ -35,14 +35,13 @@ Esses artefatos podem servir de referência para soluções semelhantes voltadas
 
 \section{Limitações}
 
-Apesar dos resultados positivos, reconhecem-se limitações. A avaliação funcional privilegiou testes unitários e de integração com \textit{mocks}, sem mensuração sistemática de cobertura percentual de linhas/branches nem baterias de carga em produção. O recálculo de \codigo{fulfilledBloodBags} permanece concentrado nos fluxos de conclusão de doação, deixando uma janela de inconsistência até a próxima sincronização quando apenas meta, prazo ou cancelamento são alterados. Além disso, o estudo de caso não inclui avaliação formal de usabilidade com usuários finais de hemocentros.
+Apesar dos resultados positivos, reconhecem-se limitações. A avaliação funcional privilegiou testes unitários e de integração com \textit{mocks}, sem mensuração sistemática de cobertura percentual de linhas/branches nem baterias de carga em produção. O \textit{snapshot} de preenchimento relê o pool do hemocentro a cada consulta que exibe progresso, o que privilegia simplicidade e consistência em detrimento de um contador materializado. Além disso, o estudo de caso não inclui avaliação formal de usabilidade com usuários finais de hemocentros.
 
 \section{Trabalhos futuros}
 
 Como direcionamentos para evoluções futuras, destacam-se:
 
 \begin{itemize}[leftmargin=*]
-  \item estender o recálculo de \codigo{fulfilledBloodBags} para criação, cancelamento e alteração de solicitações, reduzindo a janela de inconsistência descrita na Seção~\ref{sec:recomendacao-fulfillment};
   \item evoluir o algoritmo de recomendação com critérios adicionais (por exemplo, histórico de resposta a notificações);
   \item extrair módulos mais explicitamente isolados para contextos delimitados hoje tratados por convenção de pacotes (Seção~5.4);
   \item ampliar a suíte com Testcontainers, métricas JaCoCo e testes de contrato/carga;

@@ -14,9 +14,20 @@ public class Donation extends DomainObject {
   private LocalDate donationDate;
   private LocalTime expectedTime;
   private BloodCenter bloodCenter;
+
+
+  /// tirar essas propriedades, trabalhar com estado apenas nas operações booleanas.
   private boolean cancelled;
   private boolean completed;
   private boolean pending;
+
+  // criar data cancelada, isCanceled() {
+  // this.cancelDate dif nulo}
+
+
+  // deixar apenas um fluxo para criar doação, a doação pendente é uma doação instanciada sem data de doação efetivada
+  // parar de chamar de criar doação pendente e criar doação externa, começar a trabalhar com os estados
+  // com funções booleanas. 
 
   private Donation(
       Donor donor,

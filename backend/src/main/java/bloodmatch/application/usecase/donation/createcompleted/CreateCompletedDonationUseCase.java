@@ -3,8 +3,6 @@ package bloodmatch.application.usecase.donation.createcompleted;
 import bloodmatch.application.exception.NotFoundException;
 import bloodmatch.application.exception.ValidationException;
 import bloodmatch.application.shared.DomainIdParser;
-import bloodmatch.application.usecase.donation.fulfillment.DonationRequestFulfillmentRefresher;
-import bloodmatch.application.usecase.donation.fulfillment.OrganizationFulfillmentLock;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterRepositoryInterface;
 import bloodmatch.domain.donation.DonationRepositoryInterface;
@@ -22,30 +20,20 @@ public class CreateCompletedDonationUseCase {
   private final DonorRepositoryInterface donorRepository;
   private final BloodCenterRepositoryInterface bloodCenterRepository;
   private final DonationRepositoryInterface donationRepository;
-  private final DonationRequestFulfillmentRefresher fulfillmentRefresher;
-  private final OrganizationFulfillmentLock organizationFulfillmentLock;
 
   public CreateCompletedDonationUseCase(
       DonorRepositoryInterface donorRepository,
       BloodCenterRepositoryInterface bloodCenterRepository,
-      DonationRepositoryInterface donationRepository,
-      DonationRequestFulfillmentRefresher fulfillmentRefresher,
-      OrganizationFulfillmentLock organizationFulfillmentLock) {
+      DonationRepositoryInterface donationRepository) {
     if (donorRepository == null)
       throw new IllegalArgumentException("DonorRepository cannot be null");
     if (bloodCenterRepository == null)
       throw new IllegalArgumentException("BloodCenterRepository cannot be null");
     if (donationRepository == null)
       throw new IllegalArgumentException("DonationRepository cannot be null");
-    if (fulfillmentRefresher == null)
-      throw new IllegalArgumentException("DonationRequestFulfillmentRefresher cannot be null");
-    if (organizationFulfillmentLock == null)
-      throw new IllegalArgumentException("OrganizationFulfillmentLock cannot be null");
     this.donorRepository = donorRepository;
     this.bloodCenterRepository = bloodCenterRepository;
     this.donationRepository = donationRepository;
-    this.fulfillmentRefresher = fulfillmentRefresher;
-    this.organizationFulfillmentLock = organizationFulfillmentLock;
   }
 
   public Output execute(Input input) {
@@ -72,15 +60,11 @@ public class CreateCompletedDonationUseCase {
     BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
         .orElseThrow(() -> new NotFoundException("Blood center role not found"));
 
-    DomainID organizationPartyId = bloodCenter.getOrganization().getId();
-    return organizationFulfillmentLock.call(organizationPartyId, () -> {
-      Donation donation = Donation.registerExternalDonation(donor, input.donationDate(), bloodCenter, currentDate);
-      donor.registerDonation(input.donationDate(), currentDate);
-      donorRepository.save(donor);
-      donationRepository.save(donation);
-      fulfillmentRefresher.refresh(organizationPartyId, currentDate);
-      return Output.from(donation);
-    });
+    Donation donation = Donation.registerExternalDonation(donor, input.donationDate(), bloodCenter, currentDate);
+    donor.registerDonation(input.donationDate(), currentDate);
+    donorRepository.save(donor);
+    donationRepository.save(donation);
+    return Output.from(donation);
   }
 
   public record Input(String personId, String organizationId, LocalDate donationDate) {

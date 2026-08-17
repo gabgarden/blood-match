@@ -108,62 +108,32 @@ cd frontend && npm install && npm run dev
 - DonationRequest.acceptsDonation(...)
   - valida se uma doacao concluida pode ser alocada naquela request
 
-## 6. Fulfillment de requests (estado persistido)
+## 6. Fulfillment de requests (snapshot)
 
 ### 6.1 Modelo
 
-DonationRequest possui estado de progresso persistido:
+DonationRequest guarda só a meta (`goalBloodBags`). O progresso (`fulfilledBloodBags` / `goalReached`) **não é persistido**: é um snapshot em memória do pool de doações `COMPLETED` daquele hemocentro.
 
-- goalBloodBags
-- fulfilledBloodBags
-- isGoalReached()
+### 6.2 Servico de dominio
 
-Esse estado é salvo em MongoDB no schema com versao otimista.
+`DonationRequestFulfillmentService.fill(bloodCenter, startDate, endDate)`:
 
-### 6.2 Servico
+1. carrega todas as requests do hemocentro
+2. carrega as doacoes concluidas do hemocentro no intervalo
+3. aloca FIFO em memoria (compatibilidade ABO/Rh + janela de cada request)
+4. devolve o mapa de progresso — nao grava nada
 
-DonationRequestFulfillmentService:
+### 6.3 Quando o snapshot e calculado
 
-- calculate(requests, donations, currentDate)
-  - calcula alocacao FIFO por hemocentro e compatibilidade
-- synchronize(requests, donations, currentDate)
-  - aplica o resultado do calculo em fulfilledBloodBags de cada request
+Na leitura, quando a API precisa mostrar o preenchimento:
 
-### 6.3 Quando o estado é recalculado
+- `GetDonationRequestsByPartyIdUseCase`
+- `GetRecommendedRequestsUseCase` (filtra meta ja atingida)
+- `NotifyPotentialDonorsUseCase` (bloqueia se a meta ja foi atingida)
 
-No write path de doacao concluida:
+Criar ou completar doacao nao dispara recálculo. O proximo GET ja ve o pool novo.
 
-- CreateCompletedDonationUseCase
-- CompletePendingDonationUseCase
-
-Ambos delegam para `DonationRequestFulfillmentRefresher.refresh(organizationId, currentDate)`:
-
-1. persistem a doacao (no use case)
-2. carregam requests ativas da mesma organization
-3. carregam doacoes concluidas da organization
-4. executam synchronize
-5. persistem requests atualizadas
-
-### 6.4 Onde o estado é consumido
-
-No read path:
-
-- GetDonationRequestsByPartyIdUseCase
-  - usa fulfilledBloodBags e isGoalReached ja persistidos
-- GetRecommendedRequestsUseCase
-  - filtra requests com meta ja atingida
-- NotifyPotentialDonorsUseCase
-  - bloqueia notificacao se request ja atingiu meta
-
-## 7. Confiabilidade e concorrencia
-
-- DonationRequestSchema usa controle de versao otimista (@Version)
-- o repositorio converte OptimisticLockingFailureException para IllegalStateException
-- o write path de doacao completa e serializado por organizationId (`OrganizationFulfillmentLock`)
-- o refresher relê o lote e tenta de novo se o @Version colidir; esgotou retries → HTTP 409
-- detalhes e o furo original: docs/FULFILLMENT_CONCURRENCY.md
-
-## 8. Persistencia e mapeamento
+## 7. Persistencia e mapeamento
 
 Conversoes principais:
 
@@ -173,8 +143,7 @@ Conversoes principais:
 
 Esse padrao isola regras de negocio no dominio e deixa persistencia/REST em camadas externas.
 
-## 9. Artefatos de apoio
+## 8. Artefatos de apoio
 
 - scripts/seed-dev.sh: popula ambiente de desenvolvimento
-- scripts/simulate-usage.py: simula uso concorrente e recorrente do fulfillment
 - insomnia/bloodmatch-jwt-e2e-insomnia-export.json: colecao de chamadas da API

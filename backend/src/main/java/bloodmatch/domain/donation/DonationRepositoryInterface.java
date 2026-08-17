@@ -19,6 +19,11 @@ public interface DonationRepositoryInterface {
   List<Donation> findCompletedDonationsForOrganizationsOrderedByDonationDateAsc(
       List<DomainID> organizationIds);
 
+  List<Donation> findCompletedDonationsByOrganizationIdAndDateRange(
+      DomainID organizationId,
+      LocalDate startDate,
+      LocalDate endDate);
+
   List<Donation> findPendingByOrganizationId(DomainID organizationId);
 
   List<Donation> findPendingByOrganizationIdAndDate(DomainID organizationId, LocalDate date);
