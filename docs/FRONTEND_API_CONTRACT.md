@@ -133,7 +133,7 @@ Corpo padrão:
 | `401` | Sem token, token inválido/expirado, credenciais erradas |
 | `403` | Role insuficiente ou ownership |
 | `404` | Recurso não encontrado |
-| `409` | Conflito (ex.: papel já registrado) |
+| `409` | Conflito (papel já registrado; refresh de fulfillment esgotou retries — reler, não criar outra doação) |
 
 Mensagens comuns de auth:
 

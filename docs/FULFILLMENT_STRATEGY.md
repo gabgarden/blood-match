@@ -236,6 +236,8 @@ Hoje o refresh **só** roda quando uma doação completa entra no sistema. Entã
 Isso **não invalida** a estratégia de otimização; só define o contrato:  
 *“`fulfilledBloodBags` está correto em relação ao último recálculo disparado por doação completa.”*
 
+Há um furo **à parte** desse contrato (concorrência no mesmo hemocentro: doação persistida e refresh perdido). Foi fechado com lock por organização + retry no refresher: [FULFILLMENT_CONCURRENCY.md](./FULFILLMENT_CONCURRENCY.md) §8.
+
 Se o produto precisar de consistência imediata após criar/cancelar/alterar request, o caminho natural é **também** chamar o mesmo `DonationRequestFulfillmentRefresher` nesses use cases (ainda sem recalcular nas leituras).
 
 ---
@@ -260,6 +262,8 @@ Se o produto precisar de consistência imediata após criar/cancelar/alterar req
 | Campo + `acceptsDonation` | `domain/donationrequest/DonationRequest.java` |
 | Persistência do contador | `infra/persistence/schema/DonationRequestSchema.java` |
 | Write path compartilhado | `application/.../fulfillment/DonationRequestFulfillmentRefresher.java` |
+| Lock por hemocentro | `application/.../fulfillment/OrganizationFulfillmentLock.java` |
+| Concorrência do write path | [FULFILLMENT_CONCURRENCY.md](./FULFILLMENT_CONCURRENCY.md) |
 | Write: doação completa | `application/.../createcompleted/CreateCompletedDonationUseCase.java` |
 | Write: completar pendente | `application/.../completependingdonation/CompletePendingDonationUseCase.java` |
 | Read: recomendações | `application/.../recommendations/GetRecommendedRequestsUseCase.java` |

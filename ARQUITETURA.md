@@ -158,8 +158,10 @@ No read path:
 ## 7. Confiabilidade e concorrencia
 
 - DonationRequestSchema usa controle de versao otimista (@Version)
-- conflitos de escrita na mesma request podem gerar falha de persistencia
-- o repositorio converte conflito para IllegalStateException
+- o repositorio converte OptimisticLockingFailureException para IllegalStateException
+- o write path de doacao completa e serializado por organizationId (`OrganizationFulfillmentLock`)
+- o refresher relê o lote e tenta de novo se o @Version colidir; esgotou retries → HTTP 409
+- detalhes e o furo original: docs/FULFILLMENT_CONCURRENCY.md
 
 ## 8. Persistencia e mapeamento
 
@@ -174,4 +176,5 @@ Esse padrao isola regras de negocio no dominio e deixa persistencia/REST em cama
 ## 9. Artefatos de apoio
 
 - scripts/seed-dev.sh: popula ambiente de desenvolvimento
+- scripts/simulate-usage.py: simula uso concorrente e recorrente do fulfillment
 - insomnia/bloodmatch-jwt-e2e-insomnia-export.json: colecao de chamadas da API

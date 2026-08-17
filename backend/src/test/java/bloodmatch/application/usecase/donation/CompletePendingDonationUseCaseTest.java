@@ -4,6 +4,7 @@ import bloodmatch.application.usecase.donation.completependingdonation.CompleteP
 import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase.Input;
 import bloodmatch.application.usecase.donation.completependingdonation.CompletePendingDonationUseCase.Output;
 import bloodmatch.application.usecase.donation.fulfillment.DonationRequestFulfillmentRefresher;
+import bloodmatch.application.usecase.donation.fulfillment.OrganizationFulfillmentLock;
 import bloodmatch.domain.donation.Donation;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
@@ -50,7 +51,8 @@ class CompletePendingDonationUseCaseTest {
   private final CompletePendingDonationUseCase useCase = new CompletePendingDonationUseCase(
       donationRepository,
       donorRepository,
-      fulfillmentRefresher);
+      fulfillmentRefresher,
+      new OrganizationFulfillmentLock());
 
   @Test
   void shouldPersistFulfillmentCountAfterCompletingDonation() {
