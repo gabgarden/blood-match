@@ -1,10 +1,9 @@
 package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.donation.Donation;
-import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterRepositoryInterface;
 import bloodmatch.domain.donation.DonationRepositoryInterface;
-import bloodmatch.domain.roles.person.donor.DonorRepositoryInterface;
 import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.infra.persistence.mapping.PersistenceGraphLoader;
 import bloodmatch.infra.persistence.repository.mongo.DonationMongoRepository;
 import bloodmatch.infra.persistence.schema.DonationSchema;
 import org.springframework.stereotype.Repository;
@@ -17,16 +16,13 @@ import java.util.Optional;
 public class DonationRepositoryImpl implements DonationRepositoryInterface {
 
   private final DonationMongoRepository mongoRepository;
-  private final DonorRepositoryInterface donorRepository;
-  private final BloodCenterRepositoryInterface bloodCenterRepository;
+  private final PersistenceGraphLoader graphLoader;
 
   public DonationRepositoryImpl(
       DonationMongoRepository mongoRepository,
-      DonorRepositoryInterface donorRepository,
-      BloodCenterRepositoryInterface bloodCenterRepository) {
+      PersistenceGraphLoader graphLoader) {
     this.mongoRepository = mongoRepository;
-    this.donorRepository = donorRepository;
-    this.bloodCenterRepository = bloodCenterRepository;
+    this.graphLoader = graphLoader;
   }
 
   @Override
@@ -43,7 +39,7 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
       throw new IllegalArgumentException("Donation id cannot be null");
 
     return mongoRepository.findById(id.getValue().toString())
-        .map(this::toDomain);
+        .map(schema -> toDomainList(List.of(schema)).get(0));
   }
 
   @Override
@@ -51,10 +47,7 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     if (donorId == null)
       throw new IllegalArgumentException("Donor id cannot be null");
 
-    return mongoRepository.findByDonorPersonId(donorId.getValue().toString())
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(mongoRepository.findByDonorPersonId(donorId.getValue().toString()));
   }
 
   @Override
@@ -67,10 +60,10 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
 
   @Override
   public List<Donation> findCompletedDonationsOrderedByDonationDateAsc() {
-    return mongoRepository.findByCompleted(true)
-        .stream()
-        .map(this::toDomain)
-      .sorted(java.util.Comparator.comparing(Donation::getDonationDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())))
+    return toDomainList(mongoRepository.findByCompleted(true)).stream()
+        .sorted(java.util.Comparator.comparing(
+            Donation::getDonationDate,
+            java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())))
         .toList();
   }
 
@@ -83,16 +76,9 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     if (organizationIds.isEmpty())
       return List.of();
 
-    List<String> ids = organizationIds.stream()
-        .map(DomainID::getValue)
-        .map(Object::toString)
-        .distinct()
-        .toList();
-
-    return mongoRepository.findByCompletedTrueAndOrganizationIdInOrderByDonationDateAsc(ids)
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(
+        mongoRepository.findByCompletedTrueAndOrganizationIdInOrderByDonationDateAsc(
+            toStringIds(organizationIds)));
   }
 
   @Override
@@ -107,12 +93,28 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     if (endDate == null)
       throw new IllegalArgumentException("End date cannot be null");
 
-    return mongoRepository
-        .findByCompletedTrueAndOrganizationIdAndDonationDateBetweenOrderByDonationDateAsc(
-            organizationId.getValue().toString(), startDate, endDate)
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(
+        mongoRepository.findCompletedByOrganizationIdAndDonationDateInclusive(
+            organizationId.getValue().toString(), startDate, endDate));
+  }
+
+  @Override
+  public List<Donation> findCompletedDonationsByOrganizationIdsAndDateRange(
+      List<DomainID> organizationIds,
+      LocalDate startDate,
+      LocalDate endDate) {
+    if (organizationIds == null)
+      throw new IllegalArgumentException("Organization ids cannot be null");
+    if (startDate == null)
+      throw new IllegalArgumentException("Start date cannot be null");
+    if (endDate == null)
+      throw new IllegalArgumentException("End date cannot be null");
+    if (organizationIds.isEmpty())
+      return List.of();
+
+    return toDomainList(
+        mongoRepository.findCompletedByOrganizationIdsAndDonationDateInclusive(
+            toStringIds(organizationIds), startDate, endDate));
   }
 
   @Override
@@ -120,10 +122,8 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     if (organizationId == null)
       throw new IllegalArgumentException("Organization id cannot be null");
 
-    return mongoRepository.findByPendingTrueAndOrganizationId(organizationId.getValue().toString())
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(
+        mongoRepository.findByPendingTrueAndOrganizationId(organizationId.getValue().toString()));
   }
 
   @Override
@@ -133,11 +133,9 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     if (date == null)
       throw new IllegalArgumentException("Date cannot be null");
 
-    return mongoRepository
-        .findByPendingTrueAndOrganizationIdAndDonationDate(organizationId.getValue().toString(), date)
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(
+        mongoRepository.findByPendingTrueAndOrganizationIdAndDonationDate(
+            organizationId.getValue().toString(), date));
   }
 
   @Override
@@ -152,15 +150,20 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     if (to == null)
       throw new IllegalArgumentException("to cannot be null");
 
-    return mongoRepository
-        .findByPendingTrueAndOrganizationIdAndDonationDateBetween(
-            organizationId.getValue().toString(), from, to)
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(
+        mongoRepository.findPendingByOrganizationIdAndDonationDateInclusive(
+            organizationId.getValue().toString(), from, to));
   }
 
-  private Donation toDomain(DonationSchema schema) {
-    return schema.toDomain(donorRepository, bloodCenterRepository);
+  private List<Donation> toDomainList(List<DonationSchema> schemas) {
+    return graphLoader.toDonations(schemas);
+  }
+
+  private static List<String> toStringIds(List<DomainID> organizationIds) {
+    return organizationIds.stream()
+        .map(DomainID::getValue)
+        .map(Object::toString)
+        .distinct()
+        .toList();
   }
 }

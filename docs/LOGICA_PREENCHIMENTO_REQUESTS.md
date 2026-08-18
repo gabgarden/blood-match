@@ -15,15 +15,13 @@ Classe: `DonationRequestFulfillmentService`.
 ```text
 fill(bloodCenter, startDate, endDate)
 
-1. carrega todas as requests daquele hemocentro
-2. alarga o início da janela até a request mais antiga (FIFO correto)
-3. carrega as doações COMPLETED daquele hemocentro em [início, endDate]
-4. ordena requests (dateRequested, id) e doações (donationDate, id)
-5. para cada doação, aloca 1 bolsa na primeira request que acceptsDonation e ainda não bateu a meta
-6. devolve um mapa requestId → (fulfilledBloodBags, goalReached)
+1. carrega todas as solicitações daquele hemocentro
+2. o intervalo de doações começa na solicitação mais antiga, se ela for anterior a startDate
+3. carrega as doações COMPLETED daquele hemocentro no intervalo
+4. ordena solicitações e doações da mais antiga para a mais nova
+5. cada doação vai para a primeira solicitação que acceptsDonation e ainda não bateu a meta
+6. devolve requestId → (fulfilledBloodBags, goalReached)
 ```
-
-A overload `fill(..., requests, donations)` faz só o passo 4–6, para testes.
 
 `acceptsDonation` exige: mesmo hemocentro, request ativa, não expirada na data do snapshot, doação completa, `dateRequested ≤ donationDate ≤ dateLimit`, tipo sanguíneo compatível.
 

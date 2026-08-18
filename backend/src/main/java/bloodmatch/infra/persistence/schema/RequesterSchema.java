@@ -32,11 +32,17 @@ public class RequesterSchema {
     this.partyId = requester.getParty().getId().getValue().toString();
   }
 
+  public Requester toDomain(Party party) {
+    if (party == null)
+      throw new IllegalArgumentException("Party not found");
+    DomainID requesterId = new DomainID(UUID.fromString(this.id));
+    return Requester.reconstitute(party, requesterId);
+  }
+
   public Requester toDomain(PartyRepositoryInterface partyRepository) {
     DomainID partyId = new DomainID(UUID.fromString(this.partyId));
     Party party = partyRepository.findById(partyId)
         .orElseThrow(() -> new IllegalArgumentException("Party not found"));
-    DomainID requesterId = new DomainID(UUID.fromString(this.id));
-    return Requester.reconstitute(party, requesterId);
+    return toDomain(party);
   }
 }

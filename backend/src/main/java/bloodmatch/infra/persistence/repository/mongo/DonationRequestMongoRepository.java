@@ -19,6 +19,8 @@ public interface DonationRequestMongoRepository extends MongoRepository<Donation
 
   List<DonationRequestSchema> findByOrganizationId(String organizationId);
 
+  List<DonationRequestSchema> findByOrganizationIdIn(Collection<String> organizationIds);
+
   List<DonationRequestSchema> findByActiveTrueAndDateLimitGreaterThanEqualAndBloodTypeNeededInAndLocationNear(
       LocalDate currentDate, Collection<String> bloodTypes, Point location, Distance distance);
 

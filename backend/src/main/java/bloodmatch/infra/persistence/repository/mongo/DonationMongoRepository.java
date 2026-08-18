@@ -2,8 +2,10 @@ package bloodmatch.infra.persistence.repository.mongo;
 
 import bloodmatch.infra.persistence.schema.DonationSchema;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 public interface DonationMongoRepository extends MongoRepository<DonationSchema, String> {
@@ -15,8 +17,15 @@ public interface DonationMongoRepository extends MongoRepository<DonationSchema,
   List<DonationSchema> findByCompletedTrueAndOrganizationIdInOrderByDonationDateAsc(
       List<String> organizationIds);
 
-  List<DonationSchema> findByCompletedTrueAndOrganizationIdAndDonationDateBetweenOrderByDonationDateAsc(
+  @Query("{ 'completed': true, 'organizationId': ?0, 'donationDate': { $gte: ?1, $lte: ?2 } }")
+  List<DonationSchema> findCompletedByOrganizationIdAndDonationDateInclusive(
       String organizationId,
+      LocalDate startDate,
+      LocalDate endDate);
+
+  @Query("{ 'completed': true, 'organizationId': { $in: ?0 }, 'donationDate': { $gte: ?1, $lte: ?2 } }")
+  List<DonationSchema> findCompletedByOrganizationIdsAndDonationDateInclusive(
+      Collection<String> organizationIds,
       LocalDate startDate,
       LocalDate endDate);
 
@@ -26,7 +35,8 @@ public interface DonationMongoRepository extends MongoRepository<DonationSchema,
       String organizationId,
       LocalDate donationDate);
 
-  List<DonationSchema> findByPendingTrueAndOrganizationIdAndDonationDateBetween(
+  @Query("{ 'pending': true, 'organizationId': ?0, 'donationDate': { $gte: ?1, $lte: ?2 } }")
+  List<DonationSchema> findPendingByOrganizationIdAndDonationDateInclusive(
       String organizationId,
       LocalDate from,
       LocalDate to);

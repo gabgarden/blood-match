@@ -1,37 +1,50 @@
 public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
         BloodCenter bloodCenter,
         LocalDate startDate,
-        LocalDate endDate,
+        LocalDate endDate) {
+
+    List<DonationRequest> requests =
+            requestRepository.findByOrganizationId(bloodCenter.getOrganization().getId());
+    List<Donation> donations =
+            donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
+                    bloodCenter.getOrganization().getId(),
+                    startOfPool(startDate, requests),
+                    endDate);
+
+    return allocateFifo(requests, donations, endDate);
+}
+
+private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateFifo(
         List<DonationRequest> requests,
-        List<Donation> donations) {
+        List<Donation> donations,
+        LocalDate asOfDate) {
 
-    List<DonationRequest> centerRequests = requests.stream()
-        .filter(request -> sameBloodCenter(request.getBloodCenter(), bloodCenter))
-        .sorted(REQUEST_ORDER)
-        .toList();
+    requests.sort(OLDEST_REQUEST_FIRST);
+    donations.sort(OLDEST_DONATION_FIRST);
 
-    List<Donation> centerDonations = donations.stream()
-        .filter(donation -> sameBloodCenter(donation.getBloodCenter(), bloodCenter))
-        .filter(donation -> inRange(donation.getDonationDate(), startDate, endDate))
-        .sorted(DONATION_ORDER)
-        .toList();
-
-    Map<DomainID, Integer> fulfilled = new LinkedHashMap<>();
-    for (DonationRequest request : centerRequests) {
-        fulfilled.put(request.getId(), 0);
+    Map<DomainID, Integer> bags = new LinkedHashMap<>();
+    for (DonationRequest request : requests) {
+        bags.put(request.getId(), 0);
     }
 
-    for (Donation donation : centerDonations) {
-        for (DonationRequest request : centerRequests) {
-            if (!request.acceptsDonation(donation, endDate))
-                continue;
-            int current = fulfilled.get(request.getId());
-            if (current >= request.getGoalBloodBags())
-                continue;
-            fulfilled.put(request.getId(), current + 1);
-            break;
+    for (Donation donation : donations) {
+        for (DonationRequest request : requests) {
+            int given = bags.get(request.getId());
+            boolean hasRoom = given < request.getGoalBloodBags();
+            if (hasRoom && request.acceptsDonation(donation, asOfDate)) {
+                bags.put(request.getId(), given + 1);
+                break;
+            }
         }
     }
 
-    return buildResult(centerRequests, fulfilled);
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
+    for (DonationRequest request : requests) {
+        int given = bags.get(request.getId());
+        snapshot.put(
+                request.getId(),
+                new DonationRequestFulfillmentStatusRecord(
+                        given, given >= request.getGoalBloodBags()));
+    }
+    return snapshot;
 }

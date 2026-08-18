@@ -23,9 +23,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,50 +45,21 @@ class DonationRequestFulfillmentServiceTest {
     BloodCenter center = bloodCenter();
     DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
     Donation donation = donation(1, center, currentDate);
+    stubSnapshot(center, List.of(request), List.of(donation), currentDate.minusDays(2), currentDate);
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
-        service.fill(center, currentDate.minusDays(10), currentDate, List.of(request), List.of(donation));
+        service.fill(center, currentDate, currentDate);
 
     assertEquals(1, result.get(request.getId()).fulfilledBloodBags());
     assertTrue(result.get(request.getId()).goalReached());
   }
 
   @Test
-  void fillDoesNotMutateTheRequest() {
-    BloodCenter center = bloodCenter();
-    DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 2);
-    Donation donation = donation(1, center, currentDate);
-
-    service.fill(center, currentDate.minusDays(10), currentDate, List.of(request), List.of(donation));
-
-    assertEquals(2, request.getGoalBloodBags());
-  }
-
-  @Test
-  void fillIgnoresDonationsOutsideTheSnapshotWindow() {
-    BloodCenter center = bloodCenter();
-    DonationRequest request = request(1, center, currentDate.minusDays(20), currentDate.plusDays(5), 1);
-    Donation tooEarly = donation(1, center, currentDate.minusDays(10));
-    Donation tooLate = donation(2, center, currentDate.plusDays(1));
-
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
-        service.fill(center, currentDate.minusDays(2), currentDate, List.of(request), List.of(tooEarly, tooLate));
-
-    assertEquals(0, result.get(request.getId()).fulfilledBloodBags());
-    assertFalse(result.get(request.getId()).goalReached());
-  }
-
-  @Test
-  void fillLoadsSnapshotFromRepositories() {
+  void fillLoadsTheBloodCenterSnapshotFromTheRepositories() {
     BloodCenter center = bloodCenter();
     DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
     Donation donation = donation(1, center, currentDate);
-    DomainID organizationId = center.getOrganization().getId();
-
-    when(requestRepository.findByOrganizationId(organizationId)).thenReturn(List.of(request));
-    when(donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
-            organizationId, currentDate.minusDays(2), currentDate))
-        .thenReturn(List.of(donation));
+    stubSnapshot(center, List.of(request), List.of(donation), currentDate.minusDays(2), currentDate);
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
         service.fill(center, currentDate, currentDate);
@@ -101,7 +73,41 @@ class DonationRequestFulfillmentServiceTest {
 
     assertThrows(
         IllegalArgumentException.class,
-        () -> service.fill(center, currentDate, currentDate.minusDays(1), List.of(), List.of()));
+        () -> service.fill(center, currentDate, currentDate.minusDays(1)));
+  }
+
+  @Test
+  void fillListLoadsEveryOrganizationInTwoQueries() {
+    BloodCenter firstCenter = bloodCenter();
+    BloodCenter secondCenter = bloodCenter();
+    DonationRequest first = request(1, firstCenter, currentDate.minusDays(2), currentDate.plusDays(5), 1);
+    DonationRequest second = request(2, secondCenter, currentDate.minusDays(2), currentDate.plusDays(5), 1);
+
+    when(requestRepository.findByOrganizationIds(anyList())).thenReturn(List.of(first, second));
+    when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
+            anyList(), any(), any()))
+        .thenReturn(List.of(
+            donation(1, firstCenter, currentDate),
+            donation(2, secondCenter, currentDate)));
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
+        service.fill(List.of(first, second), currentDate, currentDate);
+
+    assertEquals(1, result.get(first.getId()).fulfilledBloodBags());
+    assertEquals(1, result.get(second.getId()).fulfilledBloodBags());
+  }
+
+  private void stubSnapshot(
+      BloodCenter center,
+      List<DonationRequest> requests,
+      List<Donation> donations,
+      LocalDate from,
+      LocalDate to) {
+    DomainID organizationId = center.getOrganization().getId();
+    when(requestRepository.findByOrganizationId(organizationId)).thenReturn(requests);
+    when(donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
+            organizationId, from, to))
+        .thenReturn(donations);
   }
 
   private DonationRequest request(

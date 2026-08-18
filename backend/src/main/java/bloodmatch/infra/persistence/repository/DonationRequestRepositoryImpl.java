@@ -1,19 +1,18 @@
 package bloodmatch.infra.persistence.repository;
 
 import bloodmatch.domain.donationrequest.DonationRequest;
-import bloodmatch.domain.roles.organization.bloodcenter.BloodCenterRepositoryInterface;
 import bloodmatch.domain.donationrequest.DonationRequestRepositoryInterface;
-import bloodmatch.domain.roles.requester.RequesterRepositoryInterface;
-import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.Address;
 import bloodmatch.domain.shared.valueObjects.BloodType;
+import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.infra.persistence.mapping.PersistenceGraphLoader;
 import bloodmatch.infra.persistence.repository.mongo.DonationRequestMongoRepository;
 import bloodmatch.infra.persistence.schema.DonationRequestSchema;
-import org.springframework.stereotype.Repository;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,16 +22,13 @@ import java.util.Optional;
 public class DonationRequestRepositoryImpl implements DonationRequestRepositoryInterface {
 
   private final DonationRequestMongoRepository mongoRepository;
-  private final RequesterRepositoryInterface requesterRepository;
-  private final BloodCenterRepositoryInterface bloodCenterRepository;
+  private final PersistenceGraphLoader graphLoader;
 
   public DonationRequestRepositoryImpl(
       DonationRequestMongoRepository mongoRepository,
-      RequesterRepositoryInterface requesterRepository,
-      BloodCenterRepositoryInterface bloodCenterRepository) {
+      PersistenceGraphLoader graphLoader) {
     this.mongoRepository = mongoRepository;
-    this.requesterRepository = requesterRepository;
-    this.bloodCenterRepository = bloodCenterRepository;
+    this.graphLoader = graphLoader;
   }
 
   @Override
@@ -54,15 +50,12 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
       throw new IllegalArgumentException("Donation request id cannot be null");
 
     return mongoRepository.findById(id.getValue().toString())
-        .map(this::toDomain);
+        .map(schema -> toDomainList(List.of(schema)).get(0));
   }
 
   @Override
   public List<DonationRequest> findActiveRequests() {
-    return mongoRepository.findByActiveOrderByDateRequestedAscIdAsc(true)
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(mongoRepository.findByActiveOrderByDateRequestedAscIdAsc(true));
   }
 
   @Override
@@ -83,12 +76,9 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
     Point donorLocation = new Point(donorAddress.getLongitude(), donorAddress.getLatitude());
     Distance maxDistance = new Distance(maxDistanceInKm, Metrics.KILOMETERS);
 
-    return mongoRepository
-        .findByActiveTrueAndDateLimitGreaterThanEqualAndBloodTypeNeededInAndLocationNear(
-            currentDate, donorBloodType.getCompatibleRecipientTypes(), donorLocation, maxDistance)
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(
+        mongoRepository.findByActiveTrueAndDateLimitGreaterThanEqualAndBloodTypeNeededInAndLocationNear(
+            currentDate, donorBloodType.getCompatibleRecipientTypes(), donorLocation, maxDistance));
   }
 
   @Override
@@ -102,18 +92,9 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
     if (organizationIds.isEmpty())
       return List.of();
 
-    List<String> ids = organizationIds.stream()
-        .map(DomainID::getValue)
-        .map(Object::toString)
-        .distinct()
-        .toList();
-
-    return mongoRepository
-        .findByActiveTrueAndDateLimitGreaterThanEqualAndOrganizationIdInOrderByDateRequestedAscIdAsc(
-            currentDate, ids)
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(
+        mongoRepository.findByActiveTrueAndDateLimitGreaterThanEqualAndOrganizationIdInOrderByDateRequestedAscIdAsc(
+            currentDate, toStringIds(organizationIds)));
   }
 
   @Override
@@ -121,10 +102,7 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
     if (requesterPartyId == null)
       throw new IllegalArgumentException("Requester party id cannot be null");
 
-    return mongoRepository.findByRequesterId(requesterPartyId.getValue().toString())
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(mongoRepository.findByRequesterId(requesterPartyId.getValue().toString()));
   }
 
   @Override
@@ -132,10 +110,17 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
     if (organizationId == null)
       throw new IllegalArgumentException("Organization id cannot be null");
 
-    return mongoRepository.findByOrganizationId(organizationId.getValue().toString())
-        .stream()
-        .map(this::toDomain)
-        .toList();
+    return toDomainList(mongoRepository.findByOrganizationId(organizationId.getValue().toString()));
+  }
+
+  @Override
+  public List<DonationRequest> findByOrganizationIds(List<DomainID> organizationIds) {
+    if (organizationIds == null)
+      throw new IllegalArgumentException("Organization ids cannot be null");
+    if (organizationIds.isEmpty())
+      return List.of();
+
+    return toDomainList(mongoRepository.findByOrganizationIdIn(toStringIds(organizationIds)));
   }
 
   @Override
@@ -146,7 +131,15 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
     mongoRepository.deleteById(id.getValue().toString());
   }
 
-  private DonationRequest toDomain(DonationRequestSchema schema) {
-    return schema.toDomain(requesterRepository, bloodCenterRepository);
+  private List<DonationRequest> toDomainList(List<DonationRequestSchema> schemas) {
+    return graphLoader.toDonationRequests(schemas);
+  }
+
+  private static List<String> toStringIds(List<DomainID> organizationIds) {
+    return organizationIds.stream()
+        .map(DomainID::getValue)
+        .map(Object::toString)
+        .distinct()
+        .toList();
   }
 }

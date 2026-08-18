@@ -55,13 +55,18 @@ public class DonorSchema {
     }
   }
 
+  public Donor toDomain(Person person) {
+    if (person == null)
+      throw new IllegalArgumentException("Person not found");
+    DomainID donorId = new DomainID(UUID.fromString(this.id));
+    return Donor.reconstitute(person, BloodType.of(bloodType), weight, lastDonationDate,
+        maxRecommendationDistanceKm, donorId, weightUpdatedAt);
+  }
+
   public Donor toDomain(PersonRepositoryInterface personRepository) {
     DomainID personId = new DomainID(UUID.fromString(this.personId));
     Person person = personRepository.findById(personId)
         .orElseThrow(() -> new IllegalArgumentException("Person not found"));
-
-    DomainID donorId = new DomainID(UUID.fromString(this.id));
-    return Donor.reconstitute(person, BloodType.of(bloodType), weight, lastDonationDate,
-        maxRecommendationDistanceKm, donorId, weightUpdatedAt);
+    return toDomain(person);
   }
 }

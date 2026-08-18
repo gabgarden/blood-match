@@ -32,13 +32,19 @@ public class BloodCenterSchema {
     this.organizationId = bloodCenter.getOrganization().getId().getValue().toString();
   }
 
+  public BloodCenter toDomain(Organization organization) {
+    if (organization == null)
+      throw new IllegalArgumentException("Organization not found");
+    DomainID bloodCenterId = new DomainID(UUID.fromString(this.id));
+    return BloodCenter.reconstitute(organization, bloodCenterId);
+  }
+
   public BloodCenter toDomain(PartyRepositoryInterface partyRepository) {
     DomainID organizationId = new DomainID(UUID.fromString(this.organizationId));
     Organization organization = partyRepository.findById(organizationId)
         .filter(Organization.class::isInstance)
         .map(Organization.class::cast)
         .orElseThrow(() -> new IllegalArgumentException("Organization not found"));
-    DomainID bloodCenterId = new DomainID(UUID.fromString(this.id));
-    return BloodCenter.reconstitute(organization, bloodCenterId);
+    return toDomain(organization);
   }
 }

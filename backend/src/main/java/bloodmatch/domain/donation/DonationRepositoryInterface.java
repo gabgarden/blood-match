@@ -24,6 +24,11 @@ public interface DonationRepositoryInterface {
       LocalDate startDate,
       LocalDate endDate);
 
+  List<Donation> findCompletedDonationsByOrganizationIdsAndDateRange(
+      List<DomainID> organizationIds,
+      LocalDate startDate,
+      LocalDate endDate);
+
   List<Donation> findPendingByOrganizationId(DomainID organizationId);
 
   List<Donation> findPendingByOrganizationIdAndDate(DomainID organizationId, LocalDate date);

@@ -17,6 +17,7 @@ import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,9 +47,12 @@ class DonationRequestFulfillmentFifoTest {
 
   private static final LocalDate TODAY = LocalDate.of(2026, 7, 24);
   private static final LocalDate START = TODAY.minusYears(1);
-  private final DonationRequestFulfillmentService service = new DonationRequestFulfillmentService(
-      mock(DonationRequestRepositoryInterface.class),
-      mock(DonationRepositoryInterface.class));
+  private final DonationRequestRepositoryInterface requestRepository =
+      mock(DonationRequestRepositoryInterface.class);
+  private final DonationRepositoryInterface donationRepository =
+      mock(DonationRepositoryInterface.class);
+  private final DonationRequestFulfillmentService service =
+      new DonationRequestFulfillmentService(requestRepository, donationRepository);
 
   // --- FIFO básico ---
 
@@ -419,9 +424,36 @@ class DonationRequestFulfillmentFifoTest {
         centers.add(donation.getBloodCenter());
       }
     }
+
+    for (BloodCenter center : centers) {
+      DomainID organizationId = center.getOrganization().getId();
+      List<DonationRequest> requestsAtCenter = new ArrayList<>();
+      for (DonationRequest request : requests) {
+        if (request.getBloodCenter().getOrganization().getId().equals(organizationId)) {
+          requestsAtCenter.add(request);
+        }
+      }
+      List<Donation> donationsAtCenter = new ArrayList<>();
+      for (Donation donation : donations) {
+        if (donation.getBloodCenter().getOrganization().getId().equals(organizationId)) {
+          donationsAtCenter.add(donation);
+        }
+      }
+      LocalDate from = START;
+      for (DonationRequest request : requestsAtCenter) {
+        if (request.getDateRequested().isBefore(from)) {
+          from = request.getDateRequested();
+        }
+      }
+      when(requestRepository.findByOrganizationId(organizationId)).thenReturn(requestsAtCenter);
+      when(donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
+              organizationId, from, TODAY))
+          .thenReturn(donationsAtCenter);
+    }
+
     Map<DomainID, DonationRequestFulfillmentStatusRecord> result = new HashMap<>();
     for (BloodCenter center : centers) {
-      result.putAll(service.fill(center, START, TODAY, requests, donations));
+      result.putAll(service.fill(center, START, TODAY));
     }
     return result;
   }

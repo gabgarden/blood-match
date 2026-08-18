@@ -54,6 +54,18 @@ public class DonationSchema {
     this.cancelled = donation.isCancelled();
   }
 
+  public Donation toDomain(Donor donor, BloodCenter bloodCenter) {
+    return Donation.reconstitute(
+      new DomainID(UUID.fromString(this.id)),
+      donor,
+      this.donationDate,
+      bloodCenter,
+      this.completed,
+      this.pending,
+      this.cancelled,
+      this.expectedTime);
+  }
+
   public Donation toDomain(
       DonorRepositoryInterface donorRepository,
       BloodCenterRepositoryInterface bloodCenterRepository) {
@@ -66,14 +78,6 @@ public class DonationSchema {
     BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
         .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
 
-    return Donation.reconstitute(
-      new DomainID(UUID.fromString(this.id)),
-      donor,
-      this.donationDate,
-      bloodCenter,
-      this.completed,
-      this.pending,
-      this.cancelled,
-      this.expectedTime);
+    return toDomain(donor, bloodCenter);
   }
 }

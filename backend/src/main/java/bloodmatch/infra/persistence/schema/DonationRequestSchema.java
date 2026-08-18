@@ -71,18 +71,7 @@ public class DonationRequestSchema {
  
   }
 
-  public DonationRequest toDomain(
-      RequesterRepositoryInterface requesterRepository,
-      BloodCenterRepositoryInterface bloodCenterRepository) {
-    DomainID requesterId = new DomainID(UUID.fromString(this.requesterId));
-    DomainID organizationId = new DomainID(UUID.fromString(this.organizationId));
-
-    Requester requester = requesterRepository.findByPartyId(requesterId)
-        .orElseThrow(() -> new IllegalArgumentException("Requester role not found"));
-
-    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
-        .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
-
+  public DonationRequest toDomain(Requester requester, BloodCenter bloodCenter) {
     return DonationRequest.reconstitute(
         new DomainID(UUID.fromString(this.id)),
         requester,
@@ -95,5 +84,20 @@ public class DonationRequestSchema {
         Urgency.valueOf(this.urgency),
         this.directedTo,
         this.version);
+  }
+
+  public DonationRequest toDomain(
+      RequesterRepositoryInterface requesterRepository,
+      BloodCenterRepositoryInterface bloodCenterRepository) {
+    DomainID requesterId = new DomainID(UUID.fromString(this.requesterId));
+    DomainID organizationId = new DomainID(UUID.fromString(this.organizationId));
+
+    Requester requester = requesterRepository.findByPartyId(requesterId)
+        .orElseThrow(() -> new IllegalArgumentException("Requester role not found"));
+
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
+        .orElseThrow(() -> new IllegalArgumentException("Blood center role not found"));
+
+    return toDomain(requester, bloodCenter);
   }
 }
