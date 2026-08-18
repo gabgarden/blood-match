@@ -71,7 +71,7 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(Map.of());
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(Map.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
         new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString(), true), currentDate);
@@ -90,7 +90,7 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(
         Map.of(request.getId(), new DonationRequestFulfillmentStatusRecord(0, false)));
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
@@ -114,7 +114,7 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(
         Map.of(request.getId(), new DonationRequestFulfillmentStatusRecord(1, true)));
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
@@ -139,7 +139,7 @@ class GetRecommendedRequestsUseCaseTest {
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any()))
         .thenReturn(List.of(farther, closer));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(Map.of());
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(Map.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
         new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);

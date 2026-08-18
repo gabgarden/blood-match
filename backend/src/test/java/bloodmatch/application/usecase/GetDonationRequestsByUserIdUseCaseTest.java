@@ -49,7 +49,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     DonationRequest newer = createRequest(now.minusDays(1));
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(older, newer));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(Map.of());
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(Map.of());
 
     List<GetDonationRequestsByPartyIdUseCase.OutputItem> result =
         useCase.execute(new Input(userId.getValue().toString()), now);
@@ -74,7 +74,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     cancelled.close();
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(cancelled));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(Map.of());
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(Map.of());
 
     List<GetDonationRequestsByPartyIdUseCase.OutputItem> result =
         useCase.execute(new Input(userId.getValue().toString()), now);
@@ -93,7 +93,7 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     DonationRequest expired = createRequest(currentDate.minusDays(12));
 
     when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(expired));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(
         Map.of(expired.getId(), new DonationRequestFulfillmentStatusRecord(1, true)));
 
     GetDonationRequestsByPartyIdUseCase.OutputItem result =

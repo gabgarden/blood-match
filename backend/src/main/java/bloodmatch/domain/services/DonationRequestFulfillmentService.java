@@ -49,6 +49,77 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
+   * Snapshot do preenchimento das solicitações de um hemocentro até uma data de corte (asOfDate).
+   * A data inicial da busca é calculada automaticamente a partir da solicitação mais antiga.
+   */
+  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
+      BloodCenter bloodCenter,
+      LocalDate asOfDate) {
+    if (bloodCenter == null) {
+      throw new IllegalArgumentException("Blood center cannot be null");
+    }
+    if (asOfDate == null) {
+      throw new IllegalArgumentException("As of date cannot be null");
+    }
+
+    DomainID organizationId = bloodCenter.getOrganization().getId();
+    List<DonationRequest> requests = requestRepository.findByOrganizationId(organizationId);
+    if (requests.isEmpty()) {
+      return Map.of();
+    }
+
+    LocalDate startDate = startOfPool(requests, asOfDate);
+    List<Donation> donations = donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
+        organizationId,
+        startDate,
+        asOfDate);
+
+    return allocateFifo(requests, donations, asOfDate);
+  }
+
+  /**
+   * Snapshot do preenchimento de solicitações (mesclando hemocentros) até uma data de corte (asOfDate).
+   * A data inicial da busca é calculada automaticamente a partir da solicitação mais antiga.
+   */
+  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
+      List<DonationRequest> requests,
+      LocalDate asOfDate) {
+    if (requests == null) {
+      throw new IllegalArgumentException("Requests cannot be null");
+    }
+    if (asOfDate == null) {
+      throw new IllegalArgumentException("As of date cannot be null");
+    }
+
+    List<BloodCenter> bloodCenters = bloodCentersOf(requests);
+    if (bloodCenters.isEmpty()) {
+      return Map.of();
+    }
+
+    List<DomainID> organizationIds = organizationIdsOf(bloodCenters);
+    List<DonationRequest> allRequests = requestRepository.findByOrganizationIds(organizationIds);
+    if (allRequests.isEmpty()) {
+      return Map.of();
+    }
+
+    LocalDate startDate = startOfPool(allRequests, asOfDate);
+    List<Donation> allDonations =
+        donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
+            organizationIds,
+            startDate,
+            asOfDate);
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
+    for (BloodCenter bloodCenter : bloodCenters) {
+      snapshot.putAll(allocateFifo(
+          requestsAt(bloodCenter, allRequests),
+          donationsAt(bloodCenter, allDonations),
+          asOfDate));
+    }
+    return snapshot;
+  }
+
+  /**
    * Preenchimento de um hemocentro no intervalo [startDate, endDate].
    *
    * 1. lê todas as solicitações daquele hemocentro
@@ -65,6 +136,10 @@ public class DonationRequestFulfillmentService {
 
     DomainID organizationId = bloodCenter.getOrganization().getId();
     List<DonationRequest> requests = requestRepository.findByOrganizationId(organizationId);
+    if (requests.isEmpty()) {
+      return Map.of();
+    }
+
     List<Donation> donations = donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
         organizationId,
         startOfPool(startDate, requests),
@@ -91,6 +166,10 @@ public class DonationRequestFulfillmentService {
 
     List<DomainID> organizationIds = organizationIdsOf(bloodCenters);
     List<DonationRequest> allRequests = requestRepository.findByOrganizationIds(organizationIds);
+    if (allRequests.isEmpty()) {
+      return Map.of();
+    }
+
     List<Donation> allDonations =
         donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
             organizationIds,
@@ -145,22 +224,27 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
+   * Calcula a data inicial do pool a partir da solicitação mais antiga.
+   */
+  private static LocalDate startOfPool(List<DonationRequest> requests, LocalDate fallbackDate) {
+    return requests.stream()
+        .map(DonationRequest::getDateRequested)
+        .min(Comparator.naturalOrder())
+        .map(minDate -> minDate.isBefore(fallbackDate) ? minDate : fallbackDate)
+        .orElse(fallbackDate);
+  }
+
+  /**
    * Doações anteriores à solicitação mais antiga não preenchem ninguém.
    * Se essa data for antes de {@code startDate}, o pool começa nela.
    */
   private static LocalDate startOfPool(LocalDate startDate, List<DonationRequest> requests) {
-    LocalDate start = startDate;
-    for (DonationRequest request : requests) {
-      if (request.getDateRequested().isBefore(start)) {
-        start = request.getDateRequested();
-      }
-    }
-    return start;
+    return startOfPool(requests, startDate);
   }
 
   private static List<BloodCenter> bloodCentersOf(List<DonationRequest> requests) {
-    List<BloodCenter> bloodCenters = new ArrayList<>();
     Set<DomainID> seen = new LinkedHashSet<>();
+    List<BloodCenter> bloodCenters = new ArrayList<>();
     for (DonationRequest request : requests) {
       BloodCenter bloodCenter = request.getBloodCenter();
       if (seen.add(bloodCenter.getOrganization().getId())) {
@@ -171,35 +255,25 @@ public class DonationRequestFulfillmentService {
   }
 
   private static List<DomainID> organizationIdsOf(List<BloodCenter> bloodCenters) {
-    List<DomainID> ids = new ArrayList<>();
-    for (BloodCenter bloodCenter : bloodCenters) {
-      ids.add(bloodCenter.getOrganization().getId());
-    }
-    return ids;
+    return bloodCenters.stream()
+        .map(bloodCenter -> bloodCenter.getOrganization().getId())
+        .toList();
   }
 
   private static List<DonationRequest> requestsAt(
       BloodCenter bloodCenter,
       List<DonationRequest> requests) {
     DomainID organizationId = bloodCenter.getOrganization().getId();
-    List<DonationRequest> result = new ArrayList<>();
-    for (DonationRequest request : requests) {
-      if (request.getBloodCenter().getOrganization().getId().equals(organizationId)) {
-        result.add(request);
-      }
-    }
-    return result;
+    return requests.stream()
+        .filter(request -> request.getBloodCenter().getOrganization().getId().equals(organizationId))
+        .toList();
   }
 
   private static List<Donation> donationsAt(BloodCenter bloodCenter, List<Donation> donations) {
     DomainID organizationId = bloodCenter.getOrganization().getId();
-    List<Donation> result = new ArrayList<>();
-    for (Donation donation : donations) {
-      if (donation.getBloodCenter().getOrganization().getId().equals(organizationId)) {
-        result.add(donation);
-      }
-    }
-    return result;
+    return donations.stream()
+        .filter(donation -> donation.getBloodCenter().getOrganization().getId().equals(organizationId))
+        .toList();
   }
 
   private static <T> List<T> sorted(List<T> values, Comparator<T> order) {

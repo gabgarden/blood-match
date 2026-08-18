@@ -97,6 +97,44 @@ class DonationRequestFulfillmentServiceTest {
     assertEquals(1, result.get(second.getId()).fulfilledBloodBags());
   }
 
+  @Test
+  void fillWithAsOfDateDelegatesToDateRangeForBloodCenter() {
+    BloodCenter center = bloodCenter();
+    DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
+    Donation donation = donation(1, center, currentDate);
+    stubSnapshot(center, List.of(request), List.of(donation), currentDate.minusDays(2), currentDate);
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
+        service.fill(center, currentDate);
+
+    assertEquals(1, result.get(request.getId()).fulfilledBloodBags());
+  }
+
+  @Test
+  void fillWithAsOfDateDelegatesToDateRangeForRequestsList() {
+    BloodCenter center = bloodCenter();
+    DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
+    when(requestRepository.findByOrganizationIds(anyList())).thenReturn(List.of(request));
+    when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(anyList(), any(), any()))
+        .thenReturn(List.of(donation(1, center, currentDate)));
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
+        service.fill(List.of(request), currentDate);
+
+    assertEquals(1, result.get(request.getId()).fulfilledBloodBags());
+  }
+
+  @Test
+  void fillReturnsEmptyMapWhenBloodCenterHasNoRequests() {
+    BloodCenter center = bloodCenter();
+    when(requestRepository.findByOrganizationId(center.getOrganization().getId())).thenReturn(List.of());
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
+        service.fill(center, currentDate);
+
+    assertTrue(result.isEmpty());
+  }
+
   private void stubSnapshot(
       BloodCenter center,
       List<DonationRequest> requests,
