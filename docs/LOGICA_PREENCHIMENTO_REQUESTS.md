@@ -13,15 +13,17 @@ Não há concorrência nesse cálculo: leitura de requests e doações, alocaç�
 Classe: `DonationRequestFulfillmentService`.
 
 ```text
-fill(bloodCenter, startDate, endDate)
+fill(bloodCenter, asOfDate)
 
-1. carrega todas as solicitações daquele hemocentro
-2. o intervalo de doações começa na solicitação mais antiga, se ela for anterior a startDate
+1. carrega as solicitações ativas daquele hemocentro
+2. o intervalo de doações começa na solicitação ativa mais antiga
 3. carrega as doações COMPLETED daquele hemocentro no intervalo
 4. ordena solicitações e doações da mais antiga para a mais nova
 5. cada doação vai para a primeira solicitação que acceptsDonation e ainda não bateu a meta
 6. devolve requestId → (fulfilledBloodBags, goalReached)
 ```
+
+`fill(requests, asOfDate)` faz o mesmo, carregando as solicitações **ativas** de todos os hemocentros da lista (não o histórico expirado). É o caminho das recomendações e da lista do requisitante.
 
 `acceptsDonation` exige: mesmo hemocentro, request ativa, não expirada na data do snapshot, doação completa, `dateRequested ≤ donationDate ≤ dateLimit`, tipo sanguíneo compatível.
 

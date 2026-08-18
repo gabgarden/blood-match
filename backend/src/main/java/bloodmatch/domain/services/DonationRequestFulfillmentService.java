@@ -49,8 +49,8 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
-   * Snapshot do preenchimento das solicitações de um hemocentro até uma data de corte (asOfDate).
-   * A data inicial da busca é calculada automaticamente a partir da solicitação mais antiga.
+   * Snapshot do preenchimento das solicitações ativas de um hemocentro até {@code asOfDate}.
+   * A janela de doações começa na solicitação ativa mais antiga, não no histórico inteiro.
    */
   public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
       BloodCenter bloodCenter,
@@ -63,23 +63,19 @@ public class DonationRequestFulfillmentService {
     }
 
     DomainID organizationId = bloodCenter.getOrganization().getId();
-    List<DonationRequest> requests = requestRepository.findByOrganizationId(organizationId);
+    List<DonationRequest> requests = requestRepository.findActiveRequestsByOrganizationIds(
+        List.of(organizationId),
+        asOfDate);
     if (requests.isEmpty()) {
       return Map.of();
     }
 
-    LocalDate startDate = startOfPool(requests, asOfDate);
-    List<Donation> donations = donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
-        organizationId,
-        startDate,
-        asOfDate);
-
-    return allocateFifo(requests, donations, asOfDate);
+    return allocateLoaded(requests, asOfDate);
   }
 
   /**
-   * Snapshot do preenchimento de solicitações (mesclando hemocentros) até uma data de corte (asOfDate).
-   * A data inicial da busca é calculada automaticamente a partir da solicitação mais antiga.
+   * Snapshot FIFO até {@code asOfDate} entre as solicitações ativas dos hemocentros
+   * presentes em {@code requests}. Pedidos expirados não entram no pool.
    */
   public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
       List<DonationRequest> requests,
@@ -96,27 +92,36 @@ public class DonationRequestFulfillmentService {
       return Map.of();
     }
 
-    List<DomainID> organizationIds = organizationIdsOf(bloodCenters);
-    List<DonationRequest> allRequests = requestRepository.findByOrganizationIds(organizationIds);
-    if (allRequests.isEmpty()) {
+    List<DonationRequest> activeRequests = requestRepository.findActiveRequestsByOrganizationIds(
+        organizationIdsOf(bloodCenters),
+        asOfDate);
+    if (activeRequests.isEmpty()) {
       return Map.of();
     }
 
-    LocalDate startDate = startOfPool(allRequests, asOfDate);
-    List<Donation> allDonations =
-        donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
-            organizationIds,
-            startDate,
-            asOfDate);
+    return allocateLoaded(activeRequests, asOfDate);
+  }
 
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
-    for (BloodCenter bloodCenter : bloodCenters) {
-      snapshot.putAll(allocateFifo(
-          requestsAt(bloodCenter, allRequests),
-          donationsAt(bloodCenter, allDonations),
-          asOfDate));
+  /**
+   * FIFO só entre as solicitações já carregadas. Não busca o restante do
+   * hemocentro. Só é correto se {@code requests} já for o pool inteiro que
+   * compete naquele instante (todas as ativas do centro). A janela de doações
+   * é [pedido mais antigo da lista, asOfDate].
+   */
+  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fillAmong(
+      List<DonationRequest> requests,
+      LocalDate asOfDate) {
+    if (requests == null) {
+      throw new IllegalArgumentException("Requests cannot be null");
     }
-    return snapshot;
+    if (asOfDate == null) {
+      throw new IllegalArgumentException("As of date cannot be null");
+    }
+    if (requests.isEmpty()) {
+      return Map.of();
+    }
+
+    return allocateLoaded(requests, asOfDate);
   }
 
   /**
@@ -182,6 +187,34 @@ public class DonationRequestFulfillmentService {
           requestsAt(bloodCenter, allRequests),
           donationsAt(bloodCenter, allDonations),
           endDate));
+    }
+    return snapshot;
+  }
+
+  /**
+   * Carrega as doações COMPLETED dos hemocentros de {@code requests} na janela
+   * [pedido mais antigo, asOfDate] e reparte FIFO por centro.
+   */
+  private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateLoaded(
+      List<DonationRequest> requests,
+      LocalDate asOfDate) {
+    List<BloodCenter> bloodCenters = bloodCentersOf(requests);
+    if (bloodCenters.isEmpty()) {
+      return Map.of();
+    }
+
+    List<Donation> allDonations =
+        donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
+            organizationIdsOf(bloodCenters),
+            startOfPool(requests, asOfDate),
+            asOfDate);
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
+    for (BloodCenter bloodCenter : bloodCenters) {
+      snapshot.putAll(allocateFifo(
+          requestsAt(bloodCenter, requests),
+          donationsAt(bloodCenter, allDonations),
+          asOfDate));
     }
     return snapshot;
   }
