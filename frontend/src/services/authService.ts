@@ -17,6 +17,8 @@ const POST_LOGIN_NOTICE_KEY = "bloodmatch.auth.notice";
 
 type JwtPayload = {
   exp?: number;
+  roles?: unknown;
+  partyId?: unknown;
 };
 
 function decodeJwtPayload(token: string): JwtPayload | null {
@@ -34,6 +36,20 @@ function decodeJwtPayload(token: string): JwtPayload | null {
   }
 }
 
+function normalizeRoles(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((role): role is string => typeof role === "string" && role.trim().length > 0);
+  }
+  if (typeof value === "string" && value.trim().length > 0) {
+    return [value.trim()];
+  }
+  return [];
+}
+
+function rolesFromToken(token: string): string[] {
+  return normalizeRoles(decodeJwtPayload(token)?.roles);
+}
+
 function decodeJwtExp(token: string): number | null {
   const payload = decodeJwtPayload(token);
   return typeof payload?.exp === "number" ? payload.exp * 1000 : null;
@@ -43,13 +59,15 @@ function buildSession(data: LoginResponse): AuthSession {
   const now = Date.now();
   const expFromToken = decodeJwtExp(data.accessToken);
   const expFromApi = typeof data.expiresIn === "number" ? now + data.expiresIn : null;
+  const roles = normalizeRoles(data.roles);
+  const rolesFromJwt = rolesFromToken(data.accessToken);
 
   return {
     tokenType: data.tokenType || "Bearer",
     accessToken: data.accessToken,
     expiresAt: expFromToken ?? expFromApi ?? now + 60 * 60 * 1000,
     partyId: data.partyId,
-    roles: Array.isArray(data.roles) ? data.roles : [],
+    roles: roles.length > 0 ? roles : rolesFromJwt,
   };
 }
 
@@ -64,7 +82,15 @@ function readSession(): AuthSession | null {
   }
 
   try {
-    return JSON.parse(raw) as AuthSession;
+    const session = JSON.parse(raw) as AuthSession;
+    if (!Array.isArray(session.roles) || session.roles.length === 0) {
+      const rolesFromJwt = session.accessToken ? rolesFromToken(session.accessToken) : [];
+      if (rolesFromJwt.length > 0) {
+        session.roles = rolesFromJwt;
+        saveSession(session);
+      }
+    }
+    return session;
   } catch {
     localStorage.removeItem(AUTH_SESSION_KEY);
     return null;
