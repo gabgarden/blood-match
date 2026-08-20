@@ -64,9 +64,9 @@ class DonationRequestTest {
   void rejectsPendingAndCancelledDonations() {
     DonationRequest request = request(BloodType.of("A+"));
     Donation pending = Donation.reconstitute(
-        nextId(), donor("O-"), requestedAt.plusDays(1), bloodCenter, false, true, false);
+        nextId(), donor("O-"), requestedAt.plusDays(1), null, null, bloodCenter);
     Donation cancelled = Donation.reconstitute(
-        nextId(), donor("O-"), requestedAt.plusDays(1), bloodCenter, false, false, true);
+        nextId(), donor("O-"), requestedAt.plusDays(1), null, requestedAt.plusDays(1), bloodCenter);
 
     assertFalse(request.acceptsDonation(pending, requestedAt.plusDays(1)));
     assertFalse(request.acceptsDonation(cancelled, requestedAt.plusDays(1)));
@@ -112,7 +112,7 @@ class DonationRequestTest {
   }
 
   private Donation completed(String bloodType, LocalDate date) {
-    return Donation.reconstitute(nextId(), donor(bloodType), date, bloodCenter, true, false, false);
+    return Donation.reconstitute(nextId(), donor(bloodType), null, date, null, bloodCenter);
   }
 
   private Donor donor(String bloodType) {

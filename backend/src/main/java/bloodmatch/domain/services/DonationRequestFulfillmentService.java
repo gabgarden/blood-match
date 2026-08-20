@@ -228,7 +228,9 @@ public class DonationRequestFulfillmentService {
       List<Donation> donations,
       LocalDate asOfDate) {
     List<DonationRequest> requestsOldestFirst = sorted(requests, OLDEST_REQUEST_FIRST);
-    List<Donation> donationsOldestFirst = sorted(donations, OLDEST_DONATION_FIRST);
+    List<Donation> donationsOldestFirst = sorted(
+        donations.stream().filter(Donation::isCompleted).toList(),
+        OLDEST_DONATION_FIRST);
 
     Map<DomainID, Integer> bags = new LinkedHashMap<>();
     for (DonationRequest request : requestsOldestFirst) {

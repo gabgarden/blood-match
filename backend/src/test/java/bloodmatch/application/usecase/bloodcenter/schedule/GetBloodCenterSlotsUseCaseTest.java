@@ -112,7 +112,7 @@ class GetBloodCenterSlotsUseCaseTest {
   }
 
   private Donation pendingAt(BloodCenter bloodCenter, LocalTime time) {
-    return Donation.createPending(donor(), MONDAY, bloodCenter, MONDAY.minusDays(1), time);
+    return Donation.create(donor(), bloodCenter, MONDAY, null, time, MONDAY.minusDays(1));
   }
 
   private Donor donor() {

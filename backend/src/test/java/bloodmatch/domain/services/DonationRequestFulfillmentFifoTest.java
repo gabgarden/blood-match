@@ -263,8 +263,8 @@ class DonationRequestFulfillmentFifoTest {
   void ignoresPendingAndCancelledDonations() {
     BloodCenter center = center("A");
     DonationRequest request = request(1, center, "A+", 2, TODAY.minusDays(1), TODAY.plusDays(1), true);
-    Donation pending = Donation.reconstitute(id(1), donor("O-"), TODAY, center, false, true, false);
-    Donation cancelled = Donation.reconstitute(id(2), donor("O-"), TODAY, center, false, false, true);
+    Donation pending = Donation.reconstitute(id(1), donor("O-"), TODAY, null, null, center);
+    Donation cancelled = Donation.reconstitute(id(2), donor("O-"), TODAY, null, TODAY, center);
 
     var result = calculate(List.of(request), List.of(pending, cancelled));
 
@@ -275,7 +275,7 @@ class DonationRequestFulfillmentFifoTest {
   void mixesCompletedWithPendingAndOnlyCountsCompleted() {
     BloodCenter center = center("A");
     DonationRequest request = request(1, center, "A+", 2, TODAY.minusDays(1), TODAY.plusDays(1), true);
-    Donation pending = Donation.reconstitute(id(1), donor("O-"), TODAY, center, false, true, false);
+    Donation pending = Donation.reconstitute(id(1), donor("O-"), TODAY, null, null, center);
     Donation completed = donation(2, center, "O-", TODAY);
 
     var result = calculate(List.of(request), List.of(pending, completed));
@@ -495,7 +495,7 @@ class DonationRequestFulfillmentFifoTest {
   }
 
   private Donation donation(long id, BloodCenter center, String donorBloodType, LocalDate date) {
-    return Donation.reconstitute(id(id), donor(donorBloodType), date, center, true, false, false);
+    return Donation.reconstitute(id(id), donor(donorBloodType), null, date, null, center);
   }
 
   private BloodCenter center(String suffix) {

@@ -77,7 +77,7 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
       return List.of();
 
     return toDomainList(
-        mongoRepository.findByCompletedTrueAndOrganizationIdInOrderByDonationDateAsc(
+        mongoRepository.findCompletedByOrganizationIdInOrderByDonationDateAsc(
             toStringIds(organizationIds)));
   }
 
@@ -134,7 +134,7 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
       throw new IllegalArgumentException("Date cannot be null");
 
     return toDomainList(
-        mongoRepository.findByPendingTrueAndOrganizationIdAndDonationDate(
+        mongoRepository.findPendingByOrganizationIdAndIntendedDate(
             organizationId.getValue().toString(), date));
   }
 
@@ -151,7 +151,7 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
       throw new IllegalArgumentException("to cannot be null");
 
     return toDomainList(
-        mongoRepository.findPendingByOrganizationIdAndDonationDateInclusive(
+        mongoRepository.findPendingByOrganizationIdAndIntendedDateInclusive(
             organizationId.getValue().toString(), from, to));
   }
 

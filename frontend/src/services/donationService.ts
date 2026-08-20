@@ -59,17 +59,12 @@ export type CreateDonationRequestPayload = {
   directedTo?: string;
 };
 
-export type CreatePendingDonationPayload = {
+export type CreateDonationPayload = {
   organizationId: string;
   personId: string;
-  expectedDate: string;
+  intendedDate?: string;
+  donationDate?: string;
   expectedTime?: string;
-};
-
-export type CreateCompletedDonationPayload = {
-  personId: string;
-  organizationId: string;
-  donationDate: string;
 };
 
 function toNumber(value: number | string | null | undefined, fallback = 0): number {
@@ -172,23 +167,23 @@ export async function createDonationRequest(payload: CreateDonationRequestPayloa
   return response.data;
 }
 
-export async function createPendingDonation(payload: CreatePendingDonationPayload) {
-  const body: CreatePendingDonationPayload = {
+export async function createDonation(payload: CreateDonationPayload) {
+  const body: CreateDonationPayload = {
     organizationId: payload.organizationId,
     personId: payload.personId,
-    expectedDate: payload.expectedDate,
   };
 
+  if (payload.intendedDate) {
+    body.intendedDate = payload.intendedDate;
+  }
+  if (payload.donationDate) {
+    body.donationDate = payload.donationDate;
+  }
   if (payload.expectedTime) {
     body.expectedTime = payload.expectedTime;
   }
 
-  const response = await api.post("/donations/create-pending", body);
-  return response.data;
-}
-
-export async function createCompletedDonation(payload: CreateCompletedDonationPayload) {
-  const response = await api.post("/donations/completed", payload);
+  const response = await api.post("/donations", body);
   return response.data;
 }
 

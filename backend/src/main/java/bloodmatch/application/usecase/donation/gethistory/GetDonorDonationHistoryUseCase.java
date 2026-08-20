@@ -29,7 +29,7 @@ public class GetDonorDonationHistoryUseCase {
 
     return donationRepository.findByDonorId(personId)
         .stream()
-        .sorted(Comparator.comparing(Donation::getDonationDate).reversed())
+        .sorted(Comparator.comparing(Donation::getReferenceDate, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
         .map(OutputItem::from)
         .toList();
   }
@@ -45,7 +45,7 @@ public class GetDonorDonationHistoryUseCase {
     public static OutputItem from(Donation donation) {
       return new OutputItem(
           donation.getId().getValue().toString(),
-          donation.getDonationDate(),
+          donation.getReferenceDate(),
           donation.getBloodCenter().getOrganization().getName());
     }
   }

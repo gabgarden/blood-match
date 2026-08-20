@@ -37,7 +37,7 @@ class CompletePendingDonationUseCaseTest {
     LocalDate currentDate = LocalDate.now();
     Donor donor = donor();
     BloodCenter bloodCenter = bloodCenter();
-    Donation donation = Donation.createPending(donor, currentDate, bloodCenter, currentDate.minusDays(1));
+    Donation donation = Donation.create(donor, bloodCenter, currentDate, null, currentDate.minusDays(1));
 
     when(donationRepository.findById(donation.getId())).thenReturn(Optional.of(donation));
 

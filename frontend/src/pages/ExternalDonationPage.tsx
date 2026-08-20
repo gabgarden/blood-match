@@ -15,7 +15,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useRoleResolution } from "../hooks/useRoleResolution";
 import { hasAdminRole, hasDonorRole, hasRequesterRole } from "../routes/roleRouting";
-import { createCompletedDonation, createPendingDonation } from "../services/donationService";
+import { createDonation } from "../services/donationService";
 import { extractApiErrorMessage } from "../utils/apiError";
 
 type DonationMode = "pending" | "completed";
@@ -79,14 +79,14 @@ export default function ExternalDonationPage() {
 
     try {
       if (mode === "pending") {
-        await createPendingDonation({
+        await createDonation({
           personId: partyId,
           organizationId: bloodCenter.organizationId,
-          expectedDate: donationDate,
+          intendedDate: donationDate,
         });
         setSuccessMessage(`Doação pendente registrada em ${bloodCenter.name}.`);
       } else {
-        await createCompletedDonation({
+        await createDonation({
           personId: partyId,
           organizationId: bloodCenter.organizationId,
           donationDate,

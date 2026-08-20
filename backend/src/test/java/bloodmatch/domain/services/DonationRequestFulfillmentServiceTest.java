@@ -217,11 +217,10 @@ class DonationRequestFulfillmentServiceTest {
             new Person("Donor", new PhoneNumber("11988887777"), new CPF("98765432100"), LocalDate.of(1990, 1, 1)),
             BloodType.of("O-"),
             70.0),
+        null,
         date,
-        center,
-        true,
-        false,
-        false);
+        null,
+        center);
   }
 
   private BloodCenter bloodCenter() {

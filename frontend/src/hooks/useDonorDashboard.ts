@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import { fetchDonorHeroSummary } from "../services/partyService";
 import {
-  createPendingDonation,
+  createDonation,
   fetchDonorDonationHistory,
   type DonationHistoryEntry,
 } from "../services/donationService";
@@ -263,10 +263,10 @@ export function useDonorDashboard({ partyId, hasDonorRole }: DonorDashboardParam
     try {
       setFeedback(null);
       setErrorMessage(null);
-      await createPendingDonation({
+      await createDonation({
         personId: partyId,
         organizationId: recommendation.organizationId,
-        expectedDate: expectedDate || todayIsoDate(),
+        intendedDate: expectedDate || todayIsoDate(),
         expectedTime,
       });
       setFeedback("Doação pendente agendada com sucesso.");
