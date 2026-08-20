@@ -103,95 +103,6 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
-   * FIFO só entre as solicitações já carregadas. Não busca o restante do
-   * hemocentro. Só é correto se {@code requests} já for o pool inteiro que
-   * compete naquele instante (todas as ativas do centro). A janela de doações
-   * é [pedido mais antigo da lista, asOfDate].
-   */
-  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fillAmong(
-      List<DonationRequest> requests,
-      LocalDate asOfDate) {
-    if (requests == null) {
-      throw new IllegalArgumentException("Requests cannot be null");
-    }
-    if (asOfDate == null) {
-      throw new IllegalArgumentException("As of date cannot be null");
-    }
-    if (requests.isEmpty()) {
-      return Map.of();
-    }
-
-    return allocateLoaded(requests, asOfDate);
-  }
-
-  /**
-   * Preenchimento de um hemocentro no intervalo [startDate, endDate].
-   *
-   * 1. lê todas as solicitações daquele hemocentro
-   * 2. lê as doações COMPLETED daquele hemocentro no intervalo
-   * 3. ordena ambos do mais antigo para o mais novo
-   * 4. cada doação vai para a primeira solicitação que ainda cabe
-   *    e aceita o tipo sanguíneo
-   */
-  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
-      BloodCenter bloodCenter,
-      LocalDate startDate,
-      LocalDate endDate) {
-    requireInterval(bloodCenter, startDate, endDate);
-
-    DomainID organizationId = bloodCenter.getOrganization().getId();
-    List<DonationRequest> requests = requestRepository.findByOrganizationId(organizationId);
-    if (requests.isEmpty()) {
-      return Map.of();
-    }
-
-    List<Donation> donations = donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
-        organizationId,
-        startOfPool(startDate, requests),
-        endDate);
-
-    return allocateFifo(requests, donations, endDate);
-  }
-
-  /**
-   * Mesmo FIFO, quando a entrada mistura hemocentros.
-   * Cada hemocentro tem o próprio pool: uma doação nunca preenche
-   * solicitação de outro centro.
-   */
-  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
-      List<DonationRequest> requests,
-      LocalDate startDate,
-      LocalDate endDate) {
-    requireInterval(requests, startDate, endDate);
-
-    List<BloodCenter> bloodCenters = bloodCentersOf(requests);
-    if (bloodCenters.isEmpty()) {
-      return Map.of();
-    }
-
-    List<DomainID> organizationIds = organizationIdsOf(bloodCenters);
-    List<DonationRequest> allRequests = requestRepository.findByOrganizationIds(organizationIds);
-    if (allRequests.isEmpty()) {
-      return Map.of();
-    }
-
-    List<Donation> allDonations =
-        donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
-            organizationIds,
-            startOfPool(startDate, allRequests),
-            endDate);
-
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
-    for (BloodCenter bloodCenter : bloodCenters) {
-      snapshot.putAll(allocateFifo(
-          requestsAt(bloodCenter, allRequests),
-          donationsAt(bloodCenter, allDonations),
-          endDate));
-    }
-    return snapshot;
-  }
-
-  /**
    * Carrega as doações COMPLETED dos hemocentros de {@code requests} na janela
    * [pedido mais antigo, asOfDate] e reparte FIFO por centro.
    */
@@ -260,21 +171,14 @@ public class DonationRequestFulfillmentService {
 
   /**
    * Calcula a data inicial do pool a partir da solicitação mais antiga.
+   * Doações anteriores a essa data não preenchem ninguém no snapshot.
    */
-  private static LocalDate startOfPool(List<DonationRequest> requests, LocalDate fallbackDate) {
+  private static LocalDate startOfPool(List<DonationRequest> requests, LocalDate asOfDate) {
     return requests.stream()
         .map(DonationRequest::getDateRequested)
         .min(Comparator.naturalOrder())
-        .map(minDate -> minDate.isBefore(fallbackDate) ? minDate : fallbackDate)
-        .orElse(fallbackDate);
-  }
-
-  /**
-   * Doações anteriores à solicitação mais antiga não preenchem ninguém.
-   * Se essa data for antes de {@code startDate}, o pool começa nela.
-   */
-  private static LocalDate startOfPool(LocalDate startDate, List<DonationRequest> requests) {
-    return startOfPool(requests, startDate);
+        .map(minDate -> minDate.isBefore(asOfDate) ? minDate : asOfDate)
+        .orElse(asOfDate);
   }
 
   private static List<BloodCenter> bloodCentersOf(List<DonationRequest> requests) {
@@ -315,31 +219,5 @@ public class DonationRequestFulfillmentService {
     List<T> copy = new ArrayList<>(values);
     copy.sort(order);
     return copy;
-  }
-
-  private static void requireInterval(BloodCenter bloodCenter, LocalDate startDate, LocalDate endDate) {
-    if (bloodCenter == null) {
-      throw new IllegalArgumentException("Blood center cannot be null");
-    }
-    requireInterval(startDate, endDate);
-  }
-
-  private static void requireInterval(List<DonationRequest> requests, LocalDate startDate, LocalDate endDate) {
-    if (requests == null) {
-      throw new IllegalArgumentException("Requests cannot be null");
-    }
-    requireInterval(startDate, endDate);
-  }
-
-  private static void requireInterval(LocalDate startDate, LocalDate endDate) {
-    if (startDate == null) {
-      throw new IllegalArgumentException("Start date cannot be null");
-    }
-    if (endDate == null) {
-      throw new IllegalArgumentException("End date cannot be null");
-    }
-    if (endDate.isBefore(startDate)) {
-      throw new IllegalArgumentException("End date cannot be before start date");
-    }
   }
 }

@@ -6,7 +6,7 @@ Este apêndice documenta o núcleo algorítmico da solução: a alocação \text
 
 \section{Alocação FIFO de doações}
 
-A Listagem~\ref{lst:fifo} sintetiza \codigo{fill} e \codigo{allocateFifo} do \codigo{DonationRequestFulfillmentService}. O serviço recebe o hemocentro e a janela \codigo{[startDate, endDate]}, carrega o snapshot daquele centro, ordena solicitações e doações da mais antiga para a mais nova e atribui cada doação à primeira solicitação que a aceita (\codigo{acceptsDonation}) e ainda não atingiu a meta --- o \texttt{break} encerra a busca, concretizando a política FIFO. O resultado permanece em memória: nada é persistido.
+A Listagem~\ref{lst:fifo} sintetiza o caminho de leitura do \codigo{DonationRequestFulfillmentService}: \codigo{fill} recebe o hemocentro e a data de referência \codigo{asOfDate}, carrega somente as solicitações ativas e não expiradas daquele centro, e \codigo{allocateLoaded} busca as doações concluídas na janela \codigo{[pedido ativo mais antigo, asOfDate]}. Em seguida, \codigo{allocateFifo} isola o pool por hemocentro, ordena solicitações e doações da mais antiga para a mais nova e atribui cada doação à primeira solicitação que ainda cabe na meta e que \codigo{acceptsDonation} aceita --- o \texttt{break} encerra a busca, concretizando a política FIFO. O resultado permanece em memória: nada é persistido.
 
 \lstinputlisting[
   language=Java,

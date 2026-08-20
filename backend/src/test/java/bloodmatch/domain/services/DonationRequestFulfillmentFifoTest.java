@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DonationRequestFulfillmentFifoTest {
 
   private static final LocalDate TODAY = LocalDate.of(2026, 7, 24);
-  private static final LocalDate START = TODAY.minusYears(1);
   private final DonationRequestRepositoryInterface requestRepository =
       mock(DonationRequestRepositoryInterface.class);
   private final DonationRepositoryInterface donationRepository =
@@ -217,7 +217,6 @@ class DonationRequestFulfillmentFifoTest {
   @Test
   void skipsOlderRequestOutsideDonationDateWindowAndFillsNewerCompatibleOne() {
     BloodCenter center = center("A");
-    // oldest só aceita até yesterday; donation é TODAY → cai na newest
     DonationRequest oldestNarrowWindow = request(1, center, "A+", 1, TODAY.minusDays(5), TODAY.minusDays(1), true);
     DonationRequest newest = request(2, center, "A+", 1, TODAY.minusDays(1), TODAY.plusDays(2), true);
 
@@ -225,7 +224,7 @@ class DonationRequestFulfillmentFifoTest {
         List.of(oldestNarrowWindow, newest),
         List.of(donation(1, center, "O-", TODAY)));
 
-    assertFulfilled(result, oldestNarrowWindow, 0, false);
+    assertFalse(result.containsKey(oldestNarrowWindow.getId()));
     assertFulfilled(result, newest, 1, true);
   }
 
@@ -241,8 +240,7 @@ class DonationRequestFulfillmentFifoTest {
         List.of(inactive, expired),
         List.of(donation(1, center, "O-", TODAY), donation(2, center, "O-", TODAY)));
 
-    assertFulfilled(result, inactive, 0, false);
-    assertFulfilled(result, expired, 0, false);
+    assertTrue(result.isEmpty());
   }
 
   @Test
@@ -255,7 +253,7 @@ class DonationRequestFulfillmentFifoTest {
         List.of(inactiveOldest, activeNewest),
         List.of(donation(1, center, "O-", TODAY)));
 
-    assertFulfilled(result, inactiveOldest, 0, false);
+    assertFalse(result.containsKey(inactiveOldest.getId()));
     assertFulfilled(result, activeNewest, 1, true);
   }
 
@@ -427,10 +425,12 @@ class DonationRequestFulfillmentFifoTest {
 
     for (BloodCenter center : centers) {
       DomainID organizationId = center.getOrganization().getId();
-      List<DonationRequest> requestsAtCenter = new ArrayList<>();
+      List<DonationRequest> activeAtCenter = new ArrayList<>();
       for (DonationRequest request : requests) {
-        if (request.getBloodCenter().getOrganization().getId().equals(organizationId)) {
-          requestsAtCenter.add(request);
+        if (request.getBloodCenter().getOrganization().getId().equals(organizationId)
+            && request.isActive()
+            && !request.isExpired(TODAY)) {
+          activeAtCenter.add(request);
         }
       }
       List<Donation> donationsAtCenter = new ArrayList<>();
@@ -439,21 +439,23 @@ class DonationRequestFulfillmentFifoTest {
           donationsAtCenter.add(donation);
         }
       }
-      LocalDate from = START;
-      for (DonationRequest request : requestsAtCenter) {
+      LocalDate from = TODAY;
+      for (DonationRequest request : activeAtCenter) {
         if (request.getDateRequested().isBefore(from)) {
           from = request.getDateRequested();
         }
       }
-      when(requestRepository.findByOrganizationId(organizationId)).thenReturn(requestsAtCenter);
-      when(donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
-              organizationId, from, TODAY))
+      when(requestRepository.findActiveRequestsByOrganizationIds(
+              eq(List.of(organizationId)), eq(TODAY)))
+          .thenReturn(activeAtCenter);
+      when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
+              eq(List.of(organizationId)), eq(from), eq(TODAY)))
           .thenReturn(donationsAtCenter);
     }
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> result = new HashMap<>();
     for (BloodCenter center : centers) {
-      result.putAll(service.fill(center, START, TODAY));
+      result.putAll(service.fill(center, TODAY));
     }
     return result;
   }

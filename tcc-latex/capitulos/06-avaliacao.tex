@@ -9,7 +9,7 @@ A solução implementada materializa-se em uma API RESTful em Java~17 com Spring
 \begin{itemize}[leftmargin=*]
   \item cadastro de pessoas e organizações e associação de papéis (doador, requisitante e hemocentro);
   \item gestão do ciclo de vida das solicitações de doação (criação, consulta, atualização de meta e prazo, cancelamento e notificação de elegíveis);
-  \item registro e acompanhamento de doações (pendentes, concluídas, reagendamento e histórico);
+  \item registro unificado de doações --- data de intenção (pendente) ou data efetiva (concluída) ---, reagendamento, conclusão e histórico;
   \item recomendação de solicitações compatíveis ao doador, considerando tipagem sanguínea, elegibilidade temporal e proximidade geográfica;
   \item cumprimento de metas por \textit{snapshot} em memória: alocação FIFO de doações concluídas às solicitações do mesmo hemocentro, sem campo persistido;
   \item busca autenticada de hemocentros por nome, retornando o identificador da organização utilizado nas operações de escrita.

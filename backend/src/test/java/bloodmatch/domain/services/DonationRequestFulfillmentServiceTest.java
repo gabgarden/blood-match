@@ -29,7 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,46 +46,31 @@ class DonationRequestFulfillmentServiceTest {
   void fillAllocatesCompatibleDonationToTheRequest() {
     BloodCenter center = bloodCenter();
     DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
-    Donation donation = donation(1, center, currentDate);
-    stubSnapshot(center, List.of(request), List.of(donation), currentDate.minusDays(2), currentDate);
+    stubActiveSnapshot(List.of(request), List.of(donation(1, center, currentDate)));
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
-        service.fill(center, currentDate, currentDate);
+        service.fill(center, currentDate);
 
     assertEquals(1, result.get(request.getId()).fulfilledBloodBags());
     assertTrue(result.get(request.getId()).goalReached());
   }
 
   @Test
-  void fillLoadsTheBloodCenterSnapshotFromTheRepositories() {
+  void fillRejectsNullAsOfDate() {
     BloodCenter center = bloodCenter();
-    DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
-    Donation donation = donation(1, center, currentDate);
-    stubSnapshot(center, List.of(request), List.of(donation), currentDate.minusDays(2), currentDate);
 
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
-        service.fill(center, currentDate, currentDate);
-
-    assertEquals(1, result.get(request.getId()).fulfilledBloodBags());
+    assertThrows(IllegalArgumentException.class, () -> service.fill(center, null));
   }
 
   @Test
-  void fillRejectsInvertedDateWindow() {
-    BloodCenter center = bloodCenter();
-
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> service.fill(center, currentDate, currentDate.minusDays(1)));
-  }
-
-  @Test
-  void fillListLoadsEveryOrganizationInTwoQueries() {
+  void fillListLoadsActiveRequestsForEveryOrganization() {
     BloodCenter firstCenter = bloodCenter();
     BloodCenter secondCenter = bloodCenter();
     DonationRequest first = request(1, firstCenter, currentDate.minusDays(2), currentDate.plusDays(5), 1);
     DonationRequest second = request(2, secondCenter, currentDate.minusDays(2), currentDate.plusDays(5), 1);
 
-    when(requestRepository.findByOrganizationIds(anyList())).thenReturn(List.of(first, second));
+    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(currentDate)))
+        .thenReturn(List.of(first, second));
     when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
             anyList(), any(), any()))
         .thenReturn(List.of(
@@ -94,7 +78,7 @@ class DonationRequestFulfillmentServiceTest {
             donation(2, secondCenter, currentDate)));
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
-        service.fill(List.of(first, second), currentDate, currentDate);
+        service.fill(List.of(first, second), currentDate);
 
     assertEquals(1, result.get(first.getId()).fulfilledBloodBags());
     assertEquals(1, result.get(second.getId()).fulfilledBloodBags());
@@ -125,32 +109,39 @@ class DonationRequestFulfillmentServiceTest {
   }
 
   @Test
-  void fillAmongAllocatesOnlyTheProvidedRequestsWithoutReloadingCenterHistory() {
+  void fillReloadsActiveRequestsInsteadOfAllocatingOnlyTheProvidedList() {
     BloodCenter center = bloodCenter();
-    DonationRequest candidate = request(2, center, currentDate.minusDays(1), currentDate.plusDays(5), 1);
-    stubDonations(List.of(donation(1, center, currentDate)), currentDate.minusDays(1), currentDate);
-
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
-        service.fillAmong(List.of(candidate), currentDate);
-
-    assertEquals(1, result.get(candidate.getId()).fulfilledBloodBags());
-    verify(requestRepository, never()).findByOrganizationIds(anyList());
-    verify(requestRepository, never()).findActiveRequestsByOrganizationIds(anyList(), any());
-    verify(requestRepository, never()).findByOrganizationId(any());
-  }
-
-  @Test
-  void fillAmongUsesTheOldestProvidedRequestAsTheDonationWindowStart() {
-    BloodCenter center = bloodCenter();
-    DonationRequest older = request(1, center, currentDate.minusDays(10), currentDate.plusDays(5), 1);
-    DonationRequest newer = request(2, center, currentDate.minusDays(1), currentDate.plusDays(5), 1);
+    DonationRequest providedOnly = request(2, center, currentDate.minusDays(1), currentDate.plusDays(5), 1);
+    DonationRequest otherActiveOlder = request(1, center, currentDate.minusDays(10), currentDate.plusDays(5), 1);
+    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(currentDate)))
+        .thenReturn(List.of(otherActiveOlder, providedOnly));
     stubDonations(
         List.of(donation(1, center, currentDate.minusDays(9))),
         currentDate.minusDays(10),
         currentDate);
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
-        service.fillAmong(List.of(newer, older), currentDate);
+        service.fill(List.of(providedOnly), currentDate);
+
+    assertEquals(1, result.get(otherActiveOlder.getId()).fulfilledBloodBags());
+    assertEquals(0, result.get(providedOnly.getId()).fulfilledBloodBags());
+    verify(requestRepository).findActiveRequestsByOrganizationIds(anyList(), eq(currentDate));
+  }
+
+  @Test
+  void fillUsesTheOldestActiveRequestAsTheDonationWindowStart() {
+    BloodCenter center = bloodCenter();
+    DonationRequest older = request(1, center, currentDate.minusDays(10), currentDate.plusDays(5), 1);
+    DonationRequest newer = request(2, center, currentDate.minusDays(1), currentDate.plusDays(5), 1);
+    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(currentDate)))
+        .thenReturn(List.of(newer, older));
+    stubDonations(
+        List.of(donation(1, center, currentDate.minusDays(9))),
+        currentDate.minusDays(10),
+        currentDate);
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
+        service.fill(List.of(newer, older), currentDate);
 
     assertEquals(1, result.get(older.getId()).fulfilledBloodBags());
     assertEquals(0, result.get(newer.getId()).fulfilledBloodBags());
@@ -174,19 +165,6 @@ class DonationRequestFulfillmentServiceTest {
 
   private void stubDonations(List<Donation> donations, LocalDate from, LocalDate to) {
     when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(anyList(), eq(from), eq(to)))
-        .thenReturn(donations);
-  }
-
-  private void stubSnapshot(
-      BloodCenter center,
-      List<DonationRequest> requests,
-      List<Donation> donations,
-      LocalDate from,
-      LocalDate to) {
-    DomainID organizationId = center.getOrganization().getId();
-    when(requestRepository.findByOrganizationId(organizationId)).thenReturn(requests);
-    when(donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
-            organizationId, from, to))
         .thenReturn(donations);
   }
 
