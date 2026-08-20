@@ -15,7 +15,7 @@ A abstração permite que os programadores se preocupem apenas com as caracterí
 
 A definição de contratos entre tipos surge principalmente por meio de classes abstratas e interfaces, que estabelecem obrigações funcionais sem detalhar o processo interno \citeonline{gamma1994}. Implementações concretas surgem depois, moldadas conforme as particularidades de cada classe descendente.
 
-No domínio da doação sanguínea, a abstração pode ser exemplificada pela definição de um conceito genérico de participante do processo, que reúna características comuns a diferentes atores --- como nome, contato e endereço --- independentemente de se tratar de um doador, de um solicitante ou de uma instituição de saúde. Especializações desse conceito genérico assumiriam, então, comportamentos e regras próprias de cada papel, sem que o restante do sistema precisasse conhecer tais particularidades para lidar com o participante em um nível mais alto de abstração.
+Na prática deste projeto, essa abstração reflete-se na criação da entidade genérica de participante do sistema, reunindo características comuns a diferentes atores --- como nome, contato e endereço --- independentemente de se tratar de um doador, de um solicitante ou de uma instituição de saúde. Especializações dessa abstração assumem comportamentos e regras próprias de cada papel, sem que o restante da aplicação precise conhecer particularidades internas para operar em alto nível.
 
 \subsection{Encapsulamento}
 
@@ -23,7 +23,7 @@ O encapsulamento é responsável por controlar o acesso aos dados internos de um
 
 De maneira prática, o encapsulamento usa modificadores de acesso para definir quais atributos e métodos podem ser vistos ou utilizados externamente. Assim, os dados ficam protegidos, enquanto métodos específicos permitem interação controlada. De acordo com \citeonline{bloch2018}, essa prática permite validações e garante a consistência do objeto.
 
-No domínio da doação sanguínea, o encapsulamento se manifestaria, por exemplo, na proteção de regras associadas à elegibilidade de um doador ou à validade de uma solicitação de sangue: informações como o tipo sanguíneo, a data da solicitação e o prazo limite para atendimento permaneceriam protegidas de alterações diretas, sendo modificadas apenas por meio de operações que garantam a consistência do estado do objeto, como a validação de que o prazo limite não seja anterior à data da solicitação.
+Para o cenário hemoterápico, a aplicação desse princípio assegura a proteção direta de regras críticas relativas à elegibilidade do doador e à validade das solicitações de sangue: informações como tipo sanguíneo, data da solicitação e prazo limite não sofrem alterações arbitrárias externas, sendo modificadas exclusivamente por operações que validam a consistência do estado (como garantir que o prazo limite seja posterior à data de abertura).
 
 \subsection{Herança}
 
@@ -31,7 +31,7 @@ O conceito de herança possibilita o reaproveitamento e a especialização de co
 
 A herança pode ocorrer de duas principais maneiras: a herança simples, em que uma classe deriva de uma única superclasse, e a herança múltipla, em que uma classe herda de mais de uma superclasse, recebendo todos os atributos e métodos não privados das classes-base. Em ambos os casos é possível sobrescrever métodos para implementação específica \citeonline{booch2007}. \citeonline{sommerville2011} destaca que a herança facilita a manutenção do sistema, uma vez que mudanças na superclasse são automaticamente propagadas para as subclasses.
 
-No domínio da doação sanguínea, a herança poderia ser aplicada ao se derivar diferentes tipos de participantes --- como pessoas físicas e instituições --- de um conceito comum que concentre atributos compartilhados, permitindo que cada tipo especializado adicione apenas as características próprias de seu contexto, sem duplicar o que já é comum a todos.
+Ao modelar os diferentes atores envolvidos, a herança permite derivar especializações (como pessoas físicas e instituições) a partir de uma estrutura comum de participante, concentrando atributos compartilhados na classe base e evitando a duplicação de regras cadastrais.
 
 \subsection{Polimorfismo}
 
@@ -39,7 +39,7 @@ Formas distintas de um mesmo comportamento surgem quando objetos diversos utiliz
 
 Existem dois tipos principais de polimorfismo: o polimorfismo de sobrecarga (\textit{overloading}), em que operações distintas com o mesmo nome coexistem com assinaturas diferentes, e o polimorfismo de sobrescrita (\textit{overriding}), em que subclasses redefinem métodos herdados da superclasse \citeonline{booch2007}. O polimorfismo de subtipo, também conhecido como polimorfismo de inclusão, permite que uma referência de uma superclasse ou interface aponte para objetos de qualquer uma de suas subclasses, possibilitando que o sistema determine em tempo de execução qual implementação específica deve ser invocada \citeonline{sommerville2011}. Essa característica reduz o acoplamento entre componentes e facilita a adição de novos tipos ao sistema sem modificar código existente. Para que o polimorfismo de subtipo funcione corretamente, é fundamental que as classes derivadas possam substituir suas classes mãe sem alterar o comportamento esperado do sistema, princípio conhecido como \textit{Liskov Substitution Principle} (LSP), segundo o qual objetos de uma classe derivada devem poder ser usados no lugar de objetos da classe base sem comprometer a correção do programa \citeonline{martin2003}.
 
-No domínio da doação sanguínea, o polimorfismo se manifestaria ao permitir que diferentes tipos de participantes --- pessoas físicas e instituições, por exemplo --- fossem tratados de maneira uniforme por meio de uma interface comum, possibilitando que o sistema execute operações genéricas, como o envio de notificações, sem a necessidade de verificações explícitas sobre o tipo concreto de cada participante.
+Em uma API voltada à captação, o polimorfismo viabiliza tratar múltiplos perfis de uso por meio de interfaces unificadas, permitindo que a aplicação execute rotinas genéricas --- tais como envio de notificações ou verificação de autorização --- sem necessitar de condicionais explícitas sobre o tipo concreto de participante envolvido.
 
 \section{Princípios SOLID}
 \label{sec:solid}

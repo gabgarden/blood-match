@@ -63,15 +63,15 @@ Mais de 2,4 bilhões de referências citadas desde 1970.}
 {EVANS, E. \emph{Domain-Driven Design: Tackling Complexity in the Heart of
   Software}. [S.l.]: Addison-Wesley, 2003.}
 
-\bibitem[Frandsen 2020]{frandsen2020}
-\abntrefinfo{Frandsen}{FRANDSEN}{2020}
-{FRANDSEN, F. \emph{Health sciences literature review made easy: The PICO
-  strategy}. Burlington: Jones \& Bartlett Learning, 2020.}
-
 \bibitem[Gamma et al. 1994]{gamma1994}
 \abntrefinfo{Gamma et al.}{GAMMA et al.}{1994}
 {GAMMA, E. et al. \emph{Design patterns: elements of reusable object-oriented
   software}. Reading: Addison-Wesley, 1994.}
+
+\bibitem[Garrard 2020]{garrard2020}
+\abntrefinfo{Garrard}{GARRARD}{2020}
+{GARRARD, J. \emph{Health Sciences Literature Review Made Easy: The Matrix
+  Method}. 6. ed. Burlington: Jones \& Bartlett Learning, 2020.}
 
 \bibitem[Gil 2008]{gil2008}
 \abntrefinfo{Gil}{GIL}{2008}
@@ -87,7 +87,7 @@ Rio de Janeiro, 2023.}
 \abntrefinfo{Li et al.}{LI et al.}{2023}
 {LI, L. et al. Mobile applications for encouraging blood donation: A systematic
   review and case study.
-2023.}
+\emph{Digital Health}, v.~9, 2023.}
 
 \bibitem[Marconi e Lakatos 2003]{marconi2003}
 \abntrefinfo{Marconi e Lakatos}{MARCONI; LAKATOS}{2003}
@@ -136,7 +136,7 @@ Washington, D.C., 2020.}
 \abntrefinfo{Ou-Yang et al.}{OU-YANG et al.}{2020}
 {OU-YANG, J. et al. Effective methods for reactivating inactive blood donors: A
   stratified randomised controlled study.
-2020.}
+\emph{BMC Public Health}, v.~20, 2020.}
 
 \bibitem[Petersen et al. 2008]{petersen2008}
 \abntrefinfo{Petersen et al.}{PETERSEN et al.}{2008}
