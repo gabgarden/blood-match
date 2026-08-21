@@ -23,17 +23,18 @@ import org.springframework.stereotype.Service;
 /**
  * Snapshot em memória do preenchimento das solicitações de um hemocentro.
  *
- * Não há vínculo doação → solicitação e nada é persistido. O serviço lê o
- * banco naquele instante e reparte as doações COMPLETED em FIFO: a solicitação
+ * Lê o banco naquele instante e reparte doações COMPLETED em FIFO: a solicitação
  * mais antiga compatível recebe a bolsa, até atingir a meta.
  */
 @Service
 public class DonationRequestFulfillmentService {
 
+  /** Ordem FIFO das solicitações: data do pedido, depois id (desempate estável). */
   private static final Comparator<DonationRequest> OLDEST_REQUEST_FIRST =
       Comparator.comparing(DonationRequest::getDateRequested)
           .thenComparing(request -> request.getId().getValue());
 
+  /** Ordem FIFO das doações: data da doação, depois id (desempate estável). */
   private static final Comparator<Donation> OLDEST_DONATION_FIRST =
       Comparator.comparing(Donation::getDonationDate)
           .thenComparing(donation -> donation.getId().getValue());
@@ -41,6 +42,7 @@ public class DonationRequestFulfillmentService {
   private final DonationRequestRepositoryInterface requestRepository;
   private final DonationRepositoryInterface donationRepository;
 
+  /** Injeta os repositórios usados para montar o snapshot. */
   public DonationRequestFulfillmentService(
       DonationRequestRepositoryInterface requestRepository,
       DonationRepositoryInterface donationRepository) {
@@ -49,8 +51,8 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
-   * Snapshot do preenchimento das solicitações ativas de um hemocentro até {@code asOfDate}.
-   * A janela de doações começa na solicitação ativa mais antiga, não no histórico inteiro.
+   * Entrada por hemocentro: busca pedidos ativos daquele centro e devolve
+   * quantas bolsas cada um “recebeu” no snapshot até {@code asOfDate}.
    */
   public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
       BloodCenter bloodCenter,
@@ -74,8 +76,9 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
-   * Snapshot FIFO até {@code asOfDate} entre as solicitações ativas dos hemocentros
-   * presentes em {@code requests}. Pedidos expirados não entram no pool.
+   * Entrada por lista de pedidos: descobre os hemocentros envolvidos, recarrega
+   * só os pedidos ativos desses centros e monta o snapshot FIFO até {@code asOfDate}.
+   * Pedidos expirados da lista de entrada não entram no pool.
    */
   public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
       List<DonationRequest> requests,
@@ -103,8 +106,8 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
-   * Carrega as doações COMPLETED dos hemocentros de {@code requests} na janela
-   * [pedido mais antigo, asOfDate] e reparte FIFO por centro.
+   * Carrega doações COMPLETED na janela [pedido mais antigo, asOfDate] e,
+   * para cada hemocentro, chama o FIFO só com pedidos/doações daquele centro.
    */
   private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateLoaded(
       List<DonationRequest> requests,
@@ -131,8 +134,9 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
-   * FIFO: cada doação é atribuída à primeira solicitação que a aceita
-   * e ainda não atingiu a meta. O {@code break} garante uma bolsa por doação.
+   * Núcleo FIFO de um hemocentro: ordena pedidos e doações do mais antigo ao mais novo;
+   * cada doação vai para o primeiro pedido que a aceita e ainda tem meta; o break
+   * garante uma bolsa por doação. Devolve contagem e se a meta foi atingida.
    */
   private static Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateFifo(
       List<DonationRequest> requests,
@@ -170,8 +174,8 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
-   * Calcula a data inicial do pool a partir da solicitação mais antiga.
-   * Doações anteriores a essa data não preenchem ninguém no snapshot.
+   * Início da janela de busca no banco: data do pedido mais antigo (ou asOfDate
+   * se for mais cedo). Doações anteriores a isso não entram no snapshot.
    */
   private static LocalDate startOfPool(List<DonationRequest> requests, LocalDate asOfDate) {
     return requests.stream()
@@ -181,6 +185,7 @@ public class DonationRequestFulfillmentService {
         .orElse(asOfDate);
   }
 
+  /** Hemocentros distintos presentes na lista de pedidos (sem duplicar). */
   private static List<BloodCenter> bloodCentersOf(List<DonationRequest> requests) {
     Set<DomainID> seen = new LinkedHashSet<>();
     List<BloodCenter> bloodCenters = new ArrayList<>();
@@ -193,12 +198,14 @@ public class DonationRequestFulfillmentService {
     return bloodCenters;
   }
 
+  /** Ids de organização usados nas queries do repositório. */
   private static List<DomainID> organizationIdsOf(List<BloodCenter> bloodCenters) {
     return bloodCenters.stream()
         .map(bloodCenter -> bloodCenter.getOrganization().getId())
         .toList();
   }
 
+  /** Filtra só os pedidos daquele hemocentro antes do FIFO. */
   private static List<DonationRequest> requestsAt(
       BloodCenter bloodCenter,
       List<DonationRequest> requests) {
@@ -208,6 +215,7 @@ public class DonationRequestFulfillmentService {
         .toList();
   }
 
+  /** Filtra só as doações daquele hemocentro antes do FIFO. */
   private static List<Donation> donationsAt(BloodCenter bloodCenter, List<Donation> donations) {
     DomainID organizationId = bloodCenter.getOrganization().getId();
     return donations.stream()
@@ -215,6 +223,7 @@ public class DonationRequestFulfillmentService {
         .toList();
   }
 
+  /** Cópia ordenada: não altera a lista original. */
   private static <T> List<T> sorted(List<T> values, Comparator<T> order) {
     List<T> copy = new ArrayList<>(values);
     copy.sort(order);

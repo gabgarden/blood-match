@@ -32,19 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Bloqueio de notificação com o {@link DonationRequestFulfillmentService} real.
- */
 class NotifyPotentialDonorsUseCaseTest {
 
-  private static final LocalDate TODAY = LocalDate.of(2026, 7, 24);
-
+  private final LocalDate currentDate = LocalDate.of(2026, 4, 23);
   private final DonationRequestRepositoryInterface requestRepository =
       mock(DonationRequestRepositoryInterface.class);
   private final DonationRepositoryInterface donationRepository =
@@ -62,18 +57,15 @@ class NotifyPotentialDonorsUseCaseTest {
       new DonationRequestFulfillmentService(requestRepository, donationRepository));
 
   @Test
-  void blocksNotificationWhenTheRealFulfillmentSnapshotHasReachedTheGoal() {
-    BloodCenter center = center();
-    DonationRequest request = request(center, 1);
+  void shouldRejectNotificationWhenRealFulfillmentSnapshotAlreadyReachedTheGoal() {
+    DonationRequest request = request();
     stubRequest(request);
-    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(TODAY)))
-        .thenReturn(List.of(request));
     when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(anyList(), any(), any()))
-        .thenReturn(List.of(donation(center)));
+        .thenReturn(List.of(completedDonation(request.getBloodCenter(), currentDate)));
 
     ValidationException error = assertThrows(
         ValidationException.class,
-        () -> useCase.execute(input(request), TODAY));
+        () -> useCase.execute(input(request), currentDate));
 
     assertEquals(
         "Cannot notify donors. The goal for this request has already been reached.",
@@ -83,25 +75,23 @@ class NotifyPotentialDonorsUseCaseTest {
   }
 
   @Test
-  void continuesWhenTheRealFulfillmentSnapshotHasNotReachedTheGoal() {
-    BloodCenter center = center();
-    DonationRequest request = request(center, 2);
+  void shouldProceedWhenRealFulfillmentSnapshotHasNotReachedTheGoal() {
+    DonationRequest request = request();
     stubRequest(request);
-    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(TODAY)))
-        .thenReturn(List.of(request));
     when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(anyList(), any(), any()))
         .thenReturn(List.of());
     when(donorRepository.findAll()).thenReturn(List.of());
 
-    NotifyPotentialDonorsUseCase.Output result = useCase.execute(input(request), TODAY);
+    NotifyPotentialDonorsUseCase.Output result = useCase.execute(input(request), currentDate);
 
     assertEquals("Notifications sent to eligible donors successfully.", result.message());
-    verify(donorRepository).findAll();
     verify(notificationService, never()).notifyDonorAboutRequest(any(), any(), any());
   }
 
   private void stubRequest(DonationRequest request) {
     when(requestRepository.findById(request.getId())).thenReturn(Optional.of(request));
+    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), any()))
+        .thenReturn(List.of(request));
   }
 
   private Input input(DonationRequest request) {
@@ -110,46 +100,37 @@ class NotifyPotentialDonorsUseCaseTest {
         request.getRequester().getParty().getId().getValue().toString());
   }
 
-  private DonationRequest request(BloodCenter center, int goal) {
-    return DonationRequest.reconstitute(
-        id(1),
-        new Requester(new Person(
-            "Requester",
-            new PhoneNumber("11999990000"),
-            new CPF("12345678901"),
-            LocalDate.of(1990, 1, 1))),
+  private DonationRequest request() {
+    Requester requester = new Requester(new Person(
+        "Requester Person",
+        new PhoneNumber("11999990000"),
+        new CPF("12345678901"),
+        LocalDate.of(1990, 1, 1)));
+    BloodCenter center = new BloodCenter(new Organization(
+        "Blood Center",
+        new PhoneNumber("1133334444"),
+        new CNPJ("12345678000100")));
+    return DonationRequest.create(
+        requester,
         center,
         BloodType.of("A+"),
-        goal,
-        TODAY.minusDays(1),
-        TODAY.plusDays(5),
-        true,
+        1,
+        currentDate.plusDays(10),
+        currentDate.minusDays(2),
         Urgency.MEDIUM,
-        null,
         null);
   }
 
-  private Donation donation(BloodCenter center) {
+  private Donation completedDonation(BloodCenter center, LocalDate date) {
     return Donation.reconstitute(
-        id(10),
+        new DomainID(new UUID(0, 1)),
         new Donor(
             new Person("Donor", new PhoneNumber("11988887777"), new CPF("98765432100"), LocalDate.of(1990, 1, 1)),
             BloodType.of("O-"),
             70.0),
         null,
-        TODAY,
+        date,
         null,
         center);
-  }
-
-  private BloodCenter center() {
-    return new BloodCenter(new Organization(
-        "Center",
-        new PhoneNumber("1133334444"),
-        new CNPJ("12345678000100")));
-  }
-
-  private DomainID id(long value) {
-    return new DomainID(new UUID(0, value));
   }
 }

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -42,8 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * - primeira request compatível (centro + sangue + janela + ativa + meta) ganha
  * - isolamento por hemocentro
  *
- * Os casos passam pelo {@code fill(lista)}, o caminho das recomendações e da lista
- * do requisitante: o helper só imita o repositório (ativas + pool misturado).
+ * O helper só imita o repositório (ativas + pool misturado) e chama {@code fill(lista)}.
  */
 class DonationRequestFulfillmentFifoTest {
 
@@ -421,7 +419,15 @@ class DonationRequestFulfillmentFifoTest {
 
     when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(TODAY)))
         .thenReturn(active);
-    when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(anyList(), any(), any()))
+
+    LocalDate from = TODAY;
+    for (DonationRequest request : active) {
+      if (request.getDateRequested().isBefore(from)) {
+        from = request.getDateRequested();
+      }
+    }
+    when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
+            anyList(), eq(from), eq(TODAY)))
         .thenReturn(donations);
 
     return service.fill(requests, TODAY);

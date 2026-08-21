@@ -85,6 +85,18 @@ class DonationRequestFulfillmentServiceTest {
   }
 
   @Test
+  void fillWithAsOfDateLoadsOnlyActiveRequestsAtTheBloodCenter() {
+    BloodCenter center = bloodCenter();
+    DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
+    stubActiveSnapshot(List.of(request), List.of(donation(1, center, currentDate)));
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result =
+        service.fill(center, currentDate);
+
+    assertEquals(1, result.get(request.getId()).fulfilledBloodBags());
+  }
+
+  @Test
   void fillWithAsOfDateLoadsOnlyActiveRequestsForTheRequestList() {
     BloodCenter center = bloodCenter();
     DonationRequest request = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
