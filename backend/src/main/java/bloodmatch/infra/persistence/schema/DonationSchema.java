@@ -21,8 +21,9 @@ import java.util.UUID;
 
 @Document(collection = "donations")
 @CompoundIndexes({
-    @CompoundIndex(name = "completed_organization_donation_date", def = "{'organizationId': 1, 'donationDate': 1}"),
-    @CompoundIndex(name = "pending_organization_intended_date_time", def = "{'organizationId': 1, 'intendedDate': 1, 'expectedTime': 1}")
+    // Keep keys aligned with Atlas: same name + different keys aborts Spring boot (IndexKeySpecsConflict).
+    @CompoundIndex(name = "completed_organization_donation_date", def = "{'completed': 1, 'organizationId': 1, 'donationDate': 1}"),
+    @CompoundIndex(name = "pending_organization_intended_date_time", def = "{'pending': 1, 'organizationId': 1, 'intendedDate': 1, 'expectedTime': 1}")
 })
 @Getter
 @Setter

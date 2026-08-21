@@ -10,50 +10,52 @@ function readString(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
 }
 
-export function extractApiErrorMessage(error: unknown, fallback: string): string {
-  if (!isAxiosError(error)) {
-    return error instanceof Error && error.message.trim().length > 0 ? error.message : fallback;
-  }
+/** Nginx/proxy error pages and other non-API payloads must not be shown in the UI. */
+function looksLikeHtmlOrProxyNoise(message: string): boolean {
+  const normalized = message.trim().toLowerCase();
+  return (
+    normalized.startsWith("<!doctype") ||
+    normalized.startsWith("<html") ||
+    normalized.includes("<head>") ||
+    normalized.includes("<body>") ||
+    normalized.includes("bad gateway") ||
+    normalized.includes("nginx/")
+  );
+}
 
-  if (!error.response) {
-    return "Não foi possível conectar ao servidor. Confirme se a API está no ar e se este endereço tem permissão de acesso.";
-  }
-
-  const data = error.response.data as ApiErrorBody | string | undefined;
-
+function messageFromApiBody(data: ApiErrorBody | string | undefined): string | null {
   if (typeof data === "string") {
-    const message = readString(data);
-    if (message) {
-      return translateKnownApiMessage(message);
-    }
-  } else if (data && typeof data === "object") {
-    const fromError = readString(data.error);
-    if (fromError) {
-      return translateKnownApiMessage(fromError);
-    }
+    return readString(data);
+  }
+  if (!data || typeof data !== "object") {
+    return null;
+  }
 
-    const fromMessage = readString(data.message);
-    if (fromMessage) {
-      return translateKnownApiMessage(fromMessage);
-    }
+  const fromError = readString(data.error);
+  if (fromError) {
+    return fromError;
+  }
 
-    if (Array.isArray(data.errors) && data.errors.length > 0) {
-      const firstError = data.errors[0];
-      if (typeof firstError === "string") {
-        const message = readString(firstError);
-        if (message) {
-          return translateKnownApiMessage(message);
-        }
-      } else if (firstError && typeof firstError === "object") {
-        const message = readString((firstError as { message?: unknown }).message);
-        if (message) {
-          return translateKnownApiMessage(message);
-        }
-      }
+  const fromMessage = readString(data.message);
+  if (fromMessage) {
+    return fromMessage;
+  }
+
+  if (Array.isArray(data.errors) && data.errors.length > 0) {
+    const firstError = data.errors[0];
+    if (typeof firstError === "string") {
+      return readString(firstError);
+    }
+    if (firstError && typeof firstError === "object") {
+      return readString((firstError as { message?: unknown }).message);
     }
   }
 
-  switch (error.response.status) {
+  return null;
+}
+
+function messageForHttpStatus(status: number, fallback: string): string {
+  switch (status) {
     case 400:
       return "Dados inválidos. Verifique os campos e tente novamente.";
     case 401:
@@ -64,12 +66,46 @@ export function extractApiErrorMessage(error: unknown, fallback: string): string
       return "Recurso não encontrado.";
     case 409:
       return "Conflito: este recurso já existe ou não pode ser criado novamente.";
+    case 502:
+    case 503:
+    case 504:
+      return "Serviço temporariamente indisponível. Tente novamente em instantes.";
     default:
       return fallback;
   }
 }
 
+export function extractApiErrorMessage(error: unknown, fallback: string): string {
+  if (!isAxiosError(error)) {
+    const raw = error instanceof Error ? error.message.trim() : "";
+    if (!raw || looksLikeHtmlOrProxyNoise(raw)) {
+      return fallback;
+    }
+    return raw;
+  }
+
+  if (!error.response) {
+    return "Não foi possível conectar ao servidor. Confirme se a API está no ar e se este endereço tem permissão de acesso.";
+  }
+
+  const status = error.response.status;
+  if (status === 502 || status === 503 || status === 504) {
+    return messageForHttpStatus(status, fallback);
+  }
+
+  const raw = messageFromApiBody(error.response.data as ApiErrorBody | string | undefined);
+  if (raw && !looksLikeHtmlOrProxyNoise(raw)) {
+    return translateKnownApiMessage(raw);
+  }
+
+  return messageForHttpStatus(status, fallback);
+}
+
 export function translateKnownApiMessage(message: string): string {
+  if (looksLikeHtmlOrProxyNoise(message)) {
+    return "Serviço temporariamente indisponível. Tente novamente em instantes.";
+  }
+
   const normalized = message.toLowerCase();
   if (normalized.includes("email not confirmed")) {
     return "Confirme seu e-mail antes de entrar.";
