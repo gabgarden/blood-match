@@ -17,15 +17,13 @@ import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,6 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * - cada doação completa só preenche uma request
  * - primeira request compatível (centro + sangue + janela + ativa + meta) ganha
  * - isolamento por hemocentro
+ *
+ * Os casos passam pelo {@code fill(lista)}, o caminho das recomendações e da lista
+ * do requisitante: o helper só imita o repositório (ativas + pool misturado).
  */
 class DonationRequestFulfillmentFifoTest {
 
@@ -413,51 +414,17 @@ class DonationRequestFulfillmentFifoTest {
   private Map<DomainID, DonationRequestFulfillmentStatusRecord> calculate(
       List<DonationRequest> requests,
       List<Donation> donations) {
-    Set<BloodCenter> centers = new LinkedHashSet<>();
-    for (DonationRequest request : requests) {
-      centers.add(request.getBloodCenter());
-    }
-    if (centers.isEmpty()) {
-      for (Donation donation : donations) {
-        centers.add(donation.getBloodCenter());
-      }
-    }
+    List<DonationRequest> active = requests.stream()
+        .filter(DonationRequest::isActive)
+        .filter(request -> !request.isExpired(TODAY))
+        .toList();
 
-    for (BloodCenter center : centers) {
-      DomainID organizationId = center.getOrganization().getId();
-      List<DonationRequest> activeAtCenter = new ArrayList<>();
-      for (DonationRequest request : requests) {
-        if (request.getBloodCenter().getOrganization().getId().equals(organizationId)
-            && request.isActive()
-            && !request.isExpired(TODAY)) {
-          activeAtCenter.add(request);
-        }
-      }
-      List<Donation> donationsAtCenter = new ArrayList<>();
-      for (Donation donation : donations) {
-        if (donation.getBloodCenter().getOrganization().getId().equals(organizationId)) {
-          donationsAtCenter.add(donation);
-        }
-      }
-      LocalDate from = TODAY;
-      for (DonationRequest request : activeAtCenter) {
-        if (request.getDateRequested().isBefore(from)) {
-          from = request.getDateRequested();
-        }
-      }
-      when(requestRepository.findActiveRequestsByOrganizationIds(
-              eq(List.of(organizationId)), eq(TODAY)))
-          .thenReturn(activeAtCenter);
-      when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
-              eq(List.of(organizationId)), eq(from), eq(TODAY)))
-          .thenReturn(donationsAtCenter);
-    }
+    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(TODAY)))
+        .thenReturn(active);
+    when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(anyList(), any(), any()))
+        .thenReturn(donations);
 
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> result = new HashMap<>();
-    for (BloodCenter center : centers) {
-      result.putAll(service.fill(center, TODAY));
-    }
-    return result;
+    return service.fill(requests, TODAY);
   }
 
   private void assertFulfilled(
