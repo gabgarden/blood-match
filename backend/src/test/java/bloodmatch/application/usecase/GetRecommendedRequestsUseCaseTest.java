@@ -1,6 +1,8 @@
 package bloodmatch.application.usecase;
 
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
+import bloodmatch.domain.donation.Donation;
+import bloodmatch.domain.donation.DonationRepositoryInterface;
 import bloodmatch.domain.donationrequest.DonationRequest;
 import bloodmatch.domain.donationrequest.Urgency;
 import bloodmatch.domain.party.Organization;
@@ -24,9 +26,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,7 +75,7 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(Map.of());
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(Map.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
         new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString(), true), currentDate);
@@ -90,7 +94,7 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(
         Map.of(request.getId(), new DonationRequestFulfillmentStatusRecord(0, false)));
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
@@ -114,7 +118,7 @@ class GetRecommendedRequestsUseCaseTest {
 
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of(request));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(
         Map.of(request.getId(), new DonationRequestFulfillmentStatusRecord(1, true)));
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
@@ -139,7 +143,7 @@ class GetRecommendedRequestsUseCaseTest {
     when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.of(donor));
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any()))
         .thenReturn(List.of(farther, closer));
-    when(fulfillmentService.fill(anyList(), any(), any())).thenReturn(Map.of());
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(Map.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
         new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
@@ -160,6 +164,33 @@ class GetRecommendedRequestsUseCaseTest {
     when(donationRequestRepository.findActiveRequestsForDonor(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyDouble(), org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
 
     List<GetRecommendedRequestsUseCase.OutputItem> result = useCase.execute(
+        new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
+
+    assertEquals(List.of(), result);
+  }
+
+  @Test
+  void shouldOmitRequestWhenRealFulfillmentSnapshotAlreadyReachedTheGoal() {
+    LocalDate currentDate = LocalDate.of(2026, 4, 17);
+    DomainID donorId = DomainID.generate();
+    Donor donor = createDonor(currentDate);
+    DonationRequest request = createRequest(currentDate);
+
+    DonationRequestRepositoryInterface requests = mock(DonationRequestRepositoryInterface.class);
+    DonationRepositoryInterface donations = mock(DonationRepositoryInterface.class);
+    DonorRepositoryInterface donors = mock(DonorRepositoryInterface.class);
+    GetRecommendedRequestsUseCase recommendations = new GetRecommendedRequestsUseCase(
+        donors,
+        requests,
+        new DonationRequestFulfillmentService(requests, donations));
+
+    when(donors.findByPartyId(donorId)).thenReturn(Optional.of(donor));
+    when(requests.findActiveRequestsForDonor(any(), any(), anyDouble(), any())).thenReturn(List.of(request));
+    when(requests.findActiveRequestsByOrganizationIds(anyList(), any())).thenReturn(List.of(request));
+    when(donations.findCompletedDonationsByOrganizationIdsAndDateRange(anyList(), any(), any()))
+        .thenReturn(List.of(completedDonation(request.getBloodCenter(), currentDate)));
+
+    List<GetRecommendedRequestsUseCase.OutputItem> result = recommendations.execute(
         new GetRecommendedRequestsUseCase.Input(donorId.getValue().toString()), currentDate);
 
     assertEquals(List.of(), result);
@@ -199,5 +230,18 @@ class GetRecommendedRequestsUseCaseTest {
         currentDate,
         Urgency.MEDIUM,
         null);
+  }
+
+  private Donation completedDonation(BloodCenter center, LocalDate date) {
+    return Donation.reconstitute(
+        new DomainID(new UUID(0, 1)),
+        new Donor(
+            new Person("Donor", new PhoneNumber("11988887777"), new CPF("98765432100"), LocalDate.of(1990, 1, 1)),
+            BloodType.of("O-"),
+            70.0),
+        null,
+        date,
+        null,
+        center);
   }
 }

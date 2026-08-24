@@ -71,7 +71,7 @@ public class NotifyPotentialDonorsUseCase {
     }
 
     DonationRequestFulfillmentStatusRecord status =
-        fulfillmentService.fill(request.getBloodCenter(), currentDate, currentDate)
+        fulfillmentService.fill(request.getBloodCenter(), currentDate)
             .getOrDefault(request.getId(), new DonationRequestFulfillmentStatusRecord(0, false));
     if (status.goalReached()) {
       throw new ValidationException(

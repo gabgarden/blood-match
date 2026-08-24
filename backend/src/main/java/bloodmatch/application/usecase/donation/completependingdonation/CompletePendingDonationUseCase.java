@@ -66,20 +66,7 @@ public class CompletePendingDonationUseCase {
       return new Output(
           donation.getId().getValue().toString(),
           donation.getDonationDate(),
-          statusOf(donation));
-    }
-
-    private static String statusOf(Donation donation) {
-      if (donation.isCompleted()) {
-        return "COMPLETED";
-      }
-      if (donation.isPending()) {
-        return "PENDING";
-      }
-      if (donation.isCancelled()) {
-        return "CANCELLED";
-      }
-      return "UNKNOWN";
+          donation.status());
     }
   }
 }

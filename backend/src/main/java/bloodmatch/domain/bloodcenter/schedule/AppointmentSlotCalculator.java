@@ -42,7 +42,7 @@ public final class AppointmentSlotCalculator {
       if (donation.getExpectedTime() == null) {
         continue;
       }
-      if (date != null && donation.getDonationDate() != null && !date.equals(donation.getDonationDate())) {
+      if (date != null && donation.getIntendedDate() != null && !date.equals(donation.getIntendedDate())) {
         continue;
       }
       bookedByStart.merge(donation.getExpectedTime(), 1, Integer::sum);

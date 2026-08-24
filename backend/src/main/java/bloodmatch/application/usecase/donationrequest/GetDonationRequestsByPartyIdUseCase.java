@@ -45,7 +45,7 @@ public class GetDonationRequestsByPartyIdUseCase {
         donationRequestRepository.findByRequesterPartyId(partyId);
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot =
-        fulfillmentService.fill(userRequests, currentDate, currentDate);
+        fulfillmentService.fill(userRequests, currentDate);
 
     return userRequests.stream()
         .sorted(

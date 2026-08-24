@@ -245,6 +245,16 @@ export default function DonorDashboardPage() {
               </p>
             </section>
           )}
+
+          {!canAccessDonorDashboard && !canAccessAdminArea && (
+            <section className="rounded-[2rem] border border-dashed border-surface-container-highest bg-white px-6 py-12 text-center">
+              <h2 className="font-headline text-xl font-extrabold text-on-surface">Perfil incompleto</h2>
+              <p className="mx-auto mt-2 max-w-md text-sm text-text-secondary">
+                Sua sessão não tem o papel de doador. Abra <strong>Meu Perfil</strong> ou saia e entre novamente.
+                Se o menu continuar só com perfil, o login não está devolvendo as permissões.
+              </p>
+            </section>
+          )}
         </div>
       </main>
 

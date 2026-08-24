@@ -21,8 +21,9 @@ import java.util.UUID;
 
 @Document(collection = "donations")
 @CompoundIndexes({
+    // Keep keys aligned with Atlas: same name + different keys aborts Spring boot (IndexKeySpecsConflict).
     @CompoundIndex(name = "completed_organization_donation_date", def = "{'completed': 1, 'organizationId': 1, 'donationDate': 1}"),
-    @CompoundIndex(name = "pending_organization_donation_date_time", def = "{'pending': 1, 'organizationId': 1, 'donationDate': 1, 'expectedTime': 1}")
+    @CompoundIndex(name = "pending_organization_intended_date_time", def = "{'pending': 1, 'organizationId': 1, 'intendedDate': 1, 'expectedTime': 1}")
 })
 @Getter
 @Setter
@@ -34,7 +35,9 @@ public class DonationSchema {
   private String id;
   private String donorPersonId;
   private String organizationId;
+  private LocalDate intendedDate;
   private LocalDate donationDate;
+  private LocalDate cancelledAt;
   private LocalTime expectedTime;
   private boolean completed;
   private boolean pending;
@@ -47,7 +50,9 @@ public class DonationSchema {
     this.id = donation.getId().getValue().toString();
     this.donorPersonId = donation.getDonor().getPerson().getId().getValue().toString();
     this.organizationId = donation.getBloodCenter().getOrganization().getId().getValue().toString();
+    this.intendedDate = donation.getIntendedDate();
     this.donationDate = donation.getDonationDate();
+    this.cancelledAt = donation.getCancelledAt();
     this.expectedTime = donation.getExpectedTime();
     this.completed = donation.isCompleted();
     this.pending = donation.isPending();
@@ -55,14 +60,28 @@ public class DonationSchema {
   }
 
   public Donation toDomain(Donor donor, BloodCenter bloodCenter) {
+    LocalDate intended = this.intendedDate;
+    LocalDate actual = this.donationDate;
+    LocalDate cancelledOn = this.cancelledAt;
+
+    if (intended == null && cancelledOn == null) {
+      if (this.pending) {
+        intended = this.donationDate;
+        actual = null;
+      } else if (this.cancelled) {
+        intended = this.donationDate;
+        actual = null;
+        cancelledOn = this.donationDate;
+      }
+    }
+
     return Donation.reconstitute(
       new DomainID(UUID.fromString(this.id)),
       donor,
-      this.donationDate,
+      intended,
+      actual,
+      cancelledOn,
       bloodCenter,
-      this.completed,
-      this.pending,
-      this.cancelled,
       this.expectedTime);
   }
 

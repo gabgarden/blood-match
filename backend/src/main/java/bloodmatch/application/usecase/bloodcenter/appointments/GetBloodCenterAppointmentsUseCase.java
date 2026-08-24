@@ -54,7 +54,7 @@ public class GetBloodCenterAppointmentsUseCase {
     return donationRepository.findPendingByOrganizationIdAndDateRange(organizationId, from, to).stream()
         .filter(Donation::isPending)
         .sorted(Comparator
-            .comparing(Donation::getDonationDate)
+            .comparing(Donation::getIntendedDate)
             .thenComparing(Donation::getExpectedTime, Comparator.nullsLast(Comparator.naturalOrder())))
         .map(OutputItem::from)
         .toList();
@@ -75,7 +75,7 @@ public class GetBloodCenterAppointmentsUseCase {
     public static OutputItem from(Donation donation) {
       return new OutputItem(
           donation.getId().getValue().toString(),
-          donation.getDonationDate(),
+          donation.getIntendedDate(),
           TimeFormats.format(donation.getExpectedTime()),
           "PENDING",
           donation.getDonor().getPerson().getName(),

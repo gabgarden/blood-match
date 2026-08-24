@@ -66,7 +66,7 @@ public class GetRecommendedRequestsUseCase {
     }
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot =
-        fulfillmentService.fill(candidateRequests, currentDate, currentDate);
+        fulfillmentService.fill(candidateRequests, currentDate);
 
     return candidateRequests.stream()
         .filter(request -> !statusOf(snapshot, request).goalReached())

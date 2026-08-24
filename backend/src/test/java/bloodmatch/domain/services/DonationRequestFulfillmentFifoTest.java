@@ -17,15 +17,13 @@ import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.PhoneNumber;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,11 +40,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * - cada doação completa só preenche uma request
  * - primeira request compatível (centro + sangue + janela + ativa + meta) ganha
  * - isolamento por hemocentro
+ *
+ * O helper só imita o repositório (ativas + pool misturado) e chama {@code fill(lista)}.
  */
 class DonationRequestFulfillmentFifoTest {
 
   private static final LocalDate TODAY = LocalDate.of(2026, 7, 24);
-  private static final LocalDate START = TODAY.minusYears(1);
   private final DonationRequestRepositoryInterface requestRepository =
       mock(DonationRequestRepositoryInterface.class);
   private final DonationRepositoryInterface donationRepository =
@@ -217,7 +216,6 @@ class DonationRequestFulfillmentFifoTest {
   @Test
   void skipsOlderRequestOutsideDonationDateWindowAndFillsNewerCompatibleOne() {
     BloodCenter center = center("A");
-    // oldest só aceita até yesterday; donation é TODAY → cai na newest
     DonationRequest oldestNarrowWindow = request(1, center, "A+", 1, TODAY.minusDays(5), TODAY.minusDays(1), true);
     DonationRequest newest = request(2, center, "A+", 1, TODAY.minusDays(1), TODAY.plusDays(2), true);
 
@@ -225,7 +223,7 @@ class DonationRequestFulfillmentFifoTest {
         List.of(oldestNarrowWindow, newest),
         List.of(donation(1, center, "O-", TODAY)));
 
-    assertFulfilled(result, oldestNarrowWindow, 0, false);
+    assertFalse(result.containsKey(oldestNarrowWindow.getId()));
     assertFulfilled(result, newest, 1, true);
   }
 
@@ -241,8 +239,7 @@ class DonationRequestFulfillmentFifoTest {
         List.of(inactive, expired),
         List.of(donation(1, center, "O-", TODAY), donation(2, center, "O-", TODAY)));
 
-    assertFulfilled(result, inactive, 0, false);
-    assertFulfilled(result, expired, 0, false);
+    assertTrue(result.isEmpty());
   }
 
   @Test
@@ -255,7 +252,7 @@ class DonationRequestFulfillmentFifoTest {
         List.of(inactiveOldest, activeNewest),
         List.of(donation(1, center, "O-", TODAY)));
 
-    assertFulfilled(result, inactiveOldest, 0, false);
+    assertFalse(result.containsKey(inactiveOldest.getId()));
     assertFulfilled(result, activeNewest, 1, true);
   }
 
@@ -263,8 +260,8 @@ class DonationRequestFulfillmentFifoTest {
   void ignoresPendingAndCancelledDonations() {
     BloodCenter center = center("A");
     DonationRequest request = request(1, center, "A+", 2, TODAY.minusDays(1), TODAY.plusDays(1), true);
-    Donation pending = Donation.reconstitute(id(1), donor("O-"), TODAY, center, false, true, false);
-    Donation cancelled = Donation.reconstitute(id(2), donor("O-"), TODAY, center, false, false, true);
+    Donation pending = Donation.reconstitute(id(1), donor("O-"), TODAY, null, null, center);
+    Donation cancelled = Donation.reconstitute(id(2), donor("O-"), TODAY, null, TODAY, center);
 
     var result = calculate(List.of(request), List.of(pending, cancelled));
 
@@ -275,7 +272,7 @@ class DonationRequestFulfillmentFifoTest {
   void mixesCompletedWithPendingAndOnlyCountsCompleted() {
     BloodCenter center = center("A");
     DonationRequest request = request(1, center, "A+", 2, TODAY.minusDays(1), TODAY.plusDays(1), true);
-    Donation pending = Donation.reconstitute(id(1), donor("O-"), TODAY, center, false, true, false);
+    Donation pending = Donation.reconstitute(id(1), donor("O-"), TODAY, null, null, center);
     Donation completed = donation(2, center, "O-", TODAY);
 
     var result = calculate(List.of(request), List.of(pending, completed));
@@ -415,47 +412,25 @@ class DonationRequestFulfillmentFifoTest {
   private Map<DomainID, DonationRequestFulfillmentStatusRecord> calculate(
       List<DonationRequest> requests,
       List<Donation> donations) {
-    Set<BloodCenter> centers = new LinkedHashSet<>();
-    for (DonationRequest request : requests) {
-      centers.add(request.getBloodCenter());
-    }
-    if (centers.isEmpty()) {
-      for (Donation donation : donations) {
-        centers.add(donation.getBloodCenter());
-      }
-    }
+    List<DonationRequest> active = requests.stream()
+        .filter(DonationRequest::isActive)
+        .filter(request -> !request.isExpired(TODAY))
+        .toList();
 
-    for (BloodCenter center : centers) {
-      DomainID organizationId = center.getOrganization().getId();
-      List<DonationRequest> requestsAtCenter = new ArrayList<>();
-      for (DonationRequest request : requests) {
-        if (request.getBloodCenter().getOrganization().getId().equals(organizationId)) {
-          requestsAtCenter.add(request);
-        }
-      }
-      List<Donation> donationsAtCenter = new ArrayList<>();
-      for (Donation donation : donations) {
-        if (donation.getBloodCenter().getOrganization().getId().equals(organizationId)) {
-          donationsAtCenter.add(donation);
-        }
-      }
-      LocalDate from = START;
-      for (DonationRequest request : requestsAtCenter) {
-        if (request.getDateRequested().isBefore(from)) {
-          from = request.getDateRequested();
-        }
-      }
-      when(requestRepository.findByOrganizationId(organizationId)).thenReturn(requestsAtCenter);
-      when(donationRepository.findCompletedDonationsByOrganizationIdAndDateRange(
-              organizationId, from, TODAY))
-          .thenReturn(donationsAtCenter);
-    }
+    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(TODAY)))
+        .thenReturn(active);
 
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> result = new HashMap<>();
-    for (BloodCenter center : centers) {
-      result.putAll(service.fill(center, START, TODAY));
+    LocalDate from = TODAY;
+    for (DonationRequest request : active) {
+      if (request.getDateRequested().isBefore(from)) {
+        from = request.getDateRequested();
+      }
     }
-    return result;
+    when(donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
+            anyList(), eq(from), eq(TODAY)))
+        .thenReturn(donations);
+
+    return service.fill(requests, TODAY);
   }
 
   private void assertFulfilled(
@@ -495,7 +470,7 @@ class DonationRequestFulfillmentFifoTest {
   }
 
   private Donation donation(long id, BloodCenter center, String donorBloodType, LocalDate date) {
-    return Donation.reconstitute(id(id), donor(donorBloodType), date, center, true, false, false);
+    return Donation.reconstitute(id(id), donor(donorBloodType), null, date, null, center);
   }
 
   private BloodCenter center(String suffix) {

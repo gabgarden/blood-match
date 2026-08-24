@@ -14,7 +14,8 @@ public interface DonationMongoRepository extends MongoRepository<DonationSchema,
 
   List<DonationSchema> findByCompleted(boolean completed);
 
-  List<DonationSchema> findByCompletedTrueAndOrganizationIdInOrderByDonationDateAsc(
+  @Query(value = "{ 'completed': true, 'organizationId': { $in: ?0 } }", sort = "{ 'donationDate': 1 }")
+  List<DonationSchema> findCompletedByOrganizationIdInOrderByDonationDateAsc(
       List<String> organizationIds);
 
   @Query("{ 'completed': true, 'organizationId': ?0, 'donationDate': { $gte: ?1, $lte: ?2 } }")
@@ -31,12 +32,13 @@ public interface DonationMongoRepository extends MongoRepository<DonationSchema,
 
   List<DonationSchema> findByPendingTrueAndOrganizationId(String organizationId);
 
-  List<DonationSchema> findByPendingTrueAndOrganizationIdAndDonationDate(
+  @Query("{ 'pending': true, 'organizationId': ?0, $or: [ { 'intendedDate': ?1 }, { 'intendedDate': null, 'donationDate': ?1 } ] }")
+  List<DonationSchema> findPendingByOrganizationIdAndIntendedDate(
       String organizationId,
-      LocalDate donationDate);
+      LocalDate intendedDate);
 
-  @Query("{ 'pending': true, 'organizationId': ?0, 'donationDate': { $gte: ?1, $lte: ?2 } }")
-  List<DonationSchema> findPendingByOrganizationIdAndDonationDateInclusive(
+  @Query("{ 'pending': true, 'organizationId': ?0, $or: [ { 'intendedDate': { $gte: ?1, $lte: ?2 } }, { 'intendedDate': null, 'donationDate': { $gte: ?1, $lte: ?2 } } ] }")
+  List<DonationSchema> findPendingByOrganizationIdAndIntendedDateInclusive(
       String organizationId,
       LocalDate from,
       LocalDate to);

@@ -12,16 +12,14 @@ public Output execute(Input input, LocalDate currentDate) {
     }
 
     Donation donation = donationRepository.findById(donationId)
-        .orElseThrow(() -> new NotFoundException("Donation not found"));
+            .orElseThrow(() -> new NotFoundException("Donation not found"));
 
     PartyOwnership.requireSameParty(
-        donation.getDonor().getPerson().getId(), input.actorPartyId());
+            donation.getDonor().getPerson().getId(), input.actorPartyId());
 
     donation.complete(input.completionDate(), currentDate);
     donation.getDonor().registerDonation(input.completionDate(), currentDate);
-
     donorRepository.save(donation.getDonor());
     donationRepository.save(donation);
-
     return Output.from(donation);
 }

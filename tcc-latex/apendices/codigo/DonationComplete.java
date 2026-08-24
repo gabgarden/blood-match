@@ -1,15 +1,15 @@
-private static void validateStatusFlags(
-        boolean isCompleted,
-        boolean isPending,
-        boolean isCancelled) {
-    int activeStates = 0;
-    if (isCompleted) activeStates++;
-    if (isPending) activeStates++;
-    if (isCancelled) activeStates++;
-
-    if (activeStates != 1) {
-        throw new IllegalArgumentException(
-            "Donation status must be exactly one of completed, pending or cancelled");
+private static void validateDates(
+        LocalDate intendedDate,
+        LocalDate donationDate,
+        LocalDate cancelledAt) {
+    if (donationDate != null && cancelledAt != null) {
+        throw new IllegalArgumentException("Donation cannot be completed and cancelled");
+    }
+    if (cancelledAt != null && intendedDate == null) {
+        throw new IllegalArgumentException("Cancelled donation requires intendedDate");
+    }
+    if (donationDate == null && cancelledAt == null && intendedDate == null) {
+        throw new IllegalArgumentException("Donation requires intendedDate or donationDate");
     }
 }
 
@@ -24,6 +24,4 @@ public void complete(LocalDate completionDate, LocalDate currentDate) {
         throw new IllegalArgumentException("Completion date cannot be in the future");
 
     this.donationDate = completionDate;
-    this.completed = true;
-    this.pending = false;
 }

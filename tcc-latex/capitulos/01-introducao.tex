@@ -2,11 +2,13 @@
 
 \section{Problema e contexto}
 
-A transfusão sanguínea é essencial em emergências, cirurgias de grande porte e tratamentos de condições crônicas. Mantê-la depende de doações periódicas e de mecanismos eficazes de captação.
+A transfusão sanguínea é de suma importância para a medicina nos dias de hoje, sendo essencial em diversas situações clínicas que demandam ação imediata para salvar vidas. Exemplos de demandas emanam de emergências médicas oriundas de acidentes ou de procedimentos cirúrgicos de grande porte, sem deixar de mencionar pacientes com condições patológicas crônicas que necessitam de transfusões regulares. Com toda essa demanda em vista, fica bem clara a enorme importância de doações periódicas por parte do doador, ajudando a manter e salvar vidas.
 
-De acordo com a Organização Mundial da Saúde (OMS,~\citeyear{oms2020}) em colaboração com a Organização Pan-Americana da Saúde (OPAS,~\citeyear{opas2020}), a taxa de doação por mil habitantes varia de 32,6 em países de alta renda a 4,4 em países de baixa renda. No Brasil, a demanda permanece elevada frente à oferta de doadores.
+De acordo com a Organização Mundial da Saúde \citeonline{oms2020} em colaboração com a Organização Pan-Americana da Saúde \citeonline{opas2020}, a taxa de doação de sangue por mil habitantes é de 32,6 em países de alta renda, 15,1 em países de renda média-alta, 8,1 em países de renda média-baixa e 4,4 em países de baixa renda. Com isso, verifica-se que o sistema de doação de sangue no território brasileiro sofre com o baixo número de doadores para uma alta demanda.
 
-Do ponto de vista tecnológico, a conexão entre oferta e demanda ainda é limitada. Solicitações emergenciais em redes sociais evidenciam a dificuldade de localizar doadores adequados com rapidez e a baixa conversão dessas chamadas em doações efetivas. É necessário, portanto, desenvolver soluções escaláveis e bem estruturadas, com ciclo de vida longo.
+Do ponto de vista tecnológico, o processo atual de captação de novos doadores mostra-se extremamente limitado em relação à eficiência na conexão entre oferta e demanda. É comum vermos nas redes sociais pessoas requisitando doações extraordinárias em virtude de uma necessidade de um conhecido, demonstrando a falta de sangue nos bancos e a ineficiência das ferramentas tecnológicas atuais de captação, o que resulta em tempo excessivo para localizar doadores adequados e baixa taxa de conversão das solicitações em doações efetivas.
+
+Diante desse cenário de alta demanda de doações, juntamente com as limitações dos métodos atuais de divulgação e captação de doadores, torna-se necessário o desenvolvimento de soluções tecnológicas robustas, bem estruturadas e escaláveis, para que a captação seja mais efetiva, sendo fundamental uma abordagem de desenvolvimento que garanta um longo ciclo de vida ao sistema.
 
 \section{Objetivos}
 
@@ -24,9 +26,13 @@ Objetivos específicos:
 
 \section{Justificativa}
 
-A OMS recomenda que ao menos 1\% da população doe sangue \citeonline{oms2020}. Mesmo quando índices nominais são atingidos, a oferta pode ser insuficiente \citeonline{hemorio2023}. O Ceará, com 2,21\% da população doadora \citeonline{ceara2021}, ilustra o efeito de uma hemorrede integrada coordenada pelo Hemoce, com mais de 480 unidades de saúde \citeonline{hemoce2022} e recorde de 110.784 doações em 2024 \citeonline{ceara2025}.
+Segundo a Organização Mundial da Saúde \citeonline{oms2020}, qualquer país deve ter no mínimo 1\% da população doando sangue. Porém, de acordo com o diretor do Hemorio, Luiz Amorim \citeonline{hemorio2023}, mesmo estando dentro dos índices sugeridos pela OMS, o nível de sangue doado no Brasil não é suficiente para suprir a demanda real.
 
-No plano técnico, o DDD favorece a modelagem fiel das regras do domínio \citeonline{evans2003}, e os princípios SOLID \citeonline{martin2000} apoiam evolução e integração. A contribuição deste trabalho é uma API RESTful orientada a esse domínio, voltada à captação efetiva de doadores.
+Por outro lado, o estado do Ceará se destaca no cenário hemoterápico nacional, possuindo 2,21\% da população doadora de sangue \citeonline{ceara2021} --- mais que o dobro do mínimo recomendado pela OMS ---, estabelecendo-se como referência nacional. Esse desempenho está diretamente relacionado ao sistema integrado e unificado dos hemocentros do estado, coordenado pelo Centro de Hematologia e Hemoterapia do Ceará (Hemoce), que atende a demanda de transfusão sanguínea dos 184 municípios cearenses por meio da Hemorrede Pública Estadual, abrangendo mais de 480 unidades de saúde \citeonline{hemoce2022}. Em 2024, o estado alcançou um marco histórico com 110.784 doações, o maior número registrado em 30 anos \citeonline{ceara2025}, demonstrando que um sistema bem estruturado e integrado pode efetivamente suprir a demanda por sangue e derivados.
+
+Do ponto de vista tecnológico, o desenvolvimento utilizando as técnicas de \textit{Domain-Driven Design} (DDD) é justificado pelas características específicas do domínio, facilitando a modelagem das regras de negócio da doação sanguínea \citeonline{evans2003}, enquanto os princípios SOLID \citeonline{martin2000} garantem futuras expansões do sistema, fornecendo uma arquitetura preparada para receber integrações com facilidade.
+
+Diante desse cenário, o presente trabalho contribui com o desenvolvimento de uma API RESTful, aplicando as técnicas e princípios supracitados, de forma a promover a captação efetiva de possíveis doadores de sangue.
 
 \section{Organização da monografia}
 

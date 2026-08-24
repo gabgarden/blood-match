@@ -92,7 +92,7 @@ public class EmailNotificationService implements NotificationServiceInterface {
         String centerName = bloodCenter.getOrganization().getName();
         String donorName = donor.getPerson().getName();
         String bloodType = donor.getBloodType().getType();
-        String date = donation.getDonationDate() == null ? "-" : donation.getDonationDate().toString();
+        String date = donation.getIntendedDate() == null ? "-" : donation.getIntendedDate().toString();
         String time = donation.getExpectedTime() == null
                 ? "horário não informado"
                 : donation.getExpectedTime().toString().substring(0, 5);

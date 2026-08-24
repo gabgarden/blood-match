@@ -90,11 +90,9 @@ public class SecurityConfig {
             .requestMatchers(PATCH, "/donation-requests/date-limit")
                 .hasAnyAuthority("REQUESTER", "SYSTEM_ADMIN")
 
-            .requestMatchers(POST, "/donations/completed")
+            .requestMatchers(POST, "/donations")
                 .hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(PATCH, "/donations/complete")
-                .hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
-            .requestMatchers(POST, "/donations/create-pending")
                 .hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(PATCH, "/donations/reschedule")
                 .hasAnyAuthority("DONOR", "SYSTEM_ADMIN")

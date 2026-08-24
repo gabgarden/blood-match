@@ -1,9 +1,9 @@
 package bloodmatch.application.usecase.donation;
 
 import bloodmatch.application.exception.ValidationException;
-import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase;
-import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase.Input;
-import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase.Output;
+import bloodmatch.application.usecase.donation.create.CreateDonationUseCase;
+import bloodmatch.application.usecase.donation.create.CreateDonationUseCase.Input;
+import bloodmatch.application.usecase.donation.create.CreateDonationUseCase.Output;
 import bloodmatch.domain.bloodcenter.schedule.BloodCenterSchedule;
 import bloodmatch.domain.bloodcenter.schedule.BloodCenterScheduleRepositoryInterface;
 import bloodmatch.domain.bloodcenter.schedule.WeeklyWindow;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class CreatePendingDonationUseCaseTest {
+class CreateDonationUseCaseTest {
 
   private final DonorRepositoryInterface donorRepository = mock(DonorRepositoryInterface.class);
   private final BloodCenterRepositoryInterface bloodCenterRepository = mock(BloodCenterRepositoryInterface.class);
@@ -47,7 +47,7 @@ class CreatePendingDonationUseCaseTest {
       mock(BloodCenterScheduleRepositoryInterface.class);
   private final UserAccountRepositoryInterface userAccountRepository = mock(UserAccountRepositoryInterface.class);
   private final NotificationServiceInterface notificationService = mock(NotificationServiceInterface.class);
-  private final CreatePendingDonationUseCase useCase = new CreatePendingDonationUseCase(
+  private final CreateDonationUseCase useCase = new CreateDonationUseCase(
       donorRepository,
       bloodCenterRepository,
       donationRepository,
@@ -58,7 +58,7 @@ class CreatePendingDonationUseCaseTest {
   private static final LocalDate MONDAY = LocalDate.of(2026, 8, 17);
 
   @Test
-  void createsDateOnlyBookingWhenBloodCenterHasNoSchedule() {
+  void createsPendingDonationWhenIntendedDateIsProvided() {
     Donor donor = donor();
     BloodCenter bloodCenter = bloodCenter();
     when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
@@ -74,14 +74,43 @@ class CreatePendingDonationUseCaseTest {
             donor.getPerson().getId().getValue().toString(),
             bloodCenter.getOrganization().getId().getValue().toString(),
             MONDAY,
+            null,
             null),
         MONDAY.minusDays(1));
 
     assertEquals("PENDING", output.status());
-    assertEquals(MONDAY, output.expectedDate());
+    assertEquals(MONDAY, output.intendedDate());
+    assertNull(output.donationDate());
     assertNull(output.expectedTime());
     verify(donationRepository).save(any(Donation.class));
+    verify(donorRepository, never()).save(any());
     verify(notificationService, never()).notifyBloodCenterAboutAppointment(any(), any(), any(), any());
+  }
+
+  @Test
+  void createsCompletedDonationWhenDonationDateIsProvided() {
+    LocalDate currentDate = LocalDate.now();
+    Donor donor = donor();
+    BloodCenter bloodCenter = bloodCenter();
+
+    when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
+    when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId()))
+        .thenReturn(Optional.of(bloodCenter));
+
+    Output result = useCase.execute(
+        new Input(
+            donor.getPerson().getId().getValue().toString(),
+            bloodCenter.getOrganization().getId().getValue().toString(),
+            null,
+            currentDate,
+            null),
+        currentDate);
+
+    verify(donorRepository).save(donor);
+    verify(donationRepository).save(any(Donation.class));
+    assertEquals("COMPLETED", result.status());
+    assertEquals(currentDate, result.donationDate());
+    assertNull(result.intendedDate());
   }
 
   @Test
@@ -97,8 +126,8 @@ class CreatePendingDonationUseCaseTest {
             30,
             1)),
         List.of());
-    Donation alreadyBooked = Donation.createPending(
-        donor, MONDAY, bloodCenter, MONDAY.minusDays(1), LocalTime.of(8, 0));
+    Donation alreadyBooked = Donation.create(
+        donor, bloodCenter, MONDAY, null, LocalTime.of(8, 0), MONDAY.minusDays(1));
 
     when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
     when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId()))
@@ -113,11 +142,35 @@ class CreatePendingDonationUseCaseTest {
             donor.getPerson().getId().getValue().toString(),
             bloodCenter.getOrganization().getId().getValue().toString(),
             MONDAY,
+            null,
             LocalTime.of(8, 0)),
         MONDAY.minusDays(1)));
 
     assertEquals("Time slot is fully booked", exception.getMessage());
     verify(donationRepository, never()).save(any(Donation.class));
+  }
+
+  @Test
+  void rejectsWhenBothOrNeitherDateIsProvided() {
+    Donor donor = donor();
+    BloodCenter bloodCenter = bloodCenter();
+
+    assertThrows(ValidationException.class, () -> useCase.execute(
+        new Input(
+            donor.getPerson().getId().getValue().toString(),
+            bloodCenter.getOrganization().getId().getValue().toString(),
+            MONDAY,
+            MONDAY,
+            null),
+        MONDAY));
+    assertThrows(ValidationException.class, () -> useCase.execute(
+        new Input(
+            donor.getPerson().getId().getValue().toString(),
+            bloodCenter.getOrganization().getId().getValue().toString(),
+            null,
+            null,
+            null),
+        MONDAY));
   }
 
   private Donor donor() {

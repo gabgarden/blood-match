@@ -1,7 +1,7 @@
-package bloodmatch.interfaces.rest.donation.createpending;
+package bloodmatch.interfaces.rest.donation.create;
 
-import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase;
-import bloodmatch.application.usecase.donation.createpending.CreatePendingDonationUseCase.Input;
+import bloodmatch.application.usecase.donation.create.CreateDonationUseCase;
+import bloodmatch.application.usecase.donation.create.CreateDonationUseCase.Input;
 import bloodmatch.application.shared.TimeFormats;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -16,32 +16,32 @@ import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.require
 import static bloodmatch.interfaces.rest.shared.RequestValidationSupport.requireNotBlank;
 
 @RestController
-@Tag(name = "Create Pending Donation", description = "Create a new pending donation.")
+@Tag(name = "Create Donation", description = "Create a pending donation with intendedDate, or a completed donation with donationDate.")
 @RequestMapping("/donations")
-public class CreatePendingDonationController {
+public class CreateDonationController {
 
-  private final CreatePendingDonationUseCase useCase;
+  private final CreateDonationUseCase useCase;
 
-  public CreatePendingDonationController(CreatePendingDonationUseCase useCase) {
+  public CreateDonationController(CreateDonationUseCase useCase) {
     this.useCase = useCase;
   }
 
-  @PostMapping("/create-pending")
-  public ResponseEntity<CreatePendingDonationResponseDto> execute(
-      @RequestBody CreatePendingDonationDto payload) {
+  @PostMapping
+  public ResponseEntity<CreateDonationResponseDto> create(
+      @RequestBody CreateDonationDto payload) {
     requireNonNull(payload, "Request body cannot be null");
-    requireNotBlank(payload.organizationId(), "organizationId cannot be blank");
     requireNotBlank(payload.personId(), "personId cannot be blank");
-    requireNonNull(payload.expectedDate(), "expectedDate cannot be null");
+    requireNotBlank(payload.organizationId(), "organizationId cannot be blank");
     requireSamePartyOrAdmin(payload.personId());
 
     var output = useCase.execute(new Input(
         payload.personId(),
         payload.organizationId(),
-        payload.expectedDate(),
+        payload.intendedDate(),
+        payload.donationDate(),
         TimeFormats.parseOptionalHourMinute(payload.expectedTime(), "expectedTime")));
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CreatePendingDonationResponseDto.from(output));
+        .body(CreateDonationResponseDto.from(output));
   }
 }

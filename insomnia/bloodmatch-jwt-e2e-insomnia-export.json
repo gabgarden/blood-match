@@ -701,13 +701,13 @@
       "parentId": "fld_role_blood_center",
       "modified": 1785200000000,
       "created": 1776706800000,
-      "url": "{{ _.base_url }}/donations/create-pending",
-      "name": "POST Create Pending Donation",
-      "description": "DONOR or SYSTEM_ADMIN - Agenda uma doacao pendente no hemocentro. Body: organizationId, personId, expectedDate.",
+      "url": "{{ _.base_url }}/donations",
+      "name": "POST Create Donation (pending)",
+      "description": "DONOR or SYSTEM_ADMIN - Agenda uma doacao pendente. Body: organizationId, personId, intendedDate.",
       "method": "POST",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"expectedDate\": \"2026-12-20\"\n}"
+        "text": "{\n  \"organizationId\": \"{{ _.organization_id }}\",\n  \"personId\": \"{{ _.person_id }}\",\n  \"intendedDate\": \"2026-12-20\"\n}"
       },
       "parameters": [],
       "headers": [
@@ -736,9 +736,9 @@
       "parentId": "fld_role_blood_center",
       "modified": 1776706800000,
       "created": 1776706800000,
-      "url": "{{ _.base_url }}/donations/completed",
-      "name": "POST Create Completed Donation",
-      "description": "DONOR or SYSTEM_ADMIN - Registra doacao ja concluida no hemocentro",
+      "url": "{{ _.base_url }}/donations",
+      "name": "POST Create Donation (completed)",
+      "description": "DONOR or SYSTEM_ADMIN - Registra doacao ja concluida. Body: personId, organizationId, donationDate.",
       "method": "POST",
       "body": {
         "mimeType": "application/json",
