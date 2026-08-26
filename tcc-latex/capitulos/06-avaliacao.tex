@@ -11,7 +11,7 @@ A solução implementada materializa-se em uma API RESTful em Java~17 com Spring
   \item gestão do ciclo de vida das solicitações de doação (criação, consulta, atualização de meta e prazo, cancelamento e notificação de elegíveis);
   \item registro unificado de doações --- data de intenção (pendente) ou data efetiva (concluída) ---, reagendamento, conclusão e histórico;
   \item recomendação de solicitações compatíveis ao doador, considerando tipagem sanguínea, elegibilidade temporal e proximidade geográfica;
-  \item cumprimento de metas por \textit{snapshot} em memória: alocação FIFO de doações concluídas às solicitações do mesmo hemocentro, sem campo persistido;
+  \item cumprimento de metas por \textit{snapshot} em memória: alocação FIFO de doações concluídas às solicitações do mesmo hemocentro, restrita por um teto proporcional ao prazo de cada solicitação e sem campo persistido;
   \item busca autenticada de hemocentros por nome, retornando o identificador da organização utilizado nas operações de escrita.
 \end{itemize}
 
@@ -23,7 +23,7 @@ A avaliação foi conduzida em duas frentes complementares, coerentes com o Cap�
 
 A primeira frente, funcional, apoia-se em testes automatizados executados com Maven Surefire e JUnit~5. Os testes unitários isolam regras de domínio e casos de uso com dependências mockadas (repositórios e serviços). Os testes de integração exercitam a configuração Spring Boot e a cadeia de segurança HTTP com \codigo{MockMvc}, verificando respostas \texttt{401}/\texttt{403}/\texttt{200} conforme a presença e o papel do JWT.
 
-A segunda frente, estrutural, avalia qualitativamente a manutenibilidade à luz dos princípios SOLID e do DDD (Capítulo~2), observando se a separação em camadas isola o domínio de detalhes de infraestrutura e se a suíte de testes cobre as regras críticas do negócio --- em especial compatibilidade sanguínea, elegibilidade, recomendação e alocação FIFO.
+A segunda frente, estrutural, avalia qualitativamente a manutenibilidade à luz dos princípios SOLID e do DDD (Capítulo~2), observando se a separação em camadas isola o domínio de detalhes de infraestrutura e se a suíte de testes cobre as regras críticas do negócio --- em especial compatibilidade sanguínea, elegibilidade, recomendação e alocação de doações às metas.
 
 O critério de sucesso funcional adotado foi a execução integral da suíte sem falhas (\textit{failures}) nem erros (\textit{errors}). O critério de manutenibilidade foi a evidência de que as regras centrais permanecem testáveis no domínio/aplicação, sem necessidade de acoplar cada cenário a um banco de dados real.
 
@@ -40,22 +40,22 @@ A suíte reside em \codigo{src/test/java} e está agrupada por camada, espelhand
     \toprule
     \textbf{Camada} & \textbf{Classes de teste (exemplos de foco)} & \textbf{Casos} \\
     \midrule
-    Domínio & Compatibilidade sanguínea (\codigo{BloodTypeTest}); agregados de doação e solicitação; matching de doadores; alocação FIFO e serviço de \textit{fulfillment} & 52 \\
-    Aplicação & Autenticação; criação/cancelamento/listagem de solicitações; recomendação; registro e conclusão de doações; refresher de metas; cadastro de papéis; busca de hemocentros; distância de recomendação & 41 \\
+    Domínio & Compatibilidade sanguínea (\codigo{BloodTypeTest}); agregados de doação e solicitação, incluindo o teto proporcional; matching de doadores; alocação FIFO e serviço de \textit{fulfillment} & 84 \\
+    Aplicação & Autenticação; criação/cancelamento/listagem de solicitações; recomendação; registro e conclusão de doações; agenda e estoque de hemocentro; cadastro de papéis; busca de hemocentros; distância de recomendação & 60 \\
     Infraestrutura / segurança & Emissão e validação de JWT; autorização HTTP (\codigo{SecurityAuthorizationIntegrationTest}) & 11 \\
     \textit{Smoke} & Carregamento do contexto Spring Boot (\codigo{BloodmatchApplicationTests}) & 1 \\
     \midrule
-    \textbf{Total} & 21 classes de teste & \textbf{105} \\
+    \textbf{Total} & 33 classes de teste & \textbf{156} \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026), a partir da execução Maven Surefire.}
 \end{table}
 
-Entre os testes de domínio, destaca-se a cobertura do \codigo{DonationRequestFulfillmentFifoTest} (26 casos), que valida cenários de alocação FIFO por hemocentro --- incluindo ordenação temporal, compatibilidade tipológica, janela entre data de solicitação e data-limite, e esgotamento de meta. Nos testes de aplicação, o \codigo{GetRecommendedRequestsUseCaseTest} verifica elegibilidade do doador, descarte de solicitações com meta atingida e ordenação por distância/urgência/prazo. Nos testes de integração, o \codigo{SecurityAuthorizationIntegrationTest} confirma que recomendações e listagens respeitam autenticação, papéis (\texttt{DONOR}/\texttt{REQUESTER}) e regras de \textit{ownership} do participante autenticado.
+Entre os testes de domínio, destaca-se a cobertura do algoritmo de cumprimento de metas, distribuída em três classes. O \codigo{DonationRequestFulfillmentFifoTest} (26 casos) valida a ordem FIFO por hemocentro --- incluindo ordenação temporal, compatibilidade tipológica, janela entre data de solicitação e data-limite, e esgotamento de meta. O \codigo{DonationRequestFulfillmentProportionalTest} (5 casos) cobre o teto proporcional: represamento da solicitação de prazo folgado em favor da que está próxima do vencimento, ausência de teto no dia da data-limite, retorno das sobras em segunda passagem FIFO e preservação do total de bolsas alocadas. O \codigo{DonationRequestTest} (14 casos) exercita a fórmula do teto isoladamente no agregado, incluindo os contornos de arredondamento e de janela de um único dia. Nos testes de aplicação, o \codigo{GetRecommendedRequestsUseCaseTest} verifica elegibilidade do doador, descarte de solicitações com meta atingida e ordenação por distância/urgência/prazo. Nos testes de integração, o \codigo{SecurityAuthorizationIntegrationTest} confirma que recomendações e listagens respeitam autenticação, papéis (\texttt{DONOR}/\texttt{REQUESTER}) e regras de \textit{ownership} do participante autenticado.
 
 \section{Resultados da execução}
 
-A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução concluída em 11 de agosto de 2026 obteve o resultado sintetizado no Quadro~\ref{tab:resultado-testes}.
+A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução concluída em 26 de agosto de 2026 obteve o resultado sintetizado no Quadro~\ref{tab:resultado-testes}.
 
 \begin{table}[H]
   \centering
@@ -65,19 +65,19 @@ A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test
     \toprule
     \textbf{Indicador} & \textbf{Valor} \\
     \midrule
-    Casos de teste executados & 105 \\
+    Casos de teste executados & 156 \\
     Falhas (\textit{Failures}) & 0 \\
     Erros (\textit{Errors}) & 0 \\
     Casos ignorados (\textit{Skipped}) & 0 \\
     Taxa de sucesso & 100\% \\
-    Tempo total de build (aprox.) & 17,8~s \\
+    Tempo total de build (aprox.) & 27,9~s \\
     Resultado Maven & \texttt{BUILD SUCCESS} \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-A ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação FIFO de \codigo{fulfilledBloodBags} por \textit{snapshot}, bem como o controle de acesso baseado em JWT e papéis.
+A ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e papéis.
 
 Ressalta-se que a maior parte dos testes de domínio e de aplicação não depende de uma instância MongoDB ativa: repositórios e serviços externos são substituídos por \textit{mocks}, o que favorece a repetibilidade e reduz o custo de execução. Os testes que sobem o contexto Spring Boot (\textit{smoke} e autorização HTTP) validam a montagem da aplicação e a barreira de segurança sem exigir, nos cenários cobertos, a persistência real de documentos.
 
@@ -86,9 +86,9 @@ Ressalta-se que a maior parte dos testes de domínio e de aplicação não depen
 Do ponto de vista estrutural, a avaliação qualitativa confirma que a arquitetura em camadas favorece a manutenibilidade (RNF04--RNF06). Evidências observadas:
 
 \begin{itemize}[leftmargin=*]
-  \item \textbf{Isolamento do domínio.} As regras de tipagem, elegibilidade, \codigo{acceptsDonation(...)} e a alocação FIFO estão concentradas em classes de domínio/serviços de domínio, testáveis sem Spring MVC ou MongoDB.
-  \item \textbf{Casos de uso como orquestração.} Os testes de aplicação verificam fluxos (por exemplo, concluir doação e disparar o refresher de metas) sem misturar detalhes de serialização HTTP, o que reduz o acoplamento entre protocolo e negócio.
-  \item \textbf{Inversão de dependência.} Interfaces como repositórios e \codigo{NotificationServiceInterface} permitem substituir implementações de infraestrutura sem alterar o núcleo do domínio --- propriedade explorada pelos \textit{mocks} na suíte.
+  \item \textbf{Isolamento do domínio.} As regras de tipagem, elegibilidade, \codigo{acceptsDonation(...)}, o teto proporcional e a alocação estão concentradas em classes de domínio/serviços de domínio, testáveis sem Spring MVC ou MongoDB. A introdução do teto ilustra essa propriedade: a regra foi acrescentada ao agregado e ao serviço de domínio sem alterar casos de uso, \textit{controllers} ou esquemas de persistência.
+  \item \textbf{Casos de uso como orquestração.} Os testes de aplicação verificam fluxos (por exemplo, concluir uma doação e exibir o preenchimento recalculado na leitura seguinte) sem misturar detalhes de serialização HTTP, o que reduz o acoplamento entre protocolo e negócio.
+  \item \textbf{Inversão de dependência.} As dez interfaces de repositório declaradas no domínio e a \codigo{NotificationServiceInterface} permitem substituir implementações de infraestrutura sem alterar o núcleo --- propriedade explorada pelos \textit{mocks} na suíte, que dispensam uma instância MongoDB ativa.
   \item \textbf{Segurança testável na borda.} A autorização foi validada na camada de interface, separando a política de acesso das regras de alocação/recomendação.
 \end{itemize}
 
@@ -106,4 +106,4 @@ A partir da avaliação, identificam-se melhorias desejáveis para evoluções f
 
 \section{Considerações sobre a avaliação}
 
-Os resultados obtidos permitem concluir que a API implementada --- e validada pela suíte de 105 testes automatizados com 100\% de sucesso --- materializa o estudo de caso do Capítulo~5 e atende, no escopo desta monografia, aos objetivos O3 (mecanismos de recomendação e notificação, cobertos por testes de matching, recomendação e notificação indireta via casos de uso), O4 (validação por implementação e testes) e O5 (manutenibilidade evidenciada pela arquitetura testável em camadas). A Seção~7 retoma esses achados à luz da problemática apresentada na Introdução.
+Os resultados obtidos permitem concluir que a API implementada --- e validada pela suíte de 156 testes automatizados com 100\% de sucesso --- materializa o estudo de caso do Capítulo~5 e atende, no escopo desta monografia, aos objetivos O3 (mecanismos de recomendação e notificação, cobertos por testes de matching, recomendação e notificação indireta via casos de uso), O4 (validação por implementação e testes) e O5 (manutenibilidade evidenciada pela arquitetura testável em camadas). A Seção~7 retoma esses achados à luz da problemática apresentada na Introdução.

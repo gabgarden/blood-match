@@ -1,16 +1,3 @@
-public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
-        BloodCenter bloodCenter,
-        LocalDate asOfDate) {
-    DomainID organizationId = bloodCenter.getOrganization().getId();
-    List<DonationRequest> requests = requestRepository.findActiveRequestsByOrganizationIds(
-            List.of(organizationId),
-            asOfDate);
-    if (requests.isEmpty()) {
-        return Map.of();
-    }
-    return allocateLoaded(requests, asOfDate);
-}
-
 private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateLoaded(
         List<DonationRequest> requests,
         LocalDate asOfDate) {
@@ -22,7 +9,7 @@ private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateLoaded(
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
     for (BloodCenter bloodCenter : bloodCentersOf(requests)) {
-        snapshot.putAll(allocateFifo(
+        snapshot.putAll(allocateProportionalThenFifo(
                 requestsAt(bloodCenter, requests),
                 donationsAt(bloodCenter, allDonations),
                 asOfDate));
@@ -30,10 +17,11 @@ private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateLoaded(
     return snapshot;
 }
 
-private static Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateFifo(
-        List<DonationRequest> requests,
-        List<Donation> donations,
-        LocalDate asOfDate) {
+private static Map<DomainID, DonationRequestFulfillmentStatusRecord>
+        allocateProportionalThenFifo(
+                List<DonationRequest> requests,
+                List<Donation> donations,
+                LocalDate asOfDate) {
     List<DonationRequest> requestsOldestFirst = sorted(requests, OLDEST_REQUEST_FIRST);
     List<Donation> donationsOldestFirst = sorted(
             donations.stream().filter(Donation::isCompleted).toList(),
@@ -44,16 +32,17 @@ private static Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateFif
         bags.put(request.getId(), 0);
     }
 
-    for (Donation donation : donationsOldestFirst) {
-        for (DonationRequest request : requestsOldestFirst) {
-            int given = bags.get(request.getId());
-            boolean hasRoom = given < request.getGoalBloodBags();
-            if (hasRoom && request.acceptsDonation(donation, asOfDate)) {
-                bags.put(request.getId(), given + 1);
-                break;
-            }
-        }
-    }
+    // 1a passagem: cada solicitacao recebe ate o seu teto proporcional
+    List<Donation> leftovers = distribute(
+            requestsOldestFirst, donationsOldestFirst, bags,
+            proportionalLimits(requestsOldestFirst, asOfDate),
+            asOfDate);
+
+    // 2a passagem: as sobras voltam em FIFO, agora ate a meta cheia
+    distribute(
+            requestsOldestFirst, leftovers, bags,
+            fullGoalLimits(requestsOldestFirst),
+            asOfDate);
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
     for (DonationRequest request : requestsOldestFirst) {
@@ -64,4 +53,47 @@ private static Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateFif
                         given, given >= request.getGoalBloodBags()));
     }
     return snapshot;
+}
+
+private static Map<DomainID, Integer> proportionalLimits(
+        List<DonationRequest> requests,
+        LocalDate asOfDate) {
+    Map<DomainID, Integer> limits = new LinkedHashMap<>();
+    for (DonationRequest request : requests) {
+        limits.put(request.getId(), request.proportionalGoalAt(asOfDate));
+    }
+    return limits;
+}
+
+private static Map<DomainID, Integer> fullGoalLimits(List<DonationRequest> requests) {
+    Map<DomainID, Integer> limits = new LinkedHashMap<>();
+    for (DonationRequest request : requests) {
+        limits.put(request.getId(), request.getGoalBloodBags());
+    }
+    return limits;
+}
+
+private static List<Donation> distribute(
+        List<DonationRequest> requestsOldestFirst,
+        List<Donation> donationsOldestFirst,
+        Map<DomainID, Integer> bags,
+        Map<DomainID, Integer> limits,
+        LocalDate asOfDate) {
+    List<Donation> unallocated = new ArrayList<>();
+    for (Donation donation : donationsOldestFirst) {
+        boolean allocated = false;
+        for (DonationRequest request : requestsOldestFirst) {
+            int given = bags.get(request.getId());
+            int limit = limits.get(request.getId());
+            if (given < limit && request.acceptsDonation(donation, asOfDate)) {
+                bags.put(request.getId(), given + 1);
+                allocated = true;
+                break;
+            }
+        }
+        if (!allocated) {
+            unallocated.add(donation);
+        }
+    }
+    return unallocated;
 }

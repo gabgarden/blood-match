@@ -8,6 +8,7 @@ import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 
 public class DonationRequest extends DomainObject {
@@ -194,6 +195,42 @@ public class DonationRequest extends DomainObject {
       throw new IllegalArgumentException("Current date cannot be null");
 
     return currentDate.isAfter(dateLimit);
+  }
+
+  /**
+   * Teto de bolsas que a solicitação pode receber até {@code asOfDate}.
+   *
+   * A meta é liberada no mesmo ritmo em que a janela [dateRequested, dateLimit] é
+   * consumida: se 3 dos 10 dias já passaram, só 3/10 da meta pode ser preenchida
+   * naquele instante. Serve para que uma solicitação com prazo folgado não esvazie
+   * o pool do hemocentro antes de uma irmã que está perto de expirar.
+   *
+   * É um cálculo puro sobre os dados que a request já tem — nada é persistido.
+   */
+  public int proportionalGoalAt(LocalDate asOfDate) {
+    if (asOfDate == null)
+      throw new IllegalArgumentException("As of date cannot be null");
+
+    long windowDays = ChronoUnit.DAYS.between(dateRequested, dateLimit);
+
+    // Janela de um único dia: não há tempo a escalonar, a meta vale inteira.
+    if (windowDays <= 0)
+      return goalBloodBags;
+
+    long elapsedDays = ChronoUnit.DAYS.between(dateRequested, asOfDate);
+
+    // Ainda no dia do pedido: nenhuma fração da janela foi consumida.
+    if (elapsedDays <= 0)
+      return 0;
+
+    // No dia do limite (ou depois) o teto deixa de existir: a meta é liberada inteira.
+    if (elapsedDays >= windowDays)
+      return goalBloodBags;
+
+    // ceil(goal * elapsed / window) em aritmética inteira. Arredonda para cima para
+    // que metas pequenas não fiquem travadas em zero durante toda a janela:
+    // com floor, uma meta de 1 bolsa só sairia do zero no último dia.
+    return (int) ((goalBloodBags * elapsedDays + windowDays - 1) / windowDays);
   }
 
   public boolean canBeFulfilledBy(BloodType candidateBloodType) {

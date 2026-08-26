@@ -80,6 +80,18 @@ Com a API no ar:
 ./scripts/seed-dev.sh
 ```
 
+## Documentação
+
+| Arquivo | Conteúdo |
+|---|---|
+| [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) | Camadas DDD, pacotes e mapa da API |
+| [`docs/FRONTEND_API_CONTRACT.md`](docs/FRONTEND_API_CONTRACT.md) | Contrato HTTP (paths, payloads, roles) |
+| [`docs/LOGICA_PREENCHIMENTO_REQUESTS.md`](docs/LOGICA_PREENCHIMENTO_REQUESTS.md) | Snapshot FIFO das metas |
+| [`docs/FULFILLMENT_STRATEGY.md`](docs/FULFILLMENT_STRATEGY.md) | Resumo do snapshot |
+| [`frontend/ARCHITECTURE.md`](frontend/ARCHITECTURE.md) | Pastas e fluxos do app |
+| [`ACESSOS.md`](ACESSOS.md) | URLs, portas e logins de seed |
+| [`COMMANDS.md`](COMMANDS.md) | Comandos de dev e produção |
+
 ## Variáveis principais
 
 | Variável | Uso |
@@ -89,3 +101,7 @@ Com a API no ar:
 | `CORS_ALLOWED_ORIGINS` | Origins permitidas (CSV) |
 | `VITE_API_BASE_URL` | Base URL da API no frontend |
 | `VITE_BASE` | Base path do Vite (`/` local; `/bloodmatch-frontend/` no GitHub Pages) |
+| `APP_PUBLIC_URL` | URL do frontend nos e-mails de confirmação |
+| `REQUIRE_EMAIL_CONFIRMATION` | Exige confirmar e-mail antes do login |
+| `GOOGLE_MAPS_API_KEY` | Geocoding (distância nas recomendações) |
+| `SPRING_MAIL_*` | SMTP da confirmação de e-mail |

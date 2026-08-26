@@ -212,7 +212,7 @@
 
 % Resumo em português
 \begin{resumo}
-  A transfusão sanguínea é essencial em emergências, cirurgias e tratamentos crônicos, mas o Brasil ainda enfrenta descompasso entre demanda e oferta de doadores. Este trabalho propõe o desenvolvimento de uma API RESTful para captação de doadores e recomendação de solicitações compatíveis, utilizando DDD e princípios SOLID. A pesquisa adota abordagem qualitativa, exploratória-descritiva, com mapeamento sistemático da literatura e modelagem do domínio da doação sanguínea. A solução, implementada em Java~17 com Spring Boot, MongoDB e autenticação JWT, intermedia requisitantes e doadores, considerando tipagem sanguínea, proximidade geográfica e alocação FIFO de doações às metas das solicitações. A proposta foi validada por estudo de caso e por uma suíte de 105 testes automatizados executados com sucesso integral.
+  A transfusão sanguínea é essencial em emergências, cirurgias e tratamentos crônicos, mas o Brasil ainda enfrenta descompasso entre demanda e oferta de doadores. Este trabalho propõe o desenvolvimento de uma API RESTful para captação de doadores e recomendação de solicitações compatíveis, utilizando DDD e princípios SOLID. A pesquisa adota abordagem qualitativa, exploratória-descritiva, com mapeamento sistemático da literatura e modelagem do domínio da doação sanguínea. A solução, implementada em Java~17 com Spring Boot, MongoDB e autenticação JWT, intermedia requisitantes e doadores, considerando tipagem sanguínea, proximidade geográfica e alocação FIFO de doações às metas das solicitações, restrita por um teto proporcional ao prazo de cada solicitação. A proposta foi validada por estudo de caso e por uma suíte de 156 testes automatizados executados com sucesso integral.
 
   \vspace{\onelineskip}
   \noindent
@@ -222,7 +222,7 @@
 % Abstract
 \begin{resumo}[Abstract]
   \begin{otherlanguage*}{english}
-    Blood transfusion is essential in emergencies, surgeries and chronic treatments, yet Brazil still faces a mismatch between demand and donor supply. This undergraduate thesis proposes a RESTful API for donor recruitment and recommendation of compatible donation requests, using DDD and SOLID principles. The research adopts a qualitative, exploratory-descriptive approach, with a systematic literature mapping and blood-donation domain modeling. The solution, implemented in Java~17 with Spring Boot, MongoDB and JWT authentication, mediates between requesters and donors, considering blood type, geographic proximity and FIFO allocation of donations to request goals. The proposal was validated through a case study and a suite of 105 automated tests executed with full success.
+    Blood transfusion is essential in emergencies, surgeries and chronic treatments, yet Brazil still faces a mismatch between demand and donor supply. This undergraduate thesis proposes a RESTful API for donor recruitment and recommendation of compatible donation requests, using DDD and SOLID principles. The research adopts a qualitative, exploratory-descriptive approach, with a systematic literature mapping and blood-donation domain modeling. The solution, implemented in Java~17 with Spring Boot, MongoDB and JWT authentication, mediates between requesters and donors, considering blood type, geographic proximity and FIFO allocation of donations to request goals, constrained by a deadline-proportional cap per request. The proposal was validated through a case study and a suite of 156 automated tests executed with full success.
 
     \vspace{\onelineskip}
     \noindent

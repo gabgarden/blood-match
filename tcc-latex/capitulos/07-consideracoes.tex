@@ -26,7 +26,7 @@ Do ponto de vista tecnológico, a principal contribuição é a API RESTful \tex
 
 \begin{itemize}[leftmargin=*]
   \item a estratégia de recomendação de solicitações compatíveis ao doador;
-  \item o cumprimento de metas por \textit{snapshot} em memória, com alocação FIFO de doações concluídas às solicitações do hemocentro;
+  \item o cumprimento de metas por \textit{snapshot} em memória, com alocação FIFO de doações concluídas às solicitações do hemocentro restrita por um teto proporcional ao prazo, que reparte a escassez em favor das solicitações mais próximas do vencimento;
   \item o modelo de autorização baseado em JWT e papéis, com verificação de \textit{ownership};
   \item a organização em camadas que isola o domínio de persistência e de protocolo HTTP, facilitando evolução e testes.
 \end{itemize}
@@ -35,7 +35,7 @@ Esses artefatos podem servir de referência para soluções semelhantes voltadas
 
 \section{Limitações}
 
-Apesar dos resultados positivos, reconhecem-se limitações. A avaliação funcional privilegiou testes unitários e de integração com \textit{mocks}, sem mensuração sistemática de cobertura percentual de linhas/branches nem baterias de carga em produção. O \textit{snapshot} de preenchimento relê o pool do hemocentro a cada consulta que exibe progresso, o que privilegia simplicidade e consistência em detrimento de um contador materializado. Além disso, o estudo de caso não inclui avaliação formal de usabilidade com usuários finais de hemocentros.
+Apesar dos resultados positivos, reconhecem-se limitações. A avaliação funcional privilegiou testes unitários e de integração com \textit{mocks}, sem mensuração sistemática de cobertura percentual de linhas/branches nem baterias de carga em produção. O \textit{snapshot} de preenchimento relê o pool do hemocentro a cada consulta que exibe progresso, o que privilegia simplicidade e consistência em detrimento de um contador materializado. Como consequência do teto proporcional sobre esse recálculo, o progresso exibido de uma solicitação de prazo folgado pode decrescer entre duas leituras, quando bolsas migram para solicitações mais próximas do vencimento --- comportamento correto do ponto de vista da política de racionamento, mas cuja apresentação ao requisitante merece tratamento específico na interface. Além disso, o estudo de caso não inclui avaliação formal de usabilidade com usuários finais de hemocentros.
 
 \section{Trabalhos futuros}
 

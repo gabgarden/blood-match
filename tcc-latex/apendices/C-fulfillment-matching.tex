@@ -1,16 +1,38 @@
 % !TeX root = ../main.tex
-\chapter{Cumprimento de metas FIFO e matching de doadores}
+\chapter{Cumprimento de metas e matching de doadores}
 \label{ap:fulfillment}
 
-Este apêndice documenta o núcleo algorítmico da solução: a alocação \textit{First In, First Out} (FIFO) de doações concluídas às solicitações ativas de um hemocentro e o serviço de domínio que identifica doadores elegíveis para notificação.
+Este apêndice documenta o núcleo algorítmico da solução: a alocação das doações concluídas às solicitações ativas de um hemocentro --- \textit{First In, First Out} (FIFO) restrita por um teto proporcional ao prazo --- e o serviço de domínio que identifica doadores elegíveis para notificação.
 
-\section{Alocação FIFO de doações}
+\section{Teto proporcional ao prazo}
 
-A Listagem~\ref{lst:fifo} sintetiza o caminho de leitura do \codigo{DonationRequestFulfillmentService}: \codigo{fill} recebe o hemocentro e a data de referência \codigo{asOfDate}, carrega somente as solicitações ativas e não expiradas daquele centro, e \codigo{allocateLoaded} busca as doações concluídas na janela \codigo{[pedido ativo mais antigo, asOfDate]}. Em seguida, \codigo{allocateFifo} isola o pool por hemocentro, ordena solicitações e doações da mais antiga para a mais nova e atribui cada doação à primeira solicitação que ainda cabe na meta e que \codigo{acceptsDonation} aceita --- o \texttt{break} encerra a busca, concretizando a política FIFO. O resultado permanece em memória: nada é persistido.
+A meta de uma solicitação não é liberada de uma só vez. A Listagem~\ref{lst:teto-proporcional} apresenta \codigo{DonationRequest.proportionalGoalAt}, que devolve quantas bolsas a solicitação pode receber na data de referência: a fração da meta liberada é igual à fração da janela \codigo{[dateRequested, dateLimit]} já decorrida, conforme a Equação~\ref{eq:teto}.
+
+\begin{equation}
+  \label{eq:teto}
+  \mathrm{teto}(t) = \left\lceil \mathrm{goalBloodBags} \times \frac{t - \mathrm{dateRequested}}{\mathrm{dateLimit} - \mathrm{dateRequested}} \right\rceil
+\end{equation}
+
+Assim, decorridos 3 de 10 dias de janela, apenas $3/10$ da meta está disponível naquele instante. A regra impede que uma solicitação de prazo folgado esgote o \textit{pool} do hemocentro antes de outra que está prestes a expirar. Três casos de contorno são tratados explicitamente: a solicitação criada na própria data de referência tem teto nulo, pois nenhuma fração da janela foi consumida; no dia da data-limite o teto iguala a meta cheia; e a janela de um único dia dispensa o escalonamento. O arredondamento para cima é deliberado --- com arredondamento para baixo, uma meta de uma única bolsa permaneceria em zero durante toda a janela, saindo do zero apenas no último dia. Por se tratar de um cálculo derivado apenas de atributos que a própria solicitação já possui, a regra reside no agregado, e não no serviço de domínio.
 
 \lstinputlisting[
   language=Java,
-  caption={Alocação FIFO em \texttt{DonationRequestFulfillmentService}},
+  caption={Teto proporcional em \texttt{DonationRequest}},
+  label={lst:teto-proporcional}
+]{apendices/codigo/ProportionalGoal.java}
+\fonte{Elaborado pelos próprios autores (2026).}
+
+\section{Alocação das doações em duas passagens}
+
+A Listagem~\ref{lst:fifo} sintetiza o caminho de leitura do \codigo{DonationRequestFulfillmentService}: \codigo{fill} recebe o hemocentro e a data de referência \codigo{asOfDate}, carrega somente as solicitações ativas e não expiradas daquele centro, e \codigo{allocateLoaded} busca as doações concluídas na janela \codigo{[pedido ativo mais antigo, asOfDate]}. Em seguida, \codigo{allocateProportionalThenFifo} isola o pool por hemocentro e ordena solicitações e doações da mais antiga para a mais nova.
+
+A distribuição ocorre em duas passagens sobre o mesmo pool, ambas implementadas pelo método \codigo{distribute}. A única diferença entre elas é o limite aplicável a cada solicitação, recebido como uma tabela de limites previamente calculada --- \codigo{proportionalLimits} na primeira passagem e \codigo{fullGoalLimits} na segunda ---, o que evita duplicar o laço FIFO e assegura que o teto de cada solicitação seja calculado uma única vez, e não a cada par doação--solicitação avaliado. Na primeira passagem, cada doação é atribuída à primeira solicitação que \codigo{acceptsDonation} aceita e que ainda esteja abaixo do seu teto proporcional; ao atingir o teto, a solicitação é preterida e a bolsa segue para a próxima candidata. As doações que nenhuma solicitação pôde absorver retornam na segunda passagem, na mesma ordem FIFO, agora limitadas apenas pela meta cheia. Em ambas, o \texttt{break} encerra a busca e garante uma bolsa por doação.
+
+Duas propriedades decorrem desse desenho. A primeira é que o total de bolsas alocadas permanece idêntico ao de uma alocação FIFO simples, pois nenhuma doação é descartada: o teto altera apenas \textit{qual} solicitação recebe cada bolsa em situação de escassez, e não a contagem agregada. A segunda é que, havendo doações suficientes para todas as metas, o resultado das duas passagens coincide com o do FIFO simples --- a política só se manifesta quando o pool é insuficiente. O resultado permanece em memória: nada é persistido.
+
+\lstinputlisting[
+  language=Java,
+  caption={Alocação em duas passagens em \texttt{DonationRequestFulfillmentService}},
   label={lst:fifo}
 ]{apendices/codigo/FulfillmentDistributeDonations.java}
 \fonte{Elaborado pelos próprios autores (2026).}

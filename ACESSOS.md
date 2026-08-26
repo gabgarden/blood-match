@@ -2,6 +2,8 @@
 
 Guia rápido de URLs, portas, endpoints e configurações de acesso do projeto **BloodMatch**.
 
+Mapa da API: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) · contrato HTTP: [`docs/FRONTEND_API_CONTRACT.md`](docs/FRONTEND_API_CONTRACT.md).
+
 ---
 
 ## 🌐 Serviços Locais (Ambiente de Desenvolvimento)

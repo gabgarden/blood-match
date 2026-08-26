@@ -24,16 +24,22 @@ import org.springframework.stereotype.Service;
  * Snapshot em memória do preenchimento das solicitações de um hemocentro.
  *
  * Lê o banco naquele instante e reparte doações COMPLETED em FIFO: a solicitação
- * mais antiga compatível recebe a bolsa, até atingir a meta.
+ * mais antiga compatível recebe a bolsa. A meta, porém, é liberada aos poucos —
+ * cada solicitação só recebe até o teto proporcional ao tempo já decorrido da sua
+ * janela; o que sobra é redistribuído numa segunda passagem FIFO até a meta cheia.
  */
 @Service
 public class DonationRequestFulfillmentService {
 
+
+  //APENAS CRITÉRIO
   /** Ordem FIFO das solicitações: data do pedido, depois id (desempate estável). */
   private static final Comparator<DonationRequest> OLDEST_REQUEST_FIRST =
       Comparator.comparing(DonationRequest::getDateRequested)
           .thenComparing(request -> request.getId().getValue());
 
+
+  //APENAS CRITÉRIO
   /** Ordem FIFO das doações: data da doação, depois id (desempate estável). */
   private static final Comparator<Donation> OLDEST_DONATION_FIRST =
       Comparator.comparing(Donation::getDonationDate)
@@ -42,7 +48,6 @@ public class DonationRequestFulfillmentService {
   private final DonationRequestRepositoryInterface requestRepository;
   private final DonationRepositoryInterface donationRepository;
 
-  /** Injeta os repositórios usados para montar o snapshot. */
   public DonationRequestFulfillmentService(
       DonationRequestRepositoryInterface requestRepository,
       DonationRepositoryInterface donationRepository) {
@@ -107,7 +112,7 @@ public class DonationRequestFulfillmentService {
 
   /**
    * Carrega doações COMPLETED na janela [pedido mais antigo, asOfDate] e,
-   * para cada hemocentro, chama o FIFO só com pedidos/doações daquele centro.
+   * para cada hemocentro, chama a alocação só com pedidos/doações daquele centro.
    */
   private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateLoaded(
       List<DonationRequest> requests,
@@ -125,7 +130,7 @@ public class DonationRequestFulfillmentService {
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
     for (BloodCenter bloodCenter : bloodCenters) {
-      snapshot.putAll(allocateFifo(
+      snapshot.putAll(allocateProportionalThenFifo(
           requestsAt(bloodCenter, requests),
           donationsAt(bloodCenter, allDonations),
           asOfDate));
@@ -134,11 +139,18 @@ public class DonationRequestFulfillmentService {
   }
 
   /**
-   * Núcleo FIFO de um hemocentro: ordena pedidos e doações do mais antigo ao mais novo;
-   * cada doação vai para o primeiro pedido que a aceita e ainda tem meta; o break
-   * garante uma bolsa por doação. Devolve contagem e se a meta foi atingida.
+   * Núcleo de alocação de um hemocentro, em duas passagens sobre o mesmo pool.
+   *
+   * 1ª passagem — cada pedido só pode receber até o seu teto proporcional
+   * ({@code proportionalGoalAt}): quem tem prazo folgado é represado e a bolsa
+   * segue para o próximo pedido compatível.
+   *
+   * 2ª passagem — as doações que ninguém pôde absorver voltam ao início, na mesma
+   * ordem FIFO, agora limitadas só pela meta cheia. É o que impede bolsas ociosas:
+   * o total alocado continua igual ao do FIFO puro, o teto só muda quem recebe
+   * quando há escassez.
    */
-  private static Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateFifo(
+  private static Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateProportionalThenFifo(
       List<DonationRequest> requests,
       List<Donation> donations,
       LocalDate asOfDate) {
@@ -152,16 +164,19 @@ public class DonationRequestFulfillmentService {
       bags.put(request.getId(), 0);
     }
 
-    for (Donation donation : donationsOldestFirst) {
-      for (DonationRequest request : requestsOldestFirst) {
-        int given = bags.get(request.getId());
-        boolean hasRoom = given < request.getGoalBloodBags();
-        if (hasRoom && request.acceptsDonation(donation, asOfDate)) {
-          bags.put(request.getId(), given + 1);
-          break;
-        }
-      }
-    }
+    List<Donation> leftovers = distribute(
+        requestsOldestFirst,
+        donationsOldestFirst,
+        bags,
+        proportionalLimits(requestsOldestFirst, asOfDate),
+        asOfDate);
+
+    distribute(
+        requestsOldestFirst,
+        leftovers,
+        bags,
+        fullGoalLimits(requestsOldestFirst),
+        asOfDate);
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
     for (DonationRequest request : requestsOldestFirst) {
@@ -171,6 +186,63 @@ public class DonationRequestFulfillmentService {
           new DonationRequestFulfillmentStatusRecord(given, given >= request.getGoalBloodBags()));
     }
     return snapshot;
+  }
+
+  /**
+   * Limite da 1ª passagem: quanto da meta o tempo já liberou para cada pedido.
+   */
+  private static Map<DomainID, Integer> proportionalLimits(
+      List<DonationRequest> requests,
+      LocalDate asOfDate) {
+    Map<DomainID, Integer> limits = new LinkedHashMap<>();
+    for (DonationRequest request : requests) {
+      limits.put(request.getId(), request.proportionalGoalAt(asOfDate));
+    }
+    return limits;
+  }
+
+  /**
+   * Limite da 2ª passagem: a meta cheia, sem represar ninguém.
+   */
+  private static Map<DomainID, Integer> fullGoalLimits(List<DonationRequest> requests) {
+    Map<DomainID, Integer> limits = new LinkedHashMap<>();
+    for (DonationRequest request : requests) {
+      limits.put(request.getId(), request.getGoalBloodBags());
+    }
+    return limits;
+  }
+
+  /**
+   * Uma passagem FIFO: cada doação vai para o primeiro pedido que a aceita e ainda
+   * não chegou ao limite daquela passagem; o break garante uma bolsa por doação.
+   *
+   * {@code limits} traz o teto de cada pedido já calculado — é só o que muda entre
+   * as duas passagens. {@code bags} é acumulado entre elas. Devolve as doações que
+   * não acharam destino, que são justamente a entrada da passagem seguinte.
+   */
+  private static List<Donation> distribute(
+      List<DonationRequest> requestsOldestFirst,
+      List<Donation> donationsOldestFirst,
+      Map<DomainID, Integer> bags,
+      Map<DomainID, Integer> limits,
+      LocalDate asOfDate) {
+    List<Donation> unallocated = new ArrayList<>();
+    for (Donation donation : donationsOldestFirst) {
+      boolean allocated = false;
+      for (DonationRequest request : requestsOldestFirst) {
+        int given = bags.get(request.getId());
+        int limit = limits.get(request.getId());
+        if (given < limit && request.acceptsDonation(donation, asOfDate)) {
+          bags.put(request.getId(), given + 1);
+          allocated = true;
+          break;
+        }
+      }
+      if (!allocated) {
+        unallocated.add(donation);
+      }
+    }
+    return unallocated;
   }
 
   /**
