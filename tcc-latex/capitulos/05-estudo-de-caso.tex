@@ -120,8 +120,8 @@ A representação gráfica dessas interações é dividida de acordo com o níve
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura03-uc-visitante}
   \caption{Diagrama de caso de uso de visitante}
+  \includegraphics[width=0.9\textwidth]{figura03-uc-visitante}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-guest}
 \end{figure}
@@ -130,8 +130,8 @@ O ator \textit{Guest} representa utilizadores sem cadastro prévio, limitados à
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura04-uc-requisitante}
   \caption{Diagrama de caso de uso de requisitante}
+  \includegraphics[width=0.9\textwidth]{figura04-uc-requisitante}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-requester}
 \end{figure}
@@ -140,8 +140,8 @@ O ator \textit{Requester} concentra as permissões relacionadas à criação e �
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura05-uc-doador}
   \caption{Diagrama de caso de uso de doador}
+  \includegraphics[width=0.9\textwidth]{figura05-uc-doador}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-donor}
 \end{figure}
@@ -156,8 +156,8 @@ A Figura~\ref{fig:classe-participantes} apresenta o diagrama de classes conceitu
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura06-classes-participantes}
   \caption{Diagrama conceitual dos participantes}
+  \includegraphics[width=0.9\textwidth]{figura06-classes-participantes}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:classe-participantes}
 \end{figure}
@@ -168,33 +168,37 @@ Dando prosseguimento à representação do negócio, a Figura~\ref{fig:classe-do
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura07-classes-doacao}
   \caption{Diagrama conceitual do processo de doação}
+  \includegraphics[width=0.9\textwidth]{figura07-classes-doacao}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:classe-doacao}
 \end{figure}
 
 Neste nível de abstração, evidencia-se a associação semântica entre a solicitação (\codigo{DonationRequest}) e o ato de doar (\codigo{Donation}). O fluxo natural demonstra que um \codigo{Requester} origina a solicitação, que é vinculada a um \codigo{BloodCenter} e, posteriormente, recebe as doações efetivadas por um \codigo{Donor}.
 
-Elevando o rigor para o design de software, a Figura~\ref{fig:impl-request} detalha a implementação técnica do agregado \texttt{DonationRequest}. A classe é modelada como uma raiz de agregado (\texttt{<<AggregateRoot>>}), atuando como a única porta de entrada para a proteção de invariantes, como as datas-limite e a urgência da solicitação. Observa-se a aplicação da herança por meio da superclasse abstrata \texttt{DomainObject}, responsável por compor os identificadores únicos globais (\texttt{<<ValueObject>> DomainID}). Destaca-se também a dependência tracejada (\texttt{<<use>>}) com a classe \texttt{Donation}, a qual evidencia o baixo acoplamento da arquitetura: a requisição não armazena doações em memória, apenas as avalia de forma transitória por meio de parâmetros no método \texttt{acceptsDonation()}.
+Elevando o rigor para o design de software, a Figura~\ref{fig:impl-request} detalha a implementação técnica do agregado \texttt{DonationRequest}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura08-impl-donation-request}
   \caption{Diagrama de implementação: agregado DonationRequest}
+  \includegraphics[width=0.9\textwidth]{figura08-impl-donation-request}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:impl-request}
 \end{figure}
 
-Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementação do agregado \texttt{Donation}. Tratada também como uma raiz de agregado autônoma, a classe concentra uma única fábrica \codigo{create} e o ciclo de vida pendente--concluída--cancelada. O estado não é armazenado como flags independentes: deriva das datas de intenção (\codigo{intendedDate}), de efetivação (\codigo{donationDate}) e de cancelamento (\codigo{cancelledAt}). Completar uma doação pendente preenche a data efetiva sem apagar a intenção; reagendar e cancelar permanecem transições sobre o mesmo agregado. A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
+A classe é modelada como uma raiz de agregado (\texttt{<<AggregateRoot>>}), atuando como a única porta de entrada para a proteção de invariantes, como as datas-limite e a urgência da solicitação. Observa-se a aplicação da herança por meio da superclasse abstrata \texttt{DomainObject}, responsável por compor os identificadores únicos globais (\texttt{<<ValueObject>> DomainID}). Destaca-se também a dependência tracejada (\texttt{<<use>>}) com a classe \texttt{Donation}, a qual evidencia o baixo acoplamento da arquitetura: a requisição não armazena doações em memória, apenas as avalia de forma transitória por meio de parâmetros no método \texttt{acceptsDonation()}.
+
+Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementação do agregado \texttt{Donation}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.95\textwidth]{figura09-impl-donation}
   \caption{Diagrama de implementação: agregado Donation}
+  \includegraphics[width=0.95\textwidth]{figura09-impl-donation}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:impl-donation}
 \end{figure}
+
+Tratada também como uma raiz de agregado autônoma, a classe concentra uma única fábrica \codigo{create} e o ciclo de vida pendente--concluída--cancelada. O estado não é armazenado como flags independentes: deriva das datas de intenção (\codigo{intendedDate}), de efetivação (\codigo{donationDate}) e de cancelamento (\codigo{cancelledAt}). Completar uma doação pendente preenche a data efetiva sem apagar a intenção; reagendar e cancelar permanecem transições sobre o mesmo agregado. A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
 
 \section{Domínio e arquitetura}
 
