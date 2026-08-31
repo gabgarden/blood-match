@@ -18,6 +18,8 @@ App React + Vite + TypeScript. Contrato HTTP: [`../docs/FRONTEND_API_CONTRACT.md
 | `src/routes` | Tabela de rotas, guards e `roleRouting` |
 | `src/types` | Tipos compartilhados (`auth`, `party`, …) |
 | `src/api` | Cliente Axios (Bearer + `401`) |
+| `src/config` | `VITE_API_BASE_URL` |
+| `src/utils` | Mensagens de erro HTTP |
 
 ## Rotas
 

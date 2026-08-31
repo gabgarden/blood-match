@@ -25,7 +25,7 @@ blood-match/
 
 ```bash
 cp .env.example .env
-# edite MONGODB_URI, JWT_SECRET, GMAIL_*, GOOGLE_MAPS_API_KEY
+# edite MONGODB_URI, JWT_SECRET, SPRING_MAIL_*, GOOGLE_MAPS_API_KEY
 ```
 
 ## Subir com Docker Compose (Desenvolvimento)

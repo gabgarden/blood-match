@@ -4,6 +4,7 @@ type DonationHistoryApiItem = {
   donationId: string;
   date: string | null;
   location: string;
+  status?: string;
 };
 
 export type DonationHistoryEntry = {
@@ -83,12 +84,12 @@ function toNumber(value: number | string | null | undefined, fallback = 0): numb
 }
 
 function normalizeDonation(item: DonationHistoryApiItem, index: number): DonationHistoryEntry {
+  const status = item.status?.trim().toUpperCase();
   return {
     id: item.donationId || `donation-${index}`,
     location: item.location || "Local nao informado",
     donationDate: item.date,
-    // O contrato de histórico não devolve status; ações de concluir/reagendar validam no backend.
-    status: "REGISTERED",
+    status: status === "PENDING" || status === "COMPLETED" || status === "CANCELLED" ? status : "COMPLETED",
   };
 }
 

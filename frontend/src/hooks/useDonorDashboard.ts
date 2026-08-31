@@ -237,7 +237,7 @@ export function useDonorDashboard({ partyId, hasDonorRole }: DonorDashboardParam
   }, [hasDonorRole, partyId]);
 
   const hasPendingDonation = donationHistory.some(
-    (item) => item.status === "REGISTERED" || item.status === "PENDING",
+    (item) => item.status.trim().toUpperCase() === "PENDING",
   );
 
   async function acceptDonation(requestId: string, expectedDate?: string, expectedTime?: string): Promise<boolean> {

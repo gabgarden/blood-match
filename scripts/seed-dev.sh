@@ -191,7 +191,7 @@ while IFS='|' read -r donor_idx org_idx; do
   blood_center_id="${ORG_IDS[$org_idx]}"
 
   donation_id=$(
-    post /donations/completed \
+    post /donations \
       "$donor_token" \
       "{\"personId\":\"$donor_id\",\"organizationId\":\"$blood_center_id\",\"donationDate\":\"$TODAY\"}" \
       | jq -r '.id'

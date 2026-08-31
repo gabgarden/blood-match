@@ -299,18 +299,20 @@ Use `organizationId` em `POST /donation-requests` e `POST /donations`.
   "address": "string",
   "lastDonationDate": "2026-01-15",
   "daysRemaining": 0,
-  "livesImpacted": 0
+  "livesImpacted": 0,
+  "weight": 70.5,
+  "weightUpdatedAt": "2026-01-15"
 }
 ```
 
-`lastDonationDate` pode ser `null`.
+`lastDonationDate` e `weight` / `weightUpdatedAt` podem ser `null`.
 
 #### `GET /donors/{personId}/donations` — Auth + Own(path) → `200`
 
-Histórico **não** devolve `status`. Só `donationId`, `date`, `location`.
+`status` é `PENDING` | `COMPLETED` | `CANCELLED`. `date` é a data de referência (conclusão ou data pretendida).
 
 ```json
-[{ "donationId": "<uuid>", "date": "2026-01-15", "location": "Nome do hemocentro" }]
+[{ "donationId": "<uuid>", "date": "2026-01-15", "location": "Nome do hemocentro", "status": "COMPLETED" }]
 ```
 
 ---
@@ -620,7 +622,7 @@ Swagger `/swagger-ui/**` e `/v3/api-docs/**` são públicos.
 - [ ] Pedido: `partyId` = logado; `organizationId` = hemocentro buscado
 - [ ] Guards por `DONOR` / `REQUESTER` / `BLOOD_CENTER`
 - [ ] PATCH de meta: `goalBloodBags` na resposta é **string**
-- [ ] Histórico do doador não traz `status`
+- [ ] Histórico do doador usa `status` (`PENDING` | `COMPLETED` | `CANCELLED`) para agendar / concluir / reagendar
 
 ---
 
@@ -643,5 +645,4 @@ Swagger `/swagger-ui/**` e `/v3/api-docs/**` são públicos.
 - Obter `SYSTEM_ADMIN` por UI pública
 - Que registrar papel atualiza o JWT sozinho
 - Que `goalBloodBags` no PATCH de meta volta como number
-- Que o histórico `GET /donors/{id}/donations` traz `status`
 - Que progresso de bolsas está persistido no Mongo

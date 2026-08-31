@@ -36,9 +36,9 @@ Subindo com `docker compose -f docker-compose.yml -f docker-compose.prod.yml --e
 
 ## 📁 Estrutura de Infraestrutura Adicionada
 
-- **Nginx Config:** [`infrastructure/nginx/default.conf`](file:///c:/Users/garde/Desktop/projects/blood-match/infrastructure/nginx/default.conf)
-- **Compose de Produção:** [`docker-compose.prod.yml`](file:///c:/Users/garde/Desktop/projects/blood-match/docker-compose.prod.yml)
-- **Env de Produção Exemplo:** [`.env.production.example`](file:///c:/Users/garde/Desktop/projects/blood-match/.env.production.example)
+- **Nginx Config:** [`infrastructure/nginx/default.conf`](infrastructure/nginx/default.conf)
+- **Compose de Produção:** [`docker-compose.prod.yml`](docker-compose.prod.yml)
+- **Env de Produção Exemplo:** [`.env.production.example`](.env.production.example)
 
 ---
 

@@ -32,7 +32,7 @@ O domínio não depende de HTTP nem de Mongo. Repositórios são interfaces no d
 - `frontend/` — app React + Vite + TypeScript
 - `infrastructure/` — Nginx (produção)
 - `docs/` — contratos e estratégias
-- `scripts/` — seed e simulações
+- `scripts/` — seed de desenvolvimento
 - `insomnia/` — coleção da API
 - `tcc-latex/` — monografia
 
@@ -155,7 +155,12 @@ Não existem mais `POST /donations/create-pending` nem `POST /donations/complete
 - `fill(bloodCenter, asOfDate)` — pedidos **ativos** daquele hemocentro
 - `fill(requests, asOfDate)` — recarrega ativos dos hemocentros da lista (recomendações e listagem do requisitante)
 
-O intervalo de doações começa na solicitação ativa mais antiga e vai até `asOfDate`. Alocação FIFO em memória (compatibilidade + janela). Nada é regravado.
+O intervalo de doações começa na solicitação ativa mais antiga e vai até `asOfDate`. Duas passagens em memória, nada é regravado:
+
+1. FIFO até o **teto proporcional** do dia (`proportionalGoalAt(asOfDate)`)
+2. sobras em FIFO de novo, até a meta cheia (`goalBloodBags`)
+
+O teto cresce com o prazo: `ceil(goalBloodBags × decorrido / janela)`. Com pool abundante o resultado coincide com FIFO puro; em escassez privilegiamos quem está perto de expirar. O progresso de uma request folgada pode **regredir** entre snapshots quando bolsas migram para uma irmã mais urgente.
 
 Usado em:
 
@@ -178,7 +183,7 @@ Isso isola regras no domínio e deixa Mongo/REST nas bordas.
 ## 9. Artefatos de apoio
 
 - [`FRONTEND_API_CONTRACT.md`](FRONTEND_API_CONTRACT.md) — payloads, auth e matriz path × role
-- [`LOGICA_PREENCHIMENTO_REQUESTS.md`](LOGICA_PREENCHIMENTO_REQUESTS.md) — FIFO do snapshot
+- [`LOGICA_PREENCHIMENTO_REQUESTS.md`](LOGICA_PREENCHIMENTO_REQUESTS.md) — FIFO + teto proporcional
 - [`FULFILLMENT_STRATEGY.md`](FULFILLMENT_STRATEGY.md) — resumo do snapshot
 - `scripts/seed-dev.sh` — dados de desenvolvimento
 - `insomnia/bloodmatch-jwt-e2e-insomnia-export.json` — coleção da API

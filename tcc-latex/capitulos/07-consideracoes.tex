@@ -12,7 +12,7 @@ Quanto aos objetivos específicos:
   \item[\textbf{O1}] O processo da doação sanguínea foi mapeado com técnicas de DDD, resultando na hierarquia de participantes (\codigo{Party}, \codigo{Person}, \codigo{Organization}), nos papéis (\codigo{Donor}, \codigo{Requester}, \codigo{BloodCenter}) e nos agregados \codigo{DonationRequest} e \codigo{Donation}, detalhados no Capítulo~5.
   \item[\textbf{O2}] Sistemas e abordagens similares foram identificados e discutidos no mapeamento sistemático da literatura (Capítulo~3), orientando decisões de recomendação, notificação e gestão de solicitações.
   \item[\textbf{O3}] Os mecanismos de recomendação de solicitações a doadores e de notificação a candidatos elegíveis foram implementados --- \codigo{GetRecommendedRequestsUseCase}, \codigo{FindEligibleDonorsUseCase}, \codigo{DonorMatchingService} e \codigo{NotifyPotentialDonorsUseCase} --- e cobertos por testes automatizados de domínio e de aplicação.
-  \item[\textbf{O4}] A proposta foi validada pelo estudo de caso e pela implementação da API, com evidência empírica dada pela execução bem-sucedida de 105 testes automatizados (100\% de sucesso), conforme o Quadro~\ref{tab:resultado-testes}.
+  \item[\textbf{O4}] A proposta foi validada pelo estudo de caso e pela implementação da API, com evidência empírica dada pela execução bem-sucedida de 156 testes automatizados (100\% de sucesso), conforme o Quadro~\ref{tab:resultado-testes}.
   \item[\textbf{O5}] A manutenibilidade foi avaliada qualitativamente a partir da arquitetura em camadas orientada a DDD/SOLID e da testabilidade das regras críticas sem acoplamento obrigatório à infraestrutura, conforme discutido na Seção~6.5.
 \end{itemize}
 
@@ -50,6 +50,6 @@ Como direcionamentos para evoluções futuras, destacam-se:
 
 \section{Considerações finais}
 
-O descompasso entre demanda e oferta de sangue, contextualizado na Introdução, motiva soluções tecnológicas que aproximem requisitantes e doadores com critérios clinicamente relevantes --- tipagem, elegibilidade e proximidade. Este trabalho respondeu a essa necessidade com uma API RESTful orientada ao domínio da doação sanguínea, validada por implementação e por 105 testes automatizados sem falhas.
+O descompasso entre demanda e oferta de sangue, contextualizado na Introdução, motiva soluções tecnológicas que aproximem requisitantes e doadores com critérios clinicamente relevantes --- tipagem, elegibilidade e proximidade. Este trabalho respondeu a essa necessidade com uma API RESTful orientada ao domínio da doação sanguínea, validada por implementação e por 156 testes automatizados sem falhas.
 
 Conclui-se que a combinação de DDD, SOLID e testes automatizados favoreceu não apenas a entrega funcional dos requisitos, mas também a confiança na corretude das regras críticas e a perspectiva de manutenção evolutiva da solução. Espera-se que os artefatos e os resultados aqui apresentados subsidiem trabalhos futuros e inspirem aprimoramentos em sistemas de apoio à captação de doadores de sangue.

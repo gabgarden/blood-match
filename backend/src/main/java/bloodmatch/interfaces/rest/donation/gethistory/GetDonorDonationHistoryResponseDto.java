@@ -9,12 +9,14 @@ import java.time.LocalDate;
 public record GetDonorDonationHistoryResponseDto(
     @Schema(description = "Donation UUID", format = "uuid") String donationId,
     @Schema(description = "Donation date", format = "date") LocalDate date,
-    @Schema(description = "Blood center name") String location) {
+    @Schema(description = "Blood center name") String location,
+    @Schema(description = "PENDING, COMPLETED or CANCELLED", example = "COMPLETED") String status) {
 
   public static GetDonorDonationHistoryResponseDto from(OutputItem item) {
     return new GetDonorDonationHistoryResponseDto(
         item.donationId(),
         item.date(),
-        item.location());
+        item.location(),
+        item.status());
   }
 }

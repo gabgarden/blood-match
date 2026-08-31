@@ -40,13 +40,15 @@ public class GetDonorDonationHistoryUseCase {
   public record OutputItem(
       String donationId,
       LocalDate date,
-      String location) {
+      String location,
+      String status) {
 
     public static OutputItem from(Donation donation) {
       return new OutputItem(
           donation.getId().getValue().toString(),
           donation.getReferenceDate(),
-          donation.getBloodCenter().getOrganization().getName());
+          donation.getBloodCenter().getOrganization().getName(),
+          donation.status());
     }
   }
 }
