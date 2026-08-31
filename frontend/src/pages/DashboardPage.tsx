@@ -1,0 +1,273 @@
+import { useState, useMemo } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { RecommendationCard } from "../components/dashboard/RecommendationCard";
+import { useAuth } from "../context/AuthContext";
+import { DonorDashboardSidebar } from "../components/dashboard/DashboardSidebar";
+import { DonorDashboardTopbar } from "../components/dashboard/DashboardTopbar";
+import { MobileBottomNav } from "../components/dashboard/MobileBottomNav";
+import { DonorHeroSection } from "../components/dashboard/DonorHeroSection";
+import { LastDonationCard } from "../components/dashboard/LastDonationCard";
+import { InteractiveMapCard } from "../components/dashboard/InteractiveMapCard";
+import { ScheduleDonationModal } from "../components/dashboard/ScheduleDonationModal";
+import { CommunityImpactSection } from "../components/dashboard/CommunityImpactSection";
+import { useDonorDashboard, type Recommendation } from "../hooks/useDonorDashboard";
+import { FullPageLoading, InlineAlert } from "../components/ui";
+import { useRoleResolution } from "../hooks/useRoleResolution";
+import { hasAdminRole, hasBloodCenterRole, hasDonorRole, hasRequesterRole } from "../routes/roleRouting";
+import { BloodStockSemaphoreWidget } from "../components/dashboard/BloodStockSemaphoreWidget";
+import { useRegionalBloodStock } from "../hooks/useRegionalBloodStock";
+import { externalDonationCreatePath } from "../services/donationService";
+import { OtherCausesSection } from "../components/OtherCausesSection";
+
+export default function DonorDashboardPage() {
+  const navigate = useNavigate();
+  const { roles, partyId, logout } = useAuth();
+  const [schedulingRecommendation, setSchedulingRecommendation] = useState<Recommendation | null>(null);
+  const [isSubmittingSchedule, setIsSubmittingSchedule] = useState(false);
+
+  const normalizedRoles = useMemo(() => roles, [roles]);
+  const isResolvingRoles = useRoleResolution(normalizedRoles);
+  const canAccessDonorDashboard = hasDonorRole(normalizedRoles);
+  const canAccessRequesterArea = hasRequesterRole(normalizedRoles);
+  const canAccessAdminArea = hasAdminRole(normalizedRoles);
+  const canAccessBloodCenter = hasBloodCenterRole(normalizedRoles);
+  const isRequesterOnly = canAccessRequesterArea && !canAccessDonorDashboard && !canAccessAdminArea && !canAccessBloodCenter;
+  const isBloodCenterHome = canAccessBloodCenter && !canAccessDonorDashboard && !canAccessAdminArea;
+
+  const {
+    recommendations,
+    isLoadingRecommendations,
+    feedback,
+    errorMessage,
+    displayName,
+    donorBloodType,
+    daysRemaining,
+    livesImpacted,
+    lastDonationDate,
+    lastDonationHospitalName,
+    lastDonationId,
+    acceptDonation,
+  } = useDonorDashboard({ partyId, hasDonorRole: canAccessDonorDashboard });
+
+  const {
+    levels: stockLevels,
+    isLoading: isLoadingStock,
+    errorMessage: stockError,
+  } = useRegionalBloodStock(canAccessDonorDashboard);
+
+  const waitingDays = Math.max(daysRemaining, 0);
+  const isEligibleToDonate = waitingDays <= 0;
+  const featuredRecommendations = useMemo(() => recommendations.slice(0, 3), [recommendations]);
+  const criticalCount = useMemo(
+    () => recommendations.filter((item) => item.urgency === "CRITICAL").length,
+    [recommendations],
+  );
+
+  if (isResolvingRoles) {
+    return <FullPageLoading message="Carregando permissões..." />;
+  }
+
+  function handleCreateExternalDonation() {
+    navigate(externalDonationCreatePath);
+  }
+
+  function handleOpenScheduleModal(requestId: string) {
+    const rec = recommendations.find((item) => item.id === requestId);
+    if (rec) {
+      setSchedulingRecommendation(rec);
+    }
+  }
+
+  async function handleConfirmSchedule(requestId: string, expectedDate: string, expectedTime?: string) {
+    setIsSubmittingSchedule(true);
+    try {
+      return await acceptDonation(requestId, expectedDate, expectedTime);
+    } finally {
+      setIsSubmittingSchedule(false);
+    }
+  }
+
+  if (isBloodCenterHome) {
+    return <Navigate to="/blood-center" replace />;
+  }
+
+  if (isRequesterOnly) {
+    return <Navigate to="/requests" replace />;
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f9f9fb] text-[#1a1c1d]">
+      <DonorDashboardSidebar onLogout={logout} activeItem="donor-dashboard" />
+      <DonorDashboardTopbar title="Central do Doador" onLogout={logout} />
+
+      <main className="pt-20 px-4 pb-24 lg:ml-64 lg:px-8 lg:pb-10">
+        <div className="mx-auto max-w-[1400px] space-y-6">
+          {feedback && <InlineAlert tone="success" message={feedback} />}
+          {errorMessage && <InlineAlert tone="error" message={errorMessage} />}
+
+          {canAccessDonorDashboard && (
+            <>
+              <section className="grid grid-cols-12 gap-6">
+                <DonorHeroSection
+                  userName={displayName}
+                  bloodType={donorBloodType}
+                  daysRemaining={daysRemaining}
+                  livesImpacted={livesImpacted}
+                  recommendationCount={isEligibleToDonate ? recommendations.length : 0}
+                />
+                <LastDonationCard
+                  lastDonationDate={lastDonationDate}
+                  lastDonationHospitalName={lastDonationHospitalName}
+                  hasDonation={!!lastDonationId}
+                  isEligibleToDonate={isEligibleToDonate}
+                  onCreateExternalDonation={handleCreateExternalDonation}
+                />
+              </section>
+
+              {/* Mapa Interativo de Hemocentros e Urgências */}
+              <InteractiveMapCard
+                recommendations={recommendations}
+                onSchedule={handleOpenScheduleModal}
+                isEligibleToDonate={isEligibleToDonate}
+                daysRemaining={waitingDays}
+              />
+
+              <BloodStockSemaphoreWidget
+                levels={stockLevels.map((level) => ({ type: level.bloodType, percentage: level.percentage }))}
+                isLoading={isLoadingStock}
+                errorMessage={stockError}
+              />
+
+              {/* Painel de Transparência e Impacto da Comunidade */}
+              <CommunityImpactSection />
+
+              <section className="space-y-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-surface">
+                        Recomendações
+                      </h2>
+                      {criticalCount > 0 && (
+                        <span className="rounded-lg bg-[#fff2f0] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                          {criticalCount} crítica{criticalCount === 1 ? "" : "s"}
+                        </span>
+                      )}
+                      {!isEligibleToDonate && (
+                        <span className="rounded-lg bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                          Modo Consulta
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-sm text-text-secondary">
+                      {isEligibleToDonate
+                        ? `Pedidos compatíveis com ${donorBloodType}, priorizados por proximidade e urgência.`
+                        : `Solicitações ativas na sua região. Você estará liberado para doar em ${waitingDays} ${waitingDays === 1 ? "dia" : "dias"}.`}
+                    </p>
+                  </div>
+
+                  {recommendations.length > 0 && (
+                    <Link
+                      to="/dashboard/recommendations"
+                      className="inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline"
+                    >
+                      Ver todas
+                      <span className="material-symbols-outlined text-base">chevron_right</span>
+                    </Link>
+                  )}
+                </div>
+
+                {!isEligibleToDonate && (
+                  <div className="rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4 flex items-center gap-3 text-amber-900 shadow-xs">
+                    <span className="material-symbols-outlined text-amber-600 text-xl shrink-0">info</span>
+                    <p className="text-xs font-semibold leading-relaxed">
+                      Você está em período de descanso ({waitingDays} {waitingDays === 1 ? "dia restante" : "dias restantes"}), mas pode consultar todas as solicitações abaixo e pré-agendar doações para datas futuras!
+                    </p>
+                  </div>
+                )}
+
+                {isLoadingRecommendations && (
+                  <div className="rounded-[2rem] border border-surface-container-high bg-white p-10 text-center">
+                    <span className="material-symbols-outlined animate-spin text-3xl text-primary">
+                      progress_activity
+                    </span>
+                    <p className="mt-3 text-sm text-text-secondary">Buscando recomendações...</p>
+                  </div>
+                )}
+
+                {!isLoadingRecommendations && featuredRecommendations.length > 0 && (
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                    {featuredRecommendations.map((recommendation) => (
+                      <RecommendationCard
+                        key={recommendation.id}
+                        id={recommendation.id}
+                        name={recommendation.bloodCenterName}
+                        bloodTypeNeeded={recommendation.bloodTypeNeeded}
+                        dateLimit={recommendation.dateLimit}
+                        urgency={recommendation.urgency}
+                        distanceInKm={recommendation.distanceInKm}
+                        goalBloodBags={recommendation.goalBloodBags}
+                        fulfilledBloodBags={recommendation.fulfilledBloodBags}
+                        goalReached={recommendation.goalReached}
+                        onAccept={handleOpenScheduleModal}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {!isLoadingRecommendations && featuredRecommendations.length === 0 && (
+                  <div className="rounded-[2rem] border border-dashed border-surface-container-highest bg-white px-6 py-12 text-center">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-container-low text-secondary">
+                      <span className="material-symbols-outlined text-2xl">travel_explore</span>
+                    </div>
+                    <p className="mt-4 font-headline text-lg font-bold text-on-surface">
+                      Nenhuma recomendação no momento
+                    </p>
+                    <p className="mx-auto mt-1 max-w-md text-sm text-text-secondary">
+                      Assim que houver pedidos compatíveis no seu raio, eles aparecem aqui.
+                    </p>
+                  </div>
+                )}
+              </section>
+
+              {/* Seção Informativa de Outras Causas */}
+              <div className="rounded-[2rem] overflow-hidden border border-surface-container-high shadow-sm bg-white">
+                <OtherCausesSection />
+              </div>
+            </>
+          )}
+
+          {!canAccessDonorDashboard && canAccessAdminArea && (
+            <section className="rounded-[2rem] border border-surface-container-high bg-white p-6 sm:p-8">
+              <h2 className="font-headline text-xl font-extrabold text-on-surface">Acesso administrativo</h2>
+              <p className="mt-2 text-sm text-text-secondary">
+                Use o menu lateral para gerenciar requisições e demais áreas liberadas ao seu perfil.
+              </p>
+            </section>
+          )}
+
+          {!canAccessDonorDashboard && !canAccessAdminArea && (
+            <section className="rounded-[2rem] border border-dashed border-surface-container-highest bg-white px-6 py-12 text-center">
+              <h2 className="font-headline text-xl font-extrabold text-on-surface">Perfil incompleto</h2>
+              <p className="mx-auto mt-2 max-w-md text-sm text-text-secondary">
+                Sua sessão não tem o papel de doador. Abra <strong>Meu Perfil</strong> ou saia e entre novamente.
+                Se o menu continuar só com perfil, o login não está devolvendo as permissões.
+              </p>
+            </section>
+          )}
+        </div>
+      </main>
+
+      <ScheduleDonationModal
+        isOpen={!!schedulingRecommendation}
+        recommendation={schedulingRecommendation}
+        onClose={() => setSchedulingRecommendation(null)}
+        onConfirm={handleConfirmSchedule}
+        isSubmitting={isSubmittingSchedule}
+        daysRemaining={waitingDays}
+      />
+
+      <MobileBottomNav activeItem="donor-dashboard" />
+    </div>
+  );
+}

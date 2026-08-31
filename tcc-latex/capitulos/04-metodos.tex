@@ -7,7 +7,7 @@ Neste capítulo são descritos os procedimentos metodológicos adotados para o a
 Para o desenvolvimento da pesquisa adotou-se a abordagem qualitativa, que se destaca por enfatizar a análise de dados não numéricos, como documentos, normativas e literatura especializada, buscando compreender o significado e a complexidade dos fenômenos investigados.
 
 \begin{citacao}
-A pesquisa qualitativa trabalha com o universo de significados, motivos, aspirações, crenças, valores e atitudes, o que corresponde a um espaço mais profundo das relações, dos processos e dos fenômenos que não pode ser reduzido à operacionalização de variáveis. \citeonline[p.~21]{minayo2001}
+A pesquisa qualitativa trabalha com o universo de significados, motivos, aspirações, crenças, valores e atitudes, o que corresponde a um espaço mais profundo das relações, dos processos e dos fenômenos que não pode ser reduzido à operacionalização de variáveis. \cite[p.~21]{minayo2001}
 \end{citacao}
 
 Para a condução do trabalho, foram traçadas etapas sequenciais, ilustradas na Figura~\ref{fig:processo-tcc} e na Figura~\ref{fig:processo-api}.
@@ -34,7 +34,7 @@ Paralelamente, realizou-se o mapeamento do processo de um hemocentro por meio de
 
 Com base no conhecimento adquirido nessas etapas, realizou-se a análise do domínio sob a ótica do DDD e a definição dos requisitos funcionais e não funcionais. Na sequência, elaborou-se o projeto da solução (casos de uso e diagramas de classes) e desenvolveu-se a API aplicando SOLID, com vistas à escalabilidade, manutenibilidade e testabilidade.
 
-Por fim, os resultados foram avaliados por meio de testes unitários, seguidos da elaboração das conclusões do trabalho.
+Por fim, os resultados foram avaliados por meio de testes unitários e de integração, seguidos da elaboração das conclusões do trabalho.
 
 \section{Instrumentos e ferramentas}
 
@@ -58,7 +58,7 @@ O desenvolvimento da API foi orientado por boas práticas de engenharia de \text
 
 \subsubsection{Linguagem de programação (Java)}
 
-A linguagem escolhida para a implementação foi o Java, em sua versão 17 (\textit{Long Term Support} --- LTS). Java é uma linguagem orientada a objetos, fortemente tipada e amplamente documentada na literatura \citeonline{deitel2017}. A tipagem estática do Java favorece a implementação de \textit{Value Objects} e \textit{Entities}, garantindo que erros de domínio sejam capturados em tempo de compilação. Em contrapartida, uma crítica comum ao Java é a sua verbosidade e o consumo de memória da \textit{Java Virtual Machine} (JVM), se comparado a linguagens como Go ou Python, conforme discutido por \citeonline{bloch2018}. Ainda assim, a robustez da linguagem compensa essas restrições para o contexto corporativo.
+A linguagem escolhida para a implementação foi o Java, em sua versão 17 (\textit{Long Term Support} --- LTS). Java é uma linguagem orientada a objetos, fortemente tipada e amplamente documentada na literatura \cite{deitel2017}. A tipagem estática do Java favorece a implementação de \textit{Value Objects} e \textit{Entities}, garantindo que erros de domínio sejam capturados em tempo de compilação. Em contrapartida, uma crítica comum ao Java é a sua verbosidade e o consumo de memória da \textit{Java Virtual Machine} (JVM), se comparado a linguagens como Go ou Python, conforme discutido por \citeonline{bloch2018}. Ainda assim, a robustez da linguagem compensa essas restrições para o contexto corporativo.
 
 \subsubsection{\textit{Framework} de desenvolvimento (Spring Boot)}
 

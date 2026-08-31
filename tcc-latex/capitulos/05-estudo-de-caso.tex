@@ -38,13 +38,12 @@ Os requisitos funcionais representam as operações que a API disponibiliza para
     RF13 & Permitir a consulta das solicitações de doação de um participante. \\
     RF14 & Permitir a consulta das solicitações de doação recomendadas para um doador. \\
     RF15 & Permitir a notificação de doadores potenciais elegíveis para uma solicitação. \\
-    RF16 & Permitir o registro de uma doação pendente. \\
+    RF16 & Permitir o registro de uma doação, informando a data de intenção (pendente) ou a data efetiva (concluída). \\
     RF17 & Permitir o reagendamento de uma doação pendente. \\
     RF18 & Permitir a confirmação (conclusão) de uma doação pendente. \\
-    RF19 & Permitir o registro direto de uma doação já concluída. \\
-    RF20 & Permitir a consulta do histórico de doações de um doador. \\
-    RF21 & Permitir a consulta do resumo (\textit{summary}) de um doador. \\
-    RF22 & Permitir o ajuste da distância máxima considerada nas recomendações de um doador. \\
+    RF19 & Permitir a consulta do histórico de doações de um doador. \\
+    RF20 & Permitir a consulta do resumo (\textit{summary}) de um doador. \\
+    RF21 & Permitir o ajuste da distância máxima considerada nas recomendações de um doador. \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
@@ -104,15 +103,14 @@ A modelagem de casos de uso, em notação UML, sintetiza as operações disponí
     UC07 & Atualizar dados cadastrais / perfil do doador & Donor / Requester \\
     UC08 & Registrar solicitação de doação (\textit{Register Donation Request}) & Requester \\
     UC09 & Consultar recomendações de solicitações (\textit{Consult Recommendations}) & Donor \\
-    UC10 & Registrar doação pendente (\textit{Register Pending Donation}) & Donor \\
-    UC11 & Registrar doação realizada (\textit{Register Completed Donation}) & Donor \\
-    UC12 & Completar doação pendente (\textit{Complete a Pending Donation}) & Donor \\
-    UC13 & Consultar histórico de doações (\textit{See Donation History}) & Donor \\
-    UC14 & Gerenciar solicitações --- atualizar meta/prazo, cancelar e consultar & Requester \\
-    UC15 & Atualizar distância máxima para recomendações & Donor \\
-    UC16 & Notificar doadores potenciais elegíveis & Requester \\
-    UC17 & Reagendar doação pendente & Donor \\
-    UC18 & Consultar resumo do doador (\textit{Donor Summary}) & Donor \\
+    UC10 & Registrar doação (\textit{Register Donation}) & Donor \\
+    UC11 & Completar doação pendente (\textit{Complete a Pending Donation}) & Donor \\
+    UC12 & Consultar histórico de doações (\textit{See Donation History}) & Donor \\
+    UC13 & Gerenciar solicitações --- atualizar meta/prazo, cancelar e consultar & Requester \\
+    UC14 & Atualizar distância máxima para recomendações & Donor \\
+    UC15 & Notificar doadores potenciais elegíveis & Requester \\
+    UC16 & Reagendar doação pendente & Donor \\
+    UC17 & Consultar resumo do doador (\textit{Donor Summary}) & Donor \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
@@ -122,8 +120,8 @@ A representação gráfica dessas interações é dividida de acordo com o níve
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura03-uc-visitante}
   \caption{Diagrama de caso de uso de visitante}
+  \includegraphics[width=0.9\textwidth]{figura03-uc-visitante}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-guest}
 \end{figure}
@@ -132,23 +130,23 @@ O ator \textit{Guest} representa utilizadores sem cadastro prévio, limitados à
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura04-uc-requisitante}
   \caption{Diagrama de caso de uso de requisitante}
+  \includegraphics[width=0.9\textwidth]{figura04-uc-requisitante}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-requester}
 \end{figure}
 
-O ator \textit{Requester} concentra as permissões relacionadas à criação e à gestão de solicitações de sangue (UC08 e UC14), além do disparo de notificações a doadores potenciais quando uma solicitação precisa de maior alcance (UC16).
+O ator \textit{Requester} concentra as permissões relacionadas à criação e à gestão de solicitações de sangue (UC08 e UC13), além do disparo de notificações a doadores potenciais quando uma solicitação precisa de maior alcance (UC15).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura05-uc-doador}
   \caption{Diagrama de caso de uso de doador}
+  \includegraphics[width=0.9\textwidth]{figura05-uc-doador}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-donor}
 \end{figure}
 
-O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a consulta às solicitações recomendadas, o ajuste da distância máxima de recomendação, a gestão do próprio histórico hemoterápico e a consulta ao seu resumo (UC09, UC10, UC11, UC12, UC13, UC15, UC17 e UC18).
+O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a consulta às solicitações recomendadas, o registro unificado de doações, a conclusão e o reagendamento de pendentes, o ajuste da distância máxima de recomendação, a gestão do próprio histórico hemoterápico e a consulta ao seu resumo (UC09, UC10, UC11, UC12, UC14, UC16 e UC17). No UC10, a doação nasce pendente quando o doador informa a data de intenção ou concluída quando informa a data efetiva --- um único caso de uso, sem fábricas concorrentes no domínio.
 
 \subsection{Diagramas de classes}
 
@@ -158,8 +156,8 @@ A Figura~\ref{fig:classe-participantes} apresenta o diagrama de classes conceitu
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura06-classes-participantes}
   \caption{Diagrama conceitual dos participantes}
+  \includegraphics[width=0.9\textwidth]{figura06-classes-participantes}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:classe-participantes}
 \end{figure}
@@ -170,33 +168,37 @@ Dando prosseguimento à representação do negócio, a Figura~\ref{fig:classe-do
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura07-classes-doacao}
   \caption{Diagrama conceitual do processo de doação}
+  \includegraphics[width=0.9\textwidth]{figura07-classes-doacao}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:classe-doacao}
 \end{figure}
 
-Neste nível de abstração, evidencia-se a associação semântica entre a solicitação (\texttt{DonationRequest}) e o ato de doar (\texttt{Donation}). O fluxo natural demonstra que um \texttt{Requester} origina a solicitação, que é vinculada a um \texttt{BloodCenter} e, posteriormente, recebe as doações efetivadas por um \texttt{Donor}.
+Neste nível de abstração, evidencia-se a associação semântica entre a solicitação (\codigo{DonationRequest}) e o ato de doar (\codigo{Donation}). O fluxo natural demonstra que um \codigo{Requester} origina a solicitação, que é vinculada a um \codigo{BloodCenter} e, posteriormente, recebe as doações efetivadas por um \codigo{Donor}.
 
-Elevando o rigor para o design de software, a Figura~\ref{fig:impl-request} detalha a implementação técnica do agregado \texttt{DonationRequest}. A classe é modelada como uma raiz de agregado (\texttt{<<AggregateRoot>>}), atuando como a única porta de entrada para a proteção de invariantes, como as datas-limite e a urgência da solicitação. Observa-se a aplicação da herança por meio da superclasse abstrata \texttt{DomainObject}, responsável por compor os identificadores únicos globais (\texttt{<<ValueObject>> DomainID}). Destaca-se também a dependência tracejada (\texttt{<<use>>}) com a classe \texttt{Donation}, a qual evidencia o baixo acoplamento da arquitetura: a requisição não armazena doações em memória, apenas as avalia de forma transitória por meio de parâmetros no método \texttt{acceptsDonation()}.
+Elevando o rigor para o design de software, a Figura~\ref{fig:impl-request} detalha a implementação técnica do agregado \texttt{DonationRequest}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{figura08-impl-donation-request}
   \caption{Diagrama de implementação: agregado DonationRequest}
+  \includegraphics[width=0.9\textwidth]{figura08-impl-donation-request}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:impl-request}
 \end{figure}
 
-Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementação do agregado \texttt{Donation}. Tratada também como uma raiz de agregado autônoma, a classe gerencia seu próprio ciclo de vida de estados (pendente, concluída, cancelada). A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação de doação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
+A classe é modelada como uma raiz de agregado (\texttt{<<AggregateRoot>>}), atuando como a única porta de entrada para a proteção de invariantes, como as datas-limite e a urgência da solicitação. Observa-se a aplicação da herança por meio da superclasse abstrata \texttt{DomainObject}, responsável por compor os identificadores únicos globais (\texttt{<<ValueObject>> DomainID}). Destaca-se também a dependência tracejada (\texttt{<<use>>}) com a classe \texttt{Donation}, a qual evidencia o baixo acoplamento da arquitetura: a requisição não armazena doações em memória, apenas as avalia de forma transitória por meio de parâmetros no método \texttt{acceptsDonation()}.
+
+Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementação do agregado \texttt{Donation}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.95\textwidth]{figura09-impl-donation}
   \caption{Diagrama de implementação: agregado Donation}
+  \includegraphics[width=0.95\textwidth]{figura09-impl-donation}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:impl-donation}
 \end{figure}
+
+Tratada também como uma raiz de agregado autônoma, a classe concentra uma única fábrica \codigo{create} e o ciclo de vida pendente--concluída--cancelada. O estado não é armazenado como flags independentes: deriva das datas de intenção (\codigo{intendedDate}), de efetivação (\codigo{donationDate}) e de cancelamento (\codigo{cancelledAt}). Completar uma doação pendente preenche a data efetiva sem apagar a intenção; reagendar e cancelar permanecem transições sobre o mesmo agregado. A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
 
 \section{Domínio e arquitetura}
 
@@ -237,7 +239,7 @@ A estrutura central do domínio foi modelada de forma hierárquica e orientada a
     Requester & Representa o perfil requisitante. \\
     BloodCenter & Representa o perfil de banco de sangue vinculado a uma organização. \\
     DonationRequest & Representa uma solicitação de doação de sangue, incluindo sua meta e seu progresso. \\
-    Donation & Representa uma doação registrada no sistema. \\
+    Donation & Representa uma doação registrada no sistema, cujo estado (pendente, concluída ou cancelada) deriva das datas de intenção, de efetivação e de cancelamento. \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
@@ -249,11 +251,33 @@ As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de
 
 \section{Implementação}
 
+A implementação técnica da API é descrita a seguir em termos de persistência, segurança e integração com serviços externos. Trechos do código-fonte que materializam as regras de domínio, os invariantes dos agregados, o algoritmo de cumprimento de metas, o matching de doadores e a inversão de dependência nos casos de uso são apresentados nos Apêndices~\ref{ap:regras-dominio},~\ref{ap:agregados},~\ref{ap:fulfillment} e~\ref{ap:dip}, respectivamente, a fim de não sobrecarregar o corpo do capítulo.
+
 \subsection{Persistência de dados}
 
-A persistência foi implementada sobre MongoDB, um banco de dados NoSQL orientado a documentos. Cada agregado de domínio possui um \textit{schema} de persistência correspondente (por exemplo, \texttt{DonationRequestSchema} e \texttt{DonationSchema}), responsável por converter o objeto de domínio em um documento e vice-versa por meio de métodos dedicados de mapeamento (construtor a partir do domínio e \texttt{toDomain(...)}). Essa separação evita que anotações e particularidades do banco de dados vazem para as classes de domínio, mantendo o isolamento preconizado no DDD.
+A persistência foi implementada sobre MongoDB, um banco de dados NoSQL orientado a documentos, e organizada no pacote \codigo{infra/persistence} em três subpacotes de responsabilidades distintas: \codigo{schema}, com os documentos e o mapeamento; \codigo{repository}, com os adaptadores que implementam as interfaces de repositório do domínio; e \codigo{repository/mongo}, com as interfaces \textit{Spring Data} que efetivamente consultam o banco.
 
-Um ponto de destaque é o controle de concorrência da solicitação de doação: o \texttt{DonationRequestSchema} utiliza controle de versão otimista (anotação \texttt{@Version}), de forma que duas escritas concorrentes sobre a mesma solicitação --- por exemplo, um recálculo de cumprimento de meta e uma atualização manual de prazo --- sejam detectadas pelo MongoDB. Ao identificar um conflito de versão, o repositório converte a exceção de persistência em uma \texttt{IllegalStateException}, sinalizando de forma explícita ao caso de uso que a operação deve ser reavaliada. Além disso, índices compostos foram definidos sobre campos como situação ativa, tipo sanguíneo e data-limite, bem como um índice geoespacial sobre a localização do hemocentro, otimizando as consultas de recomendação descritas na Seção~\ref{sec:recomendacao-fulfillment}.
+\subsubsection{Esquemas e mapeamento}
+
+Cada agregado de domínio possui um \textit{schema} de persistência correspondente (por exemplo, \texttt{DonationRequestSchema} e \texttt{DonationSchema}), responsável por converter o objeto de domínio em um documento e vice-versa por meio de métodos dedicados de mapeamento (construtor a partir do domínio e \texttt{toDomain(...)}). Essa separação evita que anotações e particularidades do banco de dados vazem para as classes de domínio, mantendo o isolamento preconizado no DDD: o agregado \texttt{DonationRequest} não conhece \texttt{@Document}, \texttt{@Id} ou \texttt{@Version}, e é reconstruído pela fábrica \codigo{reconstitute(...)} --- distinta da fábrica \codigo{create(...)} usada no cadastro, que aplica as validações de criação descritas na Seção anterior.
+
+\subsubsection{Repositórios como portas do domínio}
+
+O acesso a dados segue o padrão \textit{Repository} \cite{evans2003} combinado à inversão de dependência (Capítulo~2). Para cada agregado ou papel, o domínio declara uma interface --- \codigo{DonationRequestRepositoryInterface}, \codigo{DonationRepositoryInterface}, \codigo{DonorRepositoryInterface}, \codigo{PartyRepositoryInterface}, entre outras, somando dez portas --- expressa inteiramente em termos de tipos de domínio (\codigo{DomainID}, \codigo{BloodType}, \codigo{Address}). Os casos de uso dependem apenas dessas interfaces; nenhum deles importa classes de \textit{Spring Data} ou do driver MongoDB. É essa propriedade que permite que a suíte de testes substitua os repositórios por \textit{mocks} e exercite as regras de negócio sem uma instância de banco ativa, conforme discutido no Capítulo~6.
+
+Na camada de infraestrutura, cada porta possui um adaptador anotado com \texttt{@Repository} (por exemplo, \codigo{DonationRequestRepositoryImpl}) que cumpre três funções: validar os argumentos recebidos, traduzir os tipos de domínio para os tipos primitivos armazenados no documento --- notadamente convertendo \codigo{DomainID} em \codigo{String} --- e delegar a consulta a uma interface \textit{Spring Data} (\codigo{DonationRequestMongoRepository} e congêneres, nove ao todo), cujos métodos são derivados do próprio nome. Consultas de maior porte, como a recomendação geoespacial, são expressas nessa interface por \textit{query methods} que combinam situação ativa, data-limite, conjunto de tipos sanguíneos compatíveis e proximidade (\codigo{...AndLocationNear}), de modo que a filtragem ocorra no banco e não em memória.
+
+\subsubsection{Carregamento do grafo de objetos}
+
+Um documento de solicitação não armazena o requisitante nem o hemocentro por composição: guarda apenas os identificadores \codigo{requesterId} e \codigo{organizationId}. Reconstituir o agregado exige, portanto, recuperar a \codigo{Party} correspondente, o papel associado (\codigo{Requester}, \codigo{BloodCenter} ou \codigo{Donor}) e só então invocar \codigo{toDomain(...)}. Realizada ingenuamente, uma consulta por identificador para cada elemento da lista, essa reconstituição incorre no problema conhecido como N+1 consultas: listar cinquenta solicitações dispararia mais de cem leituras adicionais ao banco.
+
+Para evitá-lo, o mapeamento foi centralizado no componente \codigo{PersistenceGraphLoader}, no subpacote \codigo{mapping}. Em vez de resolver cada documento isoladamente, ele opera sobre a lista inteira: percorre os documentos coletando os identificadores distintos de participantes e organizações, executa um número fixo de leituras em lote (\codigo{findAllById} sobre as \textit{parties} e consultas \codigo{findBy...In} sobre os papéis), indexa os resultados em mapas por identificador e, em uma segunda passagem, monta cada objeto de domínio consultando esses mapas em memória. O número de idas ao banco passa a ser constante --- quatro, independentemente do tamanho da lista --- em vez de proporcional à quantidade de documentos.
+
+O componente expõe dois métodos, \codigo{toDonationRequests(...)} e \codigo{toDonations(...)}, e é a única via de reconstituição usada pelos repositórios de solicitação e de doação; ambos delegam a ele por meio de um método privado \codigo{toDomainList(...)}, inclusive no caso de um único documento, o que mantém um caminho de mapeamento único. Referências órfãs --- um papel ausente para um identificador presente no documento --- são detectadas explicitamente e convertidas em \codigo{IllegalArgumentException}, de forma que uma inconsistência do banco falhe de imediato, em vez de propagar um agregado parcialmente construído para o domínio. Esse carregamento em lote é particularmente relevante para o \textit{snapshot} de cumprimento de metas descrito na Seção~\ref{sec:fulfillment-bags}, que reconstitui, a cada leitura, todas as solicitações ativas e todas as doações concluídas do hemocentro.
+
+\subsubsection{Concorrência otimista e índices}
+
+Um ponto de destaque é o controle de concorrência da solicitação de doação: o \texttt{DonationRequestSchema} utiliza controle de versão otimista (anotação \texttt{@Version}), de forma que duas escritas concorrentes sobre a mesma solicitação --- por exemplo, a atualização do prazo e a da meta de bolsas --- sejam detectadas pelo MongoDB. Ao identificar um conflito de versão, o repositório captura a \codigo{OptimisticLockingFailureException} do \textit{Spring Data} e a converte em uma \texttt{IllegalStateException}, sinalizando de forma explícita ao caso de uso que a operação deve ser reavaliada --- e, novamente, impedindo que uma exceção específica da infraestrutura alcance as camadas superiores. O cumprimento de metas, descrito na Seção~\ref{sec:fulfillment-bags}, não participa desse conflito: o \textit{snapshot} é calculado em memória e não regrava a solicitação. Além disso, índices compostos foram definidos sobre situação ativa, tipo sanguíneo e data-limite, e sobre situação ativa, organização e data da solicitação --- este último alinhado à ordenação exigida pela alocação, evitando uma ordenação adicional em memória ---, bem como um índice geoespacial \texttt{2dsphere} sobre a localização do hemocentro, otimizando as consultas de recomendação descritas na Seção~\ref{sec:recomendacao-fulfillment}.
 
 \subsection{Segurança e autenticação}
 
@@ -261,29 +285,32 @@ O controle de acesso é implementado por meio de autenticação baseada em JWT. 
 
 \subsection{Serviços externos e documentação da API}
 
-A notificação de doadores é abstraída por uma interface de domínio (\texttt{NotificationServiceInterface}), permitindo múltiplas implementações na camada de infraestrutura --- como uma implementação por e-mail e uma implementação simplificada para ambiente de desenvolvimento --- sem que o caso de uso que dispara a notificação precise conhecer o mecanismo concreto de envio. Essa inversão de dependência, alinhada aos princípios SOLID discutidos no Capítulo~2, evita que o domínio fique acoplado a bibliotecas de terceiros.
+A notificação de doadores é abstraída por uma interface de domínio (\codigo{NotificationServiceInterface}), permitindo múltiplas implementações na camada de infraestrutura --- como uma implementação por e-mail e uma implementação simplificada para ambiente de desenvolvimento --- sem que o caso de uso que dispara a notificação precise conhecer o mecanismo concreto de envio. Essa inversão de dependência, alinhada aos princípios SOLID discutidos no Capítulo~2 e exemplificada no Apêndice~\ref{ap:dip} para o fluxo de conclusão de doação, evita que o domínio fique acoplado a bibliotecas de terceiros. O registro da doação, por sua vez, é orquestrado por um único caso de uso (\codigo{CreateDonationUseCase}, \textit{endpoint} \codigo{POST /donations}): a presença de \codigo{intendedDate} agenda a doação; a presença de \codigo{donationDate} a registra já concluída.
 
 Para a documentação e a exploração interativa dos recursos da API, foi integrada a biblioteca \textit{springdoc-openapi}, que gera automaticamente a especificação OpenAPI a partir dos \textit{controllers} e disponibiliza uma interface de teste dos \textit{endpoints}. Essa documentação viva reduz o custo de manutenção da documentação técnica e facilita a validação manual dos fluxos descritos neste capítulo.
 
 \section{Recomendação de solicitações e cumprimento de metas}
 \label{sec:recomendacao-fulfillment}
 
-Esta seção detalha o mecanismo central da API: a recomendação de solicitações compatíveis a doadores, a notificação de doadores potenciais e o acompanhamento do cumprimento de metas de cada solicitação. Ao contrário de um simples contador incrementado a cada doação, o sistema trata o cumprimento de metas como o resultado de um algoritmo de alocação, sincronizado sempre que uma doação é concluída.
+Esta seção detalha o mecanismo central da API: a recomendação de solicitações compatíveis a doadores, a notificação de doadores potenciais e o acompanhamento do cumprimento de metas de cada solicitação. O cumprimento de metas não é um contador incrementado a cada doação, tampouco um campo persistido: é o resultado de um algoritmo de alocação FIFO calculado em memória a partir de um \textit{snapshot} do banco no momento da leitura.
 
 \subsection{Recomendação de solicitações para o doador}
 
-O caminho de leitura é implementado pelo \texttt{GetRecommendedRequestsUseCase}, acionado pelo \textit{endpoint} \texttt{GET /donation-requests/recommendations}. Dado um doador autenticado, o caso de uso primeiro verifica sua elegibilidade para doar na data corrente (\texttt{Donor.isEligibleToDonate(...)}), considerando faixa etária e intervalo mínimo desde a última doação. Em seguida, busca no repositório as solicitações ativas compatíveis com o tipo sanguíneo do doador, dentro da distância máxima de recomendação configurada por ele (RF22) e ainda não expiradas, aproveitando o índice geoespacial descrito na Seção anterior.
+O caminho de leitura é implementado pelo \codigo{GetRecommendedRequestsUseCase}, acionado pelo \textit{endpoint} \codigo{GET /donation-requests/recommendations}. Dado um doador autenticado, o caso de uso primeiro verifica sua elegibilidade para doar na data corrente --- método \codigo{Donor.isEligibleToDonate(...)} (Listagem~\ref{lst:donor-eligible}) ---, considerando faixa etária e intervalo mínimo desde a última doação. Em seguida, busca no repositório as solicitações ativas compatíveis com o tipo sanguíneo do doador (Listagem~\ref{lst:bloodtype-candonateto}), dentro da distância máxima de recomendação configurada por ele (RF21) e ainda não expiradas, aproveitando o índice geoespacial descrito na Seção anterior.
 
-As solicitações candidatas que já atingiram a meta (\texttt{isGoalReached()}) são descartadas, e as demais são ordenadas por proximidade geográfica, urgência e proximidade da data-limite, de modo que o doador visualize primeiro as solicitações mais próximas, mais urgentes e mais próximas de expirar. O resultado retornado inclui, para cada solicitação recomendada, a distância estimada, a urgência, a meta de bolsas e o total já cumprido --- este último lido diretamente do campo persistido \texttt{fulfilledBloodBags}, sem qualquer recálculo nesse momento.
+As solicitações candidatas cuja meta já foi atingida no \textit{snapshot} de preenchimento são descartadas, e as demais são ordenadas por proximidade geográfica, urgência e proximidade da data-limite, de modo que o doador visualize primeiro as solicitações mais próximas, mais urgentes e mais próximas de expirar. O resultado retornado inclui, para cada solicitação recomendada, a distância estimada, a urgência, a meta de bolsas e o total já cumprido --- este último obtido do \codigo{DonationRequestFulfillmentService} no momento da leitura, sem campo persistido.
 
 \subsection{Notificação de doadores potenciais}
 
-Complementarmente à recomendação, o requisitante pode disparar notificações ativas por meio do \textit{endpoint} \texttt{POST /donation-requests/\{id\}/notify}, implementado pelo \texttt{NotifyPotentialDonorsUseCase}. Esse caso de uso valida que o solicitante autenticado é o dono da solicitação, que a solicitação ainda não expirou e que sua meta ainda não foi atingida; em seguida, delega ao \texttt{FindEligibleDonorsUseCase} (por meio do serviço de domínio \texttt{DonorMatchingService}) a identificação dos doadores elegíveis --- considerando compatibilidade sanguínea e elegibilidade temporal --- para, então, notificar cada doador elegível com conta ativa através do serviço de notificação descrito na Seção~5.5.3. Esse fluxo materializa, na arquitetura da API, o comportamento observado na literatura (Capítulo~3) de notificar diretamente candidatos compatíveis em vez de aguardar passivamente novas doações.
+Complementarmente à recomendação, o requisitante pode disparar notificações ativas por meio do \textit{endpoint} \codigo{POST /donation-requests/\{id\}/notify}, implementado pelo \codigo{NotifyPotentialDonorsUseCase}. Esse caso de uso valida que o solicitante autenticado é o dono da solicitação, que a solicitação ainda não expirou e que sua meta ainda não foi atingida; em seguida, delega ao \codigo{FindEligibleDonorsUseCase} (por meio do serviço de domínio \codigo{DonorMatchingService}, Listagem~\ref{lst:matching}) a identificação dos doadores elegíveis --- considerando compatibilidade sanguínea, elegibilidade temporal e proximidade geográfica --- para, então, notificar cada doador elegível com conta ativa através do serviço de notificação descrito na Seção~5.5.3. Esse fluxo materializa, na arquitetura da API, o comportamento observado na literatura (Capítulo~3) de notificar diretamente candidatos compatíveis em vez de aguardar passivamente novas doações.
 
-\subsection{Materialização do cumprimento de metas (\texttt{fulfilledBloodBags})}
+\subsection{Snapshot do cumprimento de metas}
+\label{sec:fulfillment-bags}
 
-Não existe um vínculo direto entre uma doação e uma solicitação específica: cada doação concluída em um hemocentro entra em um agrupamento (\textit{pool}) de doações daquela organização e é distribuída entre as solicitações ativas do mesmo hemocentro pelo \texttt{DonationRequestFulfillmentService}, seguindo uma regra de alocação \textit{First In, First Out} (FIFO) por hemocentro: as solicitações são ordenadas da mais antiga para a mais nova e, para cada doação (também ordenada cronologicamente), o serviço percorre as solicitações compatíveis --- mesmo tipo sanguíneo, dentro da janela entre a data de solicitação e a data-limite, e com meta ainda não atingida --- alocando a doação à primeira solicitação elegível. A verificação de compatibilidade entre uma doação e uma solicitação específica é encapsulada no método \texttt{DonationRequest.acceptsDonation(...)}, preservando a regra de negócio dentro do agregado.
+Não existe vínculo direto entre uma doação e uma solicitação específica: cada doação concluída em um hemocentro entra em um agrupamento (\textit{pool}) de doações daquela organização e é distribuída entre as solicitações ativas do mesmo hemocentro pelo \codigo{DonationRequestFulfillmentService} (Listagem~\ref{lst:fifo}). Os casos de uso de leitura invocam \codigo{fill} com a data de referência \codigo{asOfDate} --- em geral a data corrente. O serviço recarrega as solicitações ativas e ainda não expiradas dos hemocentros envolvidos (\codigo{findActiveRequestsByOrganizationIds}), de modo que a alocação considere o pool inteiro do centro, e não apenas o recorte da recomendação ou da listagem do requisitante. As doações concluídas são lidas na janela \texttt{[data da solicitação ativa mais antiga, asOfDate]}. A alocação ocorre em memória e isolada por hemocentro, com solicitações ordenadas da mais antiga para a mais nova e doações ordenadas pela data efetiva.
 
-Diferentemente da estratégia inicialmente cogitada de recalcular essa alocação a cada leitura, optou-se por materializar o resultado no momento da escrita: o campo \texttt{fulfilledBloodBags} é persistido na própria solicitação e recalculado apenas quando o conjunto de doações concluídas de um hemocentro é alterado. Esse recálculo é disparado pelo \texttt{DonationRequestFulfillmentRefresher} a partir de dois casos de uso --- \texttt{CreateCompletedDonationUseCase} e \texttt{CompletePendingDonationUseCase} ---, que, após persistirem a doação, carregam as solicitações ativas e as doações concluídas da organização afetada, executam o método \texttt{synchronize(...)} do serviço de \textit{fulfillment} e persistem cada solicitação com o novo valor calculado.
+A política de distribuição combina a ordem \textit{First In, First Out} (FIFO) com um teto proporcional ao prazo restante de cada solicitação. O teto, calculado por \codigo{DonationRequest.proportionalGoalAt} (Listagem~\ref{lst:teto-proporcional}), libera a meta no mesmo ritmo em que a janela \codigo{[dateRequested, dateLimit]} é consumida: decorridos 3 de 10 dias, apenas $3/10$ da meta está disponível na data de referência. A distribuição ocorre, então, em duas passagens sobre o mesmo pool. Na primeira, cada doação é alocada à primeira solicitação que \codigo{acceptsDonation} aceita --- ativa, não expirada na data de referência, doação concluída, data efetiva na janela \codigo{[dateRequested, dateLimit]} e tipo sanguíneo do doador compatível via \codigo{canDonateTo} (Listagem~\ref{lst:accepts-donation}) --- e que ainda esteja abaixo do seu teto; atingido o teto, a solicitação é preterida e a bolsa segue para a próxima candidata. Na segunda passagem, as doações que nenhuma solicitação pôde absorver retornam na mesma ordem FIFO, agora limitadas apenas pela meta cheia. Em ambas, o \texttt{break} garante uma bolsa por doação.
 
-Essa abordagem caracteriza um contador materializado (\textit{materialized/denormalized counter}): as leituras de recomendação e de listagem de solicitações por participante apenas consultam o campo já calculado, enquanto o custo do algoritmo de alocação é pago somente nas escritas que efetivamente alteram o cenário de doações concluídas --- criação de solicitação, cancelamento e alterações de meta ou prazo não disparam o recálculo, permanecendo consistentes até a próxima doação concluída daquele hemocentro. Trata-se de uma decisão de desempenho deliberada: como as leituras (recomendações e listagens) tendem a ser bem mais frequentes do que a conclusão de doações, deslocar o custo computacional do caminho de leitura para o caminho de escrita reduz a carga da API sem comprometer a corretude do algoritmo FIFO, que continua sendo recalculado por completo --- e não incrementado ingenuamente --- a cada sincronização.
+O propósito do teto é redistribuir a escassez em favor de quem tem menos tempo. Sem ele, a solicitação mais antiga do hemocentro consome o pool integralmente, ainda que disponha de semanas de prazo, enquanto uma solicitação prestes a expirar permanece zerada. Como a segunda passagem devolve as sobras, a política não reduz o total de bolsas alocadas --- altera somente qual solicitação recebe cada bolsa quando o pool é insuficiente; havendo doações em quantidade suficiente para todas as metas, o resultado coincide com o da alocação FIFO simples.
+
+O progresso (\codigo{fulfilledBloodBags}) não é persistido. Os casos de uso de leitura que precisam exibir o preenchimento --- listagem de solicitações do requisitante, recomendação ao doador e bloqueio de notificação quando a meta já foi atingida --- invocam o mesmo serviço de domínio e recebem o mapa calculado na hora. Concluir uma doação apenas persiste a doação; a leitura seguinte já vê o \textit{pool} atualizado. Como o cálculo não regrava solicitações, não há condição de corrida entre escritas de contador: cada leitura monta o próprio \textit{snapshot}. Assume-se, como contrapartida, que o progresso exibido de uma solicitação de prazo folgado pode decrescer entre duas leituras: à medida que os tetos das solicitações concorrentes crescem com o tempo, bolsas antes atribuídas a ela na segunda passagem migram para solicitações mais próximas do vencimento.

@@ -5,78 +5,114 @@
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {1}\MakeTextUppercase []{Introdução}}{10}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Problema e contexto}{10}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Objetivos}{10}{section.1.2}%
-\contentsline {section}{\numberline {1.3}Justificativa}{11}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Organização da monografia}{11}{section.1.4}%
+\contentsline {chapter}{\chapternumberline {1}\MakeTextUppercase []{Introdução}}{11}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Problema e contexto}{11}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Objetivos}{11}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Justificativa}{12}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Organização da monografia}{12}{section.1.4}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {2}\MakeTextUppercase []{Referencial teórico}}{12}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Orientação a Objetos}{12}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Abstração}{12}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}Encapsulamento}{13}{subsection.2.1.2}%
-\contentsline {subsection}{\numberline {2.1.3}Herança}{13}{subsection.2.1.3}%
-\contentsline {subsection}{\numberline {2.1.4}Polimorfismo}{14}{subsection.2.1.4}%
-\contentsline {section}{\numberline {2.2}Princípios SOLID}{14}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}\textit {Single Responsibility Principle} (SRP)}{15}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}\textit {Open/Closed Principle} (OCP)}{15}{subsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.2.3}\textit {Liskov Substitution Principle} (LSP)}{15}{subsection.2.2.3}%
-\contentsline {subsection}{\numberline {2.2.4}\textit {Interface Segregation Principle} (ISP)}{16}{subsection.2.2.4}%
-\contentsline {subsection}{\numberline {2.2.5}\textit {Dependency Inversion Principle} (DIP)}{16}{subsection.2.2.5}%
-\contentsline {section}{\numberline {2.3}\textit {Domain-Driven Design} (DDD)}{16}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Padrões de \textit {design} estratégico}{17}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.3.2}Padrões de \textit {design} tático}{17}{subsection.2.3.2}%
-\contentsline {subsection}{\numberline {2.3.3}Arquitetura e isolamento do domínio}{18}{subsection.2.3.3}%
+\contentsline {chapter}{\chapternumberline {2}\MakeTextUppercase []{Referencial teórico}}{14}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Orientação a Objetos}{14}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Abstração}{14}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Encapsulamento}{15}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Herança}{15}{subsection.2.1.3}%
+\contentsline {subsection}{\numberline {2.1.4}Polimorfismo}{16}{subsection.2.1.4}%
+\contentsline {section}{\numberline {2.2}Princípios SOLID}{16}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}\textit {Single Responsibility Principle} (SRP)}{17}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}\textit {Open/Closed Principle} (OCP)}{17}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}\textit {Liskov Substitution Principle} (LSP)}{17}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}\textit {Interface Segregation Principle} (ISP)}{18}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.5}\textit {Dependency Inversion Principle} (DIP)}{18}{subsection.2.2.5}%
+\contentsline {section}{\numberline {2.3}\textit {Domain-Driven Design} (DDD)}{18}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Padrões de \textit {design} estratégico}{19}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Padrões de \textit {design} tático}{19}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Arquitetura e isolamento do domínio}{20}{subsection.2.3.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {3}\MakeTextUppercase []{Trabalhos relacionados}}{19}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Protocolo de pesquisa}{19}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}Objetivo e questões de pesquisa}{19}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}Instrumentos}{20}{subsection.3.1.2}%
-\contentsline {subsection}{\numberline {3.1.3}Critérios de seleção e procedimentos}{20}{subsection.3.1.3}%
-\contentsline {section}{\numberline {3.2}Caracterização da pesquisa}{21}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Resultados e discussões}{23}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Considerações}{25}{section.3.4}%
+\contentsline {chapter}{\chapternumberline {3}\MakeTextUppercase []{Trabalhos relacionados}}{21}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Protocolo de pesquisa}{21}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Objetivo e questões de pesquisa}{21}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Instrumentos}{22}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Critérios de seleção e procedimentos}{22}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}Caracterização da pesquisa}{23}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Resultados e discussões}{25}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Considerações}{26}{section.3.4}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {4}\MakeTextUppercase []{Métodos e recursos}}{26}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Visão geral}{26}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Instrumentos e ferramentas}{29}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Pesquisa exploratória-descritiva}{29}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Desenvolvimento da API}{30}{subsection.4.2.2}%
-\contentsline {subsubsection}{\numberline {4.2.2.1}Linguagem de programação (Java)}{30}{subsubsection.4.2.2.1}%
-\contentsline {subsubsection}{\numberline {4.2.2.2}\textit {Framework} de desenvolvimento (Spring Boot)}{30}{subsubsection.4.2.2.2}%
-\contentsline {subsubsection}{\numberline {4.2.2.3}Ambiente de desenvolvimento e versionamento (Visual Studio Code e Git)}{30}{subsubsection.4.2.2.3}%
-\contentsline {section}{\numberline {4.3}Cronograma}{31}{section.4.3}%
+\contentsline {chapter}{\chapternumberline {4}\MakeTextUppercase []{Métodos e recursos}}{28}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Visão geral}{28}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Instrumentos e ferramentas}{31}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Pesquisa exploratória-descritiva}{31}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Desenvolvimento da API}{32}{subsection.4.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.2.1}Linguagem de programação (Java)}{32}{subsubsection.4.2.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2.2}\textit {Framework} de desenvolvimento (Spring Boot)}{32}{subsubsection.4.2.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.2.3}Ambiente de desenvolvimento e versionamento (Visual Studio Code e Git)}{32}{subsubsection.4.2.2.3}%
+\contentsline {section}{\numberline {4.3}Cronograma}{33}{section.4.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {5}\MakeTextUppercase []{Estudo de caso: requisitos, modelagem e implementação}}{32}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Visão geral da solução}{32}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Levantamento de requisitos}{32}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Requisitos funcionais}{32}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Requisitos não funcionais}{33}{subsection.5.2.2}%
-\contentsline {section}{\numberline {5.3}Modelagem do sistema}{34}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Casos de uso}{34}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Diagramas de classes}{38}{subsection.5.3.2}%
-\contentsline {section}{\numberline {5.4}Domínio e arquitetura}{42}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}Linguagem ubíqua e organização em camadas}{42}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}Entidades, agregados e objetos de valor}{43}{subsection.5.4.2}%
-\contentsline {section}{\numberline {5.5}Implementação}{44}{section.5.5}%
-\contentsline {subsection}{\numberline {5.5.1}Persistência de dados}{44}{subsection.5.5.1}%
-\contentsline {subsection}{\numberline {5.5.2}Segurança e autenticação}{44}{subsection.5.5.2}%
-\contentsline {subsection}{\numberline {5.5.3}Serviços externos e documentação da API}{45}{subsection.5.5.3}%
-\contentsline {section}{\numberline {5.6}Recomendação de solicitações e cumprimento de metas}{45}{section.5.6}%
-\contentsline {subsection}{\numberline {5.6.1}Recomendação de solicitações para o doador}{45}{subsection.5.6.1}%
-\contentsline {subsection}{\numberline {5.6.2}Notificação de doadores potenciais}{46}{subsection.5.6.2}%
-\contentsline {subsection}{\numberline {5.6.3}Materialização do cumprimento de metas (\texttt {fulfilledBloodBags})}{46}{subsection.5.6.3}%
+\contentsline {chapter}{\chapternumberline {5}\MakeTextUppercase []{Estudo de caso: requisitos, modelagem e implementação}}{34}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Visão geral da solução}{34}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Levantamento de requisitos}{34}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Requisitos funcionais}{34}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Requisitos não funcionais}{35}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Modelagem do sistema}{36}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Casos de uso}{36}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Diagramas de classes}{40}{subsection.5.3.2}%
+\contentsline {section}{\numberline {5.4}Domínio e arquitetura}{44}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Linguagem ubíqua e organização em camadas}{44}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Entidades, agregados e objetos de valor}{45}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Implementação}{46}{section.5.5}%
+\contentsline {subsection}{\numberline {5.5.1}Persistência de dados}{46}{subsection.5.5.1}%
+\contentsline {subsubsection}{\numberline {5.5.1.1}Esquemas e mapeamento}{46}{subsubsection.5.5.1.1}%
+\contentsline {subsubsection}{\numberline {5.5.1.2}Repositórios como portas do domínio}{47}{subsubsection.5.5.1.2}%
+\contentsline {subsubsection}{\numberline {5.5.1.3}Carregamento do grafo de objetos}{47}{subsubsection.5.5.1.3}%
+\contentsline {subsubsection}{\numberline {5.5.1.4}Concorrência otimista e índices}{48}{subsubsection.5.5.1.4}%
+\contentsline {subsection}{\numberline {5.5.2}Segurança e autenticação}{48}{subsection.5.5.2}%
+\contentsline {subsection}{\numberline {5.5.3}Serviços externos e documentação da API}{49}{subsection.5.5.3}%
+\contentsline {section}{\numberline {5.6}Recomendação de solicitações e cumprimento de metas}{49}{section.5.6}%
+\contentsline {subsection}{\numberline {5.6.1}Recomendação de solicitações para o doador}{49}{subsection.5.6.1}%
+\contentsline {subsection}{\numberline {5.6.2}Notificação de doadores potenciais}{50}{subsection.5.6.2}%
+\contentsline {subsection}{\numberline {5.6.3}Snapshot do cumprimento de metas}{50}{subsection.5.6.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {6}\MakeTextUppercase []{Avaliação da proposta de solução}}{48}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Plano de avaliação}{48}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Resultados}{48}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Sugestões de melhorias}{48}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Considerações sobre a avaliação}{49}{section.6.4}%
+\contentsline {chapter}{\chapternumberline {6}\MakeTextUppercase []{Avaliação da proposta de solução}}{52}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Sistema entregue}{52}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Plano e método de avaliação}{53}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Organização da suíte de testes}{53}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Resultados da execução}{54}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Avaliação de manutenibilidade}{55}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Sugestões de melhorias}{55}{section.6.6}%
+\contentsline {section}{\numberline {6.7}Considerações sobre a avaliação}{56}{section.6.7}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {7}\MakeTextUppercase []{Considerações finais}}{50}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Alcance dos objetivos}{50}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Principais contribuições}{50}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Trabalhos futuros}{50}{section.7.3}%
+\contentsline {chapter}{\chapternumberline {7}\MakeTextUppercase []{Considerações finais}}{57}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Alcance dos objetivos}{57}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Principais contribuições}{58}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Limitações}{58}{section.7.3}%
+\contentsline {section}{\numberline {7.4}Trabalhos futuros}{58}{section.7.4}%
+\contentsline {section}{\numberline {7.5}Considerações finais}{59}{section.7.5}%
 \vspace {\cftbeforechapterskip }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
-\contentsline {chapter}{\MakeTextUppercase []{Refer\^encias}}{52}{section*.14}%
+\contentsline {chapter}{\MakeTextUppercase []{Refer\^encias}}{60}{section*.14}%
+\renewcommand *{\cftappendixname }{AP\^ENDICE \space }
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\cftinsert {A}
+\contentsline {appendix}{\chapternumberline {A}\MakeTextUppercase []{Regras de domínio: tipagem sanguínea e elegibilidade}}{62}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Compatibilidade tipológica}{62}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Elegibilidade do doador}{63}{section.A.2}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\cftinsert {A}
+\contentsline {appendix}{\chapternumberline {B}\MakeTextUppercase []{Agregados: aceitação de doação e ciclo de vida}}{64}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Aceitação de doação pela solicitação}{64}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Criação unificada da doação}{65}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Conclusão de doação pendente}{65}{section.B.3}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\cftinsert {A}
+\contentsline {appendix}{\chapternumberline {C}\MakeTextUppercase []{Cumprimento de metas e matching de doadores}}{67}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Teto proporcional ao prazo}{67}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Alocação das doações em duas passagens}{68}{section.C.2}%
+\contentsline {section}{\numberline {C.3}Identificação de doadores elegíveis}{70}{section.C.3}%
+\setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
+\setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
+\cftinsert {A}
+\contentsline {appendix}{\chapternumberline {D}\MakeTextUppercase []{Inversão de dependência: repositório e caso de uso}}{72}{appendix.D}%
+\contentsline {section}{\numberline {D.1}Contrato de repositório}{72}{section.D.1}%
+\contentsline {section}{\numberline {D.2}Orquestração no caso de uso}{72}{section.D.2}%

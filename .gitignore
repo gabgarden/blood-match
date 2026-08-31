@@ -1,8 +1,19 @@
-HELP.md
+# Backend
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+!backend/**/src/main/**/target/
+!backend/**/src/test/**/target/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Root / shared
+node_modules/
+dist/
 target/
 .mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
 
 ### STS ###
 .apt_generated
@@ -36,3 +47,21 @@ build/
 .env
 .env.*
 !.env.example
+!**/.env.example
+!.env.production.example
+
+### OS / logs ###
+.DS_Store
+Thumbs.db
+*.log
+
+### TCC build artifacts ###
+tcc-latex/*.aux
+tcc-latex/*.bbl
+tcc-latex/*.blg
+tcc-latex/*.fdb_latexmk
+tcc-latex/*.fls
+tcc-latex/*.log
+tcc-latex/*.out
+tcc-latex/*.synctex.gz
+tcc-latex/*.toc

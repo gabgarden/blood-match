@@ -1,0 +1,27 @@
+% !TeX root = ../main.tex
+\chapter{Inversão de dependência: repositório e caso de uso}
+\label{ap:dip}
+
+Este apêndice exemplifica a aplicação do princípio da inversão de dependência (SOLID) na arquitetura da API: o caso de uso depende de abstrações de repositório definidas no domínio, e não de implementações concretas de persistência.
+
+\section{Contrato de repositório}
+
+A Listagem~\ref{lst:donation-repo} apresenta a interface \codigo{DonationRepositoryInterface}, situada na camada \codigo{domain}. Operações de leitura e escrita são expressas em termos do agregado \codigo{Donation} e do objeto de valor \codigo{DomainID}, sem menção a MongoDB ou a \textit{schemas} de persistência.
+
+\lstinputlisting[
+  language=Java,
+  caption={Interface \texttt{DonationRepositoryInterface}},
+  label={lst:donation-repo}
+]{apendices/codigo/DonationRepositoryInterface.java}
+\fonte{Elaborado pelos próprios autores (2026).}
+
+\section{Orquestração no caso de uso}
+
+A Listagem~\ref{lst:complete-pending} mostra o método \codigo{execute} de \codigo{CompletePendingDonationUseCase}. Esse caso de uso não cria a doação: apenas transiciona um agregado já existente. O fluxo valida a entrada, carrega a doação via repositório, verifica \textit{ownership}, delega a transição ao agregado (\codigo{donation.complete}), atualiza o doador e persiste a doação concluída. A criação propriamente dita ocorre em \codigo{CreateDonationUseCase}, com a mesma fábrica de domínio e XOR entre data de intenção e data efetiva. O cumprimento de metas não é gravado nesse momento: a leitura seguinte monta o \textit{snapshot} de preenchimento a partir do banco.
+
+\lstinputlisting[
+  language=Java,
+  caption={Método \texttt{CompletePendingDonationUseCase.execute}},
+  label={lst:complete-pending}
+]{apendices/codigo/CompletePendingDonationUseCase.java}
+\fonte{Elaborado pelos próprios autores (2026).}

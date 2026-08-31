@@ -1,0 +1,38 @@
+% !TeX root = ../main.tex
+\chapter{Agregados: aceitação de doação e ciclo de vida}
+\label{ap:agregados}
+
+Este apêndice reúne trechos das raízes de agregado \codigo{DonationRequest} e \codigo{Donation}, evidenciando a proteção de invariantes no núcleo do domínio --- princípio tático do DDD discutido no Capítulo~2 e materializado na modelagem do Capítulo~5.
+
+\section{Aceitação de doação pela solicitação}
+
+A Listagem~\ref{lst:accepts-donation} mostra o método \codigo{acceptsDonation}, usado pelo algoritmo de cumprimento de metas (Apêndice~\ref{ap:fulfillment}). A solicitação só aceita a doação se estiver ativa, não expirada na data de referência, se a doação estiver concluída, se a data efetiva estiver na janela \texttt{[dateRequested, dateLimit]} e se o tipo sanguíneo do doador for compatível com o tipo solicitado --- via \codigo{canDonateTo}, e não por igualdade de tipo.
+
+\lstinputlisting[
+  language=Java,
+  caption={Método \texttt{DonationRequest.acceptsDonation}},
+  label={lst:accepts-donation}
+]{apendices/codigo/DonationRequestAcceptsDonation.java}
+\fonte{Elaborado pelos próprios autores (2026).}
+
+\section{Criação unificada da doação}
+
+A Listagem~\ref{lst:donation-create} apresenta a fábrica única \codigo{Donation.create}. Não há dois tipos de doação: o mesmo agregado nasce pendente quando recebe apenas a data de intenção (\codigo{intendedDate}) ou concluído quando recebe apenas a data efetiva (\codigo{donationDate}). O estado é consultado por predicados derivados dessas datas, e não por flags independentes.
+
+\lstinputlisting[
+  language=Java,
+  caption={Fábrica \texttt{Donation.create} e consultas de estado},
+  label={lst:donation-create}
+]{apendices/codigo/DonationCreate.java}
+\fonte{Elaborado pelos próprios autores (2026).}
+
+\section{Conclusão de doação pendente}
+
+A Listagem~\ref{lst:donation-complete} ilustra a reconstituição e a transição de estado: \codigo{validateDates} impede combinações inválidas entre data efetiva e cancelamento; \codigo{complete} só permite a transição a partir de pendente, rejeita datas futuras e preenche \codigo{donationDate} sem apagar a data de intenção.
+
+\lstinputlisting[
+  language=Java,
+  caption={Validação de datas e método \texttt{Donation.complete}},
+  label={lst:donation-complete}
+]{apendices/codigo/DonationComplete.java}
+\fonte{Elaborado pelos próprios autores (2026).}

@@ -2,28 +2,9 @@
 
 Documento de referência do **backend atual** (Spring Boot, JWT, sem prefixo `/api` e sem versionamento de URL).
 
-Use este arquivo no repositório do frontend para alinhar clientes, services, stores e rotas com o contrato real da API.
+Arquitetura e camadas: [`ARQUITETURA.md`](ARQUITETURA.md). Snapshot de metas: [`LOGICA_PREENCHIMENTO_REQUESTS.md`](LOGICA_PREENCHIMENTO_REQUESTS.md).
 
----
-
-## Prompt sugerido (colar no chat do projeto frontend)
-
-```text
-Leia o arquivo FRONTEND_API_CONTRACT.md (contrato atual do backend BloodMatch).
-O frontend está desatualizado em relação a este contrato.
-
-Faça todas as alterações necessárias para alinhar o frontend ao backend:
-- base URL, paths, métodos HTTP e payloads
-- autenticação JWT (Bearer), persistência de token/partyId/roles
-- re-login obrigatório após registrar papéis (DONOR / REQUESTER / BLOOD_CENTER)
-- ownership: partyId/personId/organizationId do request devem ser os do usuário logado
-- tratamento de erros { "error": "..." } com status 400/401/403/404/409
-- breaking changes (ex.: /requests/* → /donation-requests/*)
-- CORS / PATCH se houver chamadas browser
-- UI/fluxos que dependem de roles
-
-Não invente endpoints. Siga apenas este contrato. Ao terminar, liste o que mudou.
-```
+Não invente endpoints. Se o backend mudar, atualize este arquivo primeiro.
 
 ---
 
@@ -37,6 +18,7 @@ Não invente endpoints. Siga apenas este contrato. Ao terminar, liste o que mudo
 | Auth | JWT Bearer, stateless |
 | Content-Type | `application/json` |
 | Datas | ISO date `YYYY-MM-DD` |
+| Horários | `HH:mm` (ex.: `08:00`) |
 | Docs interativas | `/swagger-ui.html`, `/v3/api-docs` |
 
 ### Header de autenticação
@@ -47,10 +29,7 @@ Authorization: Bearer <accessToken>
 
 ### CORS (browser)
 
-Origens permitidas:
-
-- `http://localhost:5173` (Vite)
-- `https://gabgarden.github.io/`
+Origens/padrões incluem `http://localhost:*`, `http://127.0.0.1:*`, `https://gabgarden.github.io` e `bloodmatch.com.br` (com/sem `www`, http/https). Lista explícita via `CORS_ALLOWED_ORIGINS` (default `http://localhost:5173,http://127.0.0.1:5173,https://gabgarden.github.io`).
 
 Métodos: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`  
 Credentials: `true`
@@ -63,16 +42,11 @@ Credentials: `true`
 
 `POST /auth/login` — **público**
 
-Request:
-
 ```json
-{
-  "email": "user@email.com",
-  "password": "senha"
-}
+{ "email": "user@email.com", "password": "senha" }
 ```
 
-Response `200`:
+`200`:
 
 ```json
 {
@@ -84,44 +58,58 @@ Response `200`:
 }
 ```
 
-Persistir no frontend: `accessToken`, `partyId`, `roles`, `expiresIn`.
+Persistir: `accessToken`, `partyId`, `roles`, `expiresIn`.
 
-### 2.2 Roles (`SecurityRole`)
+E-mail ainda não confirmado → `401` `{ "error": "Email not confirmed" }`.
+
+### 2.2 Confirmação de e-mail — **público**
+
+Cadastro devolve `emailConfirmationRequired`. Se `true`, o usuário **não** deve tentar login até confirmar.
+
+`GET /auth/confirm-email?token=` e `POST /auth/confirm-email` com `{ "token": "..." }` — mesmo efeito.
+
+`200`: `{ "message": "Email confirmed", "email": "user@email.com" }`
+
+`POST /auth/resend-confirmation` — `{ "email": "user@email.com" }`
+
+`200`: mensagem genérica (não revela se a conta existe):  
+`"If the email is registered and pending confirmation, a new message was sent."`
+
+O link do e-mail aponta para o frontend: `/confirm-email?token=...`.
+
+### 2.3 Roles (`SecurityRole`)
 
 | Role | Significado |
 |------|-------------|
 | `DONOR` | Doador |
-| `REQUESTER` | Solicitante de sangue |
-| `BLOOD_CENTER` | Hemocentro (registrável; quase sem rotas gated por esse role hoje) |
-| `SYSTEM_ADMIN` | Admin (bypass de ownership; não há fluxo público para obter) |
+| `REQUESTER` | Solicitante |
+| `BLOOD_CENTER` | Hemocentro (estoque, agenda, consultas, busca) |
+| `SYSTEM_ADMIN` | Admin (bypass de ownership; sem fluxo público) |
 
 Roles no JWT **não** usam prefixo `ROLE_`.
 
-### 2.3 Fluxo típico de conta
+### 2.4 Fluxo típico de conta
 
-1. Registrar pessoa/org (`POST /parties/persons` ou `/parties/organizations`) → recebe `id` da party.
-2. Login → JWT com `partyId` e `roles` (inicialmente vazios ou só o que já existir).
-3. Registrar papel (`POST /donors`, `/requesters` ou `/blood-centers`).
-4. **Login de novo** — o backend **não** emite token novo no registro de papel. Sem re-login, rotas gated por role retornam **403**.
-5. Não há endpoint de refresh token.
+1. Registrar pessoa/org → `{ "id", "type", "emailConfirmationRequired" }`.
+2. Se confirmação for exigida: tela de check-email → `GET/POST /auth/confirm-email`.
+3. Login → JWT com `partyId` e `roles` (vazios até registrar papel).
+4. Registrar papel (`POST /donors`, `/requesters` ou `/blood-centers`).
+5. **Login de novo** — o backend **não** emite token novo no registro de papel. Sem re-login → **403** nas rotas gated.
+6. Não há refresh token.
 
-### 2.4 Ownership (obrigatório)
+Papéis pendentes no frontend (doador/hemocentro escolhidos no cadastro) devem ser aplicados **depois** do primeiro login com e-mail já confirmado.
 
-O frontend **não** deve permitir escolher arbitrariamente o id de outra party.
+### 2.5 Ownership (obrigatório)
 
-Regras:
-
-1. Campos `partyId` / `personId` / `organizationId` (quando representam *a própria* conta) devem ser o `partyId` do JWT.
-2. Operações por `requestId` / `donationId` só funcionam se o recurso for do usuário autenticado (ou admin).
+1. `partyId` / `personId` / `organizationId` (quando são *a própria* conta) = `partyId` do JWT.
+2. Operações por `requestId` / `donationId` só na própria conta (ou admin).
 3. Violação → **403** `{ "error": "Forbidden" }`.
 
-Na prática: após login, use sempre `auth.partyId` nos bodies/paths/queries de “eu mesmo”.
+`PUT /blood-centers/inventory` e `PUT /blood-centers/schedule` usam a org autenticada; o body **não** envia `organizationId`.
 
 ---
 
 ## 3. Erros
-
-Corpo padrão:
 
 ```json
 { "error": "<mensagem>" }
@@ -130,71 +118,78 @@ Corpo padrão:
 | Status | Quando |
 |--------|--------|
 | `400` | Validação / regra de negócio inválida |
-| `401` | Sem token, token inválido/expirado, credenciais erradas |
+| `401` | Sem token, token inválido/expirado, credenciais erradas, e-mail não confirmado |
 | `403` | Role insuficiente ou ownership |
 | `404` | Recurso não encontrado |
-| `409` | Conflito (ex.: papel já registrado) |
+| `409` | Conflito (e-mail já cadastrado; papel já registrado) |
 
-Mensagens comuns de auth:
+Mensagens comuns:
 
-- `"Unauthorized"` — sem autenticação
+- `"Unauthorized"`
 - `"Invalid or expired token"`
-- `"Forbidden"`
+- `"Email not confirmed"`
 - `"Invalid credentials"`
-- `"User account is disabled"`
+- `"Forbidden"`
+- `"Email already registered"`
+- `"Donor already registered for person"` (e equivalentes de requester/blood center)
 
-O frontend deve tratar `401` (logout / ir para login) e `403` (mensagem de permissão / fluxo incompleto de role).
+Tratar `401` (logout / login) e `403` (permissão / papel incompleto).
 
 ---
 
-## 4. Enums e valores aceitos
+## 4. Enums
 
 ### Blood type
 
 `A+` | `A-` | `B+` | `B-` | `AB+` | `AB-` | `O+` | `O-`
 
-### Urgency (pedido de doação)
+### Urgency
 
 `LOW` | `MEDIUM` | `CRITICAL`
 
-### Donation status (respostas)
+### Donation status
 
-`PENDING` | `COMPLETED` | `CANCELLED` (e possivelmente `UNKNOWN` só em edge cases)
+`PENDING` | `COMPLETED` | `CANCELLED`
 
-### Party type (registro)
+### Inventory label (resposta)
 
-- Pessoa → `type`: `"PERSON"`
-- Organização → `type`: `"ORGANIZATION"`
+`Crítico` (`< 30%`) | `Alerta` (`≤ 70%`) | `Adequado`
 
----
+### Weekday (agenda)
 
-## 5. Inventário completo de endpoints
+`MONDAY` … `SUNDAY`
 
-Legenda de auth:
+### Party type
 
-- **Public** — sem token
-- **Auth** — qualquer JWT válido
-- **Role** — JWT com a(s) role(s) listada(s)
-- **Own** — id da própria party / ownership do recurso
+`"PERSON"` | `"ORGANIZATION"`
 
 ---
+
+## 5. Inventário de endpoints
+
+Legenda: **Public** · **Auth** (qualquer JWT) · **Role** · **Own** (própria party / recurso)
 
 ### 5.1 Auth
 
-#### `POST /auth/login` — Public
+#### `POST /auth/login` — Public → `200`
 
-| | |
-|--|--|
-| Body | `email`, `password` (string, obrigatórios) |
-| `200` | `accessToken`, `tokenType`, `expiresIn`, `roles[]`, `partyId` |
+Body: `email`, `password`.
+
+#### `GET /auth/confirm-email?token=` — Public → `200`
+
+#### `POST /auth/confirm-email` — Public → `200`
+
+Body: `{ "token": "..." }`
+
+#### `POST /auth/resend-confirmation` — Public → `200`
+
+Body: `{ "email": "..." }`
 
 ---
 
 ### 5.2 Parties
 
 #### `POST /parties/persons` — Public → `201`
-
-Body:
 
 | Campo | Tipo | Obrigatório |
 |-------|------|-------------|
@@ -205,20 +200,17 @@ Body:
 | `email` | string | sim |
 | `password` | string | sim |
 | `passwordConfirmation` | string | sim |
-| `street` | string | não* |
-| `city` | string | não* |
-| `state` | string | não* |
-| `zipCode` | string | não* |
+| `street`, `city`, `state`, `zipCode` | string | não* |
 
-\* Se qualquer campo de endereço for enviado, **todos** os quatro devem ser preenchidos.
+\* Se qualquer campo de endereço for enviado, **os quatro** devem vir preenchidos.
 
-Response: `{ "id": "<uuid>", "type": "PERSON" }`
+Response: `{ "id": "<uuid>", "type": "PERSON", "emailConfirmationRequired": true }`
 
 #### `POST /parties/organizations` — Public → `201`
 
-Body: `name`, `phoneNumber`, `cnpj`, `email`, `password`, `passwordConfirmation`, endereço opcional (mesma regra all-or-nothing).
+Body: `name`, `phoneNumber`, `cnpj`, `email`, `password`, `passwordConfirmation`, endereço opcional (mesma regra).
 
-Response: `{ "id": "<uuid>", "type": "ORGANIZATION" }`
+Response: `{ "id": "<uuid>", "type": "ORGANIZATION", "emailConfirmationRequired": true }`
 
 #### `PATCH /parties/name` — Auth + Own(`partyId`) → `200`
 
@@ -230,7 +222,7 @@ Response: `{ "id": "<uuid>", "name": "Novo nome" }`
 
 ---
 
-### 5.3 Roles / doador
+### 5.3 Papéis / doador / busca de hemocentro
 
 #### `POST /donors` — Auth + Own(`personId`) → `201`
 
@@ -238,9 +230,12 @@ Response: `{ "id": "<uuid>", "name": "Novo nome" }`
 {
   "personId": "<partyId do JWT>",
   "bloodType": "O+",
-  "weight": 70.5
+  "weight": 70.5,
+  "lastDonationDate": "2026-01-15"
 }
 ```
+
+`lastDonationDate` é opcional e não pode ser futura.
 
 Response: `{ "id": "<donorRoleId>" }`  
 **Depois: re-login.**
@@ -251,7 +246,6 @@ Response: `{ "id": "<donorRoleId>" }`
 { "partyId": "<partyId do JWT>" }
 ```
 
-Response: `{ "id": "<requesterRoleId>" }`  
 **Depois: re-login.**
 
 #### `POST /blood-centers` — Auth + Own(`organizationId`) → `201`
@@ -260,32 +254,39 @@ Response: `{ "id": "<requesterRoleId>" }`
 { "organizationId": "<partyId do JWT>" }
 ```
 
-Response: `{ "id": "<bloodCenterRoleId>" }`  
-**Depois: re-login.**  
-Obs.: hoje nenhuma rota de negócio exige autoridade `BLOOD_CENTER` no `SecurityConfig`.
+**Depois: re-login.**
+
+#### `GET /blood-centers/search?q=&limit=` — Roles `DONOR` \| `REQUESTER` \| `BLOOD_CENTER` \| `SYSTEM_ADMIN` → `200`
+
+| Query | Obrigatório | Regras |
+|-------|-------------|--------|
+| `q` | sim | ≥ 2 caracteres |
+| `limit` | não | default `10`, máximo `20` |
+
+```json
+[
+  {
+    "organizationId": "<uuid>",
+    "name": "Hemocentro Regional de Campos",
+    "city": "Campos dos Goytacazes",
+    "state": "RJ"
+  }
+]
+```
+
+Use `organizationId` em `POST /donation-requests` e `POST /donations`.
 
 #### `PATCH /donors/profile` — Auth + Own(`personId`) → `200`
 
 ```json
-{
-  "personId": "<uuid>",
-  "bloodType": "A+",
-  "weight": 72.0
-}
+{ "personId": "<uuid>", "bloodType": "A+", "weight": 72.0 }
 ```
-
-Response: `{ "id": "<donorRoleId>" }`
 
 #### `PATCH /donors/recommendation-distance` — Role `DONOR` + Own(`personId`) → `200`
 
 ```json
-{
-  "personId": "<uuid>",
-  "maxDistanceInKm": 30
-}
+{ "personId": "<uuid>", "maxDistanceInKm": 30 }
 ```
-
-Response: `{ "personId": "<uuid>", "maxDistanceInKm": 30 }`
 
 #### `GET /donors/{personId}/summary` — Auth + Own(path) → `200`
 
@@ -306,29 +307,120 @@ Response: `{ "personId": "<uuid>", "maxDistanceInKm": 30 }`
 
 #### `GET /donors/{personId}/donations` — Auth + Own(path) → `200`
 
-Array:
+Histórico **não** devolve `status`. Só `donationId`, `date`, `location`.
 
 ```json
-[
-  {
-    "donationId": "<uuid>",
-    "date": "2026-01-15",
-    "location": "Nome do hemocentro"
-  }
-]
+[{ "donationId": "<uuid>", "date": "2026-01-15", "location": "Nome do hemocentro" }]
 ```
 
 ---
 
-### 5.4 Donation requests
+### 5.4 Hemocentro — estoque, agenda e consultas
 
-> **Breaking change:** paths antigos `/requests/recommendations` e `/requests/{id}/notify` foram unificados sob `/donation-requests/...`.
+#### `GET /blood-centers/inventory` — Roles `DONOR` \| `REQUESTER` \| `BLOOD_CENTER` \| `SYSTEM_ADMIN` → `200`
+
+Lista de hemocentros com níveis:
+
+```json
+[{
+  "organizationId": "<uuid>",
+  "name": "string",
+  "city": "string",
+  "state": "string",
+  "updatedAt": "2026-08-23T10:00:00",
+  "items": [{ "bloodType": "O+", "percentage": 40, "label": "Alerta" }]
+}]
+```
+
+#### `GET /blood-centers/{organizationId}/inventory` — mesmas roles → `200`
+
+```json
+{
+  "organizationId": "<uuid>",
+  "updatedAt": "...",
+  "items": [{ "bloodType": "O+", "percentage": 40, "label": "Alerta" }]
+}
+```
+
+#### `PUT /blood-centers/inventory` — Role `BLOOD_CENTER` + Own(JWT) → `200`
+
+A org é a do token. Body:
+
+```json
+{ "items": [{ "bloodType": "O+", "percentage": 40 }] }
+```
+
+Tipos omitidos entram como `0`. Percentual é limitado a `0..100`.
+
+#### `GET /blood-centers/appointments?from=&to=` — Role `BLOOD_CENTER` + Own → `200`
+
+`from` / `to` opcionais (`YYYY-MM-DD`). Lista doações **pendentes** daquela org.
+
+```json
+[{
+  "donationId": "<uuid>",
+  "expectedDate": "2026-09-01",
+  "expectedTime": "08:00",
+  "status": "PENDING",
+  "donorName": "string",
+  "donorBloodType": "O+",
+  "donorPhone": "string"
+}]
+```
+
+#### `GET /blood-centers/schedule` — Role `BLOOD_CENTER` + Own → `200`
+
+#### `PUT /blood-centers/schedule` — Role `BLOOD_CENTER` + Own → `200`
+
+```json
+{
+  "weeklyWindows": [
+    {
+      "dayOfWeek": "MONDAY",
+      "startTime": "08:00",
+      "endTime": "12:00",
+      "slotDurationMinutes": 30,
+      "capacity": 4
+    }
+  ],
+  "blockedDates": ["2026-12-25"]
+}
+```
+
+Response: `organizationId`, `weeklyWindows`, `blockedDates`.
+
+#### `GET /blood-centers/{organizationId}/slots?date=` — Roles `DONOR` \| `REQUESTER` \| `BLOOD_CENTER` \| `SYSTEM_ADMIN` → `200`
+
+Query `date` obrigatória.
+
+```json
+{
+  "organizationId": "<uuid>",
+  "date": "2026-09-01",
+  "hasSchedule": true,
+  "slots": [{
+    "startTime": "08:00",
+    "endTime": "08:30",
+    "capacity": 4,
+    "booked": 1,
+    "available": 3
+  }]
+}
+```
+
+Se o hemocentro tem slots na data, `POST /donations` com `intendedDate` deve enviar `expectedTime` igual a um `startTime` disponível.
+
+---
+
+### 5.5 Donation requests
+
+Paths antigos `/requests/...` foram unificados em `/donation-requests/...`.
 
 #### `POST /donation-requests` — Role `REQUESTER` + Own(`partyId`) → `201`
 
 ```json
 {
-  "partyId": "<requester partyId = JWT>",
+  "partyId": "<requester = JWT>",
   "organizationId": "<uuid do hemocentro>",
   "bloodTypeNeeded": "A+",
   "goalBloodBags": 3,
@@ -338,20 +430,18 @@ Array:
 }
 ```
 
-`goalBloodBags` deve ser **> 0**.  
-`organizationId` é o hemocentro destino (não precisa ser o JWT).
+`goalBloodBags` > 0. `organizationId` é o hemocentro destino (não é o JWT).
 
 Response: `{ "id": "<requestId>" }`
 
-#### `GET /donation-requests/recommendations?personId=` — Role `DONOR` + Own(query) → `200`
+#### `GET /donation-requests/recommendations?personId=&includeNonEligible=` — Role `DONOR` + Own(query) → `200`
 
-Query obrigatória: `personId` (= JWT `partyId`).
-
-Item:
+`personId` obrigatório (= JWT). `includeNonEligible` default `false`.
 
 ```json
-{
+[{
   "requestId": "<uuid>",
+  "organizationId": "<uuid>",
   "bloodTypeNeeded": "A+",
   "dateLimit": "2026-12-31",
   "bloodCenterName": "string",
@@ -359,99 +449,84 @@ Item:
   "distanceInKm": 12.5,
   "goalBloodBags": 3,
   "fulfilledBloodBags": 1,
-  "goalReached": false
-}
+  "goalReached": false,
+  "latitude": -21.75,
+  "longitude": -41.33
+}]
 ```
+
+`organizationId` (e `expectedTime` via slots) alimentam `POST /donations`. Pedidos com meta já atingida no snapshot **não** entram na lista.
 
 #### `GET /donation-requests/{partyId}` — Role `REQUESTER` + Own(path) → `200`
 
-Lista de pedidos do solicitante:
+Não use o literal `recommendations` como `{partyId}`.
+
+`fulfilledBloodBags` / `remainingBloodBags` / `goalReached` vêm do snapshot em memória, não de campo persistido.
 
 ```json
-[
-  {
-    "requestId": "<uuid>",
-    "bloodTypeNeeded": "A+",
-    "dateRequested": "2026-01-01",
-    "dateLimit": "2026-12-31",
-    "active": true,
-    "expired": false,
-    "bloodCenterName": "string",
-    "bloodCenterPhoneNumber": "string",
-    "urgency": "MEDIUM",
-    "goalBloodBags": 3,
-    "fulfilledBloodBags": 1,
-    "remainingBloodBags": 2,
-    "goalReached": false
-  }
-]
+[{
+  "requestId": "<uuid>",
+  "bloodTypeNeeded": "A+",
+  "dateRequested": "2026-01-01",
+  "dateLimit": "2026-12-31",
+  "active": true,
+  "expired": false,
+  "bloodCenterName": "string",
+  "bloodCenterPhoneNumber": "string",
+  "urgency": "MEDIUM",
+  "goalBloodBags": 3,
+  "fulfilledBloodBags": 1,
+  "remainingBloodBags": 2,
+  "goalReached": false
+}]
 ```
 
-Cuidado: não use o literal `recommendations` como `{partyId}`.
+Na listagem, `goalBloodBags` é **number**. No PATCH de meta, a resposta devolve string (abaixo).
 
 #### `DELETE /donation-requests/{requestId}` — Role `REQUESTER` + Own(recurso) → `204`
 
-Sem body.
-
 #### `POST /donation-requests/{id}/notify` — Role `REQUESTER` + Own(recurso) → `200`
 
-Sem body.
+Sem body. Bloqueia se a meta do snapshot já foi atingida.
 
 Response: `{ "message": "Notifications sent to eligible donors successfully." }`
 
 #### `PATCH /donation-requests/date-limit` — Role `REQUESTER` + Own(recurso) → `200`
 
 ```json
-{
-  "requestId": "<uuid>",
-  "newDateLimit": "2026-12-31"
-}
+{ "requestId": "<uuid>", "newDateLimit": "2026-12-31" }
 ```
 
-`newDateLimit` não pode ser no passado.
-
-Response: `{ "id": "<uuid>", "dateLimit": "2026-12-31" }`  
-(`dateLimit` vem como **string**)
+`newDateLimit` não pode ser no passado. Response: `{ "id", "dateLimit" }` (`dateLimit` como **string**).
 
 #### `PATCH /donation-requests/goal-blood-bags` — Role `REQUESTER` + Own(recurso) → `200`
 
 ```json
-{
-  "requestId": "<uuid>",
-  "newGoalBloodBags": 5
-}
+{ "requestId": "<uuid>", "newGoalBloodBags": 5 }
 ```
 
-`newGoalBloodBags` > 0.
-
-Response: `{ "id": "<uuid>", "goalBloodBags": "5" }`  
-(`goalBloodBags` vem como **string**, não number)
+`newGoalBloodBags` > 0. Response: `{ "id", "goalBloodBags": "5" }` (`goalBloodBags` como **string**).
 
 ---
 
-### 5.5 Donations
+### 5.6 Donations
 
-#### `POST /donations/create-pending` — Role `DONOR` + Own(`personId`) → `201`
+#### `POST /donations` — Role `DONOR` + Own(`personId`) → `201`
+
+Um endpoint para os dois casos. Envie **só um** de `intendedDate` ou `donationDate`.
+
+Agendar:
 
 ```json
 {
-  "organizationId": "<uuid hemocentro>",
   "personId": "<jwt partyId>",
-  "expectedDate": "2026-09-01"
+  "organizationId": "<uuid hemocentro>",
+  "intendedDate": "2026-09-01",
+  "expectedTime": "08:00"
 }
 ```
 
-Response:
-
-```json
-{
-  "id": "<uuid>",
-  "expectedDate": "2026-09-01",
-  "status": "PENDING"
-}
-```
-
-#### `POST /donations/completed` — Role `DONOR` + Own(`personId`) → `201`
+Registrar já concluída:
 
 ```json
 {
@@ -466,56 +541,40 @@ Response:
 ```json
 {
   "id": "<uuid>",
-  "donationDate": "2026-08-01",
-  "status": "COMPLETED"
-}
-```
-
-#### `PATCH /donations/complete` — Role `DONOR` + Own(doação) → `200`
-
-```json
-{
-  "donationId": "<uuid>",
-  "completionDate": "2026-08-01"
-}
-```
-
-Response:
-
-```json
-{
-  "id": "<uuid>",
-  "completionDate": "2026-08-01",
-  "status": "COMPLETED"
-}
-```
-
-#### `PATCH /donations/reschedule` — Role `DONOR` + Own(doação) → `200`
-
-```json
-{
-  "donationId": "<uuid>",
-  "newExpectedDate": "2026-09-15"
-}
-```
-
-Response:
-
-```json
-{
-  "id": "<uuid>",
-  "expectedDate": "2026-09-15",
+  "intendedDate": "2026-09-01",
+  "donationDate": null,
+  "expectedTime": "08:00",
   "status": "PENDING"
 }
 ```
 
+Não use `POST /donations/create-pending` nem `POST /donations/completed` — foram removidos.
+
+#### `PATCH /donations/complete` — Role `DONOR` + Own(doação) → `200`
+
+```json
+{ "donationId": "<uuid>", "completionDate": "2026-08-01" }
+```
+
+Response: `{ "id", "completionDate", "status": "COMPLETED" }` (`completionDate` string).
+
+#### `PATCH /donations/reschedule` — Role `DONOR` + Own(doação) → `200`
+
+```json
+{ "donationId": "<uuid>", "newExpectedDate": "2026-09-15" }
+```
+
+Response: `{ "id", "expectedDate", "status": "PENDING" }` (`expectedDate` string).
+
 ---
 
-## 6. Matriz rápida path × auth
+## 6. Matriz path × auth
 
 | Método | Path | Auth |
 |--------|------|------|
 | POST | `/auth/login` | Public |
+| GET/POST | `/auth/confirm-email` | Public |
+| POST | `/auth/resend-confirmation` | Public |
 | POST | `/parties/persons` | Public |
 | POST | `/parties/organizations` | Public |
 | PATCH | `/parties/name` | Auth + Own |
@@ -526,6 +585,13 @@ Response:
 | GET | `/donors/{personId}/donations` | Auth + Own |
 | POST | `/requesters` | Auth + Own → re-login |
 | POST | `/blood-centers` | Auth + Own → re-login |
+| GET | `/blood-centers/search` | DONOR / REQUESTER / BLOOD_CENTER / SYSTEM_ADMIN |
+| GET | `/blood-centers/inventory` | DONOR / REQUESTER / BLOOD_CENTER / SYSTEM_ADMIN |
+| GET | `/blood-centers/{organizationId}/inventory` | DONOR / REQUESTER / BLOOD_CENTER / SYSTEM_ADMIN |
+| PUT | `/blood-centers/inventory` | BLOOD_CENTER + Own |
+| GET | `/blood-centers/appointments` | BLOOD_CENTER + Own |
+| GET/PUT | `/blood-centers/schedule` | BLOOD_CENTER + Own |
+| GET | `/blood-centers/{organizationId}/slots` | DONOR / REQUESTER / BLOOD_CENTER / SYSTEM_ADMIN |
 | POST | `/donation-requests` | REQUESTER + Own |
 | GET | `/donation-requests/recommendations` | DONOR + Own |
 | GET | `/donation-requests/{partyId}` | REQUESTER + Own |
@@ -533,54 +599,49 @@ Response:
 | POST | `/donation-requests/{id}/notify` | REQUESTER + Own(recurso) |
 | PATCH | `/donation-requests/date-limit` | REQUESTER + Own(recurso) |
 | PATCH | `/donation-requests/goal-blood-bags` | REQUESTER + Own(recurso) |
-| POST | `/donations/create-pending` | DONOR + Own |
-| POST | `/donations/completed` | DONOR + Own |
+| POST | `/donations` | DONOR + Own |
 | PATCH | `/donations/complete` | DONOR + Own(recurso) |
 | PATCH | `/donations/reschedule` | DONOR + Own(recurso) |
 
+Swagger `/swagger-ui/**` e `/v3/api-docs/**` são públicos.
+
 ---
 
-## 7. Checklist de alinhamento do frontend
-
-Use como lista de trabalho no outro projeto:
+## 7. Checklist do frontend
 
 - [ ] Cliente HTTP com `baseURL` sem `/api`
-- [ ] Interceptor: `Authorization: Bearer <token>`
-- [ ] Store/sessão: `accessToken`, `partyId`, `roles`, expiração
-- [ ] Logout / redirect em `401`
-- [ ] Mensagens amigáveis para `403` / `404` / `409` / `400` via `error`
-- [ ] Após registro de papel → forçar novo login (ou chamar `/auth/login` de novo)
-- [ ] Substituir qualquer `/requests/...` por `/donation-requests/...`
-- [ ] Recommendations: query `personId` = usuário logado
-- [ ] Criar pedido: `partyId` = usuário logado; `organizationId` = hemocentro escolhido
-- [ ] Guards de UI por role (`DONOR` / `REQUESTER`) alinhados à matriz
-- [ ] Forms de PATCH (perfil, distance, date-limit, goal, complete, reschedule) com campos exatos
-- [ ] Tipagem: alguns campos de resposta de update são **string** (`goalBloodBags`, várias datas)
-- [ ] Origem CORS / Vite `5173` se desenvolvimento local
-- [ ] Remover chamadas a endpoints inexistentes neste contrato
+- [ ] Interceptor `Authorization: Bearer <token>`
+- [ ] Sessão: `accessToken`, `partyId`, `roles`, expiração
+- [ ] Cadastro: respeitar `emailConfirmationRequired`; confirmar / reenviar e-mail
+- [ ] Login: tratar `"Email not confirmed"`
+- [ ] Após registro de papel → novo login
+- [ ] `POST /donations` (não os paths antigos de create-pending/completed)
+- [ ] Recomendações: `personId` = usuário logado; usar `organizationId` (+ slots/`expectedTime`) para agendar
+- [ ] Pedido: `partyId` = logado; `organizationId` = hemocentro buscado
+- [ ] Guards por `DONOR` / `REQUESTER` / `BLOOD_CENTER`
+- [ ] PATCH de meta: `goalBloodBags` na resposta é **string**
+- [ ] Histórico do doador não traz `status`
 
 ---
 
-## 8. Breaking changes conhecidos (em relação a clientes antigos)
+## 8. Breaking changes (clientes antigos)
 
-1. `GET /requests/recommendations` → `GET /donation-requests/recommendations`
-2. `POST /requests/{id}/notify` → `POST /donation-requests/{id}/notify`
-3. Ownership reforçado: ids de outra party → `403` (antes muitos endpoints aceitavam qualquer id)
-4. `PATCH /donations/reschedule` agora exige role `DONOR`
-5. `POST /donation-requests/*/notify` agora exige role `REQUESTER`
-6. CORS passa a permitir `PATCH` explicitamente
+1. `/requests/...` → `/donation-requests/...`
+2. `POST /donations/create-pending` e `POST /donations/completed` → `POST /donations`
+3. Ownership: id de outra party → `403`
+4. Confirmação de e-mail no cadastro/login
+5. Superfície `BLOOD_CENTER`: estoque, agenda, slots, appointments
+6. Recommendations incluem `organizationId`, `latitude`, `longitude`
+7. `GET /donation-requests/recommendations` aceita `includeNonEligible`
 
 ---
 
 ## 9. O que o frontend NÃO deve assumir
 
 - Prefixo `/api` ou `/v1`
-- Refresh token / cookie session
+- Refresh token / cookie de sessão
 - Obter `SYSTEM_ADMIN` por UI pública
-- Que `BLOOD_CENTER` liberará um conjunto grande de rotas (ainda não há superfície gated por esse role)
-- Que registrar donor/requester atualiza o JWT automaticamente
-- Que `goalBloodBags` no PATCH de meta volta como number (volta string)
-
----
-
-*Gerado a partir do backend BloodMatch. Se o backend mudar, atualize este arquivo antes de pedir alinhamento no frontend.*
+- Que registrar papel atualiza o JWT sozinho
+- Que `goalBloodBags` no PATCH de meta volta como number
+- Que o histórico `GET /donors/{id}/donations` traz `status`
+- Que progresso de bolsas está persistido no Mongo

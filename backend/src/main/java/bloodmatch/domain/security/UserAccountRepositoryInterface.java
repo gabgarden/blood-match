@@ -1,0 +1,17 @@
+package bloodmatch.domain.security;
+
+import bloodmatch.domain.shared.valueObjects.DomainID;
+import bloodmatch.domain.shared.valueObjects.Email;
+
+import java.util.Optional;
+
+public interface UserAccountRepositoryInterface {
+
+  Optional<UserAccount> findByEmail(Email email);
+
+  Optional<UserAccount> findByPartyId(DomainID partyId);
+
+  Optional<UserAccount> findByEmailConfirmationToken(String token);
+
+  void save(UserAccount userAccount);
+}
