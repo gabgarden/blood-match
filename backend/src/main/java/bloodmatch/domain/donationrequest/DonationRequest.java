@@ -20,7 +20,6 @@ public class DonationRequest extends DomainObject {
   private LocalDate dateRequested;
   private LocalDate dateLimit;
   private boolean active;
-  private Long version;
   
   private String directedTo; //paciente, caso a request seja pra uma pessoa especifica (o campo é não obrigatório)
 
@@ -170,7 +169,7 @@ public class DonationRequest extends DomainObject {
     request.setId(id);
     request.dateRequested = dateRequested;
     request.active = isActive;
-    request.version = version;
+    request.setVersion(version);
 
     return request;
   }
@@ -278,10 +277,6 @@ public class DonationRequest extends DomainObject {
 
   public LocalDate getDateRequested() {
     return dateRequested;
-  }
-
-  public Long getVersion() {
-    return version;
   }
 
   public LocalDate getDateLimit() {

@@ -38,11 +38,20 @@ public class BloodCenterSchedule extends DomainObject {
       DomainID organizationId,
       List<WeeklyWindow> weeklyWindows,
       List<LocalDate> blockedDates) {
+    return reconstitute(organizationId, weeklyWindows, blockedDates, null);
+  }
+
+  public static BloodCenterSchedule reconstitute(
+      DomainID organizationId,
+      List<WeeklyWindow> weeklyWindows,
+      List<LocalDate> blockedDates,
+      Long version) {
     BloodCenterSchedule schedule = new BloodCenterSchedule();
     schedule.setId(requireOrganizationId(organizationId));
     schedule.organizationId = organizationId;
     schedule.weeklyWindows = weeklyWindows == null ? List.of() : List.copyOf(weeklyWindows);
     schedule.blockedDates = copyBlockedDates(blockedDates);
+    schedule.setVersion(version);
     return schedule;
   }
 

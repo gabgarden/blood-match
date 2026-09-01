@@ -5,6 +5,7 @@ import bloodmatch.domain.shared.valueObjects.DomainID;
 public abstract class DomainObject {
 
     protected DomainID id;
+    protected Long version;
 
     public DomainID getId() {
         return id;
@@ -16,5 +17,12 @@ public abstract class DomainObject {
         this.id = id;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    protected void setVersion(Long version) {
+        this.version = version;
+    }
 
 }

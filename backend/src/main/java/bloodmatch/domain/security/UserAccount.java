@@ -71,6 +71,33 @@ public class UserAccount extends DomainObject {
       String confirmationToken,
       LocalDateTime confirmationTokenExpiresAt) {
 
+    return rehydrate(
+        id,
+        partyId,
+        email,
+        passwordHash,
+        roles,
+        enabled,
+        createdAt,
+        updatedAt,
+        confirmationToken,
+        confirmationTokenExpiresAt,
+        null);
+  }
+
+  public static UserAccount rehydrate(
+      DomainID id,
+      DomainID partyId,
+      Email email,
+      String passwordHash,
+      Set<SecurityRole> roles,
+      boolean enabled,
+      LocalDateTime createdAt,
+      LocalDateTime updatedAt,
+      String confirmationToken,
+      LocalDateTime confirmationTokenExpiresAt,
+      Long version) {
+
     if (id == null)
       throw new IllegalArgumentException("User id cannot be null");
 
@@ -85,6 +112,7 @@ public class UserAccount extends DomainObject {
         createdAt,
         updatedAt);
     userAccount.setId(id);
+    userAccount.setVersion(version);
     return userAccount;
   }
 

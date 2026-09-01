@@ -8,7 +8,6 @@ import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.infra.persistence.mapping.PersistenceGraphLoader;
 import bloodmatch.infra.persistence.repository.mongo.DonationRequestMongoRepository;
 import bloodmatch.infra.persistence.schema.DonationRequestSchema;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
@@ -37,11 +36,9 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
       throw new IllegalArgumentException("DonationRequest cannot be null");
 
     DonationRequestSchema schema = new DonationRequestSchema(request);
-    try {
-      mongoRepository.save(schema);
-    } catch (OptimisticLockingFailureException e) {
-      throw new IllegalStateException("Donation request was changed by another operation. Reload it and try again.", e);
-    }
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(schema),
+        "Donation request");
   }
 
   @Override

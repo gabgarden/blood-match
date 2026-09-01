@@ -32,6 +32,8 @@ public class PartyRepositoryImpl implements PartyRepositoryInterface {
     if (party == null)
       throw new IllegalArgumentException("Party cannot be null");
 
-    mongoRepository.save(new PartySchema(party));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new PartySchema(party)),
+        "Party");
   }
 }

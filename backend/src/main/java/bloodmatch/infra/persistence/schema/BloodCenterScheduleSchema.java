@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.DayOfWeek;
@@ -26,6 +27,8 @@ public class BloodCenterScheduleSchema {
 
   @Id
   private String organizationId;
+  @Version
+  private Long version;
   private List<WeeklyWindowDocument> weeklyWindows;
   private List<LocalDate> blockedDates;
 
@@ -34,6 +37,7 @@ public class BloodCenterScheduleSchema {
       throw new IllegalArgumentException("Schedule cannot be null");
     }
     this.organizationId = schedule.getOrganizationId().getValue().toString();
+    this.version = schedule.getVersion();
     this.weeklyWindows = schedule.getWeeklyWindows().stream()
         .map(window -> new WeeklyWindowDocument(
             window.dayOfWeek().name(),
@@ -58,7 +62,7 @@ public class BloodCenterScheduleSchema {
             window.capacity));
       }
     }
-    return BloodCenterSchedule.reconstitute(orgId, windows, this.blockedDates);
+    return BloodCenterSchedule.reconstitute(orgId, windows, this.blockedDates, this.version);
   }
 
   @Getter

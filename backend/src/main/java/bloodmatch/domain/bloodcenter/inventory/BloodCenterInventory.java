@@ -35,11 +35,20 @@ public class BloodCenterInventory extends DomainObject {
       DomainID organizationId,
       List<BloodInventoryLevel> levels,
       LocalDateTime updatedAt) {
+    return reconstitute(organizationId, levels, updatedAt, null);
+  }
+
+  public static BloodCenterInventory reconstitute(
+      DomainID organizationId,
+      List<BloodInventoryLevel> levels,
+      LocalDateTime updatedAt,
+      Long version) {
     BloodCenterInventory inventory = new BloodCenterInventory();
     inventory.setId(requireOrganizationId(organizationId));
     inventory.organizationId = organizationId;
     inventory.levels = levels == null ? List.of() : List.copyOf(levels);
     inventory.updatedAt = updatedAt;
+    inventory.setVersion(version);
     return inventory;
   }
 

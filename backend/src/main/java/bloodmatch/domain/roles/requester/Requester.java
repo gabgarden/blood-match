@@ -16,7 +16,13 @@ public class Requester extends PartyRole<Party> {
   }
 
   public static Requester reconstitute(Party party, DomainID id) {
-    return new Requester(party, id);
+    return reconstitute(party, id, null);
+  }
+
+  public static Requester reconstitute(Party party, DomainID id, Long version) {
+    Requester requester = new Requester(party, id);
+    requester.setVersion(version);
+    return requester;
   }
 
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
@@ -22,6 +23,8 @@ public class RequesterSchema {
 
   @Id
   private String id;
+  @Version
+  private Long version;
   private String partyId;
 
   public RequesterSchema(Requester requester) {
@@ -29,6 +32,7 @@ public class RequesterSchema {
       throw new IllegalArgumentException("Requester cannot be null");
 
     this.id = requester.getId().getValue().toString();
+    this.version = requester.getVersion();
     this.partyId = requester.getParty().getId().getValue().toString();
   }
 
@@ -36,7 +40,7 @@ public class RequesterSchema {
     if (party == null)
       throw new IllegalArgumentException("Party not found");
     DomainID requesterId = new DomainID(UUID.fromString(this.id));
-    return Requester.reconstitute(party, requesterId);
+    return Requester.reconstitute(party, requesterId, this.version);
   }
 
   public Requester toDomain(PartyRepositoryInterface partyRepository) {

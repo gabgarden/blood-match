@@ -51,6 +51,8 @@ public class UserAccountRepositoryImpl implements UserAccountRepositoryInterface
     if (userAccount == null)
       throw new IllegalArgumentException("UserAccount cannot be null");
 
-    mongoRepository.save(new UserAccountSchema(userAccount));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new UserAccountSchema(userAccount)),
+        "User account");
   }
 }

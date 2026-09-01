@@ -80,7 +80,7 @@ public class Donation extends DomainObject {
       LocalDate donationDate,
       LocalDate cancelledAt,
       BloodCenter bloodCenter) {
-    return reconstitute(id, donor, intendedDate, donationDate, cancelledAt, bloodCenter, null);
+    return reconstitute(id, donor, intendedDate, donationDate, cancelledAt, bloodCenter, null, null);
   }
 
   public static Donation reconstitute(
@@ -91,6 +91,18 @@ public class Donation extends DomainObject {
       LocalDate cancelledAt,
       BloodCenter bloodCenter,
       LocalTime expectedTime) {
+    return reconstitute(id, donor, intendedDate, donationDate, cancelledAt, bloodCenter, expectedTime, null);
+  }
+
+  public static Donation reconstitute(
+      DomainID id,
+      Donor donor,
+      LocalDate intendedDate,
+      LocalDate donationDate,
+      LocalDate cancelledAt,
+      BloodCenter bloodCenter,
+      LocalTime expectedTime,
+      Long version) {
 
     if (id == null)
       throw new IllegalArgumentException("Donation id cannot be null");
@@ -104,6 +116,7 @@ public class Donation extends DomainObject {
     Donation donation = new Donation(donor, bloodCenter, intendedDate, donationDate, expectedTime);
     donation.setId(id);
     donation.cancelledAt = cancelledAt;
+    donation.setVersion(version);
     return donation;
   }
 

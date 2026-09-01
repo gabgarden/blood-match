@@ -30,7 +30,9 @@ public class DonationRepositoryImpl implements DonationRepositoryInterface {
     if (donation == null)
       throw new IllegalArgumentException("Donation cannot be null");
 
-    mongoRepository.save(new DonationSchema(donation));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new DonationSchema(donation)),
+        "Donation");
   }
 
   @Override

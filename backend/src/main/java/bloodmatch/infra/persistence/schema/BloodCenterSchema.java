@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
@@ -22,6 +23,8 @@ public class BloodCenterSchema {
 
   @Id
   private String id;
+  @Version
+  private Long version;
   private String organizationId;
 
   public BloodCenterSchema(BloodCenter bloodCenter) {
@@ -29,6 +32,7 @@ public class BloodCenterSchema {
       throw new IllegalArgumentException("BloodCenter cannot be null");
 
     this.id = bloodCenter.getId().getValue().toString();
+    this.version = bloodCenter.getVersion();
     this.organizationId = bloodCenter.getOrganization().getId().getValue().toString();
   }
 
@@ -36,7 +40,7 @@ public class BloodCenterSchema {
     if (organization == null)
       throw new IllegalArgumentException("Organization not found");
     DomainID bloodCenterId = new DomainID(UUID.fromString(this.id));
-    return BloodCenter.reconstitute(organization, bloodCenterId);
+    return BloodCenter.reconstitute(organization, bloodCenterId, this.version);
   }
 
   public BloodCenter toDomain(PartyRepositoryInterface partyRepository) {

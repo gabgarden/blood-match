@@ -37,6 +37,8 @@ public class RequesterRepositoryImpl implements RequesterRepositoryInterface {
     if (requester == null)
       throw new IllegalArgumentException("Requester cannot be null");
 
-    mongoRepository.save(new RequesterSchema(requester));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new RequesterSchema(requester)),
+        "Requester");
   }
 }

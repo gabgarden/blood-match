@@ -52,6 +52,12 @@ public class Donor extends PersonRole {
 
   public static Donor reconstitute(Person person, BloodType bloodType, double weight, LocalDate lastDonationDate,
       Double maxRecommendationDistanceKm, DomainID id, LocalDate weightUpdatedAt) {
+    return reconstitute(person, bloodType, weight, lastDonationDate, maxRecommendationDistanceKm, id, weightUpdatedAt,
+        null);
+  }
+
+  public static Donor reconstitute(Person person, BloodType bloodType, double weight, LocalDate lastDonationDate,
+      Double maxRecommendationDistanceKm, DomainID id, LocalDate weightUpdatedAt, Long version) {
     Donor donor = new Donor(person, bloodType, weight, id);
     if (lastDonationDate != null) {
       donor.registerDonation(lastDonationDate, lastDonationDate);
@@ -62,6 +68,7 @@ public class Donor extends PersonRole {
     if (weightUpdatedAt != null) {
       donor.weightUpdatedAt = weightUpdatedAt;
     }
+    donor.setVersion(version);
     return donor;
   }
 

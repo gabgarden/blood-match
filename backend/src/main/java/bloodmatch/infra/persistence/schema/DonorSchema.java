@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,6 +28,8 @@ public class DonorSchema {
 
   @Id
   private String id;
+  @Version
+  private Long version;
   private String personId;
   private String bloodType;
   private Double weight;
@@ -42,6 +45,7 @@ public class DonorSchema {
       throw new IllegalArgumentException("Donor cannot be null");
 
     this.id = donor.getId().getValue().toString();
+    this.version = donor.getVersion();
     this.personId = donor.getPerson().getId().getValue().toString();
     this.bloodType = donor.getBloodType().getType();
     this.weight = donor.getWeight();
@@ -60,7 +64,7 @@ public class DonorSchema {
       throw new IllegalArgumentException("Person not found");
     DomainID donorId = new DomainID(UUID.fromString(this.id));
     return Donor.reconstitute(person, BloodType.of(bloodType), weight, lastDonationDate,
-        maxRecommendationDistanceKm, donorId, weightUpdatedAt);
+        maxRecommendationDistanceKm, donorId, weightUpdatedAt, this.version);
   }
 
   public Donor toDomain(PersonRepositoryInterface personRepository) {

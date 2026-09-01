@@ -47,6 +47,8 @@ public class DonorRepositoryImpl implements DonorRepositoryInterface {
     if (donor == null)
       throw new IllegalArgumentException("Donor cannot be null");
 
-    mongoRepository.save(new DonorSchema(donor));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new DonorSchema(donor)),
+        "Donor");
   }
 }

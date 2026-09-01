@@ -1,5 +1,6 @@
 package bloodmatch.interfaces.rest.shared;
 
+import bloodmatch.application.exception.ConcurrencyException;
 import bloodmatch.application.exception.ConflictException;
 import bloodmatch.application.exception.ForbiddenException;
 import bloodmatch.application.exception.NotFoundException;
@@ -25,6 +26,11 @@ public class RestExceptionHandler {
 
   @ExceptionHandler(ConflictException.class)
   public ResponseEntity<ErrorResponseDto> handleConflict(ConflictException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDto(ex.getMessage()));
+  }
+
+  @ExceptionHandler(ConcurrencyException.class)
+  public ResponseEntity<ErrorResponseDto> handleConcurrency(ConcurrencyException ex) {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDto(ex.getMessage()));
   }
 

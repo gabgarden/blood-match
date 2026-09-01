@@ -24,7 +24,9 @@ public class BloodCenterInventoryRepositoryImpl implements BloodCenterInventoryR
     if (inventory == null) {
       throw new IllegalArgumentException("Inventory cannot be null");
     }
-    mongoRepository.save(new BloodCenterInventorySchema(inventory));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new BloodCenterInventorySchema(inventory)),
+        "Blood center inventory");
   }
 
   @Override

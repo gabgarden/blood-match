@@ -15,6 +15,12 @@ public class BloodCenter extends OrganizationRole {
     }
 
     public static BloodCenter reconstitute(Organization organization, DomainID id) {
-        return new BloodCenter(organization, id);
+        return reconstitute(organization, id, null);
+    }
+
+    public static BloodCenter reconstitute(Organization organization, DomainID id, Long version) {
+        BloodCenter bloodCenter = new BloodCenter(organization, id);
+        bloodCenter.setVersion(version);
+        return bloodCenter;
     }
 }

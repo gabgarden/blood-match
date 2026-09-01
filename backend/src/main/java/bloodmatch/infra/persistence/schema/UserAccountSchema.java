@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -27,6 +28,8 @@ public class UserAccountSchema {
 
   @Id
   private String id;
+  @Version
+  private Long version;
   @Indexed(unique = true)
   private String partyId;
   @Indexed(unique = true)
@@ -44,6 +47,7 @@ public class UserAccountSchema {
       throw new IllegalArgumentException("UserAccount cannot be null");
 
     this.id = userAccount.getId().getValue().toString();
+    this.version = userAccount.getVersion();
     this.partyId = userAccount.getPartyId().getValue().toString();
     this.email = userAccount.getEmail().getValue();
     this.passwordHash = userAccount.getPasswordHash();
@@ -75,6 +79,7 @@ public class UserAccountSchema {
         this.createdAt,
         this.updatedAt,
         this.emailConfirmationToken,
-        this.emailConfirmationTokenExpiresAt);
+        this.emailConfirmationTokenExpiresAt,
+        this.version);
   }
 }

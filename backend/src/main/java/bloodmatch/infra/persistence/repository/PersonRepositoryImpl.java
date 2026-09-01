@@ -33,6 +33,8 @@ public class PersonRepositoryImpl implements PersonRepositoryInterface {
     if (person == null)
       throw new IllegalArgumentException("Person cannot be null");
 
-    mongoRepository.save(new PartySchema(person));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new PartySchema(person)),
+        "Person");
   }
 }

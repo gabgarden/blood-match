@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,8 @@ public class BloodCenterInventorySchema {
 
   @Id
   private String organizationId;
+  @Version
+  private Long version;
   private List<LevelDocument> levels;
   private LocalDateTime updatedAt;
 
@@ -33,6 +36,7 @@ public class BloodCenterInventorySchema {
       throw new IllegalArgumentException("Inventory cannot be null");
     }
     this.organizationId = inventory.getOrganizationId().getValue().toString();
+    this.version = inventory.getVersion();
     this.updatedAt = inventory.getUpdatedAt();
     this.levels = inventory.getLevels().stream()
         .map(level -> new LevelDocument(level.bloodType().getType(), level.percentage()))
@@ -50,7 +54,7 @@ public class BloodCenterInventorySchema {
         domainLevels.add(new BloodInventoryLevel(BloodType.of(level.bloodType), level.percentage));
       }
     }
-    return BloodCenterInventory.reconstitute(orgId, domainLevels, this.updatedAt);
+    return BloodCenterInventory.reconstitute(orgId, domainLevels, this.updatedAt, this.version);
   }
 
   @Getter

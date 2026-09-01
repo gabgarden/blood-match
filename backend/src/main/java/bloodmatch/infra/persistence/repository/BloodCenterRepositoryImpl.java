@@ -48,7 +48,9 @@ public class BloodCenterRepositoryImpl implements BloodCenterRepositoryInterface
     if (bloodCenter == null)
       throw new IllegalArgumentException("BloodCenter cannot be null");
 
-    mongoRepository.save(new BloodCenterSchema(bloodCenter));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new BloodCenterSchema(bloodCenter)),
+        "Blood center");
   }
 
   @Override

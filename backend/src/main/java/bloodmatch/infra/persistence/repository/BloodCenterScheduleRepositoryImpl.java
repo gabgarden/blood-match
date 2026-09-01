@@ -23,7 +23,9 @@ public class BloodCenterScheduleRepositoryImpl implements BloodCenterScheduleRep
     if (schedule == null) {
       throw new IllegalArgumentException("Schedule cannot be null");
     }
-    mongoRepository.save(new BloodCenterScheduleSchema(schedule));
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(new BloodCenterScheduleSchema(schedule)),
+        "Blood center schedule");
   }
 
   @Override

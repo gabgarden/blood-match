@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -33,6 +34,8 @@ public class DonationSchema {
 
   @Id
   private String id;
+  @Version
+  private Long version;
   private String donorPersonId;
   private String organizationId;
   private LocalDate intendedDate;
@@ -48,6 +51,7 @@ public class DonationSchema {
       throw new IllegalArgumentException("Donation cannot be null");
 
     this.id = donation.getId().getValue().toString();
+    this.version = donation.getVersion();
     this.donorPersonId = donation.getDonor().getPerson().getId().getValue().toString();
     this.organizationId = donation.getBloodCenter().getOrganization().getId().getValue().toString();
     this.intendedDate = donation.getIntendedDate();
@@ -82,7 +86,8 @@ public class DonationSchema {
       actual,
       cancelledOn,
       bloodCenter,
-      this.expectedTime);
+      this.expectedTime,
+      this.version);
   }
 
   public Donation toDomain(
