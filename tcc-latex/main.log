@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  26 AUG 2026 16:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  2 SEP 2026 14:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1438,7 +1438,10 @@ LaTeX Font Info:    Font shape `T1/qhv/m/n' will be
 
 ] (main.lot) [5
 
-] [6
+]
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
+(Font)              scaled to size 12.0pt on input line 217.
+ [6
 
 ] [7
 
@@ -1467,8 +1470,6 @@ Underfull \hbox (badness 3930) in paragraph at lines 116--116
 Cap\'{\i }tulo 1.
 LaTeX Font Info:    Font shape `T1/qhv/m/n' will be
 (Font)              scaled to size 16.24324pt on input line 3.
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
-(Font)              scaled to size 12.0pt on input line 15.
 LaTeX Font Info:    Trying to load font information for TS1+ntxtlf on input lin
 e 19.
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\ts1ntxtlf.fd
@@ -1477,40 +1478,40 @@ File: ts1ntxtlf.fd 2015/01/18 v1.0 fd file for TS1/ntxtlf
 LaTeX Font Info:    Font shape `TS1/ntxtlf/m/n' will be
 (Font)              scaled to size 12.0pt on input line 19.
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 10.0pt on input line 21.
+(Font)              scaled to size 10.0pt on input line 22.
 
 
 Class memoir Warning: The material used in the footer is too large
 (10.14995pt) for the given foot skip (0.0pt), it is recommended to
 either increase the foot skip or redesign the footer
-(in both cases you will find help in the memoir manual). on input line 21.
+(in both cases you will find help in the memoir manual). on input line 22.
 
 [11
 
 
 
-]) [12] [13]
+]) [12]
 \openout2 = `capitulos/02-fundamentacao.aux'.
 
  (capitulos/02-fundamentacao.tex
 Cap\'{\i }tulo 2.
-[14
+[13
 
 
 
 
-] [15] [16]
+] [14] [15]
 LaTeX Font Info:    Font shape `T1/qhv/m/it' will be
 (Font)              scaled to size 13.53603pt on input line 55.
- [17]
+ [16]
 LaTeX Font Info:    Font shape `T1/qhv/m/it' will be
 (Font)              scaled to size 16.24324pt on input line 75.
- [18] [19]) [20]
+ [17] [18]) [19]
 \openout2 = `capitulos/03-trabalhos-relacionados.aux'.
 
  (capitulos/03-trabalhos-relacionados.tex
 Cap\'{\i }tulo 3.
-[21
+[20
 
 
 
@@ -1597,20 +1598,20 @@ Underfull \hbox (badness 10000) in paragraph at lines 61--61
  DOCTYPE
  []
 
-[22
+[21
 pdfTeX warning (ext4): destination with the same identifier (name{table.3.1}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.64 
      ]
-<figuras/grafico01-artigos-ano.png, id=499, 485.56406pt x 251.43938pt>
+<figuras/grafico01-artigos-ano.png, id=495, 485.56406pt x 251.43938pt>
 File: figuras/grafico01-artigos-ano.png Graphic file (type png)
 <use figuras/grafico01-artigos-ano.png>
 Package pdftex.def Info: figuras/grafico01-artigos-ano.png  used on input line 
 92.
 (pdftex.def)             Requested size: 409.71692pt x 212.16295pt.
- [23
+ [22
 pdfTeX warning (ext4): destination with the same identifier (name{table.3.2}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
@@ -1623,13 +1624,13 @@ as been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.97 
      ]
-<figuras/grafico02-artigos-pais.png, id=507, 501.37312pt x 213.79875pt>
+<figuras/grafico02-artigos-pais.png, id=503, 501.37312pt x 213.79875pt>
 File: figuras/grafico02-artigos-pais.png Graphic file (type png)
 <use figuras/grafico02-artigos-pais.png>
 Package pdftex.def Info: figuras/grafico02-artigos-pais.png  used on input line
  102.
 (pdftex.def)             Requested size: 409.71692pt x 174.72235pt.
- [24
+ [23
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3.1}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
@@ -1642,232 +1643,231 @@ has been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.134 \end{table}
                   <./figuras/grafico01-artigos-ano.png> <./figuras/grafico02-ar
-tigos-pais.png>] [25
+tigos-pais.png>] [24
 pdfTeX warning (ext4): destination with the same identifier (name{table.3.4}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.141 
-      ] [26]) [27]
+      ] [25]) [26]
 \openout2 = `capitulos/04-metodos.aux'.
 
  (capitulos/04-metodos.tex
 Cap\'{\i }tulo 4.
-<figuras/figura01-processo-tcc.png, id=556, 1059.96pt x 1143.52219pt>
+<figuras/figura01-processo-tcc.png, id=552, 1059.96pt x 1143.52219pt>
 File: figuras/figura01-processo-tcc.png Graphic file (type png)
 <use figuras/figura01-processo-tcc.png>
 Package pdftex.def Info: figuras/figura01-processo-tcc.png  used on input line 
 17.
 (pdftex.def)             Requested size: 432.48051pt x 466.57881pt.
-[28
+[27
 
 
 
 
 ]
-<figuras/figura02-processo-api.png, id=562, 874.76813pt x 837.1275pt>
+<figuras/figura02-processo-api.png, id=558, 874.76813pt x 837.1275pt>
 File: figuras/figura02-processo-api.png Graphic file (type png)
 <use figuras/figura02-processo-api.png>
 Package pdftex.def Info: figuras/figura02-processo-api.png  used on input line 
 25.
 (pdftex.def)             Requested size: 432.48051pt x 413.87483pt.
- [29
+ [28
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4.3}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.30 
-      <./figuras/figura01-processo-tcc.png>] [30
+      <./figuras/figura01-processo-tcc.png>] [29
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4.4}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.39 \section
              {Instrumentos e ferramentas} <./figuras/figura02-processo-api.png>
-] [31]
+] [30]
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
 (Font)              scaled to size 10.95pt on input line 77.
- [32]) [33
+ [31]) [32
 pdfTeX warning (ext4): destination with the same identifier (name{table.4.5}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.249 \include{capitulos/04-metodos}
+l.253 \include{capitulos/04-metodos}
                                     
 pdfTeX warning (ext4): destination with the same identifier (name{table.4.6}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.249 \include{capitulos/04-metodos}
+l.253 \include{capitulos/04-metodos}
                                     ]
 \openout2 = `capitulos/05-estudo-de-caso.aux'.
 
  (capitulos/05-estudo-de-caso.tex
 Cap\'{\i }tulo 5.
-[34
+[33
 
 
 
 
-] [35
+] [34
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.7}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.79 
-     ] [36
+     ] [35
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.8}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.118 
       ]
-<figuras/figura03-uc-visitante.png, id=629, 350.05782pt x 341.77687pt>
+<figuras/figura03-uc-visitante.png, id=624, 350.05782pt x 341.77687pt>
 File: figuras/figura03-uc-visitante.png Graphic file (type png)
 <use figuras/figura03-uc-visitante.png>
 Package pdftex.def Info: figuras/figura03-uc-visitante.png  used on input line 
-123.
+124.
 (pdftex.def)             Requested size: 409.71692pt x 400.04942pt.
- [37
+ [36
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.9}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.128 
       ]
-<figuras/figura04-uc-requisitante.png, id=634, 418.56375pt x 478.78876pt>
+<figuras/figura04-uc-requisitante.png, id=630, 418.56375pt x 478.78876pt>
 File: figuras/figura04-uc-requisitante.png Graphic file (type png)
 <use figuras/figura04-uc-requisitante.png>
 Package pdftex.def Info: figuras/figura04-uc-requisitante.png  used on input li
-ne 133.
+ne 134.
 (pdftex.def)             Requested size: 409.71692pt x 468.66916pt.
- [38
+ [37
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.5}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.138 
        <./figuras/figura03-uc-visitante.png>]
-<figuras/figura05-uc-doador.png, id=640, 581.92406pt x 465.23813pt>
+<figuras/figura05-uc-doador.png, id=636, 581.92406pt x 465.23813pt>
 File: figuras/figura05-uc-doador.png Graphic file (type png)
 <use figuras/figura05-uc-doador.png>
-Package pdftex.def Info: figuras/figura05-uc-doador.png  used on input line 143
+Package pdftex.def Info: figuras/figura05-uc-doador.png  used on input line 144
 .
 (pdftex.def)             Requested size: 409.71692pt x 327.56699pt.
- [39
+ [38
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.6}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.148 
-       <./figuras/figura04-uc-requisitante.png>] [40
+       <./figuras/figura04-uc-requisitante.png>] [39
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.7}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.156 
        <./figuras/figura05-uc-doador.png>]
-<figuras/figura06-classes-participantes.png, id=652, 742.27313pt x 489.32813pt>
+<figuras/figura06-classes-participantes.png, id=648, 742.27313pt x 489.32813pt>
 
 File: figuras/figura06-classes-participantes.png Graphic file (type png)
 <use figuras/figura06-classes-participantes.png>
 Package pdftex.def Info: figuras/figura06-classes-participantes.png  used on in
-put line 159.
+put line 160.
 (pdftex.def)             Requested size: 409.71692pt x 270.10194pt.
-<figuras/figura07-classes-doacao.png, id=654, 449.42906pt x 419.31656pt>
+<figuras/figura07-classes-doacao.png, id=650, 449.42906pt x 419.31656pt>
 File: figuras/figura07-classes-doacao.png Graphic file (type png)
 <use figuras/figura07-classes-doacao.png>
 Package pdftex.def Info: figuras/figura07-classes-doacao.png  used on input lin
-e 171.
+e 172.
 (pdftex.def)             Requested size: 409.71692pt x 382.28246pt.
- [41
+ [40
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.8}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.176 
        <./figuras/figura06-classes-participantes.png>]
-<figuras/figura08-impl-donation-request.png, id=661, 1037.37563pt x 575.90157pt
+<figuras/figura08-impl-donation-request.png, id=657, 1037.37563pt x 575.90157pt
 >
 File: figuras/figura08-impl-donation-request.png Graphic file (type png)
 <use figuras/figura08-impl-donation-request.png>
 Package pdftex.def Info: figuras/figura08-impl-donation-request.png  used on in
-put line 183.
+put line 184.
 (pdftex.def)             Requested size: 409.71692pt x 227.45665pt.
- [42
+ [41
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.9}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.188 
        <./figuras/figura07-classes-doacao.png>]
-<figuras/figura09-impl-donation.png, id=669, 776.9025pt x 552.56438pt>
+<figuras/figura09-impl-donation.png, id=664, 776.9025pt x 552.56438pt>
 File: figuras/figura09-impl-donation.png Graphic file (type png)
 <use figuras/figura09-impl-donation.png>
 Package pdftex.def Info: figuras/figura09-impl-donation.png  used on input line
- 193.
+ 196.
 (pdftex.def)             Requested size: 432.48051pt x 307.60431pt.
- [43
+ [42
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.10})
  has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.198 
-       <./figuras/figura08-impl-donation-request.png>] [44
+l.200 
+       <./figuras/figura08-impl-donation-request.png>] [43
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.11})
  has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.210   \item \texttt
-                     {domain}: entidades, objetos de valor e regras de negó...
- <./figuras/figura09-impl-donation.png>] [45{C:/Users/garde/AppData/Local/Progr
-ams/MiKTeX/fonts/enc/dvips/tex-gyre/q-ts1.enc}
+l.210 
+       <./figuras/figura09-impl-donation.png>] [44{C:/Users/garde/AppData/Local
+/Programs/MiKTeX/fonts/enc/dvips/tex-gyre/q-ts1.enc}] [45
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.10}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.245 
-      ] [46] [47] [48] [49] [50{C:/Users/garde/AppData/Local/Programs/MiKTeX/fo
-nts/enc/dvips/newtx/ntx-ot1-tlf.enc}]) [51]
+l.259 
+      ] [46] [47] [48] [49]) [50{C:/Users/garde/AppData/Local/Programs/MiKTeX/f
+onts/enc/dvips/newtx/ntx-ot1-tlf.enc}]
 \openout2 = `capitulos/06-avaliacao.aux'.
 
  (capitulos/06-avaliacao.tex
 Cap\'{\i }tulo 6.
-[52
+[51
 
 
 
 
-] [53
+] [52
 pdfTeX warning (ext4): destination with the same identifier (name{table.6.11}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.55 
-     ] [54
+     ] [53
 pdfTeX warning (ext4): destination with the same identifier (name{table.6.12}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.89   \item \textbf
                     {Isolamento do domínio.} As regras de tipagem, elegibil...
-]) [55] [56]
+]) [54] [55]
 \openout2 = `capitulos/07-consideracoes.aux'.
 
  (capitulos/07-consideracoes.tex
 Cap\'{\i }tulo 7.
-[57
+[56
 
 
 
 
-] [58]) [59] (main.bbl
+] [57]) [58] (main.bbl
 bibitemlist
-[60
+[59
 
 
 
-]) [61]
+]) [60]
 \openout2 = `apendices/A-regras-dominio.aux'.
 
  (apendices/A-regras-dominio.tex
@@ -1894,23 +1894,23 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 )
-[62
+[61
 
 
-] (apendices/codigo/DonorIsEligibleToDonate.java)) [63]
+] (apendices/codigo/DonorIsEligibleToDonate.java)) [62]
 \openout2 = `apendices/B-agregados.aux'.
 
 
 (apendices/B-agregados.tex
 AP\^ENDICE B.
-(apendices/codigo/DonationRequestAcceptsDonation.java) [64
+(apendices/codigo/DonationRequestAcceptsDonation.java) [63
 
 
 
 
 ]
 (apendices/codigo/DonationCreate.java) (apendices/codigo/DonationComplete.java
-[65])) [66]
+[64])) [65]
 \openout2 = `apendices/C-fulfillment-matching.aux'.
 
  (apendices/C-fulfillment-matching.tex
@@ -1918,31 +1918,31 @@ AP\^ENDICE C.
 (apendices/codigo/ProportionalGoal.java
 LaTeX Font Info:    Font shape `T1/ntxtt/m/it' in size <9> not available
 (Font)              Font shape `T1/txtt/m/sl' tried instead on input line 7.
- [67
+ [66
 
 
 
 
 ])
-(apendices/codigo/FulfillmentDistributeDonations.java [68] [69])
-(apendices/codigo/DonorMatchingService.java [70])) [71]
+(apendices/codigo/FulfillmentDistributeDonations.java [67] [68])
+(apendices/codigo/DonorMatchingService.java [69])) [70]
 \openout2 = `apendices/D-dip-caso-uso.aux'.
 
 
 (apendices/D-dip-caso-uso.tex
 AP\^ENDICE D.
 (apendices/codigo/DonationRepositoryInterface.java)
-(apendices/codigo/CompletePendingDonationUseCase.java [72
+(apendices/codigo/CompletePendingDonationUseCase.java [71
 
 
 
 
-])) [73]
+])) [72]
 
 Class memoir Warning: The material used in the footer is too large
 (10.14995pt) for the given foot skip (0.0pt), it is recommended to
 either increase the foot skip or redesign the footer
-(in both cases you will find help in the memoir manual). on input line 271.
+(in both cases you will find help in the memoir manual). on input line 275.
 
 \tf@lof=\write4
 \openout4 = `main.lof'.
@@ -1965,8 +1965,8 @@ L3 programming layer <2020/03/25>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 26665 strings out of 467871
- 429657 string characters out of 5418376
+ 26664 strings out of 467871
+ 429650 string characters out of 5418376
  1593680 words of memory out of 5000000
  54473 multiletter control sequences out of 15000+600000
  741104 words of font info for 153 fonts, out of 8000000 for 9000
@@ -1988,9 +1988,9 @@ grams/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/garde/AppData/Local/P
 rograms/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users/garde/AppData/Local/
 Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/Users/garde/AppData/Local
 /Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on main.pdf (74 pages, 1044256 bytes).
+Output written on main.pdf (73 pages, 1043875 bytes).
 PDF statistics:
- 1665 PDF objects out of 1728 (max. 8388607)
- 573 named destinations out of 1000 (max. 500000)
+ 1660 PDF objects out of 1728 (max. 8388607)
+ 572 named destinations out of 1000 (max. 500000)
  20808 words of extra memory for PDF output out of 24883 (max. 10000000)
 

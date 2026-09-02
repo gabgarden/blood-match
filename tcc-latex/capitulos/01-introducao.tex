@@ -2,26 +2,24 @@
 
 \section{Problema e contexto}
 
-A transfusão sanguínea é de suma importância para a medicina nos dias de hoje, sendo essencial em diversas situações clínicas que demandam ação imediata para salvar vidas. Exemplos de demandas emanam de emergências médicas oriundas de acidentes ou de procedimentos cirúrgicos de grande porte, sem deixar de mencionar pacientes com condições patológicas crônicas que necessitam de transfusões regulares. Com toda essa demanda em vista, fica bem clara a enorme importância de doações periódicas por parte do doador, ajudando a manter e salvar vidas.
+De acordo com a Organização Mundial da Saúde (\citeyear{oms2020}) em colaboração com a Organização Pan-Americana da Saúde (\citeyear{opas2020}), a taxa de doação de sangue por mil habitantes é de 32,6 em países de alta renda, 15,1 em países de renda média-alta, 8,1 em países de renda média-baixa e 4,4 em países de baixa renda. Nesse cenário, a transfusão sanguínea permanece essencial à medicina contemporânea: é requerida em emergências oriundas de acidentes, em procedimentos cirúrgicos de grande porte e no tratamento de pacientes com condições patológicas crônicas que necessitam de transfusões regulares. As doações periódicas, portanto, sustentam os estoques e salvam vidas.
 
-De acordo com a Organização Mundial da Saúde (\citeyear{oms2020}) em colaboração com a Organização Pan-Americana da Saúde (\citeyear{opas2020}), a taxa de doação de sangue por mil habitantes é de 32,6 em países de alta renda, 15,1 em países de renda média-alta, 8,1 em países de renda média-baixa e 4,4 em países de baixa renda. Com isso, verifica-se que o sistema de doação de sangue no território brasileiro sofre com o baixo número de doadores para uma alta demanda.
+Ainda assim, verifica-se que o sistema de doação de sangue no território brasileiro sofre com o baixo número de doadores diante de uma alta demanda. É comum observar, nas redes sociais, pessoas requisitando doações extraordinárias em virtude da necessidade de um conhecido --- evidência da escassez nos bancos de sangue.
 
-Do ponto de vista tecnológico, o processo atual de captação de novos doadores mostra-se extremamente limitado em relação à eficiência na conexão entre oferta e demanda. É comum vermos nas redes sociais pessoas requisitando doações extraordinárias em virtude de uma necessidade de um conhecido, demonstrando a falta de sangue nos bancos e a ineficiência das ferramentas tecnológicas atuais de captação, o que resulta em tempo excessivo para localizar doadores adequados e baixa taxa de conversão das solicitações em doações efetivas.
+Do ponto de vista tecnológico, as soluções atuais de captação --- pedidos disseminados em redes sociais e ferramentas de divulgação de alcance genérico --- mostram-se extremamente limitadas na conexão entre oferta e demanda. Falta um mecanismo sistemático que aproxime requisitantes e doadores segundo critérios de compatibilidade, o que resulta em tempo excessivo para localizar doadores adequados e em baixa taxa de conversão das solicitações em doações efetivas.
 
-Diante desse cenário de alta demanda de doações, juntamente com as limitações dos métodos atuais de divulgação e captação de doadores, torna-se necessário o desenvolvimento de soluções tecnológicas robustas, bem estruturadas e escaláveis, para que a captação seja mais efetiva, sendo fundamental uma abordagem de desenvolvimento que garanta um longo ciclo de vida ao sistema.
+Diante dessa lacuna, este trabalho propõe uma API RESTful que intermedia as solicitações de unidades de saúde e pacientes e os doadores disponíveis, recomendando correspondências compatíveis. Essa abordagem torna a captação mais efetiva, ao substituir a divulgação genérica por um encontro dirigido entre oferta e demanda, e apoia-se em uma arquitetura robusta, bem estruturada e escalável, de modo a garantir um longo ciclo de vida ao sistema.
 
 \section{Objetivos}
 
-O objetivo geral deste trabalho é desenvolver uma \textit{Application Programming Interface} (API) RESTful (\textit{Representational State Transfer}) para apoiar a captação de doadores a partir de solicitações de unidades de saúde e pacientes. A API atua como intermediadora entre demanda (requisitantes) e oferta (doadores), com recomendação de solicitações compatíveis --- considerando tipagem sanguínea e proximidade geográfica --- e identificação de doadores elegíveis para notificação.
+O objetivo geral deste trabalho é gerenciar as doações de sangue a partir de um sistema de informações via Web, aproximando as solicitações de unidades de saúde e pacientes dos doadores compatíveis. O sistema recomenda solicitações à luz da tipagem sanguínea e da proximidade geográfica e identifica doadores elegíveis para notificação.
 
 Objetivos específicos:
 
 \begin{itemize}[leftmargin=*]
-  \item[\textbf{O1}] Mapear o processo da doação sanguínea com técnicas de \textit{Domain-Driven Design} (DDD).
+  \item[\textbf{O1}] Mapear o processo da doação sanguínea, identificando participantes, papéis, solicitações e regras de negócio.
   \item[\textbf{O2}] Identificar sistemas com funcionalidades similares.
-  \item[\textbf{O3}] Desenvolver mecanismos de recomendação de solicitações a doadores e de notificação a candidatos elegíveis.
-  \item[\textbf{O4}] Validar a proposta por meio de estudo de caso e implementação da API.
-  \item[\textbf{O5}] Avaliar a manutenibilidade da solução.
+  \item[\textbf{O3}] Recomendar solicitações compatíveis a doadores e notificar candidatos elegíveis.
 \end{itemize}
 
 \section{Justificativa}

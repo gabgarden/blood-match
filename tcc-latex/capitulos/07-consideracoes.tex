@@ -4,19 +4,17 @@ Este capítulo retoma a problemática apresentada na Introdução à luz do sist
 
 \section{Alcance dos objetivos}
 
-O objetivo geral --- desenvolver uma API RESTful para apoiar a captação de doadores a partir de solicitações de unidades de saúde e pacientes, intermediando demanda e oferta com recomendação de solicitações compatíveis --- foi alcançado por meio da implementação descrita no Capítulo~5 e da validação automatizada relatada no Capítulo~6.
+O objetivo geral --- gerenciar as doações de sangue a partir de um sistema de informações via Web, aproximando solicitações de unidades de saúde e pacientes dos doadores compatíveis --- foi alcançado por meio da implementação descrita no Capítulo~5. A verificação automatizada relatada no Capítulo~6 constitui o passo metodológico de avaliação da proposta, e não uma entrega autônoma.
 
 Quanto aos objetivos específicos:
 
 \begin{itemize}[leftmargin=*]
-  \item[\textbf{O1}] O processo da doação sanguínea foi mapeado com técnicas de DDD, resultando na hierarquia de participantes (\codigo{Party}, \codigo{Person}, \codigo{Organization}), nos papéis (\codigo{Donor}, \codigo{Requester}, \codigo{BloodCenter}) e nos agregados \codigo{DonationRequest} e \codigo{Donation}, detalhados no Capítulo~5.
+  \item[\textbf{O1}] O processo da doação sanguínea foi mapeado, resultando na hierarquia de participantes (\codigo{Party}, \codigo{Person}, \codigo{Organization}), nos papéis (\codigo{Donor}, \codigo{Requester}, \codigo{BloodCenter}) e nos agregados \codigo{DonationRequest} e \codigo{Donation}, detalhados no Capítulo~5.
   \item[\textbf{O2}] Sistemas e abordagens similares foram identificados e discutidos no mapeamento sistemático da literatura (Capítulo~3), orientando decisões de recomendação, notificação e gestão de solicitações.
-  \item[\textbf{O3}] Os mecanismos de recomendação de solicitações a doadores e de notificação a candidatos elegíveis foram implementados --- \codigo{GetRecommendedRequestsUseCase}, \codigo{FindEligibleDonorsUseCase}, \codigo{DonorMatchingService} e \codigo{NotifyPotentialDonorsUseCase} --- e cobertos por testes automatizados de domínio e de aplicação.
-  \item[\textbf{O4}] A proposta foi validada pelo estudo de caso e pela implementação da API, com evidência empírica dada pela execução bem-sucedida de 156 testes automatizados (100\% de sucesso), conforme o Quadro~\ref{tab:resultado-testes}.
-  \item[\textbf{O5}] A manutenibilidade foi avaliada qualitativamente a partir da arquitetura em camadas orientada a DDD/SOLID e da testabilidade das regras críticas sem acoplamento obrigatório à infraestrutura, conforme discutido na Seção~6.5.
+  \item[\textbf{O3}] Solicitações compatíveis passaram a ser recomendadas a doadores e candidatos elegíveis notificados --- \codigo{GetRecommendedRequestsUseCase}, \codigo{FindEligibleDonorsUseCase}, \codigo{DonorMatchingService} e \codigo{NotifyPotentialDonorsUseCase} --- com cobertura por testes automatizados de domínio e de aplicação.
 \end{itemize}
 
-Em síntese, os cinco objetivos específicos foram atendidos no escopo definido para este trabalho de conclusão de curso.
+Em síntese, os três objetivos específicos foram atendidos no escopo definido para este trabalho de conclusão de curso.
 
 \section{Principais contribuições}
 

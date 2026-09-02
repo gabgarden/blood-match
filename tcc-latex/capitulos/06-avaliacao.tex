@@ -1,6 +1,6 @@
 \chapter{Avaliação da proposta de solução}
 
-Este capítulo apresenta a avaliação da API desenvolvida, alinhada aos objetivos específicos O4 (validar a proposta por meio de estudo de caso e implementação) e O5 (avaliar a manutenibilidade da solução). A avaliação combina a consolidação do sistema entregue --- descrito no Capítulo~5 --- com a execução de uma suíte de testes automatizados unitários e de integração, seguida de uma análise qualitativa da arquitetura quanto à manutenibilidade.
+Este capítulo apresenta a avaliação da solução desenvolvida, tratada como passo metodológico --- e não como objetivo de entrega ---, conforme o Capítulo~4. A avaliação combina a consolidação do sistema entregue --- descrito no Capítulo~5 --- com a execução de uma suíte de testes automatizados unitários e de integração, seguida de uma análise qualitativa da arquitetura quanto à manutenibilidade.
 
 \section{Sistema entregue}
 
@@ -92,7 +92,7 @@ Do ponto de vista estrutural, a avaliação qualitativa confirma que a arquitetu
   \item \textbf{Segurança testável na borda.} A autorização foi validada na camada de interface, separando a política de acesso das regras de alocação/recomendação.
 \end{itemize}
 
-Em conjunto, esses elementos indicam que a solução atende, no escopo avaliado, ao objetivo O5: a manutenibilidade é favorecida pela separação de responsabilidades e pela testabilidade das regras críticas.
+Em conjunto, esses elementos indicam que, no escopo avaliado, a manutenibilidade é favorecida pela separação de responsabilidades e pela testabilidade das regras críticas.
 
 \section{Sugestões de melhorias}
 
@@ -106,4 +106,4 @@ A partir da avaliação, identificam-se melhorias desejáveis para evoluções f
 
 \section{Considerações sobre a avaliação}
 
-Os resultados obtidos permitem concluir que a API implementada --- e validada pela suíte de 156 testes automatizados com 100\% de sucesso --- materializa o estudo de caso do Capítulo~5 e atende, no escopo desta monografia, aos objetivos O3 (mecanismos de recomendação e notificação, cobertos por testes de matching, recomendação e notificação indireta via casos de uso), O4 (validação por implementação e testes) e O5 (manutenibilidade evidenciada pela arquitetura testável em camadas). A Seção~7 retoma esses achados à luz da problemática apresentada na Introdução.
+Os resultados obtidos permitem concluir que o sistema implementado --- verificado pela suíte de 156 testes automatizados com 100\% de sucesso --- materializa o estudo de caso do Capítulo~5 e evidencia o atendimento ao objetivo O3 (recomendação de solicitações compatíveis e notificação de candidatos elegíveis, cobertos por testes de matching, recomendação e notificação indireta via casos de uso). A análise de manutenibilidade, igualmente metodológica, aponta uma arquitetura testável em camadas. A Seção~7 retoma esses achados à luz da problemática apresentada na Introdução.
