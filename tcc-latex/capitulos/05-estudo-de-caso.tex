@@ -10,9 +10,7 @@ O desenvolvimento foi orientado pelos princípios do DDD e pelos princípios SOL
 
 A extração de requisitos ocorreu a partir da análise documental e bibliográfica descrita no Capítulo~4, alinhando as necessidades dos diferentes atores envolvidos no processo de doação de sangue às capacidades técnicas do sistema proposto.
 
-\subsection{Requisitos funcionais}
-
-Os requisitos funcionais representam as operações que a API disponibiliza para atender às rotinas de cadastro, gerenciamento de solicitações, recomendação e controle de doações. O Quadro~\ref{tab:rf} sintetiza as funcionalidades identificadas e implementadas, refletindo diretamente os recursos (\textit{endpoints}) expostos pela API.
+Os requisitos funcionais representam as operações que a API disponibiliza para atender às rotinas de cadastro, gerenciamento de solicitações, recomendação e controle de doações. A tabela~\ref{tab:rf} sintetiza as funcionalidades identificadas e implementadas, refletindo diretamente os recursos (\textit{endpoints}) expostos pela API.
 
 \begin{table}[H]
   \centering
@@ -49,9 +47,12 @@ Os requisitos funcionais representam as operações que a API disponibiliza para
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-\subsection{Requisitos não funcionais}
+/*
+discutir sobre a tabela
+Exemplo de Fernando "discorrer que a lista é resumida para poder testar a teoria, que é um conjunto mínimo coeso de requisitos, levando em consideração a oferta, demanda e histórico de doações."
+*/
 
-Além das funcionalidades diretas, foram definidos requisitos não funcionais para estabelecer os parâmetros de qualidade, segurança e arquitetura esperados. Considerando a adoção do DDD e da arquitetura em camadas, o Quadro~\ref{tab:rnf} apresenta as diretrizes técnicas estabelecidas para a solução.
+Além das funcionalidades diretas, foram definidos requisitos não funcionais para estabelecer os parâmetros de qualidade, segurança e arquitetura esperados. Considerando a adoção do DDD e da arquitetura em camadas, a Tabela~\ref{tab:rnf} apresenta as diretrizes técnicas estabelecidas para a solução.
 
 \begin{table}[H]
   \centering
@@ -77,13 +78,18 @@ Além das funcionalidades diretas, foram definidos requisitos não funcionais pa
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
+/*
+discutir sobre a tabela
+Exemplo de Fernando "discuta que os requisitos não funcionais não trata de funcionalidades mas de características do software"
+*/
+
 \section{Modelagem do sistema}
 
 Após a consolidação dos requisitos, procedeu-se com a modelagem do sistema para descrever as interações entre os atores e a API, permitindo visualizar o comportamento esperado da solução sob a perspectiva estrutural e de uso.
 
 \subsection{Casos de uso}
 
-A modelagem de casos de uso, em notação UML, sintetiza as operações disponíveis para os diferentes perfis de acesso. O Quadro~\ref{tab:uc} apresenta o mapeamento dos casos de uso e seus respectivos atores, incluindo tanto as operações representadas nos diagramas a seguir quanto operações complementares oferecidas pela API para os mesmos atores.
+A modelagem de casos de uso, em notação UML, sintetiza as operações disponíveis para os diferentes perfis de acesso. A Tabela~\ref{tab:uc} apresenta o mapeamento dos casos de uso e seus respectivos atores, incluindo tanto as operações representadas nos diagramas a seguir quanto operações complementares oferecidas pela API para os mesmos atores.
 
 \begin{table}[H]
   \centering
@@ -116,7 +122,7 @@ A modelagem de casos de uso, em notação UML, sintetiza as operações disponí
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-A representação gráfica dessas interações é dividida de acordo com o nível de acesso dos atores:
+A representação gráfica dessas interações é dividida de acordo com o nível de acesso dos atores. A Figura 3 apresenta o diagrama de caso de uso do ator (\textit{Guest}).
 
 \begin{figure}[H]
   \centering
@@ -128,6 +134,8 @@ A representação gráfica dessas interações é dividida de acordo com o níve
 
 O ator \textit{Guest} representa utilizadores sem cadastro prévio, limitados às operações de criação de contas e autenticação (UC01, UC02 e UC03).
 
+Já a Figura 4 representa o diagrama de caso de uso do ator (\textit{Requester}).
+
 \begin{figure}[H]
   \centering
   \caption{Diagrama de caso de uso de requisitante}
@@ -137,6 +145,8 @@ O ator \textit{Guest} representa utilizadores sem cadastro prévio, limitados à
 \end{figure}
 
 O ator \textit{Requester} concentra as permissões relacionadas à criação e à gestão de solicitações de sangue (UC08 e UC13), além do disparo de notificações a doadores potenciais quando uma solicitação precisa de maior alcance (UC15).
+
+Por fim, a Figura 5 representa o diagrama de caso de uso do ator (\textit{Donor}).
 
 \begin{figure}[H]
   \centering
@@ -222,7 +232,7 @@ O fluxo padrão de uma chamada percorre essas camadas em uma única direção --
 
 \subsection{Entidades, agregados e objetos de valor}
 
-A estrutura central do domínio foi modelada de forma hierárquica e orientada a objetos. O Quadro~\ref{tab:entidades} sintetiza as principais entidades e agregados responsáveis por garantir a consistência das transações no sistema.
+A estrutura central do domínio foi modelada de forma hierárquica e orientada a objetos. A Tabela~\ref{tab:entidades} sintetiza as principais entidades e agregados responsáveis por garantir a consistência das transações no sistema.
 
 \begin{table}[H]
   \centering

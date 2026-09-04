@@ -55,7 +55,7 @@ Entre os testes de domínio, destaca-se a cobertura do algoritmo de cumprimento 
 
 \section{Resultados da execução}
 
-A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução concluída em 26 de agosto de 2026 obteve o resultado sintetizado no Quadro~\ref{tab:resultado-testes}.
+A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução concluída em 26 de agosto de 2026 obteve o resultado sintetizado na Tabela~\ref{tab:resultado-testes}.
 
 \begin{table}[H]
   \centering
@@ -77,7 +77,7 @@ A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-A ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e papéis.
+Como pode ser observado na Tabela, a ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e papéis.
 
 Ressalta-se que a maior parte dos testes de domínio e de aplicação não depende de uma instância MongoDB ativa: repositórios e serviços externos são substituídos por \textit{mocks}, o que favorece a repetibilidade e reduz o custo de execução. Os testes que sobem o contexto Spring Boot (\textit{smoke} e autorização HTTP) validam a montagem da aplicação e a barreira de segurança sem exigir, nos cenários cobertos, a persistência real de documentos.
 
