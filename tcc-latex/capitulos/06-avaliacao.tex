@@ -4,16 +4,9 @@ Este capítulo apresenta a avaliação da solução desenvolvida, tratada como p
 
 \section{Sistema entregue}
 
-A solução implementada materializa-se em uma API RESTful em Java~17 com Spring Boot, persistência em MongoDB e autenticação/autorização baseadas em JWT, organizada em camadas inspiradas no DDD --- \codigo{domain}, \codigo{application/usecase}, \codigo{interfaces/rest}, \codigo{infra/persistence} e \codigo{infra/security} --- conforme o Capítulo~5. Do ponto de vista funcional, a API cobre o conjunto de requisitos do Quadro~\ref{tab:rf}, com destaque para:
+A solução implementada materializa-se em uma API RESTful em Java~17 com Spring Boot, persistência em MongoDB e autenticação e autorização baseadas em JWT, organizada em camadas inspiradas no DDD --- \codigo{domain}, \codigo{application/usecase}, \codigo{interfaces/rest}, \codigo{infra/persistence} e \codigo{infra/security} --- conforme detalhado no Capítulo~5. Do ponto de vista funcional, a API cobre integralmente o conjunto de requisitos da Tabela~\ref{tab:rf}. Essa cobertura inicia-se pelo cadastro estruturado de pessoas e organizações e a respectiva atribuição de papéis de doador, requisitante e hemocentro. A partir dessa base, o sistema contempla o gerenciamento completo do ciclo de vida das solicitações de doação de sangue, permitindo a abertura de demandas, o acompanhamento de seu estado, a atualização dinâmica de metas e prazos, o cancelamento justificado e o disparo de notificações a voluntários elegíveis.
 
-\begin{itemize}[leftmargin=*]
-  \item cadastro de pessoas e organizações e associação de papéis (doador, requisitante e hemocentro);
-  \item gestão do ciclo de vida das solicitações de doação (criação, consulta, atualização de meta e prazo, cancelamento e notificação de elegíveis);
-  \item registro unificado de doações --- data de intenção (pendente) ou data efetiva (concluída) ---, reagendamento, conclusão e histórico;
-  \item recomendação de solicitações compatíveis ao doador, considerando tipagem sanguínea, elegibilidade temporal e proximidade geográfica;
-  \item cumprimento de metas por \textit{snapshot} em memória: alocação FIFO de doações concluídas às solicitações do mesmo hemocentro, restrita por um teto proporcional ao prazo de cada solicitação e sem campo persistido;
-  \item busca autenticada de hemocentros por nome, retornando o identificador da organização utilizado nas operações de escrita.
-\end{itemize}
+O fluxo de doações é estruturado por um registro unificado, capaz de diferenciar a intenção de doar --- que gera um agendamento pendente --- da doação já efetivada, viabilizando ainda o reagendamento, a confirmação de conclusão e a recuperação do histórico hemoterápico individual. No núcleo de inteligência da aplicação, destaca-se o mecanismo de recomendação de solicitações compatíveis, o qual pondera tipagem sanguínea, elegibilidade temporal e proximidade geográfica. O acompanhamento dessas demandas ocorre por meio de um algoritmo de cumprimento de metas calculado por \textit{snapshot} em memória: as doações concluídas são alocadas às solicitações do mesmo hemocentro segundo uma ordenação FIFO modulada por um teto proporcional ao prazo restante, dispensando contadores persistidos no banco de dados. Complementarmente, o sistema fornece recursos autenticados para a busca de hemocentros por nome, recuperando os identificadores necessários às operações de escrita.
 
 A documentação interativa OpenAPI (\textit{springdoc}) apoia a exploração e a validação manual dos \textit{endpoints}. Para os fins desta monografia, a avaliação formal concentrou-se na API RESTful, objeto central do estudo de caso.
 
@@ -29,7 +22,7 @@ O critério de sucesso funcional adotado foi a execução integral da suíte sem
 
 \section{Organização da suíte de testes}
 
-A suíte reside em \codigo{src/test/java} e está agrupada por camada, espelhando a arquitetura da API. O Quadro~\ref{tab:suite-testes} sintetiza as classes de teste e o número de casos executados em cada uma.
+A suíte reside em \codigo{src/test/java} e está agrupada por camada, espelhando a arquitetura da API. A Tabela~\ref{tab:suite-testes} sintetiza as classes de teste e o número de casos executados em cada uma.
 
 \begin{table}[H]
   \centering
@@ -77,32 +70,19 @@ A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-Como pode ser observado na Tabela, a ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e papéis.
+Como pode ser observado na Tabela~\ref{tab:resultado-testes}, a ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e papéis.
 
 Ressalta-se que a maior parte dos testes de domínio e de aplicação não depende de uma instância MongoDB ativa: repositórios e serviços externos são substituídos por \textit{mocks}, o que favorece a repetibilidade e reduz o custo de execução. Os testes que sobem o contexto Spring Boot (\textit{smoke} e autorização HTTP) validam a montagem da aplicação e a barreira de segurança sem exigir, nos cenários cobertos, a persistência real de documentos.
 
 \section{Avaliação de manutenibilidade}
 
-Do ponto de vista estrutural, a avaliação qualitativa confirma que a arquitetura em camadas favorece a manutenibilidade (RNF04--RNF06). Evidências observadas:
+Do ponto de vista estrutural, a avaliação qualitativa confirma que a arquitetura em camadas favorece a manutenibilidade e a sustentabilidade técnica da solução (RNF04--RNF06). Essa constatação apoia-se, em primeiro lugar, no rigoroso isolamento da camada de domínio, na qual as regras de tipagem sanguínea, cálculo de elegibilidade, verificação de aceitação (\codigo{acceptsDonation}), aplicação do teto proporcional e alocação de bolsas estão estritamente encapsuladas em entidades e serviços de domínio, operando sem qualquer acoplamento a bibliotecas do Spring MVC ou do MongoDB. A introdução do algoritmo de teto proporcional exemplifica essa flexibilidade, tendo sido incorporada como regra pura do agregado e de seu serviço de domínio sem provocar alterações em casos de uso, controladores ou esquemas de persistência.
 
-\begin{itemize}[leftmargin=*]
-  \item \textbf{Isolamento do domínio.} As regras de tipagem, elegibilidade, \codigo{acceptsDonation(...)}, o teto proporcional e a alocação estão concentradas em classes de domínio/serviços de domínio, testáveis sem Spring MVC ou MongoDB. A introdução do teto ilustra essa propriedade: a regra foi acrescentada ao agregado e ao serviço de domínio sem alterar casos de uso, \textit{controllers} ou esquemas de persistência.
-  \item \textbf{Casos de uso como orquestração.} Os testes de aplicação verificam fluxos (por exemplo, concluir uma doação e exibir o preenchimento recalculado na leitura seguinte) sem misturar detalhes de serialização HTTP, o que reduz o acoplamento entre protocolo e negócio.
-  \item \textbf{Inversão de dependência.} As dez interfaces de repositório declaradas no domínio e a \codigo{NotificationServiceInterface} permitem substituir implementações de infraestrutura sem alterar o núcleo --- propriedade explorada pelos \textit{mocks} na suíte, que dispensam uma instância MongoDB ativa.
-  \item \textbf{Segurança testável na borda.} A autorização foi validada na camada de interface, separando a política de acesso das regras de alocação/recomendação.
-\end{itemize}
-
-Em conjunto, esses elementos indicam que, no escopo avaliado, a manutenibilidade é favorecida pela separação de responsabilidades e pela testabilidade das regras críticas.
+Em consonância com esse isolamento, os casos de uso assumem exclusivamente o papel de orquestradores de fluxo, o que permite que a suíte de testes exercite cenários complexos de aplicação --- como a conclusão de uma doação e a subsequente visualização do progresso recalculado --- sem a interferência de detalhes de serialização HTTP. Adicionalmente, a aplicação do princípio de inversão de dependência por meio de dez interfaces de repositório e da interface de notificação permite desacoplar o núcleo de qualquer tecnologia concreta de infraestrutura, viabilizando o uso intensivo de objetos simulados (\textit{mocks}) que garantem testes determinísticos e rápidos sem a necessidade de um banco de dados ativo. Por fim, a verificação de segurança é concentrada na borda da aplicação, assegurando que o controle de acesso e autorização seja validado nos pontos de entrada sem poluir as regras de negócio de alocação e recomendação. Em conjunto, esses elementos demonstram que a manutenibilidade é amplamente favorecida pela separação de responsabilidades e pela elevada testabilidade das regras críticas.
 
 \section{Sugestões de melhorias}
 
-A partir da avaliação, identificam-se melhorias desejáveis para evoluções futuras da API e da própria suíte:
-
-\begin{itemize}[leftmargin=*]
-  \item ampliar testes de integração com persistência real (por exemplo, Testcontainers com MongoDB) para cobrir concorrência otimista (\codigo{@Version}) e agregações de busca de hemocentros;
-  \item incorporar métricas de cobertura de código (por exemplo, JaCoCo) como indicador complementar à taxa de sucesso da suíte;
-  \item formalizar testes de contrato da API (OpenAPI) e cenários de carga para recomendações geoespaciais em volumes maiores de dados.
-\end{itemize}
+A partir dos resultados obtidos na avaliação, delineiam-se aprimoramentos pertinentes para a evolução da API e de seus mecanismos de validação. No âmbito dos testes de integração, mostra-se recomendável expandir os cenários com persistência real em contêineres gerenciados (como Testcontainers com MongoDB), assegurando a validação automatizada de aspectos de infraestrutura como o controle de concorrência otimista (\codigo{@Version}) e consultas de agregação complexas na busca de hemocentros. Como complemento métrico à taxa de sucesso dos testes, sugere-se a incorporação contínua de ferramentas de cobertura de código, a exemplo do JaCoCo, mapeando ramificações não cobertas. No nível das interfaces externas, mostra-se oportuno formalizar testes automatizados de contrato a partir da especificação OpenAPI, bem como conduzir ensaios de carga e estresse dedicados a avaliar o desempenho das consultas geoespaciais e da reconstituição de agregados sob volumes elevados de dados e requisições concorrentes.
 
 \section{Considerações sobre a avaliação}
 

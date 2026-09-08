@@ -47,10 +47,9 @@ Os requisitos funcionais representam as operações que a API disponibiliza para
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-/*
-discutir sobre a tabela
-Exemplo de Fernando "discorrer que a lista é resumida para poder testar a teoria, que é um conjunto mínimo coeso de requisitos, levando em consideração a oferta, demanda e histórico de doações."
-*/
+
+Ressalta-se que a lista de requisitos funcionais apresentada não tem a pretensão de esgotar todas as rotinas administrativas de um hemocentro ou unidade hospitalar, mas de delimitar um conjunto mínimo e coeso de operações indispensáveis para validar os conceitos teóricos e arquiteturais propostos. Esse escopo abrange o ciclo fundamental da doação de sangue ao contemplar, de maneira integrada, a gestão da demanda (abertura e acompanhamento de solicitações por unidades de saúde e pacientes), a oferta (disponibilidade, elegibilidade e intenções de doação pelos voluntários) e o registro histórico das doações realizadas.
+
 
 Além das funcionalidades diretas, foram definidos requisitos não funcionais para estabelecer os parâmetros de qualidade, segurança e arquitetura esperados. Considerando a adoção do DDD e da arquitetura em camadas, a Tabela~\ref{tab:rnf} apresenta as diretrizes técnicas estabelecidas para a solução.
 
@@ -78,10 +77,9 @@ Além das funcionalidades diretas, foram definidos requisitos não funcionais pa
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-/*
-discutir sobre a tabela
-Exemplo de Fernando "discuta que os requisitos não funcionais não trata de funcionalidades mas de características do software"
-*/
+
+Diferentemente dos requisitos funcionais, que especificam os serviços e as ações que o sistema deve executar, os requisitos não funcionais definem as qualidades, restrições e propriedades estruturais do \textit{software}. Nesse sentido, os itens elencados estabelecem parâmetros de segurança (como autenticação sem estado e autorização por papéis), manutenibilidade e baixo acoplamento (assegurados pela divisão em camadas orientada ao DDD e ao SOLID), integridade de dados (por meio do controle de concorrência otimista) e padronização das comunicações (via API RESTful e formato JSON), sustentando a robustez técnica da solução desenvolvida.
+
 
 \section{Modelagem do sistema}
 
@@ -122,36 +120,36 @@ A modelagem de casos de uso, em notação UML, sintetiza as operações disponí
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-A representação gráfica dessas interações é dividida de acordo com o nível de acesso dos atores. A Figura 3 apresenta o diagrama de caso de uso do ator (\textit{Guest}).
+A representação gráfica dessas interações é dividida de acordo com o nível de acesso dos atores. A Figura~\ref{fig:uc-guest} apresenta o diagrama de caso de uso do ator (\textit{Guest}).
 
 \begin{figure}[H]
   \centering
   \caption{Diagrama de caso de uso de visitante}
-  \includegraphics[width=0.9\textwidth]{figura03-uc-visitante}
+  \includegraphics[width=0.6\textwidth]{figura03-uc-visitante}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-guest}
 \end{figure}
 
 O ator \textit{Guest} representa utilizadores sem cadastro prévio, limitados às operações de criação de contas e autenticação (UC01, UC02 e UC03).
 
-Já a Figura 4 representa o diagrama de caso de uso do ator (\textit{Requester}).
+Já a Figura~\ref{fig:uc-requester} representa o diagrama de caso de uso do ator (\textit{Requester}).
 
 \begin{figure}[H]
   \centering
   \caption{Diagrama de caso de uso de requisitante}
-  \includegraphics[width=0.9\textwidth]{figura04-uc-requisitante}
+  \includegraphics[width=0.65\textwidth]{figura04-uc-requisitante}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-requester}
 \end{figure}
 
 O ator \textit{Requester} concentra as permissões relacionadas à criação e à gestão de solicitações de sangue (UC08 e UC13), além do disparo de notificações a doadores potenciais quando uma solicitação precisa de maior alcance (UC15).
 
-Por fim, a Figura 5 representa o diagrama de caso de uso do ator (\textit{Donor}).
+Por fim, a Figura~\ref{fig:uc-donor} representa o diagrama de caso de uso do ator (\textit{Donor}).
 
 \begin{figure}[H]
   \centering
   \caption{Diagrama de caso de uso de doador}
-  \includegraphics[width=0.9\textwidth]{figura05-uc-doador}
+  \includegraphics[width=0.7\textwidth]{figura05-uc-doador}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:uc-donor}
 \end{figure}
@@ -167,7 +165,7 @@ A Figura~\ref{fig:classe-participantes} apresenta o diagrama de classes conceitu
 \begin{figure}[H]
   \centering
   \caption{Diagrama conceitual dos participantes}
-  \includegraphics[width=0.9\textwidth]{figura06-classes-participantes}
+  \includegraphics[width=0.65\textwidth]{figura06-classes-participantes}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:classe-participantes}
 \end{figure}
@@ -179,7 +177,7 @@ Dando prosseguimento à representação do negócio, a Figura~\ref{fig:classe-do
 \begin{figure}[H]
   \centering
   \caption{Diagrama conceitual do processo de doação}
-  \includegraphics[width=0.9\textwidth]{figura07-classes-doacao}
+  \includegraphics[width=0.65\textwidth]{figura07-classes-doacao}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:classe-doacao}
 \end{figure}
@@ -203,7 +201,7 @@ Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementaçã
 \begin{figure}[H]
   \centering
   \caption{Diagrama de implementação: agregado Donation}
-  \includegraphics[width=0.95\textwidth]{figura09-impl-donation}
+  \includegraphics[width=0.75\textwidth]{figura09-impl-donation}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:impl-donation}
 \end{figure}

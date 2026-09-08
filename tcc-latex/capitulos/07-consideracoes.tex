@@ -6,30 +6,15 @@ Este capítulo retoma a problemática apresentada na Introdução à luz do sist
 
 O objetivo geral --- gerenciar as doações de sangue a partir de um sistema de informações via Web, aproximando solicitações de unidades de saúde e pacientes dos doadores compatíveis --- foi alcançado por meio da implementação descrita no Capítulo~5. A verificação automatizada relatada no Capítulo~6 constitui o passo metodológico de avaliação da proposta, e não uma entrega autônoma.
 
-Quanto aos objetivos específicos:
+No que tange aos objetivos específicos estabelecidos, constata-se que todos foram plenamente atendidos no escopo do trabalho. O primeiro objetivo específico (O1) concretizou-se por meio do mapeamento aprofundado dos processos hemoterápicos, culminando na modelagem da hierarquia de participantes (\codigo{Party}, \codigo{Person} e \codigo{Organization}), na definição dinâmica de seus papéis (\codigo{Donor}, \codigo{Requester} e \codigo{BloodCenter}) e na estruturação dos agregados centrais \codigo{DonationRequest} e \codigo{Donation}, detalhados no Capítulo~5.
 
-\begin{itemize}[leftmargin=*]
-  \item[\textbf{O1}] O processo da doação sanguínea foi mapeado, resultando na hierarquia de participantes (\codigo{Party}, \codigo{Person}, \codigo{Organization}), nos papéis (\codigo{Donor}, \codigo{Requester}, \codigo{BloodCenter}) e nos agregados \codigo{DonationRequest} e \codigo{Donation}, detalhados no Capítulo~5.
-  \item[\textbf{O2}] Sistemas e abordagens similares foram identificados e discutidos no mapeamento sistemático da literatura (Capítulo~3), orientando decisões de recomendação, notificação e gestão de solicitações.
-  \item[\textbf{O3}] Solicitações compatíveis passaram a ser recomendadas a doadores e candidatos elegíveis notificados --- \codigo{GetRecommendedRequestsUseCase}, \codigo{FindEligibleDonorsUseCase}, \codigo{DonorMatchingService} e \codigo{NotifyPotentialDonorsUseCase} --- com cobertura por testes automatizados de domínio e de aplicação.
-\end{itemize}
-
-Em síntese, os três objetivos específicos foram atendidos no escopo definido para este trabalho de conclusão de curso.
+O segundo objetivo específico (O2) foi alcançado com a condução do mapeamento sistemático da literatura apresentado no Capítulo~3, o qual possibilitou identificar o estado da arte e as lacunas nos sistemas existentes, fornecendo subsídios teóricos e práticos que nortearam as decisões de projeto para recomendação, notificação ativa e gestão de demandas. Por sua vez, o terceiro objetivo específico (O3) materializou-se na concepção e codificação dos serviços de matching e recomendação geoespacial compatível e na notificação dirigida a voluntários elegíveis --- por meio de casos de uso como \codigo{GetRecommendedRequestsUseCase}, \codigo{FindEligibleDonorsUseCase}, \codigo{DonorMatchingService} e \codigo{NotifyPotentialDonorsUseCase} ---, sendo a eficácia e a corretude de tais componentes formalmente corroboradas pela execução da suíte de testes automatizados apresentada no Capítulo~6. Desse modo, evidencia-se o atendimento harmônico e integral dos objetivos propostos para a pesquisa.
 
 \section{Principais contribuições}
 
-Do ponto de vista acadêmico, este trabalho contribui com: (i) um mapeamento sistemático da literatura sobre sistemas de captação de doadores de sangue (Capítulo~3); (ii) um estudo de caso detalhado de aplicação de DDD e princípios SOLID a um domínio de saúde pública com regras de elegibilidade, compatibilidade tipológica e proximidade geográfica; e (iii) uma avaliação explícita da solução por meio de suíte automatizada, tornando verificáveis as regras centrais do domínio.
+Do ponto de vista acadêmico, este trabalho oferece contribuições ao sistematizar o conhecimento sobre sistemas de captação de doadores por meio de um mapeamento sistemático da literatura, ao formalizar um estudo de caso de engenharia de \textit{software} aplicando DDD e princípios SOLID a um domínio crítico de saúde pública com restrições biológicas e temporais, e ao fornecer uma metodologia explícita de avaliação estruturada em suíte de testes automatizados que torna verificáveis as regras de negócio essenciais.
 
-Do ponto de vista tecnológico, a principal contribuição é a API RESTful \textit{BloodMatch}, incluindo:
-
-\begin{itemize}[leftmargin=*]
-  \item a estratégia de recomendação de solicitações compatíveis ao doador;
-  \item o cumprimento de metas por \textit{snapshot} em memória, com alocação FIFO de doações concluídas às solicitações do hemocentro restrita por um teto proporcional ao prazo, que reparte a escassez em favor das solicitações mais próximas do vencimento;
-  \item o modelo de autorização baseado em JWT e papéis, com verificação de \textit{ownership};
-  \item a organização em camadas que isola o domínio de persistência e de protocolo HTTP, facilitando evolução e testes.
-\end{itemize}
-
-Esses artefatos podem servir de referência para soluções semelhantes voltadas à captação e ao matching entre doadores e solicitações.
+No plano tecnológico, a principal contribuição consolida-se no desenvolvimento da API RESTful \textit{BloodMatch}. Destaca-se a concepção da estratégia de recomendação personalizada que combina proximidade e critérios clínicos, bem como o algoritmo de cumprimento de metas calculado por \textit{snapshot} em memória. Esse algoritmo introduz uma abordagem de racionamento em que a alocação FIFO de bolsas é modulada por um teto proporcional ao tempo de vigência da solicitação, repartindo a escassez em favor das demandas mais urgentes e prevenindo concorrência em contadores persistidos. A solução é complementada por um modelo seguro de autenticação e autorização via JWT com validação de posse (\textit{ownership}) dos recursos e por uma arquitetura em camadas desacopladas que preserva a pureza do domínio em relação a protocolos de transporte e esquemas de armazenamento, servindo de base arquitetural para aplicações correlatas na área da saúde.
 
 \section{Limitações}
 
@@ -37,14 +22,9 @@ Apesar dos resultados positivos, reconhecem-se limitações. A avaliação funci
 
 \section{Trabalhos futuros}
 
-Como direcionamentos para evoluções futuras, destacam-se:
+Como direcionamentos para trabalhos e pesquisas futuras, vislumbra-se aprimorar o algoritmo de recomendação com a introdução de critérios heurísticos e comportamentais adicionais, tais como a taxa de resposta histórica dos voluntários e padrões sazonais de doação. Do ponto de vista arquitetural, sugere-se evoluir o particionamento do sistema mediante a extração de módulos Maven ou microsserviços independentes para os contextos delimitados do DDD, reforçando os limites transacionais hoje estabelecidos por convenção de pacotes.
 
-\begin{itemize}[leftmargin=*]
-  \item evoluir o algoritmo de recomendação com critérios adicionais (por exemplo, histórico de resposta a notificações);
-  \item extrair módulos mais explicitamente isolados para contextos delimitados hoje tratados por convenção de pacotes (Seção~5.4);
-  \item ampliar a suíte com Testcontainers, métricas JaCoCo e testes de contrato/carga;
-  \item aprofundar a integração com processos reais de hemocentros e avaliar impacto na conversão de solicitações em doações efetivas.
-\end{itemize}
+Sob a perspectiva da engenharia de testes, recomenda-se a expansão da suíte por meio da adoção de contêineres gerenciados para testes com banco real, da geração automatizada de relatórios de cobertura de código e da execução sistemática de testes de carga e de contrato da API. Por fim, no plano aplicado, mostra-se fundamental conduzir estudos empíricos integrados ao cotidiano operacional de hemocentros reais, permitindo avaliar a usabilidade e quantificar o impacto efetivo da plataforma na conversão de solicitações em doações realizadas.
 
 \section{Considerações finais}
 
