@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  8 SEP 2026 12:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  8 SEP 2026 21:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -945,29 +945,254 @@ File: microtype.cfg 2026/03/01 v3.2d microtype main configuration file (RS)
 )
 LaTeX Info: Redefining \microtypesetup on input line 3065.
 )
-(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/abntex2\abntex2cite.sty
-Package: abntex2cite 2018/11/24 v-1.9.7 abnTeX2
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblatex.sty
+Package: biblatex 2025/07/10 v3.21 programmable bibliographies (PK/MW)
 
-(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/abntex2\abntex2abrev.st
-y)
-\minimumbiblabelwidth=\skip262
-\ABCIauxlen=\skip263
-\c@ABCIaux=\count385
-\c@ABCImax=\count386
- (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifpdf.sty
-Package: ifpdf 2019/10/25 v3.4 ifpdf legacy package. Use iftex instead.
-)
-(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifxetex.sty
-Package: ifxetex 2019/10/25 v0.7 ifxetex legacy package. Use iftex instead.
-)
-(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/relsize\relsize.sty
-Package: relsize 2013/03/29 ver 4.1
-)
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/logreq\logreq.sty
+Package: logreq 2010/08/04 v1.0 xml request logger
+\lrq@indent=\count385
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/logreq\logreq.def
+File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
+))
+\c@tabx@nest=\count386
+\c@listtotal=\count387
+\c@listcount=\count388
+\c@liststart=\count389
+\c@liststop=\count390
+\c@citecount=\count391
+\c@citetotal=\count392
+\c@multicitecount=\count393
+\c@multicitetotal=\count394
+\c@instcount=\count395
+\c@maxnames=\count396
+\c@minnames=\count397
+\c@maxitems=\count398
+\c@minitems=\count399
+\c@citecounter=\count400
+\c@maxcitecounter=\count401
+\c@savedcitecounter=\count402
+\c@uniquelist=\count403
+\c@uniquename=\count404
+\c@refsection=\count405
+\c@refsegment=\count406
+\c@maxextratitle=\count407
+\c@maxextratitleyear=\count408
+\c@maxextraname=\count409
+\c@maxextradate=\count410
+\c@maxextraalpha=\count411
+\c@abbrvpenalty=\count412
+\c@highnamepenalty=\count413
+\c@lownamepenalty=\count414
+\c@maxparens=\count415
+\c@parenlevel=\count416
+\blx@tempcnta=\count417
+\blx@tempcntb=\count418
+\blx@tempcntc=\count419
+\c@blx@maxsection=\count420
+\blx@maxsegment@0=\count421
+\blx@notetype=\count422
+\blx@parenlevel@text=\count423
+\blx@parenlevel@foot=\count424
+\blx@sectionciteorder@0=\count425
+\blx@sectionciteorderinternal@0=\count426
+\blx@entrysetcounter=\count427
+\blx@biblioinstance=\count428
+\labelnumberwidth=\skip262
+\labelalphawidth=\skip263
 \biblabelsep=\skip264
-LaTeX Info: Redefining \newblock on input line 591.
-LaTeX Info: Redefining \cite on input line 618.
-\ABCItoken=\toks40
+\bibnamesep=\skip265
+\bibinitsep=\skip266
+\bibparsep=\skip267
+\bibhang=\skip268
+\blx@bcfin=\read5
+\blx@bcfout=\write4
+\blx@langwohyphens=\language80
+\c@mincomprange=\count429
+\c@maxcomprange=\count430
+\c@mincompwidth=\count431
+Package biblatex Info: Trying to load biblatex default data model...
+Package biblatex Info: ... file 'blx-dm.def' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-dm.def
+File: blx-dm.def 2025/07/10 v3.21 biblatex datamodel (PK/MW)
 )
+Package biblatex Info: Trying to load biblatex style data model...
+Package biblatex Info: ... file 'abnt.dbx' not found.
+Package biblatex Info: Trying to load biblatex custom data model...
+Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
+\c@afterword=\count432
+\c@savedafterword=\count433
+\c@annotator=\count434
+\c@savedannotator=\count435
+\c@author=\count436
+\c@savedauthor=\count437
+\c@bookauthor=\count438
+\c@savedbookauthor=\count439
+\c@commentator=\count440
+\c@savedcommentator=\count441
+\c@editor=\count442
+\c@savededitor=\count443
+\c@editora=\count444
+\c@savededitora=\count445
+\c@editorb=\count446
+\c@savededitorb=\count447
+\c@editorc=\count448
+\c@savededitorc=\count449
+\c@foreword=\count450
+\c@savedforeword=\count451
+\c@holder=\count452
+\c@savedholder=\count453
+\c@introduction=\count454
+\c@savedintroduction=\count455
+\c@namea=\count456
+\c@savednamea=\count457
+\c@nameb=\count458
+\c@savednameb=\count459
+\c@namec=\count460
+\c@savednamec=\count461
+\c@translator=\count462
+\c@savedtranslator=\count463
+\c@shortauthor=\count464
+\c@savedshortauthor=\count465
+\c@shorteditor=\count466
+\c@savedshorteditor=\count467
+\c@labelname=\count468
+\c@savedlabelname=\count469
+\c@institution=\count470
+\c@savedinstitution=\count471
+\c@lista=\count472
+\c@savedlista=\count473
+\c@listb=\count474
+\c@savedlistb=\count475
+\c@listc=\count476
+\c@savedlistc=\count477
+\c@listd=\count478
+\c@savedlistd=\count479
+\c@liste=\count480
+\c@savedliste=\count481
+\c@listf=\count482
+\c@savedlistf=\count483
+\c@location=\count484
+\c@savedlocation=\count485
+\c@organization=\count486
+\c@savedorganization=\count487
+\c@origlocation=\count488
+\c@savedoriglocation=\count489
+\c@origpublisher=\count490
+\c@savedorigpublisher=\count491
+\c@publisher=\count492
+\c@savedpublisher=\count493
+\c@language=\count494
+\c@savedlanguage=\count495
+\c@origlanguage=\count496
+\c@savedoriglanguage=\count497
+\c@pageref=\count498
+\c@savedpageref=\count499
+\shorthandwidth=\skip269
+\shortjournalwidth=\skip270
+\shortserieswidth=\skip271
+\shorttitlewidth=\skip272
+\shortauthorwidth=\skip273
+\shorteditorwidth=\skip274
+\locallabelnumberwidth=\skip275
+\locallabelalphawidth=\skip276
+\localshorthandwidth=\skip277
+\localshortjournalwidth=\skip278
+\localshortserieswidth=\skip279
+\localshorttitlewidth=\skip280
+\localshortauthorwidth=\skip281
+\localshorteditorwidth=\skip282
+Package biblatex Info: Trying to load compatibility code...
+Package biblatex Info: ... file 'blx-compat.def' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-compat.def
+File: blx-compat.def 2025/07/10 v3.21 biblatex compatibility (PK/MW)
+)
+Package biblatex Info: Trying to load generic definitions...
+Package biblatex Info: ... file 'biblatex.def' found.
+ (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblatex.def
+File: biblatex.def 2025/07/10 v3.21 biblatex compatibility (PK/MW)
+\c@textcitecount=\count500
+\c@textcitetotal=\count501
+\c@textcitemaxnames=\count502
+\c@biburlbigbreakpenalty=\count503
+\c@biburlbreakpenalty=\count504
+\c@biburlnumpenalty=\count505
+\c@biburlucpenalty=\count506
+\c@biburllcpenalty=\count507
+\biburlbigskip=\muskip19
+\biburlnumskip=\muskip20
+\biburlucskip=\muskip21
+\biburllcskip=\muskip22
+\c@smartand=\count508
+)
+Package biblatex Info: Trying to load bibliography style 'abnt'...
+Package biblatex Info: ... file 'abnt.bbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/bbx\abnt.
+bbx
+File: abnt.bbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load bibliography style 'standard'...
+Package biblatex Info: ... file 'standard.bbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/bbx\standard.b
+bx
+File: standard.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
+\c@bbx:relatedcount=\count509
+\c@bbx:relatedtotal=\count510
+))
+Package biblatex Info: Trying to load citation style 'abnt'...
+Package biblatex Info: ... file 'abnt.cbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/cbx\abnt.
+cbx
+File: abnt.cbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load citation style 'authoryear-comp'...
+Package biblatex Info: ... file 'authoryear-comp.cbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/cbx\authoryear
+-comp.cbx
+File: authoryear-comp.cbx 2025/07/10 v3.21 biblatex citation style (PK/MW)
+Package biblatex Info: Redefining '\cite'.
+Package biblatex Info: Redefining '\parencite'.
+Package biblatex Info: Redefining '\footcite'.
+Package biblatex Info: Redefining '\footcitetext'.
+Package biblatex Info: Redefining '\smartcite'.
+Package biblatex Info: Redefining '\textcite'.
+Package biblatex Info: Redefining '\textcites'.
+Package biblatex Info: Redefining '\cites'.
+Package biblatex Info: Redefining '\parencites'.
+Package biblatex Info: Redefining '\footcites'.
+Package biblatex Info: Redefining '\footcitetexts'.
+Package biblatex Info: Redefining '\smartcites'.
+)
+Package biblatex Info: Redefining '\cite'.
+Package biblatex Info: Redefining '\cites'.
+Package biblatex Info: Redefining '\footcite'.
+Package biblatex Info: Redefining '\footcites'.
+Package biblatex Info: Redefining '\citetitle'.
+Package biblatex Info: Redefining '\smartcite'.
+Package biblatex Info: Redefining '\citeauthor'.
+Package biblatex Info: Redefining '\citeyear'.
+)
+Package biblatex Info: Trying to load configuration file...
+Package biblatex Info: ... file 'biblatex.cfg' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\biblatex.cfg
+File: biblatex.cfg 
+)
+Package biblatex Info: Input encoding 'utf8' detected.
+Package biblatex Info: Document encoding is UTF8 ....
+Package biblatex Info: ... and expl3
+(biblatex)             2025-12-24 L3 programming layer (loader) 
+(biblatex)             is new enough (at least 2020/04/06),
+(biblatex)             setting 'casechanger=expl3'.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex\blx-case-expl3
+.sty
+Package: blx-case-expl3 2025/07/10 v3.21 expl3 case changing code for biblatex
+))
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
 
@@ -988,47 +1213,47 @@ Package graphics Info: Driver file: pdftex.def on input line 106.
 )
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/tools\longtable.sty
 Package: longtable 2025-10-13 v4.24 Multi-page Table package (DPC)
-\LTleft=\skip265
-\LTright=\skip266
-\LTpre=\skip267
-\LTpost=\skip268
-\LTchunksize=\count387
+\LTleft=\skip283
+\LTright=\skip284
+\LTpre=\skip285
+\LTpost=\skip286
+\LTchunksize=\count511
 \LTcapwidth=\dimen283
 \LT@head=\box62
 \LT@firsthead=\box63
 \LT@foot=\box64
 \LT@lastfoot=\box65
 \LT@gbox=\box66
-\LT@cols=\count388
-\LT@rows=\count389
-\c@LT@tables=\count390
-\c@LT@chunks=\count391
-\LT@p@ftn=\toks41
+\LT@cols=\count512
+\LT@rows=\count513
+\c@LT@tables=\count514
+\c@LT@chunks=\count515
+\LT@p@ftn=\toks40
 )
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
-\multirow@colwidth=\skip269
-\multirow@cntb=\count392
-\multirow@dima=\skip270
+\multirow@colwidth=\skip287
+\multirow@cntb=\count516
+\multirow@dima=\skip288
 \bigstrutjot=\dimen284
 )
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count393
-\float@exts=\toks42
+\c@float@type=\count517
+\float@exts=\toks41
 \float@box=\box67
-\@float@everytoks=\toks43
+\@float@everytoks=\toks42
 \@floatcapt=\box68
 )
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/csquotes\csquotes.sty
 Package: csquotes 2026-05-19 v5.2p context-sensitive quotations (JAW)
-\csq@reset=\count394
-\csq@gtype=\count395
-\csq@glevel=\count396
-\csq@qlevel=\count397
-\csq@maxlvl=\count398
-\csq@tshold=\count399
-\csq@ltx@everypar=\toks44
+\csq@reset=\count518
+\csq@gtype=\count519
+\csq@glevel=\count520
+\csq@qlevel=\count521
+\csq@maxlvl=\count522
+\csq@tshold=\count523
+\csq@ltx@everypar=\toks43
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/csquotes\csquotes.def
 File: csquotes.def 2026-05-19 v5.2p csquotes generic definitions (JAW)
@@ -1040,17 +1265,17 @@ Package csquotes Info: ... configuration file loaded successfully.
 File: csquotes.cfg 
 )) (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.st
 y
-\lst@mode=\count400
+\lst@mode=\count524
 \lst@gtempboxa=\box69
-\lst@token=\toks45
-\lst@length=\count401
+\lst@token=\toks44
+\lst@length=\count525
 \lst@currlwidth=\dimen285
-\lst@column=\count402
-\lst@pos=\count403
+\lst@column=\count526
+\lst@pos=\count527
 \lst@lostspace=\dimen286
 \lst@width=\dimen287
-\lst@newlines=\count404
-\lst@lineno=\count405
+\lst@newlines=\count528
+\lst@lineno=\count529
 \lst@maxwidth=\dimen288
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty
@@ -1058,8 +1283,8 @@ File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
 )
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
 File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
-\c@lstnumber=\count406
-\lst@skipnumbers=\count407
+\c@lstnumber=\count530
+\lst@skipnumbers=\count531
 \lst@framebox=\box70
 )
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
@@ -1081,9 +1306,9 @@ Package: geometry 2026/03/07 v6.0 Page Geometry
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
-\Gm@cnth=\count408
-\Gm@cntv=\count409
-\c@Gm@tempcnt=\count410
+\Gm@cnth=\count532
+\Gm@cntv=\count533
+\c@Gm@tempcnt=\count534
 \Gm@bindingoffset=\dimen289
 \Gm@wd@mp=\dimen290
 \Gm@odd@mp=\dimen291
@@ -1092,7 +1317,7 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layoutheight=\dimen294
 \Gm@layouthoffset=\dimen295
 \Gm@layoutvoffset=\dimen296
-\Gm@dimlist=\toks46
+\Gm@dimlist=\toks45
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/seqsplit\seqsplit.sty
@@ -1102,15 +1327,15 @@ Package: seqsplit 2006/08/07 v0.1 Splitting long sequences (DNA, RNA, proteins,
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 141.
+Package hyperref Info: Option `colorlinks' set `true' on input line 143.
 LaTeX Font Info:    Trying to load font information for T1+ntxtlf on input line
- 148.
+ 150.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\t1ntxtlf.fd
 File: t1ntxtlf.fd 2021/05/24 v1.1 font definition file for T1/ntx/tlf
 )
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 12.0pt on input line 148.
+(Font)              scaled to size 12.0pt on input line 150.
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
 Package csquotes Info: Adjusting default style.
@@ -1127,70 +1352,70 @@ Package babel Info: 'brazil' activates 'portuges' shorthands.
 (apendices/D-dip-caso-uso.aux))
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/ntxmi/m/it on input line 148.
+LaTeX Font Info:    Checking defaults for OML/ntxmi/m/it on input line 150.
 LaTeX Font Info:    Trying to load font information for OML+ntxmi on input line
- 148.
+ 150.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\omlntxmi.fd
 File: omlntxmi.fd 2015/08/25 Fontinst v1.933 font definitions for OML/ntxmi.
 )
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 148.
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 148.
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 148.
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 148.
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 148.
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 148.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 150.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 150.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 150.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 150.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 150.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 150.
 LaTeX Font Info:    Trying to load font information for U+ntxexa on input line 
-148.
+150.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\untxexa.fd
 File: untxexa.fd 2012/04/16 Fontinst v1.933 font definitions for U/ntxexa.
 )
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 148.
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 148.
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 148.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 150.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 150.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 150.
 LaTeX Font Info:    Trying to load font information for LMS+ntxsy on input line
- 148.
+ 150.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\lmsntxsy.fd
 File: lmsntxsy.fd 2016/07/02 Fontinst v1.933 font definitions for LMS/ntxsy.
 )
-LaTeX Font Info:    ... okay on input line 148.
-LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 148.
+LaTeX Font Info:    ... okay on input line 150.
+LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 150.
 LaTeX Font Info:    Trying to load font information for LMX+ntxexx on input lin
-e 148.
+e 150.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\lmxntxexx.fd
 File: lmxntxexx.fd 2016/07/03 Fontinst v1.933 font definitions for LMX/ntxexx.
 )
-LaTeX Font Info:    ... okay on input line 148.
-Package hyperref Info: Link coloring ON on input line 148.
+LaTeX Font Info:    ... okay on input line 150.
+Package hyperref Info: Link coloring ON on input line 150.
 \myptabbox=\box71
-\myptabboxwidth=\skip271
+\myptabboxwidth=\skip289
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count411
+\scratchcounter=\count535
 \scratchdimen=\dimen297
 \scratchbox=\box72
-\nofMPsegments=\count412
-\nofMParguments=\count413
-\everyMPshowfont=\toks47
-\MPscratchCnt=\count414
+\nofMPsegments=\count536
+\nofMParguments=\count537
+\everyMPshowfont=\toks46
+\MPscratchCnt=\count538
 \MPscratchDim=\dimen298
-\MPnumerator=\count415
-\makeMPintoPDFobject=\count416
-\everyMPtoPDFconversion=\toks48
+\MPnumerator=\count539
+\makeMPintoPDFobject=\count540
+\everyMPtoPDFconversion=\toks47
 )
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
 ase.sty
@@ -1202,17 +1427,17 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-\c@mv@tabular=\count417
-\c@mv@boldtabular=\count418
-LaTeX Info: Command `\dddot' is already robust on input line 148.
-LaTeX Info: Command `\ddddot' is already robust on input line 148.
-LaTeX Info: Redefining \microtypecontext on input line 148.
-Package microtype Info: Applying patch `item' on input line 148.
-Package microtype Info: Applying patch `toc' on input line 148.
-Package microtype Info: Applying patch `eqnum' on input line 148.
-Package microtype Info: Applying patch `footnote' on input line 148.
-Package microtype Info: Applying patch `verbatim' on input line 148.
-LaTeX Info: Redefining \microtypesetup on input line 148.
+\c@mv@tabular=\count541
+\c@mv@boldtabular=\count542
+LaTeX Info: Command `\dddot' is already robust on input line 150.
+LaTeX Info: Command `\ddddot' is already robust on input line 150.
+LaTeX Info: Redefining \microtypecontext on input line 150.
+Package microtype Info: Applying patch `item' on input line 150.
+Package microtype Info: Applying patch `toc' on input line 150.
+Package microtype Info: Applying patch `eqnum' on input line 150.
+Package microtype Info: Applying patch `footnote' on input line 150.
+Package microtype Info: Applying patch `verbatim' on input line 150.
+LaTeX Info: Redefining \microtypesetup on input line 150.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -1224,7 +1449,185 @@ Package microtype Info: No adjustment of character kerning.
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-ptm.cfg
 File: mt-ptm.cfg 2006/04/20 v1.7 microtype config. file: Times (RS)
 )
-\c@lstlisting=\count419
+Package biblatex Info: Trying to load language 'brazil' -> 'brazil-abnt'...
+Package biblatex Info: ... file 'brazil-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+l-abnt.lbx
+File: brazil-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian-abnt'...
+Package biblatex Info: ... file 'brazilian-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+lian-abnt.lbx
+File: brazilian-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian' -> 'brazilian-abnt'.
+..
+Package biblatex Info: ... file 'brazilian-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+lian-abnt.lbx
+File: brazilian-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)))
+Package biblatex Info: Trying to load language 'brazilian-abnt'...
+Package biblatex Info: ... file 'brazilian-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+lian-abnt.lbx
+File: brazilian-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian' -> 'brazilian-abnt'.
+..
+Package biblatex Info: ... file 'brazilian-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+lian-abnt.lbx
+File: brazilian-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)
+Package biblatex Info: Trying to load language 'brazil'...
+Package biblatex Info: ... file 'brazil.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazil.lbx
+File: brazil.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)))
+Package biblatex Info: Trying to load language 'brazil'...
+Package biblatex Info: ... file 'brazil.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazil.lbx
+File: brazil.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+Package biblatex Info: Trying to load language 'brazilian' -> 'brazilian-abnt'.
+..
+Package biblatex Info: ... file 'brazilian-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+lian-abnt.lbx
+File: brazilian-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)
+Package biblatex Info: Trying to load language 'brazil'...
+Package biblatex Info: ... file 'brazil.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazil.lbx
+File: brazil.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+))))))
+Package biblatex Info: Trying to load language 'brazilian' -> 'brazilian-abnt'.
+..
+Package biblatex Info: ... file 'brazilian-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+lian-abnt.lbx
+File: brazilian-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)
+Package biblatex Info: Trying to load language 'brazil' -> 'brazil-abnt'...
+Package biblatex Info: ... file 'brazil-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+l-abnt.lbx
+File: brazil-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian-abnt'...
+Package biblatex Info: ... file 'brazilian-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\brazi
+lian-abnt.lbx
+File: brazilian-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)
+Package biblatex Info: Trying to load language 'brazil'...
+Package biblatex Info: ... file 'brazil.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazil.lbx
+File: brazil.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+Package biblatex Info: Trying to load language 'brazilian'...
+Package biblatex Info: ... file 'brazilian.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\brazilian.
+lbx
+File: brazilian.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)))))
+Package biblatex Info: Trying to load language 'english' -> 'english-abnt'...
+Package biblatex Info: ... file 'english-abnt.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex-abnt/lbx\engli
+sh-abnt.lbx
+File: english-abnt.lbx 2018-11-17 v3.4 ABNT BibLaTeX citation style
+Package biblatex Info: Trying to load language 'english'...
+Package biblatex Info: ... file 'english.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\english.lb
+x
+File: english.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)
+Package biblatex Info: Trying to load language 'english'...
+Package biblatex Info: ... file 'english.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\english.lb
+x
+File: english.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+)
+Package biblatex Info: Trying to load language 'english'...
+Package biblatex Info: ... file 'english.lbx' found.
+
+(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/biblatex/lbx\english.lb
+x
+File: english.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
+))
+Package biblatex Info: Input encoding 'utf8' detected.
+Package biblatex Info: Automatic encoding selection.
+(biblatex)             Assuming data encoding 'utf8'.
+\openout4 = `main.bcf'.
+
+Package biblatex Info: Trying to load bibliographic data...
+Package biblatex Info: ... file 'main.bbl' found.
+ (main.bbl)
+Package biblatex Info: Reference section=0 on input line 150.
+Package biblatex Info: Reference segment=0 on input line 150.
+\c@lstlisting=\count543
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1261,115 +1664,115 @@ File: mt-ptm.cfg 2006/04/20 v1.7 microtype config. file: Times (RS)
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    Trying to load font information for T1+qhv on input line 15
-6.
+8.
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/tex-gyre\t1qhv.fd
 File: t1qhv.fd 2009/09/25 v1.2 font definition file for T1/qhv
 )
 LaTeX Font Info:    Font shape `T1/qhv/m/n' will be
-(Font)              scaled to size 11.28003pt on input line 156.
+(Font)              scaled to size 11.28003pt on input line 158.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `qhv' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/qhv/m/n' will be
-(Font)              scaled to size 13.53603pt on input line 156.
+(Font)              scaled to size 13.53603pt on input line 158.
 LaTeX Font Info:    Font shape `T1/qhv/b/n' will be
-(Font)              scaled to size 13.53603pt on input line 156.
+(Font)              scaled to size 13.53603pt on input line 158.
 LaTeX Font Info:    Font shape `T1/qhv/b/n' will be
-(Font)              scaled to size 19.49565pt on input line 156.
+(Font)              scaled to size 19.49565pt on input line 158.
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 14.4pt on input line 156.
+(Font)              scaled to size 14.4pt on input line 158.
 
 [1
 
 {C:/Users/garde/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/gard
 e/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/tex-gyre/q-ec.enc}]
 LaTeX Font Info:    Font shape `T1/qhv/b/n' will be
-(Font)              scaled to size 11.28003pt on input line 160.
+(Font)              scaled to size 11.28003pt on input line 162.
 LaTeX Font Info:    Font shape `T1/qhv/b/n' will be
-(Font)              scaled to size 16.24324pt on input line 160.
+(Font)              scaled to size 16.24324pt on input line 162.
 LaTeX Font Info:    Trying to load font information for OT1+minntx on input lin
-e 160.
+e 162.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\ot1minntx.fd
 File: ot1minntx.fd 2023/09/09 v1.1 font definition file for OT1/minntx
 )
 LaTeX Font Info:    Font shape `OT1/minntx/m/n' will be
-(Font)              scaled to size 12.0pt on input line 160.
+(Font)              scaled to size 12.0pt on input line 162.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `minntx' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `OT1/minntx/m/n' will be
-(Font)              scaled to size 8.8pt on input line 160.
+(Font)              scaled to size 8.8pt on input line 162.
 LaTeX Font Info:    Font shape `OT1/minntx/m/n' will be
-(Font)              scaled to size 6.6pt on input line 160.
+(Font)              scaled to size 6.6pt on input line 162.
 LaTeX Font Info:    Font shape `OML/ntxmi/m/it' will be
-(Font)              scaled to size 12.0pt on input line 160.
+(Font)              scaled to size 12.0pt on input line 162.
 LaTeX Font Info:    Font shape `OML/ntxmi/m/it' will be
-(Font)              scaled to size 8.8pt on input line 160.
+(Font)              scaled to size 8.8pt on input line 162.
 LaTeX Font Info:    Font shape `OML/ntxmi/m/it' will be
-(Font)              scaled to size 6.6pt on input line 160.
+(Font)              scaled to size 6.6pt on input line 162.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 12.0pt on input line 160.
+(Font)              scaled to size 12.0pt on input line 162.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 8.8pt on input line 160.
+(Font)              scaled to size 8.8pt on input line 162.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 6.6pt on input line 160.
+(Font)              scaled to size 6.6pt on input line 162.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 12.0pt on input line 160.
+(Font)              scaled to size 12.0pt on input line 162.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 8.8pt on input line 160.
+(Font)              scaled to size 8.8pt on input line 162.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 6.6pt on input line 160.
+(Font)              scaled to size 6.6pt on input line 162.
 LaTeX Font Info:    Trying to load font information for U+ntxmia on input line 
-160.
+162.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\untxmia.fd
 File: untxmia.fd 2024/04/09 Fontinst v1.933 font definitions for U/ntxmia.
 )
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 12.0pt on input line 160.
+(Font)              scaled to size 12.0pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 8.8pt on input line 160.
+(Font)              scaled to size 8.8pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 6.6pt on input line 160.
+(Font)              scaled to size 6.6pt on input line 162.
 LaTeX Font Info:    Trying to load font information for U+ntxsym on input line 
-160.
+162.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\untxsym.fd
 File: untxsym.fd 2023/08/16 Fontinst v1.933 font definitions for U/ntxsym.
 )
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 12.0pt on input line 160.
+(Font)              scaled to size 12.0pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 8.8pt on input line 160.
+(Font)              scaled to size 8.8pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 6.6pt on input line 160.
+(Font)              scaled to size 6.6pt on input line 162.
 LaTeX Font Info:    Trying to load font information for U+ntxsyc on input line 
-160.
+162.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\untxsyc.fd
 File: untxsyc.fd 2012/04/12 Fontinst v1.933 font definitions for U/ntxsyc.
 )
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 12.0pt on input line 160.
+(Font)              scaled to size 12.0pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 8.8pt on input line 160.
+(Font)              scaled to size 8.8pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 6.6pt on input line 160.
+(Font)              scaled to size 6.6pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 12.0pt on input line 160.
+(Font)              scaled to size 12.0pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 8.8pt on input line 160.
+(Font)              scaled to size 8.8pt on input line 162.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 6.6pt on input line 160.
+(Font)              scaled to size 6.6pt on input line 162.
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.160 
+l.162 
        [1
 
 
@@ -1377,60 +1780,60 @@ l.160
 {C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/newtx/ntx-ec-tlf.
 enc}]
 LaTeX Font Info:    Font shape `OT1/minntx/m/n' will be
-(Font)              scaled to size 14.4pt on input line 176.
+(Font)              scaled to size 14.4pt on input line 178.
 LaTeX Font Info:    Font shape `OT1/minntx/m/n' will be
-(Font)              scaled to size 10.5pt on input line 176.
+(Font)              scaled to size 10.5pt on input line 178.
 LaTeX Font Info:    Font shape `OT1/minntx/m/n' will be
-(Font)              scaled to size 7.9pt on input line 176.
+(Font)              scaled to size 7.9pt on input line 178.
 LaTeX Font Info:    Font shape `OML/ntxmi/m/it' will be
-(Font)              scaled to size 14.4pt on input line 176.
+(Font)              scaled to size 14.4pt on input line 178.
 LaTeX Font Info:    Font shape `OML/ntxmi/m/it' will be
-(Font)              scaled to size 10.5pt on input line 176.
+(Font)              scaled to size 10.5pt on input line 178.
 LaTeX Font Info:    Font shape `OML/ntxmi/m/it' will be
-(Font)              scaled to size 7.9pt on input line 176.
+(Font)              scaled to size 7.9pt on input line 178.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 14.4pt on input line 176.
+(Font)              scaled to size 14.4pt on input line 178.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 10.5pt on input line 176.
+(Font)              scaled to size 10.5pt on input line 178.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 7.9pt on input line 176.
+(Font)              scaled to size 7.9pt on input line 178.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 14.4pt on input line 176.
+(Font)              scaled to size 14.4pt on input line 178.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 10.5pt on input line 176.
+(Font)              scaled to size 10.5pt on input line 178.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 7.9pt on input line 176.
+(Font)              scaled to size 7.9pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 14.4pt on input line 176.
+(Font)              scaled to size 14.4pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 10.5pt on input line 176.
+(Font)              scaled to size 10.5pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 7.9pt on input line 176.
+(Font)              scaled to size 7.9pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 14.4pt on input line 176.
+(Font)              scaled to size 14.4pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 10.5pt on input line 176.
+(Font)              scaled to size 10.5pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 7.9pt on input line 176.
+(Font)              scaled to size 7.9pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 14.4pt on input line 176.
+(Font)              scaled to size 14.4pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 10.5pt on input line 176.
+(Font)              scaled to size 10.5pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 7.9pt on input line 176.
+(Font)              scaled to size 7.9pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 14.4pt on input line 176.
+(Font)              scaled to size 14.4pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 10.5pt on input line 176.
+(Font)              scaled to size 10.5pt on input line 178.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 7.9pt on input line 176.
+(Font)              scaled to size 7.9pt on input line 178.
 LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
-(Font)              scaled to size 12.0pt on input line 178.
+(Font)              scaled to size 12.0pt on input line 180.
  [2
 
 ]
 LaTeX Font Info:    Font shape `T1/qhv/m/n' will be
-(Font)              scaled to size 23.38725pt on input line 188.
+(Font)              scaled to size 23.38725pt on input line 190.
  [3
 
 
@@ -1440,7 +1843,7 @@ LaTeX Font Info:    Font shape `T1/qhv/m/n' will be
 
 ]
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
-(Font)              scaled to size 12.0pt on input line 217.
+(Font)              scaled to size 12.0pt on input line 219.
  [6
 
 ] [7
@@ -1517,6 +1920,18 @@ Cap\'{\i }tulo 3.
 
 
 ]
+LaTeX Font Info:    Trying to load font information for T1+ntxtt on input line 
+30.
+ (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\t1ntxtt.fd
+File: t1ntxtt.fd 2012/04/20 v3.1
+)
+LaTeX Font Info:    Font shape `T1/ntxtt/m/n' will be
+(Font)              scaled to size 12.0pt on input line 30.
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `ntxtt' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+
 Underfull \hbox (badness 10000) in paragraph at lines 47--47
 []|\T1/ntxtlf/m/n/12 ``sangue''
  []
@@ -1556,7 +1971,7 @@ Underfull \hbox (badness 6808) in paragraph at lines 47--47
 \T1/ntxtlf/m/n/12 ment'' OR
  []
 
-(C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/newtx\t1ntxtt.fd)
+
 Underfull \hbox (badness 10000) in paragraph at lines 61--61
 []|\T1/ntxtt/m/n/12 ( TITLE-ABS-KEY ( doador* OR donor* ) AND TITLE-ABS-KEY ( s
 angue OR
@@ -1605,7 +2020,7 @@ as been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.64 
      ]
-<figuras/grafico01-artigos-ano.png, id=485, 485.56406pt x 251.43938pt>
+<figuras/grafico01-artigos-ano.png, id=486, 485.56406pt x 251.43938pt>
 File: figuras/grafico01-artigos-ano.png Graphic file (type png)
 <use figuras/grafico01-artigos-ano.png>
 Package pdftex.def Info: figuras/grafico01-artigos-ano.png  used on input line 
@@ -1846,13 +2261,16 @@ Cap\'{\i }tulo 7.
 
 
 
-] [55]) [56] (main.bbl
-bibitemlist
+] [55]) [56]
+
+Package biblatex Warning: Month out of range or not an integer
+(biblatex)                at entry 'ceara2021' on input line 265.
+
 [57
 
 
 
-]) [58]
+] [58] [59]
 \openout2 = `apendices/A-regras-dominio.aux'.
 
  (apendices/A-regras-dominio.tex
@@ -1879,23 +2297,23 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 )
-[59
+[60
 
 
-] (apendices/codigo/DonorIsEligibleToDonate.java)) [60]
+] (apendices/codigo/DonorIsEligibleToDonate.java)) [61]
 \openout2 = `apendices/B-agregados.aux'.
 
 
 (apendices/B-agregados.tex
 AP\^ENDICE B.
-(apendices/codigo/DonationRequestAcceptsDonation.java) [61
+(apendices/codigo/DonationRequestAcceptsDonation.java) [62
 
 
 
 
 ]
 (apendices/codigo/DonationCreate.java) (apendices/codigo/DonationComplete.java
-[62])) [63]
+[63])) [64]
 \openout2 = `apendices/C-fulfillment-matching.aux'.
 
  (apendices/C-fulfillment-matching.tex
@@ -1903,40 +2321,40 @@ AP\^ENDICE C.
 (apendices/codigo/ProportionalGoal.java
 LaTeX Font Info:    Font shape `T1/ntxtt/m/it' in size <9> not available
 (Font)              Font shape `T1/txtt/m/sl' tried instead on input line 7.
- [64
+ [65
 
 
 
 
 ])
-(apendices/codigo/FulfillmentDistributeDonations.java [65] [66])
-(apendices/codigo/DonorMatchingService.java [67])) [68]
+(apendices/codigo/FulfillmentDistributeDonations.java [66] [67])
+(apendices/codigo/DonorMatchingService.java [68])) [69]
 \openout2 = `apendices/D-dip-caso-uso.aux'.
 
 
 (apendices/D-dip-caso-uso.tex
 AP\^ENDICE D.
 (apendices/codigo/DonationRepositoryInterface.java)
-(apendices/codigo/CompletePendingDonationUseCase.java [69
+(apendices/codigo/CompletePendingDonationUseCase.java [70
 
 
 
 
-])) [70]
+])) [71]
 
 Class memoir Warning: The material used in the footer is too large
 (10.14995pt) for the given foot skip (0.0pt), it is recommended to
 either increase the foot skip or redesign the footer
-(in both cases you will find help in the memoir manual). on input line 275.
+(in both cases you will find help in the memoir manual). on input line 277.
 
-\tf@lof=\write4
-\openout4 = `main.lof'.
+\tf@lof=\write5
+\openout5 = `main.lof'.
 
-\tf@lot=\write5
-\openout5 = `main.lot'.
+\tf@lot=\write6
+\openout6 = `main.lot'.
 
-\tf@toc=\write6
-\openout6 = `main.toc'.
+\tf@toc=\write7
+\openout7 = `main.toc'.
 
 (main.aux (capitulos/01-introducao.aux) (capitulos/02-fundamentacao.aux)
 (capitulos/03-trabalhos-relacionados.aux) (capitulos/04-metodos.aux)
@@ -1948,15 +2366,18 @@ either increase the foot skip or redesign the footer
 LaTeX2e <2025-11-01>
 L3 programming layer <2020/03/25>
  ***********
+Package logreq Info: Writing requests to 'main.run.xml'.
+\openout1 = `main.run.xml'.
+
  ) 
 Here is how much of TeX's memory you used:
- 26652 strings out of 467871
- 429521 string characters out of 5418376
- 1593680 words of memory out of 5000000
- 54468 multiletter control sequences out of 15000+600000
+ 33958 strings out of 467871
+ 585148 string characters out of 5418376
+ 2085049 words of memory out of 5000000
+ 61685 multiletter control sequences out of 15000+600000
  741104 words of font info for 153 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,13n,107p,1457b,2539s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,13n,117p,1457b,4447s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/NewTXM
 I.pfb><C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre
 /qhvb.pfb><C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-
@@ -1973,9 +2394,9 @@ grams/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/garde/AppData/Local/P
 rograms/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users/garde/AppData/Local/
 Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/Users/garde/AppData/Local
 /Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on main.pdf (71 pages, 1049321 bytes).
+Output written on main.pdf (72 pages, 1052394 bytes).
 PDF statistics:
- 1634 PDF objects out of 1728 (max. 8388607)
- 565 named destinations out of 1000 (max. 500000)
+ 1638 PDF objects out of 1728 (max. 8388607)
+ 566 named destinations out of 1000 (max. 500000)
  20784 words of extra memory for PDF output out of 24883 (max. 10000000)
 

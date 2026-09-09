@@ -2,7 +2,7 @@
 %% Monografia / TCC — ABNT NBR 14724:2024 (vigente em 2026)
 %% Autores: Gabriel Silveira de Azevedo e Mateus Carvalho Costa Nogueira
 %% Classe: abnTeX2 (CTAN) com ajustes da revisão 2024
-%% Compilação: pdflatex → bibtex → pdflatex → pdflatex
+%% Compilação: pdflatex → biber → pdflatex → pdflatex
 %% ============================================================================
 \documentclass[
   12pt,
@@ -20,8 +20,10 @@
 \usepackage{newtxtext,newtxmath}
 \usepackage[expansion=false]{microtype}
 
-% Citações e referências ABNT (NBR 10520 / NBR 6023)
-\usepackage[alf]{abntex2cite}
+% Citações e referências ABNT NBR 10520:2023 / NBR 6023 (biblatex-abnt)
+\usepackage[style=abnt, backend=biber]{biblatex}
+\addbibresource{referencias.bib}
+\providecommand{\citeonline}{\textcite}
 
 % Pacotes utilitários
 \usepackage{graphicx}
@@ -260,7 +262,7 @@
 % ============================================================================
 \postextual
 
-\bibliography{referencias}
+\printbibliography
 
 % ============================================================================
 % APÊNDICES (NBR 14724: material elaborado pelo autor)

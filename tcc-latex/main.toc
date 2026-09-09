@@ -85,31 +85,31 @@
 \contentsline {section}{\numberline {7.5}Considerações finais}{56}{section.7.5}%
 \vspace {\cftbeforechapterskip }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
-\contentsline {chapter}{\MakeTextUppercase []{Refer\^encias}}{57}{section*.14}%
+\contentsline {chapter}{Refer\^encias}{57}{section*.14}%
 \renewcommand *{\cftappendixname }{AP\^ENDICE \space }
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \cftinsert {A}
-\contentsline {appendix}{\chapternumberline {A}\MakeTextUppercase []{Regras de domínio: tipagem sanguínea e elegibilidade}}{59}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Compatibilidade tipológica}{59}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Elegibilidade do doador}{60}{section.A.2}%
+\contentsline {appendix}{\chapternumberline {A}\MakeTextUppercase []{Regras de domínio: tipagem sanguínea e elegibilidade}}{60}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Compatibilidade tipológica}{60}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Elegibilidade do doador}{61}{section.A.2}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \cftinsert {A}
-\contentsline {appendix}{\chapternumberline {B}\MakeTextUppercase []{Agregados: aceitação de doação e ciclo de vida}}{61}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Aceitação de doação pela solicitação}{61}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Criação unificada da doação}{62}{section.B.2}%
-\contentsline {section}{\numberline {B.3}Conclusão de doação pendente}{62}{section.B.3}%
+\contentsline {appendix}{\chapternumberline {B}\MakeTextUppercase []{Agregados: aceitação de doação e ciclo de vida}}{62}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Aceitação de doação pela solicitação}{62}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Criação unificada da doação}{63}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Conclusão de doação pendente}{63}{section.B.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \cftinsert {A}
-\contentsline {appendix}{\chapternumberline {C}\MakeTextUppercase []{Cumprimento de metas e matching de doadores}}{64}{appendix.C}%
-\contentsline {section}{\numberline {C.1}Teto proporcional ao prazo}{64}{section.C.1}%
-\contentsline {section}{\numberline {C.2}Alocação das doações em duas passagens}{65}{section.C.2}%
-\contentsline {section}{\numberline {C.3}Identificação de doadores elegíveis}{67}{section.C.3}%
+\contentsline {appendix}{\chapternumberline {C}\MakeTextUppercase []{Cumprimento de metas e matching de doadores}}{65}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Teto proporcional ao prazo}{65}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Alocação das doações em duas passagens}{66}{section.C.2}%
+\contentsline {section}{\numberline {C.3}Identificação de doadores elegíveis}{68}{section.C.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \cftinsert {A}
-\contentsline {appendix}{\chapternumberline {D}\MakeTextUppercase []{Inversão de dependência: repositório e caso de uso}}{69}{appendix.D}%
-\contentsline {section}{\numberline {D.1}Contrato de repositório}{69}{section.D.1}%
-\contentsline {section}{\numberline {D.2}Orquestração no caso de uso}{69}{section.D.2}%
+\contentsline {appendix}{\chapternumberline {D}\MakeTextUppercase []{Inversão de dependência: repositório e caso de uso}}{70}{appendix.D}%
+\contentsline {section}{\numberline {D.1}Contrato de repositório}{70}{section.D.1}%
+\contentsline {section}{\numberline {D.2}Orquestração no caso de uso}{70}{section.D.2}%

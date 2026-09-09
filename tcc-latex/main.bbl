@@ -1,182 +1,1197 @@
-\providecommand{\abntreprintinfo}[1]{%
- \citeonline{#1}}
-\setlength{\labelsep}{0pt}\begin{thebibliography}{}
-\providecommand{\abntrefinfo}[3]{}
-\providecommand{\abntbstabout}[1]{}
-\abntbstabout{v-1.9.7 }
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
 
-\bibitem[Alessa 2022]{alessa2022}
-\abntrefinfo{Alessa}{ALESSA}{2022}
-{ALESSA, T. Evaluation of the wateen app in the blood-donation process in saudi
-  arabia.
-\emph{Journal of Blood Medicine}, v.~13, p. 181--190, 2022.}
 
-\bibitem[Bloch 2018]{bloch2018}
-\abntrefinfo{Bloch}{BLOCH}{2018}
-{BLOCH, J. \emph{Effective Java}. 3. ed. Boston: Addison-Wesley, 2018.}
+\refsection{0}
+  \datalist[entry]{nty/global//global/global/global}
+    \entry{alessa2022}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=07212e8562aaf3b1bafc9b228c7cd9dd}{%
+           family={Alessa},
+           familyi={A\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{07212e8562aaf3b1bafc9b228c7cd9dd}
+      \strng{fullhash}{07212e8562aaf3b1bafc9b228c7cd9dd}
+      \strng{fullhashraw}{07212e8562aaf3b1bafc9b228c7cd9dd}
+      \strng{bibnamehash}{07212e8562aaf3b1bafc9b228c7cd9dd}
+      \strng{authorbibnamehash}{07212e8562aaf3b1bafc9b228c7cd9dd}
+      \strng{authornamehash}{07212e8562aaf3b1bafc9b228c7cd9dd}
+      \strng{authorfullhash}{07212e8562aaf3b1bafc9b228c7cd9dd}
+      \strng{authorfullhashraw}{07212e8562aaf3b1bafc9b228c7cd9dd}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Blood Medicine}
+      \field{title}{Evaluation of the Wateen App in the Blood-Donation Process in Saudi Arabia}
+      \field{volume}{13}
+      \field{year}{2022}
+      \field{pages}{181\bibrangedash 190}
+      \range{pages}{10}
+    \endentry
+    \entry{bloch2018}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=577c9b87d02f133dc6423f84705048f8}{%
+           family={Bloch},
+           familyi={B\bibinitperiod},
+           given={Joshua},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Boston}%
+      }
+      \list{publisher}{1}{%
+        {Addison-Wesley}%
+      }
+      \strng{namehash}{577c9b87d02f133dc6423f84705048f8}
+      \strng{fullhash}{577c9b87d02f133dc6423f84705048f8}
+      \strng{fullhashraw}{577c9b87d02f133dc6423f84705048f8}
+      \strng{bibnamehash}{577c9b87d02f133dc6423f84705048f8}
+      \strng{authorbibnamehash}{577c9b87d02f133dc6423f84705048f8}
+      \strng{authornamehash}{577c9b87d02f133dc6423f84705048f8}
+      \strng{authorfullhash}{577c9b87d02f133dc6423f84705048f8}
+      \strng{authorfullhashraw}{577c9b87d02f133dc6423f84705048f8}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{3}
+      \field{title}{Effective Java}
+      \field{year}{2018}
+    \endentry
+    \entry{booch2007}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e4f07715269e006a4d4a4efa3ce3f996}{%
+           family={Booch},
+           familyi={B\bibinitperiod},
+           given={Grady},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Boston}%
+      }
+      \list{publisher}{1}{%
+        {Addison-Wesley}%
+      }
+      \strng{namehash}{e4f07715269e006a4d4a4efa3ce3f996}
+      \strng{fullhash}{e4f07715269e006a4d4a4efa3ce3f996}
+      \strng{fullhashraw}{e4f07715269e006a4d4a4efa3ce3f996}
+      \strng{bibnamehash}{e4f07715269e006a4d4a4efa3ce3f996}
+      \strng{authorbibnamehash}{e4f07715269e006a4d4a4efa3ce3f996}
+      \strng{authornamehash}{e4f07715269e006a4d4a4efa3ce3f996}
+      \strng{authorfullhash}{e4f07715269e006a4d4a4efa3ce3f996}
+      \strng{authorfullhashraw}{e4f07715269e006a4d4a4efa3ce3f996}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{3}
+      \field{title}{Object-oriented analysis and design with applications}
+      \field{year}{2007}
+    \endentry
+    \entry{ceara2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=0cf6a3da3bffb444a600bc2b867b8732}{%
+           family={{Ceará. Secretaria da Saúde}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Fortaleza}%
+      }
+      \strng{namehash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{fullhash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{fullhashraw}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{bibnamehash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{authorbibnamehash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{authornamehash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{authorfullhash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{authorfullhashraw}{0cf6a3da3bffb444a600bc2b867b8732}
+      \field{extraname}{1}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{Online}
+      \field{month}{1}
+      \field{title}{Hemoce registra número recorde de doações em 2024, o maior nos últimos 30 anos}
+      \field{year}{2025}
+    \endentry
+    \entry{ceara2021}{misc}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=0cf6a3da3bffb444a600bc2b867b8732}{%
+           family={{Ceará. Secretaria da Saúde}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Fortaleza}%
+      }
+      \strng{namehash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{fullhash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{fullhashraw}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{bibnamehash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{authorbibnamehash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{authornamehash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{authorfullhash}{0cf6a3da3bffb444a600bc2b867b8732}
+      \strng{authorfullhashraw}{0cf6a3da3bffb444a600bc2b867b8732}
+      \field{extraname}{2}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{Online}
+      \field{month}{ago}
+      \field{title}{Homens são os que mais doam sangue no Ceará entre os 2\% da população doadora}
+      \field{year}{2021}
+    \endentry
+    \entry{hemoce2022}{misc}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=46717351bed82328f4ea945f30858d49}{%
+           family={{Centro de Hematologia e Hemoterapia do Ceará --- HEMOCE}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Fortaleza}%
+      }
+      \strng{namehash}{46717351bed82328f4ea945f30858d49}
+      \strng{fullhash}{46717351bed82328f4ea945f30858d49}
+      \strng{fullhashraw}{46717351bed82328f4ea945f30858d49}
+      \strng{bibnamehash}{46717351bed82328f4ea945f30858d49}
+      \strng{authorbibnamehash}{46717351bed82328f4ea945f30858d49}
+      \strng{authornamehash}{46717351bed82328f4ea945f30858d49}
+      \strng{authorfullhash}{46717351bed82328f4ea945f30858d49}
+      \strng{authorfullhashraw}{46717351bed82328f4ea945f30858d49}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{Online}
+      \field{title}{Rede de atendimento}
+      \field{year}{2022}
+    \endentry
+    \entry{chacon2014}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=8f4ee0c97dee95179ce1e79e846dd298}{%
+           family={Chacon},
+           familyi={C\bibinitperiod},
+           given={Scott},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=50418136ff59fed99760e32ba5613c51}{%
+           family={Straub},
+           familyi={S\bibinitperiod},
+           given={Ben},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Apress}%
+      }
+      \strng{namehash}{1764b95256df68c84d8a593fc2dfa143}
+      \strng{fullhash}{1764b95256df68c84d8a593fc2dfa143}
+      \strng{fullhashraw}{1764b95256df68c84d8a593fc2dfa143}
+      \strng{bibnamehash}{1764b95256df68c84d8a593fc2dfa143}
+      \strng{authorbibnamehash}{1764b95256df68c84d8a593fc2dfa143}
+      \strng{authornamehash}{1764b95256df68c84d8a593fc2dfa143}
+      \strng{authorfullhash}{1764b95256df68c84d8a593fc2dfa143}
+      \strng{authorfullhashraw}{1764b95256df68c84d8a593fc2dfa143}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Pro Git}
+      \field{year}{2014}
+    \endentry
+    \entry{dasilva2021}{article}{}{}
+      \name{author}{7}{}{%
+        {{un=0,uniquepart=base,hash=a7bb8a425d76772e2fedb83795c69c09}{%
+           family={Da\bibnamedelima Silva},
+           familyi={D\bibinitperiod\bibinitdelim S\bibinitperiod},
+           given={J.\bibnamedelimi R.},
+           giveni={J\bibinitperiod\bibinitdelim R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=92517354841423f7b9e206fd97584988}{%
+           family={Praça\bibnamedelima Brasil},
+           familyi={P\bibinitperiod\bibinitdelim B\bibinitperiod},
+           given={C.\bibnamedelimi C.},
+           giveni={C\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=b8299062f38e7049c8332ea90e74570f}{%
+           family={De\bibnamedelima Vasconcelos\bibnamedelima Filho},
+           familyi={D\bibinitperiod\bibinitdelim V\bibinitperiod\bibinitdelim F\bibinitperiod},
+           given={J.\bibnamedelimi E.},
+           giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=54eee930ea91a6fa5cb13bbb112ae71c}{%
+           family={Brasil},
+           familyi={B\bibinitperiod},
+           given={L.\bibnamedelimi M.},
+           giveni={L\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=0d440aaa61410288aa5a037fe08e7077}{%
+           family={Paiva},
+           familyi={P\bibinitperiod},
+           given={J.\bibnamedelimi C.\bibnamedelimi de},
+           giveni={J\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim d\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=be79eda3638cc3580a4edc2de44769fe}{%
+           family={De\bibnamedelima Oliveira},
+           familyi={D\bibinitperiod\bibinitdelim O\bibinitperiod},
+           given={R.\bibnamedelimi M.},
+           giveni={R\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6e66410f33c3e6be237d5bfefe782eb1}{%
+           family={Dos\bibnamedelima Santos},
+           familyi={D\bibinitperiod\bibinitdelim S\bibinitperiod},
+           given={F.\bibnamedelimi A.},
+           giveni={F\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{9da42bf49965435e930223de1c4d7cdb}
+      \strng{fullhash}{e3d2feaea71e74c23611e754b6589546}
+      \strng{fullhashraw}{e3d2feaea71e74c23611e754b6589546}
+      \strng{bibnamehash}{9da42bf49965435e930223de1c4d7cdb}
+      \strng{authorbibnamehash}{9da42bf49965435e930223de1c4d7cdb}
+      \strng{authornamehash}{9da42bf49965435e930223de1c4d7cdb}
+      \strng{authorfullhash}{e3d2feaea71e74c23611e754b6589546}
+      \strng{authorfullhashraw}{e3d2feaea71e74c23611e754b6589546}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Ciência \& Saúde Coletiva}
+      \field{number}{2}
+      \field{title}{Blood donation support application: Contributions from experts on the tool's functionality}
+      \field{volume}{26}
+      \field{year}{2021}
+      \field{pages}{493\bibrangedash 503}
+      \range{pages}{11}
+    \endentry
+    \entry{deitel2017}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=756eb68a2658255474b30bfcb28792f1}{%
+           family={Deitel},
+           familyi={D\bibinitperiod},
+           given={Paul},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e7e6200ffddec2d684e630840624d1b1}{%
+           family={Deitel},
+           familyi={D\bibinitperiod},
+           given={Harvey},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Pearson}%
+      }
+      \strng{namehash}{ad92015ae1f67d2da72c05f209f1c602}
+      \strng{fullhash}{ad92015ae1f67d2da72c05f209f1c602}
+      \strng{fullhashraw}{ad92015ae1f67d2da72c05f209f1c602}
+      \strng{bibnamehash}{ad92015ae1f67d2da72c05f209f1c602}
+      \strng{authorbibnamehash}{ad92015ae1f67d2da72c05f209f1c602}
+      \strng{authornamehash}{ad92015ae1f67d2da72c05f209f1c602}
+      \strng{authorfullhash}{ad92015ae1f67d2da72c05f209f1c602}
+      \strng{authorfullhashraw}{ad92015ae1f67d2da72c05f209f1c602}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Java: How to Program}
+      \field{year}{2017}
+    \endentry
+    \entry{elsevier2024}{misc}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=21abe5a91c2949aba6ef77033a5f98f3}{%
+           family={{Elsevier}},
+           familyi={E\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {[S. l.]}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{fullhash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{fullhashraw}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{bibnamehash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{authorbibnamehash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{authornamehash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{authorfullhash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{authorfullhashraw}{21abe5a91c2949aba6ef77033a5f98f3}
+      \field{extraname}{1}
+      \field{sortinit}{E}
+      \field{sortinithash}{8da8a182d344d5b9047633dfc0cc9131}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{Online}
+      \field{title}{Scopus}
+      \field{year}{2024}
+    \endentry
+    \entry{elsevier2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=21abe5a91c2949aba6ef77033a5f98f3}{%
+           family={{Elsevier}},
+           familyi={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{fullhash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{fullhashraw}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{bibnamehash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{authorbibnamehash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{authornamehash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{authorfullhash}{21abe5a91c2949aba6ef77033a5f98f3}
+      \strng{authorfullhashraw}{21abe5a91c2949aba6ef77033a5f98f3}
+      \field{extraname}{2}
+      \field{sortinit}{E}
+      \field{sortinithash}{8da8a182d344d5b9047633dfc0cc9131}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{Online}
+      \field{note}{Mais de 2,4 bilhões de referências citadas desde 1970}
+      \field{title}{Scopus content coverage}
+      \field{year}{2025}
+    \endentry
+    \entry{evans2003}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=a8034da9731f447121ee0dbad3354a82}{%
+           family={Evans},
+           familyi={E\bibinitperiod},
+           given={Eric},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Addison-Wesley}%
+      }
+      \strng{namehash}{a8034da9731f447121ee0dbad3354a82}
+      \strng{fullhash}{a8034da9731f447121ee0dbad3354a82}
+      \strng{fullhashraw}{a8034da9731f447121ee0dbad3354a82}
+      \strng{bibnamehash}{a8034da9731f447121ee0dbad3354a82}
+      \strng{authorbibnamehash}{a8034da9731f447121ee0dbad3354a82}
+      \strng{authornamehash}{a8034da9731f447121ee0dbad3354a82}
+      \strng{authorfullhash}{a8034da9731f447121ee0dbad3354a82}
+      \strng{authorfullhashraw}{a8034da9731f447121ee0dbad3354a82}
+      \field{sortinit}{E}
+      \field{sortinithash}{8da8a182d344d5b9047633dfc0cc9131}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Domain-Driven Design: Tackling Complexity in the Heart of Software}
+      \field{year}{2003}
+    \endentry
+    \entry{gamma1994}{book}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=abd927bf30d6566be0ac66a66e893fdd}{%
+           family={Gamma},
+           familyi={G\bibinitperiod},
+           given={Erich},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=233f891813bda0f3920985f97a4a7554}{%
+           family={Helm},
+           familyi={H\bibinitperiod},
+           given={Richard},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fd79e5e249b219ff553fc2d811104d78}{%
+           family={Johnson},
+           familyi={J\bibinitperiod},
+           given={Ralph},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e032589f0b9a38804483ab7cf5ccad7f}{%
+           family={Vlissides},
+           familyi={V\bibinitperiod},
+           given={John},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Reading}%
+      }
+      \list{publisher}{1}{%
+        {Addison-Wesley}%
+      }
+      \strng{namehash}{4d2492409a24d4ed208ae6670cb91945}
+      \strng{fullhash}{5cb4a6d7baf30d11bae6682eca698b4f}
+      \strng{fullhashraw}{5cb4a6d7baf30d11bae6682eca698b4f}
+      \strng{bibnamehash}{4d2492409a24d4ed208ae6670cb91945}
+      \strng{authorbibnamehash}{4d2492409a24d4ed208ae6670cb91945}
+      \strng{authornamehash}{4d2492409a24d4ed208ae6670cb91945}
+      \strng{authorfullhash}{5cb4a6d7baf30d11bae6682eca698b4f}
+      \strng{authorfullhashraw}{5cb4a6d7baf30d11bae6682eca698b4f}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Design patterns: elements of reusable object-oriented software}
+      \field{year}{1994}
+    \endentry
+    \entry{garrard2020}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=10eb38ec31cd17168dcc6d566fcde350}{%
+           family={Garrard},
+           familyi={G\bibinitperiod},
+           given={Judith},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Burlington}%
+      }
+      \list{publisher}{1}{%
+        {Jones \& Bartlett Learning}%
+      }
+      \strng{namehash}{10eb38ec31cd17168dcc6d566fcde350}
+      \strng{fullhash}{10eb38ec31cd17168dcc6d566fcde350}
+      \strng{fullhashraw}{10eb38ec31cd17168dcc6d566fcde350}
+      \strng{bibnamehash}{10eb38ec31cd17168dcc6d566fcde350}
+      \strng{authorbibnamehash}{10eb38ec31cd17168dcc6d566fcde350}
+      \strng{authornamehash}{10eb38ec31cd17168dcc6d566fcde350}
+      \strng{authorfullhash}{10eb38ec31cd17168dcc6d566fcde350}
+      \strng{authorfullhashraw}{10eb38ec31cd17168dcc6d566fcde350}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{6}
+      \field{title}{Health Sciences Literature Review Made Easy: The Matrix Method}
+      \field{year}{2020}
+    \endentry
+    \entry{gil2008}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=ef995cf98b517fa1168fbbaefe74df6b}{%
+           family={Gil},
+           familyi={G\bibinitperiod},
+           given={Antônio\bibnamedelima Carlos},
+           giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {São Paulo}%
+      }
+      \list{publisher}{1}{%
+        {Atlas}%
+      }
+      \strng{namehash}{ef995cf98b517fa1168fbbaefe74df6b}
+      \strng{fullhash}{ef995cf98b517fa1168fbbaefe74df6b}
+      \strng{fullhashraw}{ef995cf98b517fa1168fbbaefe74df6b}
+      \strng{bibnamehash}{ef995cf98b517fa1168fbbaefe74df6b}
+      \strng{authorbibnamehash}{ef995cf98b517fa1168fbbaefe74df6b}
+      \strng{authornamehash}{ef995cf98b517fa1168fbbaefe74df6b}
+      \strng{authorfullhash}{ef995cf98b517fa1168fbbaefe74df6b}
+      \strng{authorfullhashraw}{ef995cf98b517fa1168fbbaefe74df6b}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{6}
+      \field{title}{Métodos e técnicas de pesquisa social}
+      \field{year}{2008}
+    \endentry
+    \entry{hemorio2023}{report}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=f2b3bad24e20a613e80fedc37da4012b}{%
+           family={{Hemorio}},
+           familyi={H\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Instituto Estadual de Hematologia Arthur de Siqueira Cavalcanti}%
+      }
+      \list{location}{1}{%
+        {Rio de Janeiro}%
+      }
+      \strng{namehash}{f2b3bad24e20a613e80fedc37da4012b}
+      \strng{fullhash}{f2b3bad24e20a613e80fedc37da4012b}
+      \strng{fullhashraw}{f2b3bad24e20a613e80fedc37da4012b}
+      \strng{bibnamehash}{f2b3bad24e20a613e80fedc37da4012b}
+      \strng{authorbibnamehash}{f2b3bad24e20a613e80fedc37da4012b}
+      \strng{authornamehash}{f2b3bad24e20a613e80fedc37da4012b}
+      \strng{authorfullhash}{f2b3bad24e20a613e80fedc37da4012b}
+      \strng{authorfullhashraw}{f2b3bad24e20a613e80fedc37da4012b}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Doação de sangue no Brasil: desafios e perspectivas}
+      \field{type}{techreport}
+      \field{year}{2023}
+    \endentry
+    \entry{li2023}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=4c305f909afd2192eedb6f46f0883d14}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={L.},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c7e47df3de777ff7339b06465da57a48}{%
+           family={Valero},
+           familyi={V\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=0405069a78e37f1c9eaf24dd46c94e69}{%
+           family={Keyser},
+           familyi={K\bibinitperiod},
+           given={R.\bibnamedelimi S.},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=66ba6c5db2dc309b68ceca5b45c5d4d1}{%
+           family={Ukuku},
+           familyi={U\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=1b2ced9ee7249adaa22940124d959652}{%
+           family={Zheng},
+           familyi={Z\bibinitperiod},
+           given={H.},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{24171f47d015b0997d5f9bc82b011eae}
+      \strng{fullhash}{2dece0754b94d29be54e4e4d58347a8d}
+      \strng{fullhashraw}{2dece0754b94d29be54e4e4d58347a8d}
+      \strng{bibnamehash}{24171f47d015b0997d5f9bc82b011eae}
+      \strng{authorbibnamehash}{24171f47d015b0997d5f9bc82b011eae}
+      \strng{authornamehash}{24171f47d015b0997d5f9bc82b011eae}
+      \strng{authorfullhash}{2dece0754b94d29be54e4e4d58347a8d}
+      \strng{authorfullhashraw}{2dece0754b94d29be54e4e4d58347a8d}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Digital Health}
+      \field{title}{Mobile applications for encouraging blood donation: A systematic review and case study}
+      \field{volume}{9}
+      \field{year}{2023}
+    \endentry
+    \entry{marconi2003}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=23b70d8c3808cf05a5845480edda1cbd}{%
+           family={Marconi},
+           familyi={M\bibinitperiod},
+           given={Marina\bibnamedelimb de\bibnamedelima Andrade},
+           giveni={M\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=efdebb8eff6335ec5bc16ff1c0f47556}{%
+           family={Lakatos},
+           familyi={L\bibinitperiod},
+           given={Eva\bibnamedelima Maria},
+           giveni={E\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {São Paulo}%
+      }
+      \list{publisher}{1}{%
+        {Atlas}%
+      }
+      \strng{namehash}{1b948fe142c898cd9688520397b2124f}
+      \strng{fullhash}{1b948fe142c898cd9688520397b2124f}
+      \strng{fullhashraw}{1b948fe142c898cd9688520397b2124f}
+      \strng{bibnamehash}{1b948fe142c898cd9688520397b2124f}
+      \strng{authorbibnamehash}{1b948fe142c898cd9688520397b2124f}
+      \strng{authornamehash}{1b948fe142c898cd9688520397b2124f}
+      \strng{authorfullhash}{1b948fe142c898cd9688520397b2124f}
+      \strng{authorfullhashraw}{1b948fe142c898cd9688520397b2124f}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{5}
+      \field{title}{Fundamentos de metodologia científica}
+      \field{year}{2003}
+    \endentry
+    \entry{martin2003}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=6f41df64eb0dc4855be70172368604c2}{%
+           family={Martin},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Upper Saddle River}%
+      }
+      \list{publisher}{1}{%
+        {Prentice Hall}%
+      }
+      \strng{namehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \strng{bibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorbibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authornamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \field{extraname}{1}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Agile software development: principles, patterns, and practices}
+      \field{year}{2003}
+    \endentry
+    \entry{martin2017}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=6f41df64eb0dc4855be70172368604c2}{%
+           family={Martin},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Boston}%
+      }
+      \list{publisher}{1}{%
+        {Prentice Hall}%
+      }
+      \strng{namehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \strng{bibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorbibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authornamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \field{extraname}{2}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Clean architecture: a craftsman's guide to software structure and design}
+      \field{year}{2017}
+    \endentry
+    \entry{martin2008}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=6f41df64eb0dc4855be70172368604c2}{%
+           family={Martin},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Upper Saddle River}%
+      }
+      \list{publisher}{1}{%
+        {Prentice Hall}%
+      }
+      \strng{namehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \strng{bibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorbibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authornamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \field{extraname}{3}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Clean code: a handbook of agile software craftsmanship}
+      \field{year}{2008}
+    \endentry
+    \entry{martin2000}{report}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=6f41df64eb0dc4855be70172368604c2}{%
+           family={Martin},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{institution}{1}{%
+        {Object Mentor}%
+      }
+      \strng{namehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \strng{bibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorbibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authornamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \field{extraname}{4}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Design principles and design patterns}
+      \field{type}{techreport}
+      \field{year}{2000}
+    \endentry
+    \entry{minayo2001}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=4516aaf332959329b2b84f960e7589c9}{%
+           family={Minayo},
+           familyi={M\bibinitperiod},
+           given={Maria\bibnamedelimb Cecília\bibnamedelimb de\bibnamedelima Souza},
+           giveni={M\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Petrópolis}%
+      }
+      \list{publisher}{1}{%
+        {Vozes}%
+      }
+      \strng{namehash}{4516aaf332959329b2b84f960e7589c9}
+      \strng{fullhash}{4516aaf332959329b2b84f960e7589c9}
+      \strng{fullhashraw}{4516aaf332959329b2b84f960e7589c9}
+      \strng{bibnamehash}{4516aaf332959329b2b84f960e7589c9}
+      \strng{authorbibnamehash}{4516aaf332959329b2b84f960e7589c9}
+      \strng{authornamehash}{4516aaf332959329b2b84f960e7589c9}
+      \strng{authorfullhash}{4516aaf332959329b2b84f960e7589c9}
+      \strng{authorfullhashraw}{4516aaf332959329b2b84f960e7589c9}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{19}
+      \field{title}{Pesquisa social: teoria, método e criatividade}
+      \field{year}{2001}
+    \endentry
+    \entry{oms2020}{report}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=ae81c3ac63305831dfe0e40bce7cd0ee}{%
+           family={{Organização Mundial da Saúde}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {WHO}%
+      }
+      \list{location}{1}{%
+        {Geneva}%
+      }
+      \strng{namehash}{ae81c3ac63305831dfe0e40bce7cd0ee}
+      \strng{fullhash}{ae81c3ac63305831dfe0e40bce7cd0ee}
+      \strng{fullhashraw}{ae81c3ac63305831dfe0e40bce7cd0ee}
+      \strng{bibnamehash}{ae81c3ac63305831dfe0e40bce7cd0ee}
+      \strng{authorbibnamehash}{ae81c3ac63305831dfe0e40bce7cd0ee}
+      \strng{authornamehash}{ae81c3ac63305831dfe0e40bce7cd0ee}
+      \strng{authorfullhash}{ae81c3ac63305831dfe0e40bce7cd0ee}
+      \strng{authorfullhashraw}{ae81c3ac63305831dfe0e40bce7cd0ee}
+      \field{sortinit}{O}
+      \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Blood safety and availability}
+      \field{type}{techreport}
+      \field{year}{2020}
+    \endentry
+    \entry{opas2020}{report}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=a138d388222c679ddb01ef3fcf2c5e33}{%
+           family={{Organização Pan-Americana da Saúde}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {PAHO}%
+      }
+      \list{location}{1}{%
+        {Washington, D.C.}%
+      }
+      \strng{namehash}{a138d388222c679ddb01ef3fcf2c5e33}
+      \strng{fullhash}{a138d388222c679ddb01ef3fcf2c5e33}
+      \strng{fullhashraw}{a138d388222c679ddb01ef3fcf2c5e33}
+      \strng{bibnamehash}{a138d388222c679ddb01ef3fcf2c5e33}
+      \strng{authorbibnamehash}{a138d388222c679ddb01ef3fcf2c5e33}
+      \strng{authornamehash}{a138d388222c679ddb01ef3fcf2c5e33}
+      \strng{authorfullhash}{a138d388222c679ddb01ef3fcf2c5e33}
+      \strng{authorfullhashraw}{a138d388222c679ddb01ef3fcf2c5e33}
+      \field{sortinit}{O}
+      \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Supply of blood for transfusion in Latin American and Caribbean countries 2019-2020}
+      \field{type}{techreport}
+      \field{year}{2020}
+    \endentry
+    \entry{petersen2008}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=b1fabf9697f0dac32839ca9d4eea8d88}{%
+           family={Petersen},
+           familyi={P\bibinitperiod},
+           given={Kai},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=586e398faf79549b53f97ca8d2463143}{%
+           family={Feldt},
+           familyi={F\bibinitperiod},
+           given={Robert},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3bf1b3c9f875ee79f0a6d3082f5351ef}{%
+           family={Mujtaba},
+           familyi={M\bibinitperiod},
+           given={Shahid},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4b4a0beb3b7bdd6eb5fc29b0a7f036f4}{%
+           family={Mattsson},
+           familyi={M\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{956fcf23ee1be0159e140bdc43f360ef}
+      \strng{fullhash}{c3f0321fbd7b7bc6a6e30cf015dbff92}
+      \strng{fullhashraw}{c3f0321fbd7b7bc6a6e30cf015dbff92}
+      \strng{bibnamehash}{956fcf23ee1be0159e140bdc43f360ef}
+      \strng{authorbibnamehash}{956fcf23ee1be0159e140bdc43f360ef}
+      \strng{authornamehash}{956fcf23ee1be0159e140bdc43f360ef}
+      \strng{authorfullhash}{c3f0321fbd7b7bc6a6e30cf015dbff92}
+      \strng{authorfullhashraw}{c3f0321fbd7b7bc6a6e30cf015dbff92}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{12th International Conference on Evaluation and Assessment in Software Engineering (EASE)}
+      \field{title}{Systematic mapping studies in software engineering}
+      \field{year}{2008}
+      \field{pages}{1\bibrangedash 10}
+      \range{pages}{10}
+    \endentry
+    \entry{pressman2016}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=4d3f81788d99cf425c4b6e0a454baab0}{%
+           family={Pressman},
+           familyi={P\bibinitperiod},
+           given={Roger\bibnamedelima S.},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=13b3d71ce7fd3614b4e2e9ce804597f3}{%
+           family={Maxim},
+           familyi={M\bibinitperiod},
+           given={Bruce\bibnamedelima R.},
+           giveni={B\bibinitperiod\bibinitdelim R\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Porto Alegre}%
+      }
+      \list{publisher}{1}{%
+        {AMGH}%
+      }
+      \strng{namehash}{da6ec91488daec8c3c9eddf18c78dad8}
+      \strng{fullhash}{da6ec91488daec8c3c9eddf18c78dad8}
+      \strng{fullhashraw}{da6ec91488daec8c3c9eddf18c78dad8}
+      \strng{bibnamehash}{da6ec91488daec8c3c9eddf18c78dad8}
+      \strng{authorbibnamehash}{da6ec91488daec8c3c9eddf18c78dad8}
+      \strng{authornamehash}{da6ec91488daec8c3c9eddf18c78dad8}
+      \strng{authorfullhash}{da6ec91488daec8c3c9eddf18c78dad8}
+      \strng{authorfullhashraw}{da6ec91488daec8c3c9eddf18c78dad8}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{8}
+      \field{title}{Engenharia de Software: uma abordagem profissional}
+      \field{year}{2016}
+    \endentry
+    \entry{prodanov2013}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=1d7fe2462c1f3831fb731adf91822fc0}{%
+           family={Prodanov},
+           familyi={P\bibinitperiod},
+           given={Cleber\bibnamedelima Cristiano},
+           giveni={C\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f3943d96d992bebb9718bff20edebcd0}{%
+           family={Freitas},
+           familyi={F\bibinitperiod},
+           given={Ernani\bibnamedelimb Cesar\bibnamedelima de},
+           giveni={E\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim d\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Novo Hamburgo}%
+      }
+      \list{publisher}{1}{%
+        {Feevale}%
+      }
+      \strng{namehash}{0c5b1dac6285d0d348387cc305a68351}
+      \strng{fullhash}{0c5b1dac6285d0d348387cc305a68351}
+      \strng{fullhashraw}{0c5b1dac6285d0d348387cc305a68351}
+      \strng{bibnamehash}{0c5b1dac6285d0d348387cc305a68351}
+      \strng{authorbibnamehash}{0c5b1dac6285d0d348387cc305a68351}
+      \strng{authornamehash}{0c5b1dac6285d0d348387cc305a68351}
+      \strng{authorfullhash}{0c5b1dac6285d0d348387cc305a68351}
+      \strng{authorfullhashraw}{0c5b1dac6285d0d348387cc305a68351}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{2}
+      \field{title}{Metodologia do trabalho científico}
+      \field{year}{2013}
+    \endentry
+    \entry{sommerville2011}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=70341b3bfcce7026902f4eb1e4111b58}{%
+           family={Sommerville},
+           familyi={S\bibinitperiod},
+           given={Ian},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {São Paulo}%
+      }
+      \list{publisher}{1}{%
+        {Pearson Prentice Hall}%
+      }
+      \strng{namehash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{fullhash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{fullhashraw}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{bibnamehash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{authorbibnamehash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{authornamehash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{authorfullhash}{70341b3bfcce7026902f4eb1e4111b58}
+      \strng{authorfullhashraw}{70341b3bfcce7026902f4eb1e4111b58}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{9}
+      \field{title}{Engenharia de software}
+      \field{year}{2011}
+    \endentry
+    \entry{vernon2016}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=890056a8c9409848818dd428c6e2a8fa}{%
+           family={Vernon},
+           familyi={V\bibinitperiod},
+           given={Vaughn},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Boston}%
+      }
+      \list{publisher}{1}{%
+        {Addison-Wesley}%
+      }
+      \strng{namehash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{fullhash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{fullhashraw}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{bibnamehash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{authorbibnamehash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{authornamehash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{authorfullhash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{authorfullhashraw}{890056a8c9409848818dd428c6e2a8fa}
+      \field{extraname}{1}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Domain-driven design distilled}
+      \field{year}{2016}
+    \endentry
+    \entry{vernon2013}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=890056a8c9409848818dd428c6e2a8fa}{%
+           family={Vernon},
+           familyi={V\bibinitperiod},
+           given={Vaughn},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Addison-Wesley}%
+      }
+      \strng{namehash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{fullhash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{fullhashraw}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{bibnamehash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{authorbibnamehash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{authornamehash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{authorfullhash}{890056a8c9409848818dd428c6e2a8fa}
+      \strng{authorfullhashraw}{890056a8c9409848818dd428c6e2a8fa}
+      \field{extraname}{2}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Implementing Domain-Driven Design}
+      \field{year}{2013}
+    \endentry
+    \entry{walls2019}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=229fc5bee84302022868b790118e1d78}{%
+           family={Walls},
+           familyi={W\bibinitperiod},
+           given={Craig},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Manning}%
+      }
+      \strng{namehash}{229fc5bee84302022868b790118e1d78}
+      \strng{fullhash}{229fc5bee84302022868b790118e1d78}
+      \strng{fullhashraw}{229fc5bee84302022868b790118e1d78}
+      \strng{bibnamehash}{229fc5bee84302022868b790118e1d78}
+      \strng{authorbibnamehash}{229fc5bee84302022868b790118e1d78}
+      \strng{authornamehash}{229fc5bee84302022868b790118e1d78}
+      \strng{authorfullhash}{229fc5bee84302022868b790118e1d78}
+      \strng{authorfullhashraw}{229fc5bee84302022868b790118e1d78}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Spring in Action}
+      \field{year}{2019}
+    \endentry
+    \entry{ouyang2020}{article}{}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=6e22a30a68fb03a093deeaa0738646c0}{%
+           family={Ou-Yang},
+           familyi={O\bibinithyphendelim Y\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=35bdf4a6ef8ce53fdb97b465d27af86a}{%
+           family={Bei},
+           familyi={B\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=bbbd5346469f46de16e35af8676727ea}{%
+           family={Liang},
+           familyi={L\bibinitperiod},
+           given={H.},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=2545e5b3aab19a3552aa64de24f1a42c}{%
+           family={He},
+           familyi={H\bibinitperiod},
+           given={B.},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=38241eaee18102cab15a125b0654c7da}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=a498ef07e3d0a70a18a471263e71d36d}{%
+           family={Fu},
+           familyi={F\bibinitperiod},
+           given={Y.},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{11449289ea532d644dc8c2f739b844e6}
+      \strng{fullhash}{3a49a0194ae8748fbf9fff53229fea74}
+      \strng{fullhashraw}{3a49a0194ae8748fbf9fff53229fea74}
+      \strng{bibnamehash}{11449289ea532d644dc8c2f739b844e6}
+      \strng{authorbibnamehash}{11449289ea532d644dc8c2f739b844e6}
+      \strng{authornamehash}{11449289ea532d644dc8c2f739b844e6}
+      \strng{authorfullhash}{3a49a0194ae8748fbf9fff53229fea74}
+      \strng{authorfullhashraw}{3a49a0194ae8748fbf9fff53229fea74}
+      \field{sortinit}{Y}
+      \field{sortinithash}{fd67ad5a9ef0f7456bdd9aab10fe1495}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{BMC Public Health}
+      \field{title}{Effective methods for reactivating inactive blood donors: A stratified randomised controlled study}
+      \field{volume}{20}
+      \field{year}{2020}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
 
-\bibitem[Booch 2007]{booch2007}
-\abntrefinfo{Booch}{BOOCH}{2007}
-{BOOCH, G. \emph{Object-oriented analysis and design with applications}. 3. ed.
-  Boston: Addison-Wesley, 2007.}
-
-\bibitem[{Ceará. Secretaria da Saúde} 2021]{ceara2021}
-\abntrefinfo{{Ceará. Secretaria da Saúde}}{{Ceará. Secretaria da
-  Saúde}}{2021}
-{{Ceará. Secretaria da Saúde}. \emph{Homens são os que mais doam sangue no
-  Ceará entre os 2\% da população doadora}. Fortaleza: [s.n.], 2021.
-  Online.}
-
-\bibitem[{Ceará. Secretaria da Saúde} 2025]{ceara2025}
-\abntrefinfo{{Ceará. Secretaria da Saúde}}{{Ceará. Secretaria da
-  Saúde}}{2025}
-{{Ceará. Secretaria da Saúde}. \emph{Hemoce registra número recorde de
-  doações em 2024, o maior nos últimos 30 anos}. Fortaleza: [s.n.], 2025.
-  Online.}
-
-\bibitem[{Centro de Hematologia e Hemoterapia do Ceará --- HEMOCE}
-  2022]{hemoce2022}
-\abntrefinfo{{Centro de Hematologia e Hemoterapia do Ceará ---
-  HEMOCE}}{{Centro de Hematologia e Hemoterapia do Ceará --- HEMOCE}}{2022}
-{{Centro de Hematologia e Hemoterapia do Ceará --- HEMOCE}. \emph{Rede de
-  atendimento}. Fortaleza: [s.n.], 2022. Online.}
-
-\bibitem[Chacon e Straub 2014]{chacon2014}
-\abntrefinfo{Chacon e Straub}{CHACON; STRAUB}{2014}
-{CHACON, S.; STRAUB, B. \emph{Pro Git}. [S.l.]: Apress, 2014.}
-
-\bibitem[Deitel e Deitel 2017]{deitel2017}
-\abntrefinfo{Deitel e Deitel}{DEITEL; DEITEL}{2017}
-{DEITEL, P.; DEITEL, H. \emph{Java: How to Program}. [S.l.]: Pearson, 2017.}
-
-\bibitem[{Elsevier} 2024]{elsevier2024}
-\abntrefinfo{{Elsevier}}{{Elsevier}}{2024}
-{{Elsevier}. \emph{Scopus}. [S. l.]: Elsevier, 2024. Online.}
-
-\bibitem[{Elsevier} 2025]{elsevier2025}
-\abntrefinfo{{Elsevier}}{{Elsevier}}{2025}
-{{Elsevier}. \emph{Scopus content coverage}. 2025. Online.
-Mais de 2,4 bilhões de referências citadas desde 1970.}
-
-\bibitem[Evans 2003]{evans2003}
-\abntrefinfo{Evans}{EVANS}{2003}
-{EVANS, E. \emph{Domain-Driven Design: Tackling Complexity in the Heart of
-  Software}. [S.l.]: Addison-Wesley, 2003.}
-
-\bibitem[Gamma et al. 1994]{gamma1994}
-\abntrefinfo{Gamma et al.}{GAMMA et al.}{1994}
-{GAMMA, E. et al. \emph{Design patterns: elements of reusable object-oriented
-  software}. Reading: Addison-Wesley, 1994.}
-
-\bibitem[Garrard 2020]{garrard2020}
-\abntrefinfo{Garrard}{GARRARD}{2020}
-{GARRARD, J. \emph{Health Sciences Literature Review Made Easy: The Matrix
-  Method}. 6. ed. Burlington: Jones \& Bartlett Learning, 2020.}
-
-\bibitem[Gil 2008]{gil2008}
-\abntrefinfo{Gil}{GIL}{2008}
-{GIL, A.~C. \emph{Métodos e técnicas de pesquisa social}. 6. ed. São Paulo:
-  Atlas, 2008.}
-
-\bibitem[{Hemorio} 2023]{hemorio2023}
-\abntrefinfo{{Hemorio}}{{Hemorio}}{2023}
-{{Hemorio}. \emph{Doação de sangue no Brasil: desafios e perspectivas}.
-Rio de Janeiro, 2023.}
-
-\bibitem[Li et al. 2023]{li2023}
-\abntrefinfo{Li et al.}{LI et al.}{2023}
-{LI, L. et al. Mobile applications for encouraging blood donation: A systematic
-  review and case study.
-\emph{Digital Health}, v.~9, 2023.}
-
-\bibitem[Marconi e Lakatos 2003]{marconi2003}
-\abntrefinfo{Marconi e Lakatos}{MARCONI; LAKATOS}{2003}
-{MARCONI, M. d.~A.; LAKATOS, E.~M. \emph{Fundamentos de metodologia
-  científica}. 5. ed. São Paulo: Atlas, 2003.}
-
-\bibitem[Martin 2000]{martin2000}
-\abntrefinfo{Martin}{MARTIN}{2000}
-{MARTIN, R.~C. \emph{Design principles and design patterns}.
-[S.l.], 2000.}
-
-\bibitem[Martin 2003]{martin2003}
-\abntrefinfo{Martin}{MARTIN}{2003}
-{MARTIN, R.~C. \emph{Agile software development: principles, patterns, and
-  practices}. Upper Saddle River: Prentice Hall, 2003.}
-
-\bibitem[Martin 2008]{martin2008}
-\abntrefinfo{Martin}{MARTIN}{2008}
-{MARTIN, R.~C. \emph{Clean code: a handbook of agile software craftsmanship}.
-  Upper Saddle River: Prentice Hall, 2008.}
-
-\bibitem[Martin 2017]{martin2017}
-\abntrefinfo{Martin}{MARTIN}{2017}
-{MARTIN, R.~C. \emph{Clean architecture: a craftsman's guide to software
-  structure and design}. Boston: Prentice Hall, 2017.}
-
-\bibitem[Minayo 2001]{minayo2001}
-\abntrefinfo{Minayo}{MINAYO}{2001}
-{MINAYO, M. C. d.~S. \emph{Pesquisa social: teoria, método e criatividade}.
-  19. ed. Petrópolis: Vozes, 2001.}
-
-\bibitem[{Organização Mundial da Saúde} 2020]{oms2020}
-\abntrefinfo{{Organização Mundial da Saúde}}{{Organização Mundial da
-  Saúde}}{2020}
-{{Organização Mundial da Saúde}. \emph{Blood safety and availability}.
-Geneva, 2020.}
-
-\bibitem[{Organização Pan-Americana da Saúde} 2020]{opas2020}
-\abntrefinfo{{Organização Pan-Americana da Saúde}}{{Organização
-  Pan-Americana da Saúde}}{2020}
-{{Organização Pan-Americana da Saúde}. \emph{Supply of blood for transfusion
-  in Latin American and Caribbean countries 2019-2020}.
-Washington, D.C., 2020.}
-
-\bibitem[Ou-Yang et al. 2020]{ouyang2020}
-\abntrefinfo{Ou-Yang et al.}{OU-YANG et al.}{2020}
-{OU-YANG, J. et al. Effective methods for reactivating inactive blood donors: A
-  stratified randomised controlled study.
-\emph{BMC Public Health}, v.~20, 2020.}
-
-\bibitem[Petersen et al. 2008]{petersen2008}
-\abntrefinfo{Petersen et al.}{PETERSEN et al.}{2008}
-{PETERSEN, K. et al. Systematic mapping studies in software engineering. In:
-  \emph{12th International Conference on Evaluation and Assessment in Software
-  Engineering (EASE)}. [S.l.: s.n.], 2008. p. 1--10.}
-
-\bibitem[Pressman e Maxim 2016]{pressman2016}
-\abntrefinfo{Pressman e Maxim}{PRESSMAN; MAXIM}{2016}
-{PRESSMAN, R.~S.; MAXIM, B.~R. \emph{Engenharia de Software: uma abordagem
-  profissional}. 8. ed. Porto Alegre: AMGH, 2016.}
-
-\bibitem[Prodanov e Freitas 2013]{prodanov2013}
-\abntrefinfo{Prodanov e Freitas}{PRODANOV; FREITAS}{2013}
-{PRODANOV, C.~C.; FREITAS, E. C.~d. \emph{Metodologia do trabalho científico}.
-  2. ed. Novo Hamburgo: Feevale, 2013.}
-
-\bibitem[Silva et al. 2021]{dasilva2021}
-\abntrefinfo{Silva et al.}{SILVA et al.}{2021}
-{SILVA, J.~R. D. et al. Blood donation support application: Contributions from
-  experts on the tool's functionality.
-\emph{Ciência \& Saúde Coletiva}, v.~26, n.~2, p. 493--503, 2021.}
-
-\bibitem[Sommerville 2011]{sommerville2011}
-\abntrefinfo{Sommerville}{SOMMERVILLE}{2011}
-{SOMMERVILLE, I. \emph{Engenharia de software}. 9. ed. São Paulo: Pearson
-  Prentice Hall, 2011.}
-
-\bibitem[Vernon 2013]{vernon2013}
-\abntrefinfo{Vernon}{VERNON}{2013}
-{VERNON, V. \emph{Implementing Domain-Driven Design}. [S.l.]: Addison-Wesley,
-  2013.}
-
-\bibitem[Vernon 2016]{vernon2016}
-\abntrefinfo{Vernon}{VERNON}{2016}
-{VERNON, V. \emph{Domain-driven design distilled}. Boston: Addison-Wesley,
-  2016.}
-
-\bibitem[Walls 2019]{walls2019}
-\abntrefinfo{Walls}{WALLS}{2019}
-{WALLS, C. \emph{Spring in Action}. [S.l.]: Manning, 2019.}
-
-\end{thebibliography}
