@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  11 SEP 2026 13:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  11 SEP 2026 14:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2229,48 +2229,48 @@ as been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.267 
       ] [45] [46] [47] [48]) [49{C:/Users/garde/AppData/Local/Programs/MiKTeX/f
-onts/enc/dvips/newtx/ntx-ot1-tlf.enc}]
+onts/enc/dvips/newtx/ntx-ot1-tlf.enc}] [50]
 \openout2 = `capitulos/06-avaliacao.aux'.
 
  (capitulos/06-avaliacao.tex
 Cap\'{\i }tulo 6.
-[50
+[51
 
 
 
 
-] [51
+] [52
 pdfTeX warning (ext4): destination with the same identifier (name{table.6.9}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.48 
-     ] [52
+     ] [53
 pdfTeX warning (ext4): destination with the same identifier (name{table.6.10}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.80 
-     ]) [53] [54]
+     ]) [54] [55]
 \openout2 = `capitulos/07-consideracoes.aux'.
 
  (capitulos/07-consideracoes.tex
 Cap\'{\i }tulo 7.
-[55
+[56
 
 
 
 
-] [56]) [57]
+] [57]) [58]
 
 Package biblatex Warning: Month out of range or not an integer
 (biblatex)                at entry 'ceara2021' on input line 265.
 
-[58
+[59
 
 
 
-] [59] [60]
+] [60] [61]
 \openout2 = `apendices/A-regras-dominio.aux'.
 
  (apendices/A-regras-dominio.tex
@@ -2297,23 +2297,23 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 )
-[61
+[62
 
 
-] (apendices/codigo/DonorIsEligibleToDonate.java)) [62]
+] (apendices/codigo/DonorIsEligibleToDonate.java)) [63]
 \openout2 = `apendices/B-agregados.aux'.
 
 
 (apendices/B-agregados.tex
 AP\^ENDICE B.
-(apendices/codigo/DonationRequestAcceptsDonation.java) [63
+(apendices/codigo/DonationRequestAcceptsDonation.java) [64
 
 
 
 
 ]
 (apendices/codigo/DonationCreate.java) (apendices/codigo/DonationComplete.java
-[64])) [65]
+[65])) [66]
 \openout2 = `apendices/C-fulfillment-matching.aux'.
 
  (apendices/C-fulfillment-matching.tex
@@ -2321,26 +2321,26 @@ AP\^ENDICE C.
 (apendices/codigo/ProportionalGoal.java
 LaTeX Font Info:    Font shape `T1/ntxtt/m/it' in size <9> not available
 (Font)              Font shape `T1/txtt/m/sl' tried instead on input line 7.
- [66
+ [67
 
 
 
 
 ])
-(apendices/codigo/FulfillmentDistributeDonations.java [67] [68])
-(apendices/codigo/DonorMatchingService.java [69])) [70]
+(apendices/codigo/FulfillmentDistributeDonations.java [68] [69])
+(apendices/codigo/DonorMatchingService.java [70])) [71]
 \openout2 = `apendices/D-dip-caso-uso.aux'.
 
 
 (apendices/D-dip-caso-uso.tex
 AP\^ENDICE D.
 (apendices/codigo/DonationRepositoryInterface.java)
-(apendices/codigo/CompletePendingDonationUseCase.java [71
+(apendices/codigo/CompletePendingDonationUseCase.java [72
 
 
 
 
-])) [72]
+])) [73]
 
 Class memoir Warning: The material used in the footer is too large
 (10.14995pt) for the given foot skip (0.0pt), it is recommended to
@@ -2371,13 +2371,13 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 33965 strings out of 467871
- 585317 string characters out of 5418376
+ 33966 strings out of 467871
+ 585324 string characters out of 5418376
  2085110 words of memory out of 5000000
  61690 multiletter control sequences out of 15000+600000
  741104 words of font info for 153 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,13n,117p,1457b,4447s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,13n,117p,1447b,4447s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/NewTXM
 I.pfb><C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre
 /qhvb.pfb><C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-
@@ -2394,9 +2394,9 @@ grams/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/garde/AppData/Local/P
 rograms/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users/garde/AppData/Local/
 Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/Users/garde/AppData/Local
 /Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on main.pdf (73 pages, 1054714 bytes).
+Output written on main.pdf (74 pages, 1055858 bytes).
 PDF statistics:
- 1647 PDF objects out of 1728 (max. 8388607)
- 568 named destinations out of 1000 (max. 500000)
+ 1651 PDF objects out of 1728 (max. 8388607)
+ 569 named destinations out of 1000 (max. 500000)
  20784 words of extra memory for PDF output out of 24883 (max. 10000000)
 
