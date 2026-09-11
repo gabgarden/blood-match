@@ -6,7 +6,7 @@ Não há vínculo doação → request. Cada doação `COMPLETED` de um hemocent
 
 Não há concorrência nesse cálculo: leitura de requests e doações, alocação em memória, resposta. Nada é regravado.
 
-Resumo: [`FULFILLMENT_STRATEGY.md`](FULFILLMENT_STRATEGY.md). Camadas: [`ARQUITETURA.md`](ARQUITETURA.md).
+
 
 ---
 

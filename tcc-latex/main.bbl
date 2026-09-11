@@ -823,6 +823,33 @@
       \field{title}{Pesquisa social: teoria, método e criatividade}
       \field{year}{2001}
     \endentry
+    \entry{onu2015}{misc}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e63d148ff0b89b58b8de049ff71dc254}{%
+           family={{Organização das Nações Unidas}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Nova York}%
+      }
+      \strng{namehash}{e63d148ff0b89b58b8de049ff71dc254}
+      \strng{fullhash}{e63d148ff0b89b58b8de049ff71dc254}
+      \strng{fullhashraw}{e63d148ff0b89b58b8de049ff71dc254}
+      \strng{bibnamehash}{e63d148ff0b89b58b8de049ff71dc254}
+      \strng{authorbibnamehash}{e63d148ff0b89b58b8de049ff71dc254}
+      \strng{authornamehash}{e63d148ff0b89b58b8de049ff71dc254}
+      \strng{authorfullhash}{e63d148ff0b89b58b8de049ff71dc254}
+      \strng{authorfullhashraw}{e63d148ff0b89b58b8de049ff71dc254}
+      \field{sortinit}{O}
+      \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{Online}
+      \field{title}{Transformando nosso mundo: a Agenda 2030 para o Desenvolvimento Sustentável}
+      \field{year}{2015}
+    \endentry
     \entry{oms2020}{report}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=ae81c3ac63305831dfe0e40bce7cd0ee}{%
