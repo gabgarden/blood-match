@@ -15,7 +15,7 @@ import {
   resolvePostLoginPath,
 } from "../routes/roleRouting";
 import { fetchDonorHeroSummary, updateParty } from "../services/partyService";
-import { updateDonor, updateDonorRecommendationDistance } from "../services/profileService";
+import { updateDonor } from "../services/profileService";
 import { extractApiErrorMessage } from "../utils/apiError";
 import { DonorBadgesSection } from "../components/profile/DonorBadgesSection";
 

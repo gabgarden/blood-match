@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  12 SEP 2026 15:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  12 SEP 2026 15:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1862,7 +1862,7 @@ LaTeX Font Info:    Font shape `T1/qhv/m/it' will be
 (Font)              scaled to size 10.29301pt on input line 46.
 
 [9]
-Underfull \hbox (badness 3930) in paragraph at lines 113--113
+Underfull \hbox (badness 3930) in paragraph at lines 112--112
  [][] [][][]\T1/qhv/b/n/12 INVERSÃO DE DE-PEN-DÊN-CIA: RE-PO-SI-TÓ-RIO E 
  []
 
@@ -2020,7 +2020,7 @@ as been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.64 
      ]
-<figuras/grafico01-artigos-ano.png, id=493, 485.56406pt x 251.43938pt>
+<figuras/grafico01-artigos-ano.png, id=491, 485.56406pt x 251.43938pt>
 File: figuras/grafico01-artigos-ano.png Graphic file (type png)
 <use figuras/grafico01-artigos-ano.png>
 Package pdftex.def Info: figuras/grafico01-artigos-ano.png  used on input line 
@@ -2039,7 +2039,7 @@ as been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.97 
      ]
-<figuras/grafico02-artigos-pais.png, id=500, 501.37312pt x 213.79875pt>
+<figuras/grafico02-artigos-pais.png, id=498, 501.37312pt x 213.79875pt>
 File: figuras/grafico02-artigos-pais.png Graphic file (type png)
 <use figuras/grafico02-artigos-pais.png>
 Package pdftex.def Info: figuras/grafico02-artigos-pais.png  used on input line
@@ -2069,7 +2069,7 @@ l.141
 
  (capitulos/04-metodos.tex
 Cap\'{\i }tulo 4.
-<figuras/figura01-processo-tcc.png, id=549, 1059.96pt x 1143.52219pt>
+<figuras/figura01-processo-tcc.png, id=547, 1059.96pt x 1143.52219pt>
 File: figuras/figura01-processo-tcc.png Graphic file (type png)
 <use figuras/figura01-processo-tcc.png>
 Package pdftex.def Info: figuras/figura01-processo-tcc.png  used on input line 
@@ -2081,7 +2081,7 @@ Package pdftex.def Info: figuras/figura01-processo-tcc.png  used on input line
 
 
 ]
-<figuras/figura02-processo-api.png, id=555, 874.76813pt x 837.1275pt>
+<figuras/figura02-processo-api.png, id=553, 874.76813pt x 837.1275pt>
 File: figuras/figura02-processo-api.png Graphic file (type png)
 <use figuras/figura02-processo-api.png>
 Package pdftex.def Info: figuras/figura02-processo-api.png  used on input line 
@@ -2125,7 +2125,7 @@ as been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.120 
       ]
-<figuras/figura03-uc-visitante.png, id=618, 362.85562pt x 344.03531pt>
+<figuras/figura03-uc-visitante.png, id=616, 362.85562pt x 344.03531pt>
 File: figuras/figura03-uc-visitante.png Graphic file (type png)
 <use figuras/figura03-uc-visitante.png>
 Package pdftex.def Info: figuras/figura03-uc-visitante.png  used on input line 
@@ -2138,7 +2138,7 @@ as been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.130 
       ]
-<figuras/figura04-uc-requisitante.png, id=625, 413.29407pt x 485.56406pt>
+<figuras/figura04-uc-requisitante.png, id=623, 413.29407pt x 485.56406pt>
 File: figuras/figura04-uc-requisitante.png Graphic file (type png)
 <use figuras/figura04-uc-requisitante.png>
 Package pdftex.def Info: figuras/figura04-uc-requisitante.png  used on input li
@@ -2151,7 +2151,7 @@ has been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.142 
        <./figuras/figura03-uc-visitante.png>]
-<figuras/figura05-uc-doador.png, id=632, 488.57532pt x 506.6428pt>
+<figuras/figura05-uc-doador.png, id=630, 488.57532pt x 506.6428pt>
 File: figuras/figura05-uc-doador.png Graphic file (type png)
 <use figuras/figura05-uc-doador.png>
 Package pdftex.def Info: figuras/figura05-uc-doador.png  used on input line 150
@@ -2170,14 +2170,14 @@ has been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.162 
        <./figuras/figura05-uc-doador.png>]
-<figuras/figura06-classes-participantes.png, id=644, 742.27313pt x 489.32813pt>
+<figuras/figura06-classes-participantes.png, id=642, 742.27313pt x 489.32813pt>
 
 File: figuras/figura06-classes-participantes.png Graphic file (type png)
 <use figuras/figura06-classes-participantes.png>
 Package pdftex.def Info: figuras/figura06-classes-participantes.png  used on in
 put line 166.
 (pdftex.def)             Requested size: 295.90588pt x 195.07072pt.
-<figuras/figura07-classes-doacao.png, id=646, 449.42906pt x 419.31656pt>
+<figuras/figura07-classes-doacao.png, id=644, 449.42906pt x 419.31656pt>
 File: figuras/figura07-classes-doacao.png Graphic file (type png)
 <use figuras/figura07-classes-doacao.png>
 Package pdftex.def Info: figuras/figura07-classes-doacao.png  used on input lin
@@ -2190,7 +2190,7 @@ has been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.182 
        <./figuras/figura06-classes-participantes.png>]
-<figuras/figura08-impl-donation-request.png, id=653, 1037.37563pt x 575.90157pt
+<figuras/figura08-impl-donation-request.png, id=651, 1037.37563pt x 575.90157pt
 >
 File: figuras/figura08-impl-donation-request.png Graphic file (type png)
 <use figuras/figura08-impl-donation-request.png>
@@ -2204,7 +2204,7 @@ has been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.194 
        <./figuras/figura07-classes-doacao.png>]
-<figuras/figura09-impl-donation.png, id=660, 776.9025pt x 552.56438pt>
+<figuras/figura09-impl-donation.png, id=658, 776.9025pt x 552.56438pt>
 File: figuras/figura09-impl-donation.png Graphic file (type png)
 <use figuras/figura09-impl-donation.png>
 Package pdftex.def Info: figuras/figura09-impl-donation.png  used on input line
@@ -2229,114 +2229,114 @@ as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.265 
-      ] [46] [47] [48] [49]) [50{C:/Users/garde/AppData/Local/Programs/MiKTeX/f
-onts/enc/dvips/newtx/ntx-ot1-tlf.enc}] [51]
-\openout2 = `capitulos/06-avaliacao.aux'.
-
- (capitulos/06-avaliacao.tex
-Cap\'{\i }tulo 6.
-[52
-
-
-
-
-] [53
-pdfTeX warning (ext4): destination with the same identifier (name{table.6.9}) h
-as been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.48 
-     ] [54
-pdfTeX warning (ext4): destination with the same identifier (name{table.6.10}) 
-has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.80 
-     ]) [55] [56]
-\openout2 = `capitulos/07-consideracoes.aux'.
-
- (capitulos/07-consideracoes.tex
-Cap\'{\i }tulo 7.
-[57
-
-
-
-
-] [58]) [59] [60
-
-
-
-] [61] [62]
-\openout2 = `apendices/A-regras-dominio.aux'.
-
- (apendices/A-regras-dominio.tex
-AP\^ENDICE A.
+      ]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 15.
+nput line 266.
 LaTeX Font Info:    Font shape `T1/ntxtt/m/n' will be
-(Font)              scaled to size 9.0pt on input line 15.
-(apendices/codigo/BloodTypeCanDonateTo.java
+(Font)              scaled to size 9.0pt on input line 266.
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 9.0pt on input line 1.
+(Font)              scaled to size 9.0pt on input line 267.
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 8.0pt on input line 1.
-LaTeX Font Info:    Trying to load font information for T1+txtt on input line 1
-.
+(Font)              scaled to size 8.0pt on input line 267.
+LaTeX Font Info:    Trying to load font information for T1+txtt on input line 2
+69.
 
 (C:\Users\garde\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\t1txtt.fd
 File: t1txtt.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `T1/ntxtt/b/n' in size <9> not available
-(Font)              Font shape `T1/txtt/bx/n' tried instead on input line 1.
+(Font)              Font shape `T1/txtt/bx/n' tried instead on input line 269.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `txtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-)
-[63
+LaTeX Font Info:    Font shape `T1/ntxtt/m/it' in size <9> not available
+(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 281.
+
+[46] [47] [48] [49] [50]) [51{C:/Users/garde/AppData/Local/Programs/MiKTeX/font
+s/enc/dvips/newtx/ntx-ot1-tlf.enc}] [52]
+\openout2 = `capitulos/06-avaliacao.aux'.
+
+ (capitulos/06-avaliacao.tex
+Cap\'{\i }tulo 6.
+[53
 
 
-] (apendices/codigo/DonorIsEligibleToDonate.java)) [64]
+
+
+] [54
+pdfTeX warning (ext4): destination with the same identifier (name{table.6.9}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.48 
+     ] [55
+pdfTeX warning (ext4): destination with the same identifier (name{table.6.10}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.80 
+     ]) [56] [57]
+\openout2 = `capitulos/07-consideracoes.aux'.
+
+ (capitulos/07-consideracoes.tex
+Cap\'{\i }tulo 7.
+[58
+
+
+
+
+] [59]) [60] [61
+
+
+
+] [62] [63]
+\openout2 = `apendices/A-regras-dominio.aux'.
+
+ (apendices/A-regras-dominio.tex
+AP\^ENDICE A.
+(apendices/codigo/BloodTypeCanDonateTo.java) [64
+
+
+]
+(apendices/codigo/DonorIsEligibleToDonate.java)) [65]
 \openout2 = `apendices/B-agregados.aux'.
 
 
 (apendices/B-agregados.tex
 AP\^ENDICE B.
-(apendices/codigo/DonationRequestAcceptsDonation.java) [65
+(apendices/codigo/DonationRequestAcceptsDonation.java) [66
 
 
 
 
 ]
 (apendices/codigo/DonationCreate.java) (apendices/codigo/DonationComplete.java
-[66])) [67]
+[67])) [68]
 \openout2 = `apendices/C-fulfillment-matching.aux'.
 
  (apendices/C-fulfillment-matching.tex
 AP\^ENDICE C.
-(apendices/codigo/ProportionalGoal.java
-LaTeX Font Info:    Font shape `T1/ntxtt/m/it' in size <9> not available
-(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 7.
- [68
+(apendices/codigo/ProportionalGoal.java [69
 
 
 
 
 ])
-(apendices/codigo/FulfillmentDistributeDonations.java [69] [70]) [71]
-(apendices/codigo/DonorMatchingService.java)) [72]
+(apendices/codigo/FulfillmentDistributeDonations.java [70] [71]) [72]
+(apendices/codigo/DonorMatchingService.java)) [73]
 \openout2 = `apendices/D-dip-caso-uso.aux'.
 
 
 (apendices/D-dip-caso-uso.tex
 AP\^ENDICE D.
 (apendices/codigo/DonationRepositoryInterface.java)
-(apendices/codigo/CompletePendingDonationUseCase.java [73
+(apendices/codigo/CompletePendingDonationUseCase.java [74
 
 
 
 
-])) [74]
+])) [75]
 
 Class memoir Warning: The material used in the footer is too large
 (10.14995pt) for the given foot skip (0.0pt), it is recommended to
@@ -2367,13 +2367,13 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 33975 strings out of 467871
- 585445 string characters out of 5418376
- 2083110 words of memory out of 5000000
- 61698 multiletter control sequences out of 15000+600000
+ 34172 strings out of 467871
+ 588723 string characters out of 5418376
+ 2083457 words of memory out of 5000000
+ 61763 multiletter control sequences out of 15000+600000
  740738 words of font info for 152 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,13n,117p,1550b,4447s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,13n,117p,1381b,4447s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/NewTXM
 I.pfb><C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre
 /qhvb.pfb><C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-
@@ -2389,9 +2389,9 @@ ams/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/garde/AppData/Local/Pro
 grams/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users/garde/AppData/Local/Pr
 ograms/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/Users/garde/AppData/Local/P
 rograms/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on main.pdf (75 pages, 1054461 bytes).
+Output written on main.pdf (76 pages, 1074284 bytes).
 PDF statistics:
- 1652 PDF objects out of 1728 (max. 8388607)
- 571 named destinations out of 1000 (max. 500000)
- 20784 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 1800 PDF objects out of 2073 (max. 8388607)
+ 703 named destinations out of 1000 (max. 500000)
+ 20776 words of extra memory for PDF output out of 24883 (max. 10000000)
 

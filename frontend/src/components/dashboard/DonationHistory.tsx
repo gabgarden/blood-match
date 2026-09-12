@@ -5,6 +5,7 @@ import { extractApiErrorMessage } from "../../utils/apiError";
 
 export type DonationHistoryItem = {
   id: string;
+  version: number;
   location: string;
   donationDate: string | null;
   status: string;

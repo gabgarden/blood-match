@@ -255,37 +255,171 @@ A entidade \texttt{Party} foi adotada como abstração principal da hierarquia, 
 
 As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de agregados (\textit{Aggregate Roots}), concentrando regras de negócio --- como a validação de datas-limite e a verificação de compatibilidade sanguínea --- e protegendo o estado interno dos objetos por meio do encapsulamento. Adicionalmente, conceitos imutáveis sem identidade própria, como \texttt{Address} (Endereço), \texttt{BloodType} (Tipo Sanguíneo) e \texttt{DomainID}, foram modelados como objetos de valor, na linha proposta por \citeonline{evans2003} e detalhada por \citeonline{vernon2013}, aumentando a segurança e a previsibilidade do modelo.
 
-\section{Implementação}
+\section{Implementação e Fluxo de Dados}
 
-A implementação técnica da API é descrita a seguir em termos de persistência, segurança e integração com serviços externos. Trechos do código-fonte que materializam as regras de domínio, os invariantes dos agregados, o algoritmo de cumprimento de metas, o matching de doadores e a inversão de dependência nos casos de uso são apresentados nos Apêndices~\ref{ap:regras-dominio},~\ref{ap:agregados},~\ref{ap:fulfillment} e~\ref{ap:dip}, respectivamente, a fim de não sobrecarregar o corpo do capítulo.
+A implementação técnica da API orienta-se pelos princípios da arquitetura em camadas e do \textit{Domain-Driven Design} (DDD). Para fins de exemplificar a aplicação prática desses conceitos, esta seção demonstra o fluxo completo de uma entidade --- o registro de uma \textbf{Solicitação de Doação} (\codigo{DonationRequest}) ---, acompanhando a requisição desde a sua chegada no controlador REST até a sua persistência no banco de dados com controle de concorrência. Esse rastreamento horizontal ilustra o papel de cada camada arquitetural e as transformações sofridas pelos dados.
 
-\subsection{Persistência de dados}
+\subsection{Camada de Interface: REST Controller e DTOs}
 
-A persistência foi implementada sobre MongoDB, um banco de dados NoSQL orientado a documentos, e organizada no pacote \codigo{infra/persistence} em três subpacotes de responsabilidades distintas: \codigo{schema}, com os documentos e o mapeamento; \codigo{repository}, com os adaptadores que implementam as interfaces de repositório do domínio; e \codigo{repository/mongo}, com as interfaces \textit{Spring Data} que efetivamente consultam o banco.
+A camada de interface atua como o ponto de entrada da aplicação, isolando o núcleo do sistema dos detalhes do protocolo HTTP. O \codigo{CreateDonationRequestController} é responsável por interceptar as requisições, executar validações sintáticas básicas e converter o \textit{payload} da requisição (DTO) para o modelo de entrada do caso de uso.
 
-\subsubsection{Esquemas e mapeamento}
+\begin{lstlisting}[language=Java, caption={Exemplo de REST Controller da Solicitação de Doação}, label={lst:create-request-controller}]
+@RestController
+@RequestMapping("/donation-requests")
+public class CreateDonationRequestController {
 
-Cada agregado de domínio possui um \textit{schema} de persistência correspondente (por exemplo, \texttt{DonationRequestSchema} e \texttt{DonationSchema}), responsável por converter o objeto de domínio em um documento e vice-versa por meio de métodos dedicados de mapeamento (construtor a partir do domínio e \texttt{toDomain(...)}). Essa separação evita que anotações e particularidades do banco de dados vazem para as classes de domínio, mantendo o isolamento preconizado no DDD: o agregado \texttt{DonationRequest} não conhece \texttt{@Document}, \texttt{@Id} ou \texttt{@Version}, e é reconstruído pela fábrica \codigo{reconstitute(...)} --- distinta da fábrica \codigo{create(...)} usada no cadastro, que aplica as validações de criação descritas na Seção anterior.
+  private final CreateDonationRequestUseCase useCase;
 
-\subsubsection{Repositórios como portas do domínio}
+  public CreateDonationRequestController(CreateDonationRequestUseCase useCase) {
+    this.useCase = useCase;
+  }
 
-O acesso a dados segue o padrão \textit{Repository} \cite{evans2003} combinado à inversão de dependência (Capítulo~2). Para cada agregado ou papel, o domínio declara uma interface --- \codigo{DonationRequestRepositoryInterface}, \codigo{DonationRepositoryInterface}, \codigo{DonorRepositoryInterface}, \codigo{PartyRepositoryInterface}, entre outras, somando dez portas --- expressa inteiramente em termos de tipos de domínio (\codigo{DomainID}, \codigo{BloodType}, \codigo{Address}). Os casos de uso dependem apenas dessas interfaces; nenhum deles importa classes de \textit{Spring Data} ou do driver MongoDB. É essa propriedade que permite que a suíte de testes substitua os repositórios por \textit{mocks} e exercite as regras de negócio sem uma instância de banco ativa, conforme discutido no Capítulo~6.
+  @PostMapping
+  public ResponseEntity<CreateDonationRequestResponseDto> create(
+      @RequestBody CreateDonationRequestDto payload) {
+    
+    // Validacoes sintaticas primarias
+    requireNonNull(payload.goalBloodBags(), "goalBloodBags cannot be null");
+    requireSamePartyOrAdmin(payload.partyId()); // Autorizacao
 
-Na camada de infraestrutura, cada porta possui um adaptador anotado com \texttt{@Repository} (por exemplo, \codigo{DonationRequestRepositoryImpl}) que cumpre três funções: validar os argumentos recebidos, traduzir os tipos de domínio para os tipos primitivos armazenados no documento --- notadamente convertendo \codigo{DomainID} em \codigo{String} --- e delegar a consulta a uma interface \textit{Spring Data} (\codigo{DonationRequestMongoRepository} e congêneres, nove ao todo), cujos métodos são derivados do próprio nome. Consultas de maior porte, como a recomendação geoespacial, são expressas nessa interface por \textit{query methods} que combinam situação ativa, data-limite, conjunto de tipos sanguíneos compatíveis e proximidade (\codigo{...AndLocationNear}), de modo que a filtragem ocorra no banco e não em memória.
+    // Conversao do DTO para o objeto de entrada (Input) do Caso de Uso
+    var output = useCase.execute(new Input(
+        payload.partyId(),
+        payload.organizationId(),
+        payload.bloodTypeNeeded(),
+        payload.goalBloodBags(),
+        payload.dateLimit(),
+        payload.urgency(),
+        payload.directedTo()));
 
-\subsubsection{Carregamento do grafo de objetos}
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(CreateDonationRequestResponseDto.from(output));
+  }
+}
+\end{lstlisting}
 
-Um documento de solicitação não armazena o requisitante nem o hemocentro por composição: guarda apenas os identificadores \codigo{requesterId} e \codigo{organizationId}. Reconstituir o agregado exige, portanto, recuperar a \codigo{Party} correspondente, o papel associado (\codigo{Requester}, \codigo{BloodCenter} ou \codigo{Donor}) e só então invocar \codigo{toDomain(...)}. Realizada ingenuamente, uma consulta por identificador para cada elemento da lista, essa reconstituição incorre no problema conhecido como N+1 consultas: listar cinquenta solicitações dispararia mais de cem leituras adicionais ao banco.
+\subsection{Camada de Aplicação: Casos de Uso}
 
-Para evitá-lo, o mapeamento foi centralizado no componente \codigo{PersistenceGraphLoader}, no subpacote \codigo{mapping}. Em vez de resolver cada documento isoladamente, ele opera sobre a lista inteira: percorre os documentos coletando os identificadores distintos de participantes e organizações, executa um número fixo de leituras em lote (\codigo{findAllById} sobre as \textit{parties} e consultas \codigo{findBy...In} sobre os papéis), indexa os resultados em mapas por identificador e, em uma segunda passagem, monta cada objeto de domínio consultando esses mapas em memória. O número de idas ao banco passa a ser constante --- quatro, independentemente do tamanho da lista --- em vez de proporcional à quantidade de documentos.
+A camada de aplicação orquestra o fluxo de dados coordenando chamadas aos repositórios e aos serviços de domínio. O \codigo{CreateDonationRequestUseCase} carrega as entidades associadas (\codigo{Requester} e \codigo{BloodCenter}), invoca a fábrica da entidade e instrui o repositório a persistir o novo agregado. Esta camada desconhece qualquer dependência de infraestrutura, utilizando apenas portas de interfaces.
 
-O componente expõe dois métodos, \codigo{toDonationRequests(...)} e \codigo{toDonations(...)}, e é a única via de reconstituição usada pelos repositórios de solicitação e de doação; ambos delegam a ele por meio de um método privado \codigo{toDomainList(...)}, inclusive no caso de um único documento, o que mantém um caminho de mapeamento único. Referências órfãs --- um papel ausente para um identificador presente no documento --- são detectadas explicitamente e convertidas em \codigo{IllegalArgumentException}, de forma que uma inconsistência do banco falhe de imediato, em vez de propagar um agregado parcialmente construído para o domínio. Esse carregamento em lote é particularmente relevante para o \textit{snapshot} de cumprimento de metas descrito na Seção~\ref{sec:fulfillment-bags}, que reconstitui, a cada leitura, todas as solicitações ativas e todas as doações concluídas do hemocentro.
+\begin{lstlisting}[language=Java, caption={Exemplo de Caso de Uso de Criação}, label={lst:create-request-usecase}]
+@Service
+public class CreateDonationRequestUseCase {
 
-\subsubsection{Concorrência otimista e índices}
+  private final DonationRequestRepositoryInterface repository;
+  private final RequesterRepositoryInterface requesterRepo;
+  private final BloodCenterRepositoryInterface bloodCenterRepo;
 
-O controle de integridade transacional contra atualizações concorrentes foi estabelecido de maneira uniforme em toda a camada de persistência e exposto às camadas externas: todos os \textit{schemas} que mapeiam os agregados e entidades do sistema (como \texttt{DonationRequestSchema}, \texttt{DonationSchema}, \texttt{BloodCenterScheduleSchema} e \texttt{BloodCenterInventorySchema}) incorporam o controle de versão otimista por meio do atributo \codigo{version} anotado com \codigo{@Version}. Para garantir uma integridade de ponta a ponta, todos os casos de uso de atualização (\textit{PATCH}) e de exclusão (\textit{DELETE}) exigem explicitamente que o \textit{Frontend} informe a versão original (\codigo{version}) na qual o usuário se baseou para a modificação. O caso de uso carrega a entidade do repositório, valida se a versão informada coincide com a versão salva e só então efetua a alteração. Desse modo, escritas concorrentes sobre qualquer documento --- a exemplo da alteração simultânea do prazo e da meta de bolsas em uma solicitação por usuários diferentes em telas distintas --- são prontamente detectadas pela aplicação antes mesmo da gravação final.
+  // Construtor omitido para brevidade...
 
-Para assegurar o desacoplamento arquitetural no momento da persistência, todas as operações de escrita nos adaptadores de repositório são encapsuladas pelo componente utilitário \codigo{OptimisticConcurrency}. Ao identificar um eventual conflito de versão subjacente não capturado pelas checagens lógicas da aplicação, o componente captura a \codigo{OptimisticLockingFailureException} do \textit{Spring Data} e a converte em uma \codigo{ConcurrencyException} (exceção da camada de aplicação derivada de \codigo{ApplicationException}), sinalizando de forma explícita ao caso de uso que a entidade foi alterada por outra transação e precisa ser recarregada antes de uma nova tentativa --- impedindo, novamente, que exceções específicas da tecnologia de persistência alcancem as camadas superiores. O cumprimento de metas, descrito na Seção~\ref{sec:fulfillment-bags}, não participa desse conflito: o \textit{snapshot} é calculado em memória e não regrava a solicitação. Além disso, índices compostos foram definidos sobre situação ativa, tipo sanguíneo e data-limite, e sobre situação ativa, organização e data da solicitação --- este último alinhado à ordenação exigida pela alocação, evitando uma ordenação adicional em memória ---, bem como um índice geoespacial \texttt{2dsphere} sobre a localização do hemocentro, otimizando as consultas de recomendação descritas na Seção~\ref{sec:recomendacao-fulfillment}.
+  public Output execute(Input input, LocalDate currentDate) {
+    // 1. Parse de Identificadores e Value Objects
+    DomainID partyId = DomainIdParser.parse(input.partyId(), "partyId");
+    BloodType bloodType = BloodType.of(input.bloodTypeNeeded());
+
+    // 2. Busca das entidades relacionadas nas portas de repositorio
+    Requester requester = requesterRepo.findByPartyId(partyId)
+        .orElseThrow(() -> new NotFoundException("Requester not found"));
+    BloodCenter bloodCenter = bloodCenterRepo.findByPartyId(organizationId)
+        .orElseThrow(() -> new NotFoundException("Blood center not found"));
+
+    // 3. Invocacao da fabrica do Agregado de Dominio
+    DonationRequest request = DonationRequest.create(
+        requester,
+        bloodCenter,
+        bloodType,
+        input.goalBloodBags(),
+        input.dateLimit(),
+        currentDate,
+        parseUrgency(input.urgency()),
+        input.directedTo());
+
+    // 4. Persistencia e retorno
+    repository.save(request);
+    return Output.from(request);
+  }
+}
+\end{lstlisting}
+
+\subsection{Camada de Domínio: Agregado e Regras de Negócio}
+
+O coração do software reside na camada de domínio. A classe \codigo{DonationRequest} atua como a raiz do agregado, protegendo os seus invariantes e garantindo que nenhuma solicitação seja instanciada em um estado inválido. A lógica de negócio essencial (como não permitir metas zeradas ou datas no passado) fica concentrada no método fábrica \codigo{create(...)}.
+
+\begin{lstlisting}[language=Java, caption={Fábrica do Agregado de Domínio}, label={lst:donation-request-domain}]
+public class DonationRequest extends DomainObject {
+  private Requester requester;
+  private BloodCenter bloodCenter;
+  private BloodType bloodTypeNeeded;
+  private int goalBloodBags;
+  private LocalDate dateLimit;
+
+  public static DonationRequest create(
+      Requester requester, BloodCenter bloodCenter, BloodType bloodTypeNeeded,
+      int goalBloodBags, LocalDate dateLimit, LocalDate currentDate,
+      Urgency urgency, String directedTo) {
+      
+    // Protecao de Invariantes Essenciais
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be > zero");
+    if (dateLimit.isBefore(currentDate))
+      throw new IllegalArgumentException("Limit date invalid");
+      
+    return new DonationRequest(
+        requester, bloodCenter, bloodTypeNeeded, goalBloodBags,
+        dateLimit, currentDate, urgency, directedTo);
+  }
+}
+\end{lstlisting}
+
+\subsection{Camada de Infraestrutura: Repositório e Controle de Concorrência}
+
+Na extremidade da arquitetura, a camada de persistência traduz o modelo conceitual rico do domínio para as estruturas do banco de dados (MongoDB). Os adaptadores implementam as interfaces requeridas pelos casos de uso, mapeando o agregado de domínio para um \textit{Schema} correspondente.
+
+Ademais, para garantir a integridade das transações contra atualizações simultâneas (como alterar simultaneamente o prazo e a meta de uma mesma solicitação), o esquema incorpora um controle de versão otimista suportado pela anotação \codigo{@Version}.
+
+\begin{lstlisting}[language=Java, caption={Mapeamento e Controle de Concorrência Otimista}, label={lst:donation-request-schema}]
+@Document(collection = "donation_requests")
+public class DonationRequestSchema {
+
+  @Id
+  private String id;
+  private String requesterId;
+  private String bloodTypeNeeded;
+  private int goalBloodBags;
+
+  @Version
+  private Long version; // Controle de Concorrencia Otimista
+
+  // Metodo de conversao (Dominio -> Infraestrutura)
+  public static DonationRequestSchema fromDomain(DonationRequest domain) {
+    DonationRequestSchema schema = new DonationRequestSchema();
+    schema.id = domain.getId().getValue().toString();
+    schema.requesterId = domain.getRequester().getId().getValue().toString();
+    schema.goalBloodBags = domain.getGoalBloodBags();
+    schema.version = domain.getVersion();
+    return schema;
+  }
+}
+\end{lstlisting}
+
+Para preservar a arquitetura, todas as exceções intrínsecas ao banco de dados são tratadas e convertidas por um utilitário interno (\codigo{OptimisticConcurrency}) dentro do próprio adaptador, impedindo o vazamento de exceções tecnológicas de persistência para as camadas superiores:
+
+\begin{lstlisting}[language=Java, caption={Adaptador de Repositório}, label={lst:donation-request-repo}]
+@Repository
+public class DonationRequestRepositoryImpl implements DonationRequestRepositoryInterface {
+
+  private final DonationRequestMongoRepository mongoRepository;
+
+  @Override
+  public void save(DonationRequest request) {
+    OptimisticConcurrency.execute(() -> {
+      DonationRequestSchema schema = DonationRequestSchema.fromDomain(request);
+      mongoRepository.save(schema);
+    });
+  }
+}
+\end{lstlisting}
 
 \subsection{Segurança e autenticação}
 
@@ -293,7 +427,7 @@ O controle de acesso é implementado por meio de autenticação baseada em JWT. 
 
 \subsection{Serviços externos e documentação da API}
 
-A notificação de doadores é abstraída por uma interface de domínio (\codigo{NotificationServiceInterface}), permitindo múltiplas implementações na camada de infraestrutura --- como uma implementação por e-mail e uma implementação simplificada para ambiente de desenvolvimento --- sem que o caso de uso que dispara a notificação precise conhecer o mecanismo concreto de envio. Essa inversão de dependência, alinhada aos princípios SOLID discutidos no Capítulo~2 e exemplificada no Apêndice~\ref{ap:dip} para o fluxo de conclusão de doação, evita que o domínio fique acoplado a bibliotecas de terceiros. O registro da doação, por sua vez, é orquestrado por um único caso de uso (\codigo{CreateDonationUseCase}, \textit{endpoint} \codigo{POST /donations}): a presença de \codigo{intendedDate} agenda a doação; a presença de \codigo{donationDate} a registra já concluída.
+A notificação de doadores é abstraída por uma interface de domínio (\codigo{NotificationServiceInterface}), permitindo múltiplas implementações na camada de infraestrutura --- como uma implementação por e-mail e uma implementação simplificada para ambiente de desenvolvimento --- sem que o caso de uso que dispara a notificação precise conhecer o mecanismo concreto de envio. Essa inversão de dependência, alinhada aos princípios SOLID discutidos no Capítulo~2, evita que o domínio fique acoplado a bibliotecas de terceiros. 
 
 Para a documentação e a exploração interativa dos recursos da API, foi integrada a biblioteca \textit{springdoc-openapi}, que gera automaticamente a especificação OpenAPI a partir dos \textit{controllers} e disponibiliza uma interface de teste dos \textit{endpoints}. Essa documentação viva reduz o custo de manutenção da documentação técnica e facilita a validação manual dos fluxos descritos neste capítulo.
 

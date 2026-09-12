@@ -114,10 +114,10 @@ export default function DonationsPage() {
 
     try {
       if (manageMode === "complete") {
-        await completeDonation(selectedPending.id, manageDate);
+        await completeDonation(selectedPending.id, selectedPending.version, manageDate);
         setManageFeedback("Doação marcada como concluída com sucesso!");
       } else {
-        await rescheduleDonation(selectedPending.id, manageDate);
+        await rescheduleDonation(selectedPending.id, selectedPending.version, manageDate);
         setManageFeedback("Data da doação reagendada com sucesso!");
       }
 
