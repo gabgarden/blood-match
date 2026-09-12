@@ -11,6 +11,7 @@ import bloodmatch.domain.shared.valueObjects.CNPJ;
 import bloodmatch.domain.shared.valueObjects.CPF;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 import bloodmatch.domain.shared.valueObjects.PhoneNumber;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -107,30 +108,30 @@ class DonationRequestTest {
     // janela de 10 dias, meta 10: no 3º dia só 3/10 da meta está liberada
     DonationRequest request = requestWith(10, 10);
 
-    assertEquals(3, request.proportionalGoalAt(requestedAt.plusDays(3)));
+    assertEquals(0, new BigDecimal("3.0000").compareTo(request.proportionalGoalAt(requestedAt.plusDays(3))));
   }
 
   @Test
   void releasesNothingOnTheDayTheRequestWasCreated() {
-    assertEquals(0, requestWith(10, 10).proportionalGoalAt(requestedAt));
+    assertEquals(0, BigDecimal.ZERO.compareTo(requestWith(10, 10).proportionalGoalAt(requestedAt)));
   }
 
   @Test
   void releasesTheWholeGoalOnTheLimitDay() {
-    assertEquals(10, requestWith(10, 10).proportionalGoalAt(requestedAt.plusDays(10)));
+    assertEquals(0, BigDecimal.valueOf(10).compareTo(requestWith(10, 10).proportionalGoalAt(requestedAt.plusDays(10))));
   }
 
   @Test
-  void roundsTheProportionalGoalUpSoSmallGoalsAreNotStuckAtZero() {
-    // meta 1 em janela de 10 dias: com floor ficaria em 0 até o último dia
-    assertEquals(1, requestWith(1, 10).proportionalGoalAt(requestedAt.plusDays(1)));
-    // meta 4 em janela de 7 dias, 4 dias decorridos: ceil(16/7)
-    assertEquals(3, requestWith(4, 7).proportionalGoalAt(requestedAt.plusDays(4)));
+  void keepsTheProportionalGoalFractionalAsBigDecimal() {
+    // meta 1 em janela de 10 dias, 1 dia decorrido: mantém 0.1000 quebrado em BigDecimal
+    assertEquals(0, new BigDecimal("0.1000").compareTo(requestWith(1, 10).proportionalGoalAt(requestedAt.plusDays(1))));
+    // meta 4 em janela de 7 dias, 4 dias decorridos: 16/7 ≈ 2.2857
+    assertEquals(0, new BigDecimal("2.2857").compareTo(requestWith(4, 7).proportionalGoalAt(requestedAt.plusDays(4))));
   }
 
   @Test
   void releasesTheWholeGoalWhenTheWindowLastsASingleDay() {
-    assertEquals(5, requestWith(5, 0).proportionalGoalAt(requestedAt));
+    assertEquals(0, BigDecimal.valueOf(5).compareTo(requestWith(5, 0).proportionalGoalAt(requestedAt)));
   }
 
   @Test

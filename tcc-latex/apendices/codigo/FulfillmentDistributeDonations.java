@@ -55,20 +55,20 @@ private static Map<DomainID, DonationRequestFulfillmentStatusRecord>
     return snapshot;
 }
 
-private static Map<DomainID, Integer> proportionalLimits(
+private static Map<DomainID, BigDecimal> proportionalLimits(
         List<DonationRequest> requests,
         LocalDate asOfDate) {
-    Map<DomainID, Integer> limits = new LinkedHashMap<>();
+    Map<DomainID, BigDecimal> limits = new LinkedHashMap<>();
     for (DonationRequest request : requests) {
         limits.put(request.getId(), request.proportionalGoalAt(asOfDate));
     }
     return limits;
 }
 
-private static Map<DomainID, Integer> fullGoalLimits(List<DonationRequest> requests) {
-    Map<DomainID, Integer> limits = new LinkedHashMap<>();
+private static Map<DomainID, BigDecimal> fullGoalLimits(List<DonationRequest> requests) {
+    Map<DomainID, BigDecimal> limits = new LinkedHashMap<>();
     for (DonationRequest request : requests) {
-        limits.put(request.getId(), request.getGoalBloodBags());
+        limits.put(request.getId(), BigDecimal.valueOf(request.getGoalBloodBags()));
     }
     return limits;
 }
@@ -77,15 +77,15 @@ private static List<Donation> distribute(
         List<DonationRequest> requestsOldestFirst,
         List<Donation> donationsOldestFirst,
         Map<DomainID, Integer> bags,
-        Map<DomainID, Integer> limits,
+        Map<DomainID, BigDecimal> limits,
         LocalDate asOfDate) {
     List<Donation> unallocated = new ArrayList<>();
     for (Donation donation : donationsOldestFirst) {
         boolean allocated = false;
         for (DonationRequest request : requestsOldestFirst) {
             int given = bags.get(request.getId());
-            int limit = limits.get(request.getId());
-            if (given < limit && request.acceptsDonation(donation, asOfDate)) {
+            BigDecimal limit = limits.get(request.getId());
+            if (BigDecimal.valueOf(given).compareTo(limit) < 0 && request.acceptsDonation(donation, asOfDate)) {
                 bags.put(request.getId(), given + 1);
                 allocated = true;
                 break;

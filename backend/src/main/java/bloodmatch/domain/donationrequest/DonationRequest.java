@@ -7,6 +7,8 @@ import bloodmatch.domain.shared.entity.DomainObject;
 import bloodmatch.domain.shared.valueObjects.BloodType;
 import bloodmatch.domain.shared.valueObjects.DomainID;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -204,9 +206,13 @@ public class DonationRequest extends DomainObject {
    * naquele instante. Serve para que uma solicitação com prazo folgado não esvazie
    * o pool do hemocentro antes de uma irmã que está perto de expirar.
    *
+   * Devolve o valor proporcional fracionário (BigDecimal) com precisão decimal,
+   * permitindo que o serviço de alocação compare as bolsas já concedidas
+   * diretamente com o teto contínuo.
+   *
    * É um cálculo puro sobre os dados que a request já tem — nada é persistido.
    */
-  public int proportionalGoalAt(LocalDate asOfDate) {
+  public BigDecimal proportionalGoalAt(LocalDate asOfDate) {
     if (asOfDate == null)
       throw new IllegalArgumentException("As of date cannot be null");
 
@@ -214,25 +220,21 @@ public class DonationRequest extends DomainObject {
 
     // Janela de um único dia: não há tempo a escalonar, a meta vale inteira.
     if (windowDays <= 0)
-      return goalBloodBags;
+      return BigDecimal.valueOf(goalBloodBags);
 
     long elapsedDays = ChronoUnit.DAYS.between(dateRequested, asOfDate);
 
     // Ainda no dia do pedido: nenhuma fração da janela foi consumida.
     if (elapsedDays <= 0)
-      return 0;
+      return BigDecimal.ZERO;
 
     // No dia do limite (ou depois) o teto deixa de existir: a meta é liberada inteira.
     if (elapsedDays >= windowDays)
-      return goalBloodBags;
+      return BigDecimal.valueOf(goalBloodBags);
 
-
-    // ALTERAR O -1 PARA QUE ELE MANTENHA QUEBRADO E TRABALHEMOS COM BIGDECIMAL. 
-
-    // ceil(goal * elapsed / window) em aritmética inteira. Arredonda para cima para
-    // que metas pequenas não fiquem travadas em zero durante toda a janela:
-    // com floor, uma meta de 1 bolsa só sairia do zero no último dia.
-    return (int) ((goalBloodBags * elapsedDays + windowDays - 1) / windowDays);
+    return BigDecimal.valueOf(goalBloodBags)
+        .multiply(BigDecimal.valueOf(elapsedDays))
+        .divide(BigDecimal.valueOf(windowDays), 4, RoundingMode.HALF_UP);
   }
 
   public boolean canBeFulfilledBy(BloodType candidateBloodType) {

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  12 SEP 2026 14:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  12 SEP 2026 15:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2323,8 +2323,8 @@ LaTeX Font Info:    Font shape `T1/ntxtt/m/it' in size <9> not available
 
 
 ])
-(apendices/codigo/FulfillmentDistributeDonations.java [69] [70])
-(apendices/codigo/DonorMatchingService.java [71])) [72]
+(apendices/codigo/FulfillmentDistributeDonations.java [69] [70]) [71]
+(apendices/codigo/DonorMatchingService.java)) [72]
 \openout2 = `apendices/D-dip-caso-uso.aux'.
 
 
@@ -2362,24 +2362,16 @@ either increase the foot skip or redesign the footer
 LaTeX2e <2025-11-01>
 L3 programming layer <2020/03/25>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package biblatex Warning: Please rerun LaTeX.
-(biblatex)                Page breaks have changed.
-
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 33967 strings out of 467871
- 585331 string characters out of 5418376
- 2085110 words of memory out of 5000000
- 61690 multiletter control sequences out of 15000+600000
- 741104 words of font info for 153 fonts, out of 8000000 for 9000
+ 33975 strings out of 467871
+ 585445 string characters out of 5418376
+ 2083110 words of memory out of 5000000
+ 61698 multiletter control sequences out of 15000+600000
+ 740738 words of font info for 152 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,13n,117p,1550b,4447s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/NewTXM
@@ -2392,15 +2384,14 @@ e1/public/tex-gyre/qtmr.pfb><C:/Users/garde/AppData/Local/Programs/MiKTeX/fonts
 /type1/public/txfonts/t1xbtt.pfb><C:/Users/garde/AppData/Local/Programs/MiKTeX/
 fonts/type1/public/txfonts/t1xtt.pfb><C:/Users/garde/AppData/Local/Programs/MiK
 TeX/fonts/type1/public/txfonts/t1xtt.pfb><C:/Users/garde/AppData/Local/Programs
-/MiKTeX/fonts/type1/public/newtx/txexs.pfb><C:/Users/garde/AppData/Local/Progra
-ms/MiKTeX/fonts/type1/public/newtx/txmiaX.pfb><C:/Users/garde/AppData/Local/Pro
-grams/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/garde/AppData/Local/P
-rograms/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users/garde/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/Users/garde/AppData/Local
-/Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on main.pdf (75 pages, 1057033 bytes).
+/MiKTeX/fonts/type1/public/newtx/txmiaX.pfb><C:/Users/garde/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/garde/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users/garde/AppData/Local/Pr
+ograms/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/Users/garde/AppData/Local/P
+rograms/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
+Output written on main.pdf (75 pages, 1054461 bytes).
 PDF statistics:
- 1655 PDF objects out of 1728 (max. 8388607)
- 570 named destinations out of 1000 (max. 500000)
+ 1652 PDF objects out of 1728 (max. 8388607)
+ 571 named destinations out of 1000 (max. 500000)
  20784 words of extra memory for PDF output out of 24883 (max. 10000000)
 

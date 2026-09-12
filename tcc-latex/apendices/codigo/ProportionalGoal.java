@@ -1,4 +1,4 @@
-public int proportionalGoalAt(LocalDate asOfDate) {
+public BigDecimal proportionalGoalAt(LocalDate asOfDate) {
     if (asOfDate == null)
         throw new IllegalArgumentException("As of date cannot be null");
 
@@ -6,18 +6,19 @@ public int proportionalGoalAt(LocalDate asOfDate) {
 
     // janela de um unico dia: nao ha tempo a escalonar, a meta vale inteira
     if (windowDays <= 0)
-        return goalBloodBags;
+        return BigDecimal.valueOf(goalBloodBags);
 
     long elapsedDays = ChronoUnit.DAYS.between(dateRequested, asOfDate);
 
     // ainda no dia do pedido: nenhuma fracao da janela foi consumida
     if (elapsedDays <= 0)
-        return 0;
+        return BigDecimal.ZERO;
 
     // no dia do limite o teto deixa de existir: a meta e liberada inteira
     if (elapsedDays >= windowDays)
-        return goalBloodBags;
+        return BigDecimal.valueOf(goalBloodBags);
 
-    // ceil(goal * elapsed / window) em aritmetica inteira
-    return (int) ((goalBloodBags * elapsedDays + windowDays - 1) / windowDays);
+    return BigDecimal.valueOf(goalBloodBags)
+            .multiply(BigDecimal.valueOf(elapsedDays))
+            .divide(BigDecimal.valueOf(windowDays), 4, RoundingMode.HALF_UP);
 }

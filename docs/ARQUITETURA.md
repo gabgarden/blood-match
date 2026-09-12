@@ -158,7 +158,7 @@ O intervalo de doações começa na solicitação ativa mais antiga e vai até `
 1. FIFO até o **teto proporcional** do dia (`proportionalGoalAt(asOfDate)`)
 2. sobras em FIFO de novo, até a meta cheia (`goalBloodBags`)
 
-O teto cresce com o prazo: `ceil(goalBloodBags × decorrido / janela)`. Com pool abundante o resultado coincide com FIFO puro; em escassez privilegiamos quem está perto de expirar. O progresso de uma request folgada pode **regredir** entre snapshots quando bolsas migram para uma irmã mais urgente.
+O teto cresce com o prazo: `goalBloodBags × decorrido / janela` (calculado em `BigDecimal`). Com pool abundante o resultado coincide com FIFO puro; em escassez privilegiamos quem está perto de expirar. O progresso de uma request folgada pode **regredir** entre snapshots quando bolsas migram para uma irmã mais urgente.
 
 Usado em:
 

@@ -10,10 +10,10 @@ A meta de uma solicitação não é liberada de uma só vez. A Listagem~\ref{lst
 
 \begin{equation}
   \label{eq:teto}
-  \mathrm{teto}(t) = \left\lceil \mathrm{goalBloodBags} \times \frac{t - \mathrm{dateRequested}}{\mathrm{dateLimit} - \mathrm{dateRequested}} \right\rceil
+  \mathrm{teto}(t) = \mathrm{goalBloodBags} \times \frac{t - \mathrm{dateRequested}}{\mathrm{dateLimit} - \mathrm{dateRequested}}
 \end{equation}
 
-Assim, decorridos 3 de 10 dias de janela, apenas $3/10$ da meta está disponível naquele instante. A regra impede que uma solicitação de prazo folgado esgote o \textit{pool} do hemocentro antes de outra que está prestes a expirar. Três casos de contorno são tratados explicitamente: a solicitação criada na própria data de referência tem teto nulo, pois nenhuma fração da janela foi consumida; no dia da data-limite o teto iguala a meta cheia; e a janela de um único dia dispensa o escalonamento. O arredondamento para cima é deliberado --- com arredondamento para baixo, uma meta de uma única bolsa permaneceria em zero durante toda a janela, saindo do zero apenas no último dia. Por se tratar de um cálculo derivado apenas de atributos que a própria solicitação já possui, a regra reside no agregado, e não no serviço de domínio.
+Assim, decorridos 3 de 10 dias de janela, apenas $3/10$ da meta está disponível naquele instante. A regra impede que uma solicitação de prazo folgado esgote o \textit{pool} do hemocentro antes de outra que está prestes a expirar. Três casos de contorno são tratados explicitamente: a solicitação criada na própria data de referência tem teto nulo, pois nenhuma fração da janela foi consumida; no dia da data-limite o teto iguala a meta cheia; e a janela de um único dia dispensa o escalonamento. A precisão contínua é preservada com \codigo{BigDecimal}, sem arredondamento truncado para inteiro: na alocação FIFO, como cada doação incrementa a contagem discreta de bolsas recebidas, a verificação se o número de bolsas concedidas é estritamente menor que o teto permite que solicitações com metas pequenas e frações decimais (como $0{,}1$ ou $2{,}28$ bolsas) recebam suas cotas no momento oportuno sem necessitar de arredondamentos artificiais. Por se tratar de um cálculo derivado apenas de atributos que a própria solicitação já possui, a regra reside no agregado, e não no serviço de domínio.
 
 \lstinputlisting[
   language=Java,

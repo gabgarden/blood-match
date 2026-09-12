@@ -38,13 +38,14 @@ fill(bloodCenter, asOfDate)
 `DonationRequest.proportionalGoalAt(asOfDate)` libera a meta no mesmo ritmo em que a janela `[dateRequested, dateLimit]` é consumida:
 
 ```text
-teto = ceil(goalBloodBags × (asOfDate - dateRequested) / (dateLimit - dateRequested))
+teto = goalBloodBags × (asOfDate - dateRequested) / (dateLimit - dateRequested)
 ```
 
+- calculada com precisão contínua (`BigDecimal`, escala 4)
 - criada hoje → teto 0 (nada da janela passou)
 - no dia do limite → teto = meta cheia
 - janela de um único dia → teto = meta cheia (não há o que escalonar)
-- arredonda para cima: com `floor`, uma meta de 1 bolsa só sairia do zero no último dia
+- na alocação FIFO, a checagem `given < limit` permite que frações decimais (ex.: 0,1 ou 2,28 bolsas) absorvam a primeira bolsa sem necessitar de arredondamentos inteiros artificiais
 
 O objetivo é racionar em favor de quem está perto de expirar. Como a segunda passagem devolve as sobras, o total alocado não muda — com pool abundante o resultado é idêntico ao FIFO puro.
 
