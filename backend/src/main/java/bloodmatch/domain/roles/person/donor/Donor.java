@@ -133,6 +133,23 @@ public class Donor extends PersonRole {
         this.weight = weight;
     }
 
+    public void updateBloodType(BloodType bloodType) {
+        if (bloodType == null) {
+            throw new IllegalArgumentException("Blood type cannot be null");
+        }
+        this.bloodType = bloodType;
+    }
+
+    public void updateWeight(double weight) {
+        if (weight < 50) {
+            throw new IllegalArgumentException("Minimum weight is 50kg");
+        }
+        if (Double.compare(this.weight, weight) != 0) {
+            this.weight = weight;
+            this.weightUpdatedAt = LocalDate.now();
+        }
+    }
+
     public void updateMaxRecommendationDistanceKm(double maxRecommendationDistanceKm) {
         if (maxRecommendationDistanceKm <= 0) {
             throw new IllegalArgumentException("Maximum recommendation distance must be greater than zero");

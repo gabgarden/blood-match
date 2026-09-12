@@ -35,12 +35,17 @@ public class CancelDonationRequestUseCase {
     DonationRequest request = donationRequestRepository.findById(requestId)
         .orElseThrow(() -> new NotFoundException("Donation request not found"));
 
+    if (!java.util.Objects.equals(request.getVersion(), input.version())) {
+      throw new bloodmatch.application.exception.ConcurrencyException(
+          "Resource version conflict: expected " + input.version() + " but found " + request.getVersion());
+    }
+
     PartyOwnership.requireSameParty(request.getRequester().getParty().getId(), input.actorPartyId());
 
     request.close();
     donationRequestRepository.save(request);
   }
 
-  public record Input(String requestId, String actorPartyId) {
+  public record Input(String requestId, Long version, String actorPartyId) {
   }
 }

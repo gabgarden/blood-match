@@ -212,13 +212,23 @@ Body: `name`, `phoneNumber`, `cnpj`, `email`, `password`, `passwordConfirmation`
 
 Response: `{ "id": "<uuid>", "type": "ORGANIZATION", "emailConfirmationRequired": true }`
 
-#### `PATCH /parties/name` — Auth + Own(`partyId`) → `200`
+#### `PATCH /parties` — Auth + Own(`partyId`) → `200`
 
 ```json
-{ "partyId": "<uuid>", "newName": "Novo nome" }
+{ 
+  "partyId": "<uuid>", 
+  "version": 1,
+  "name": "Novo nome",
+  "phoneNumber": "11999999999",
+  "street": "Rua X",
+  "city": "São Paulo",
+  "state": "SP",
+  "zipCode": "01000-000"
+}
 ```
 
-Response: `{ "id": "<uuid>", "name": "Novo nome" }`
+(Propriedades de update são opcionais, exceto `partyId` e `version`)
+Response: `{ "id": "<uuid>", "version": 2, "name": "Novo nome" }`
 
 ---
 
@@ -276,23 +286,27 @@ Response: `{ "id": "<donorRoleId>" }`
 
 Use `organizationId` em `POST /donation-requests` e `POST /donations`.
 
-#### `PATCH /donors/profile` — Auth + Own(`personId`) → `200`
+#### `PATCH /donors` — Role `DONOR` + Own(`personId`) → `200`
 
 ```json
-{ "personId": "<uuid>", "bloodType": "A+", "weight": 72.0 }
+{ 
+  "personId": "<uuid>", 
+  "version": 1,
+  "bloodType": "A+", 
+  "weight": 72.0,
+  "maxDistanceInKm": 30 
+}
 ```
 
-#### `PATCH /donors/recommendation-distance` — Role `DONOR` + Own(`personId`) → `200`
-
-```json
-{ "personId": "<uuid>", "maxDistanceInKm": 30 }
-```
+Response: `{ "id": "<uuid>", "version": 2 }`
 
 #### `GET /donors/{personId}/summary` — Auth + Own(path) → `200`
 
 ```json
 {
   "personId": "<uuid>",
+  "partyVersion": 1,
+  "donorVersion": 1,
   "donorName": "string",
   "phoneNumber": "string",
   "bloodType": "O+",
@@ -312,7 +326,7 @@ Use `organizationId` em `POST /donation-requests` e `POST /donations`.
 `status` é `PENDING` | `COMPLETED` | `CANCELLED`. `date` é a data de referência (conclusão ou data pretendida).
 
 ```json
-[{ "donationId": "<uuid>", "date": "2026-01-15", "location": "Nome do hemocentro", "status": "COMPLETED" }]
+[{ "donationId": "<uuid>", "version": 1, "date": "2026-01-15", "location": "Nome do hemocentro", "status": "COMPLETED" }]
 ```
 
 ---
@@ -468,6 +482,7 @@ Não use o literal `recommendations` como `{partyId}`.
 ```json
 [{
   "requestId": "<uuid>",
+  "version": 1,
   "bloodTypeNeeded": "A+",
   "dateRequested": "2026-01-01",
   "dateLimit": "2026-12-31",
@@ -483,9 +498,9 @@ Não use o literal `recommendations` como `{partyId}`.
 }]
 ```
 
-Na listagem, `goalBloodBags` é **number**. No PATCH de meta, a resposta devolve string (abaixo).
+Na listagem, `goalBloodBags` é **number**. No PATCH, a resposta atualizada é devolvida.
 
-#### `DELETE /donation-requests/{requestId}` — Role `REQUESTER` + Own(recurso) → `204`
+#### `DELETE /donation-requests/{requestId}?version={version}` — Role `REQUESTER` + Own(recurso) → `204`
 
 #### `POST /donation-requests/{id}/notify` — Role `REQUESTER` + Own(recurso) → `200`
 
@@ -493,21 +508,19 @@ Sem body. Bloqueia se a meta do snapshot já foi atingida.
 
 Response: `{ "message": "Notifications sent to eligible donors successfully." }`
 
-#### `PATCH /donation-requests/date-limit` — Role `REQUESTER` + Own(recurso) → `200`
+#### `PATCH /donation-requests` — Role `REQUESTER` + Own(recurso) → `200`
 
 ```json
-{ "requestId": "<uuid>", "newDateLimit": "2026-12-31" }
+{ 
+  "requestId": "<uuid>", 
+  "version": 1,
+  "dateLimit": "2026-12-31",
+  "goalBloodBags": 5 
+}
 ```
 
-`newDateLimit` não pode ser no passado. Response: `{ "id", "dateLimit" }` (`dateLimit` como **string**).
-
-#### `PATCH /donation-requests/goal-blood-bags` — Role `REQUESTER` + Own(recurso) → `200`
-
-```json
-{ "requestId": "<uuid>", "newGoalBloodBags": 5 }
-```
-
-`newGoalBloodBags` > 0. Response: `{ "id", "goalBloodBags": "5" }` (`goalBloodBags` como **string**).
+As propriedades de update são opcionais, exceto `requestId` e `version`. `dateLimit` não pode ser no passado. `goalBloodBags` > 0.
+Response: `{ "id": "<uuid>", "version": 2, "dateLimit": "2026-12-31", "goalBloodBags": "5" }`
 
 ---
 
@@ -555,18 +568,18 @@ Não use `POST /donations/create-pending` nem `POST /donations/completed` — fo
 #### `PATCH /donations/complete` — Role `DONOR` + Own(doação) → `200`
 
 ```json
-{ "donationId": "<uuid>", "completionDate": "2026-08-01" }
+{ "donationId": "<uuid>", "version": 1, "completionDate": "2026-08-01" }
 ```
 
-Response: `{ "id", "completionDate", "status": "COMPLETED" }` (`completionDate` string).
+Response: `{ "id": "<uuid>", "version": 2, "completionDate": "2026-08-01", "status": "COMPLETED" }` (`completionDate` string).
 
 #### `PATCH /donations/reschedule` — Role `DONOR` + Own(doação) → `200`
 
 ```json
-{ "donationId": "<uuid>", "newExpectedDate": "2026-09-15" }
+{ "donationId": "<uuid>", "version": 1, "newExpectedDate": "2026-09-15" }
 ```
 
-Response: `{ "id", "expectedDate", "status": "PENDING" }` (`expectedDate` string).
+Response: `{ "id": "<uuid>", "version": 2, "expectedDate": "2026-09-15", "status": "PENDING" }` (`expectedDate` string).
 
 ---
 
@@ -579,10 +592,9 @@ Response: `{ "id", "expectedDate", "status": "PENDING" }` (`expectedDate` string
 | POST | `/auth/resend-confirmation` | Public |
 | POST | `/parties/persons` | Public |
 | POST | `/parties/organizations` | Public |
-| PATCH | `/parties/name` | Auth + Own |
+| PATCH | `/parties` | Auth + Own |
 | POST | `/donors` | Auth + Own → re-login |
-| PATCH | `/donors/profile` | Auth + Own |
-| PATCH | `/donors/recommendation-distance` | DONOR + Own |
+| PATCH | `/donors` | Auth + Own |
 | GET | `/donors/{personId}/summary` | Auth + Own |
 | GET | `/donors/{personId}/donations` | Auth + Own |
 | POST | `/requesters` | Auth + Own → re-login |
@@ -597,10 +609,9 @@ Response: `{ "id", "expectedDate", "status": "PENDING" }` (`expectedDate` string
 | POST | `/donation-requests` | REQUESTER + Own |
 | GET | `/donation-requests/recommendations` | DONOR + Own |
 | GET | `/donation-requests/{partyId}` | REQUESTER + Own |
-| DELETE | `/donation-requests/{requestId}` | REQUESTER + Own(recurso) |
+| DELETE | `/donation-requests/{requestId}?version={version}` | REQUESTER + Own(recurso) |
 | POST | `/donation-requests/{id}/notify` | REQUESTER + Own(recurso) |
-| PATCH | `/donation-requests/date-limit` | REQUESTER + Own(recurso) |
-| PATCH | `/donation-requests/goal-blood-bags` | REQUESTER + Own(recurso) |
+| PATCH | `/donation-requests` | REQUESTER + Own(recurso) |
 | POST | `/donations` | DONOR + Own |
 | PATCH | `/donations/complete` | DONOR + Own(recurso) |
 | PATCH | `/donations/reschedule` | DONOR + Own(recurso) |

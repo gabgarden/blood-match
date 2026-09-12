@@ -49,6 +49,11 @@ public class CompletePendingDonationUseCase {
     Donation donation = donationRepository.findById(donationId)
         .orElseThrow(() -> new NotFoundException("Donation not found"));
 
+    if (!java.util.Objects.equals(donation.getVersion(), input.version())) {
+      throw new bloodmatch.application.exception.ConcurrencyException(
+          "Resource version conflict: expected " + input.version() + " but found " + donation.getVersion());
+    }
+
     PartyOwnership.requireSameParty(donation.getDonor().getPerson().getId(), input.actorPartyId());
 
     donation.complete(input.completionDate(), currentDate);
@@ -58,7 +63,7 @@ public class CompletePendingDonationUseCase {
     return Output.from(donation);
   }
 
-  public record Input(String donationId, LocalDate completionDate, String actorPartyId) {
+  public record Input(String donationId, Long version, LocalDate completionDate, String actorPartyId) {
   }
 
   public record Output(String id, LocalDate completionDate, String status) {

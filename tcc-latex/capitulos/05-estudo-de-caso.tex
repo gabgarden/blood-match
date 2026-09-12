@@ -27,21 +27,19 @@ Os requisitos funcionais representam as operações que a API disponibiliza para
     RF04 & Permitir que uma pessoa ou organização registre um perfil de requisitante. \\
     RF05 & Permitir que uma organização cadastrada registre um perfil de banco de sangue (hemocentro). \\
     RF06 & Permitir a autenticação de usuários por meio de credenciais válidas, emitindo um JWT. \\
-    RF07 & Permitir a atualização do nome cadastral de um participante (\textit{party}). \\
-    RF08 & Permitir a atualização do perfil do doador. \\
+    RF07 & Permitir a atualização dos dados cadastrais de um participante (\textit{party}). \\
+    RF08 & Permitir a atualização do perfil e das preferências de recomendação do doador. \\
     RF09 & Permitir que requisitantes criem solicitações de doação de sangue. \\
-    RF10 & Permitir a atualização da meta de bolsas de sangue de uma solicitação. \\
-    RF11 & Permitir a atualização do prazo (data-limite) de uma solicitação. \\
-    RF12 & Permitir o cancelamento de uma solicitação de doação. \\
-    RF13 & Permitir a consulta das solicitações de doação de um participante. \\
-    RF14 & Permitir a consulta das solicitações de doação recomendadas para um doador. \\
-    RF15 & Permitir a notificação de doadores potenciais elegíveis para uma solicitação. \\
-    RF16 & Permitir o registro de uma doação, informando a data de intenção (pendente) ou a data efetiva (concluída). \\
-    RF17 & Permitir o reagendamento de uma doação pendente. \\
-    RF18 & Permitir a confirmação (conclusão) de uma doação pendente. \\
-    RF19 & Permitir a consulta do histórico de doações de um doador. \\
-    RF20 & Permitir a consulta do resumo (\textit{summary}) de um doador. \\
-    RF21 & Permitir o ajuste da distância máxima considerada nas recomendações de um doador. \\
+    RF10 & Permitir a atualização dos dados de uma solicitação (meta de bolsas e/ou data-limite). \\
+    RF11 & Permitir o cancelamento de uma solicitação de doação. \\
+    RF12 & Permitir a consulta das solicitações de doação de um participante. \\
+    RF13 & Permitir a consulta das solicitações de doação recomendadas para um doador. \\
+    RF14 & Permitir a notificação de doadores potenciais elegíveis para uma solicitação. \\
+    RF15 & Permitir o registro de uma doação, informando a data de intenção (pendente) ou a data efetiva (concluída). \\
+    RF16 & Permitir o reagendamento de uma doação pendente. \\
+    RF17 & Permitir a confirmação (conclusão) de uma doação pendente. \\
+    RF18 & Permitir a consulta do histórico de doações de um doador. \\
+    RF19 & Permitir a consulta do resumo (\textit{summary}) de um doador. \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
@@ -104,14 +102,14 @@ A modelagem de casos de uso, em notação UML, sintetiza as operações disponí
     UC04 & Registrar perfil de doador & Person \\
     UC05 & Registrar perfil de requisitante & Person / Organization \\
     UC06 & Registrar perfil de banco de sangue & Organization \\
-    UC07 & Atualizar dados cadastrais / perfil do doador & Donor / Requester \\
-    UC08 & Registrar solicitação de doação (\textit{Register Donation Request}) & Requester \\
-    UC09 & Consultar recomendações de solicitações (\textit{Consult Recommendations}) & Donor \\
-    UC10 & Registrar doação (\textit{Register Donation}) & Donor \\
-    UC11 & Completar doação pendente (\textit{Complete a Pending Donation}) & Donor \\
-    UC12 & Consultar histórico de doações (\textit{See Donation History}) & Donor \\
-    UC13 & Gerenciar solicitações --- atualizar meta/prazo, cancelar e consultar & Requester \\
-    UC14 & Atualizar distância máxima para recomendações & Donor \\
+    UC07 & Atualizar dados cadastrais (\textit{Update Party}) & Person / Organization \\
+    UC08 & Atualizar perfil e preferências do doador (\textit{Update Donor}) & Donor \\
+    UC09 & Registrar solicitação de doação (\textit{Register Donation Request}) & Requester \\
+    UC10 & Consultar recomendações de solicitações (\textit{Consult Recommendations}) & Donor \\
+    UC11 & Registrar doação (\textit{Register Donation}) & Donor \\
+    UC12 & Completar doação pendente (\textit{Complete a Pending Donation}) & Donor \\
+    UC13 & Consultar histórico de doações (\textit{See Donation History}) & Donor \\
+    UC14 & Gerenciar solicitações --- atualizar dados, cancelar e consultar & Requester \\
     UC15 & Notificar doadores potenciais elegíveis & Requester \\
     UC16 & Reagendar doação pendente & Donor \\
     UC17 & Consultar resumo do doador (\textit{Donor Summary}) & Donor \\
@@ -142,7 +140,7 @@ Já a Figura~\ref{fig:uc-requester} representa o diagrama de caso de uso do ator
   \label{fig:uc-requester}
 \end{figure}
 
-O ator \textit{Requester} concentra as permissões relacionadas à criação e à gestão de solicitações de sangue (UC08 e UC13), além do disparo de notificações a doadores potenciais quando uma solicitação precisa de maior alcance (UC15).
+O ator \textit{Requester} concentra as permissões relacionadas à criação e à gestão de solicitações de sangue (UC09 e UC14), além do disparo de notificações a doadores potenciais quando uma solicitação precisa de maior alcance (UC15).
 
 Por fim, a Figura~\ref{fig:uc-donor} representa o diagrama de caso de uso do ator (\textit{Donor}).
 
@@ -154,7 +152,7 @@ Por fim, a Figura~\ref{fig:uc-donor} representa o diagrama de caso de uso do ato
   \label{fig:uc-donor}
 \end{figure}
 
-O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a consulta às solicitações recomendadas, o registro unificado de doações, a conclusão e o reagendamento de pendentes, o ajuste da distância máxima de recomendação, a gestão do próprio histórico hemoterápico e a consulta ao seu resumo (UC09, UC10, UC11, UC12, UC14, UC16 e UC17). No UC10, a doação nasce pendente quando o doador informa a data de intenção ou concluída quando informa a data efetiva --- um único caso de uso, sem fábricas concorrentes no domínio.
+O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a consulta às solicitações recomendadas, o registro unificado de doações, a conclusão e o reagendamento de pendentes, a edição de seu perfil e preferências de recomendação, a gestão do próprio histórico hemoterápico e a consulta ao seu resumo (UC08, UC10, UC11, UC12, UC13, UC16 e UC17). No UC11, a doação nasce pendente quando o doador informa a data de intenção ou concluída quando informa a data efetiva --- um único caso de uso, sem fábricas concorrentes no domínio.
 
 \subsection{Diagramas de classes}
 
@@ -285,9 +283,9 @@ O componente expõe dois métodos, \codigo{toDonationRequests(...)} e \codigo{to
 
 \subsubsection{Concorrência otimista e índices}
 
-O controle de integridade transacional contra atualizações concorrentes foi estabelecido de maneira uniforme em toda a camada de persistência: todos os nove \textit{schemas} que mapeiam os agregados e entidades do sistema (como \texttt{DonationRequestSchema}, \texttt{DonationSchema}, \texttt{BloodCenterScheduleSchema} e \texttt{BloodCenterInventorySchema}) incorporam o controle de versão otimista por meio do atributo \codigo{version} anotado com \codigo{@Version}. Desse modo, escritas concorrentes sobre qualquer documento --- a exemplo da alteração simultânea do prazo e da meta de bolsas em uma solicitação, de agendamentos concomitantes na grade do hemocentro ou de ajustes simultâneos no estoque de bolsas --- são prontamente detectadas pelo MongoDB.
+O controle de integridade transacional contra atualizações concorrentes foi estabelecido de maneira uniforme em toda a camada de persistência e exposto às camadas externas: todos os \textit{schemas} que mapeiam os agregados e entidades do sistema (como \texttt{DonationRequestSchema}, \texttt{DonationSchema}, \texttt{BloodCenterScheduleSchema} e \texttt{BloodCenterInventorySchema}) incorporam o controle de versão otimista por meio do atributo \codigo{version} anotado com \codigo{@Version}. Para garantir uma integridade de ponta a ponta, todos os casos de uso de atualização (\textit{PATCH}) e de exclusão (\textit{DELETE}) exigem explicitamente que o \textit{Frontend} informe a versão original (\codigo{version}) na qual o usuário se baseou para a modificação. O caso de uso carrega a entidade do repositório, valida se a versão informada coincide com a versão salva e só então efetua a alteração. Desse modo, escritas concorrentes sobre qualquer documento --- a exemplo da alteração simultânea do prazo e da meta de bolsas em uma solicitação por usuários diferentes em telas distintas --- são prontamente detectadas pela aplicação antes mesmo da gravação final.
 
-Para assegurar o desacoplamento arquitetural, todas as operações de escrita nos adaptadores de repositório são encapsuladas pelo componente utilitário \codigo{OptimisticConcurrency}. Ao identificar um conflito de versão, o componente captura a \codigo{OptimisticLockingFailureException} do \textit{Spring Data} e a converte em uma \codigo{ConcurrencyException} (exceção da camada de aplicação derivada de \codigo{ApplicationException}), sinalizando de forma explícita ao caso de uso que a entidade foi alterada por outra transação e precisa ser recarregada antes de uma nova tentativa --- impedindo, novamente, que exceções específicas da tecnologia de persistência alcancem as camadas superiores. O cumprimento de metas, descrito na Seção~\ref{sec:fulfillment-bags}, não participa desse conflito: o \textit{snapshot} é calculado em memória e não regrava a solicitação. Além disso, índices compostos foram definidos sobre situação ativa, tipo sanguíneo e data-limite, e sobre situação ativa, organização e data da solicitação --- este último alinhado à ordenação exigida pela alocação, evitando uma ordenação adicional em memória ---, bem como um índice geoespacial \texttt{2dsphere} sobre a localização do hemocentro, otimizando as consultas de recomendação descritas na Seção~\ref{sec:recomendacao-fulfillment}.
+Para assegurar o desacoplamento arquitetural no momento da persistência, todas as operações de escrita nos adaptadores de repositório são encapsuladas pelo componente utilitário \codigo{OptimisticConcurrency}. Ao identificar um eventual conflito de versão subjacente não capturado pelas checagens lógicas da aplicação, o componente captura a \codigo{OptimisticLockingFailureException} do \textit{Spring Data} e a converte em uma \codigo{ConcurrencyException} (exceção da camada de aplicação derivada de \codigo{ApplicationException}), sinalizando de forma explícita ao caso de uso que a entidade foi alterada por outra transação e precisa ser recarregada antes de uma nova tentativa --- impedindo, novamente, que exceções específicas da tecnologia de persistência alcancem as camadas superiores. O cumprimento de metas, descrito na Seção~\ref{sec:fulfillment-bags}, não participa desse conflito: o \textit{snapshot} é calculado em memória e não regrava a solicitação. Além disso, índices compostos foram definidos sobre situação ativa, tipo sanguíneo e data-limite, e sobre situação ativa, organização e data da solicitação --- este último alinhado à ordenação exigida pela alocação, evitando uma ordenação adicional em memória ---, bem como um índice geoespacial \texttt{2dsphere} sobre a localização do hemocentro, otimizando as consultas de recomendação descritas na Seção~\ref{sec:recomendacao-fulfillment}.
 
 \subsection{Segurança e autenticação}
 

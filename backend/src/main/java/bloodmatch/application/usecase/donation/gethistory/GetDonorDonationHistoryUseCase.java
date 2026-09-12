@@ -39,6 +39,7 @@ public class GetDonorDonationHistoryUseCase {
 
   public record OutputItem(
       String donationId,
+      Long version,
       LocalDate date,
       String location,
       String status) {
@@ -46,6 +47,7 @@ public class GetDonorDonationHistoryUseCase {
     public static OutputItem from(Donation donation) {
       return new OutputItem(
           donation.getId().getValue().toString(),
+          donation.getVersion(),
           donation.getReferenceDate(),
           donation.getBloodCenter().getOrganization().getName(),
           donation.status());

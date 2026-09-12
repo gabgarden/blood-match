@@ -40,6 +40,11 @@ public class ReschedulePendingDonationUseCase {
     Donation donation = donationRepository.findById(donationId)
         .orElseThrow(() -> new NotFoundException("Donation not found"));
 
+    if (!java.util.Objects.equals(donation.getVersion(), input.version())) {
+      throw new bloodmatch.application.exception.ConcurrencyException(
+          "Resource version conflict: expected " + input.version() + " but found " + donation.getVersion());
+    }
+
     PartyOwnership.requireSameParty(donation.getDonor().getPerson().getId(), input.actorPartyId());
 
     donation.reschedule(input.newExpectedDate(), currentDate);
@@ -49,7 +54,7 @@ public class ReschedulePendingDonationUseCase {
     return Output.from(donation);
   }
 
-  public record Input(String donationId, LocalDate newExpectedDate, String actorPartyId) {
+  public record Input(String donationId, Long version, LocalDate newExpectedDate, String actorPartyId) {
   }
 
   public record Output(String id, LocalDate expectedDate, String status) {

@@ -2,7 +2,7 @@ package bloodmatch.interfaces.rest.security;
 
 import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByPartyIdUseCase;
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
-import bloodmatch.application.usecase.party.UpdatePartyNameUseCase;
+import bloodmatch.application.usecase.party.UpdatePartyUseCase;
 import bloodmatch.infra.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ class SecurityAuthorizationIntegrationTest {
   private GetDonationRequestsByPartyIdUseCase getDonationRequestsByPartyIdUseCase;
 
   @MockitoBean
-  private UpdatePartyNameUseCase updatePartyNameUseCase;
+  private UpdatePartyUseCase updatePartyUseCase;
 
   @Test
   void shouldReturn401WhenTokenIsMissing() throws Exception {
@@ -164,9 +164,9 @@ class SecurityAuthorizationIntegrationTest {
 
   @Test
   void shouldReturn401WhenTokenIsMissingForUpdatePartyName() throws Exception {
-    mockMvc.perform(patch("/parties/name")
+    mockMvc.perform(patch("/parties")
             .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"partyId\":\"" + UUID.randomUUID() + "\",\"newName\":\"Test\"}"))
+            .content("{\"partyId\":\"" + UUID.randomUUID() + "\",\"version\":1,\"name\":\"Test\"}"))
         .andExpect(status().isUnauthorized());
   }
 
@@ -179,13 +179,13 @@ class SecurityAuthorizationIntegrationTest {
     when(jwtTokenProvider.extractRoles(token)).thenReturn(List.of("DONOR"));
     when(jwtTokenProvider.extractUserId(token)).thenReturn(UUID.randomUUID().toString());
     when(jwtTokenProvider.extractPartyId(token)).thenReturn(partyId);
-    when(updatePartyNameUseCase.execute(any(UpdatePartyNameUseCase.Input.class)))
-        .thenReturn(new UpdatePartyNameUseCase.Output(partyId, "New Name"));
+    when(updatePartyUseCase.execute(any(UpdatePartyUseCase.Input.class)))
+        .thenReturn(new UpdatePartyUseCase.Output(partyId, 2L, "New Name", null, null));
 
-    mockMvc.perform(patch("/parties/name")
+    mockMvc.perform(patch("/parties")
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"partyId\":\"" + partyId + "\",\"newName\":\"New Name\"}"))
+            .content("{\"partyId\":\"" + partyId + "\",\"version\":1,\"name\":\"New Name\"}"))
         .andExpect(status().isOk());
   }
 
@@ -200,10 +200,10 @@ class SecurityAuthorizationIntegrationTest {
     when(jwtTokenProvider.extractUserId(token)).thenReturn(UUID.randomUUID().toString());
     when(jwtTokenProvider.extractPartyId(token)).thenReturn(tokenPartyId);
 
-    mockMvc.perform(patch("/parties/name")
+    mockMvc.perform(patch("/parties")
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"partyId\":\"" + otherPartyId + "\",\"newName\":\"New Name\"}"))
+            .content("{\"partyId\":\"" + otherPartyId + "\",\"version\":1,\"name\":\"New Name\"}"))
         .andExpect(status().isForbidden());
   }
 }

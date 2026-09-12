@@ -45,7 +45,7 @@ class CancelDonationRequestUseCaseTest {
 
     when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
 
-    useCase.execute(new Input(requestId.getValue().toString(), requesterPartyId(request)));
+    useCase.execute(new Input(requestId.getValue().toString(), null, requesterPartyId(request)));
 
     verify(donationRequestRepository).save(request);
   }
@@ -57,14 +57,14 @@ class CancelDonationRequestUseCaseTest {
     when(donationRequestRepository.findById(requestId)).thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class,
-        () -> useCase.execute(new Input(requestId.getValue().toString(), UUID.randomUUID().toString())));
+        () -> useCase.execute(new Input(requestId.getValue().toString(), null, UUID.randomUUID().toString())));
 
     verify(donationRequestRepository, never()).save(any());
   }
 
   @Test
   void shouldThrowWhenRequestIdIsNull() {
-    assertThrows(ValidationException.class, () -> useCase.execute(new Input(null, null)));
+    assertThrows(ValidationException.class, () -> useCase.execute(new Input(null, null, null)));
   }
 
   @Test
@@ -75,7 +75,7 @@ class CancelDonationRequestUseCaseTest {
     when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
 
     assertThrows(ForbiddenException.class,
-        () -> useCase.execute(new Input(requestId.getValue().toString(), UUID.randomUUID().toString())));
+        () -> useCase.execute(new Input(requestId.getValue().toString(), null, UUID.randomUUID().toString())));
 
     verify(donationRequestRepository, never()).save(any());
   }
@@ -87,7 +87,7 @@ class CancelDonationRequestUseCaseTest {
 
     when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
 
-    useCase.execute(new Input(requestId.getValue().toString(), null));
+    useCase.execute(new Input(requestId.getValue().toString(), null, null));
 
     verify(donationRequestRepository).save(request);
   }

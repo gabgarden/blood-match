@@ -118,10 +118,10 @@ export function DonationHistory({ items, isLoading, errorMessage, onChanged }: D
 
     try {
       if (mode === "complete") {
-        await completeDonation(selectedDonation.id, actionDate);
+        await completeDonation(selectedDonation.id, selectedDonation.version, actionDate);
         setActionFeedback("Doação marcada como concluída.");
       } else {
-        await rescheduleDonation(selectedDonation.id, actionDate);
+        await rescheduleDonation(selectedDonation.id, selectedDonation.version, actionDate);
         setActionFeedback("Doação reagendada.");
       }
 

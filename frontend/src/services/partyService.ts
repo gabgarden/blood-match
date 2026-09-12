@@ -12,16 +12,23 @@ export const registerOrganization = async (data: CreateOrganizationDTO) => {
   return response.data;
 };
 
-export async function updatePartyName(partyId: string, newName: string) {
-  const response = await api.patch<{ id: string; name: string }>("/parties/name", {
+export async function updateParty(
+  partyId: string,
+  version: number,
+  patch: { name?: string; phoneNumber?: string; address?: { street: string; city: string; state: string; zipCode?: string } }
+) {
+  const response = await api.patch<{ id: string; version: number; name?: string; phoneNumber?: string; address?: any }>("/parties", {
     partyId,
-    newName,
+    version,
+    ...patch,
   });
   return response.data;
 }
 
 type DonorSummaryResponse = {
   personId?: string;
+  partyVersion?: number;
+  donorVersion?: number;
   donorName?: string;
   phoneNumber?: string;
   bloodType?: string;
@@ -35,6 +42,8 @@ type DonorSummaryResponse = {
 
 export type DonorHeroSummary = {
   personId: string | null;
+  partyVersion: number | null;
+  donorVersion: number | null;
   donorName: string | null;
   phoneNumber: string | null;
   bloodType: string | null;
@@ -65,6 +74,8 @@ export async function fetchDonorHeroSummary(personId: string): Promise<DonorHero
 
     return {
       personId: data.personId ?? personId,
+      partyVersion: data.partyVersion ?? null,
+      donorVersion: data.donorVersion ?? null,
       donorName: data.donorName ?? null,
       phoneNumber: data.phoneNumber ?? null,
       bloodType: data.bloodType ?? null,

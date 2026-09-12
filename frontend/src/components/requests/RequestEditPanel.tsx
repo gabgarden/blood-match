@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { AppButton, InlineAlert } from "../ui";
 import {
-  updateDonationRequestDateLimit,
-  updateDonationRequestGoalBloodBags,
+  updateDonationRequest,
   type UserDonationRequestCard,
 } from "../../services/donationService";
 import { extractApiErrorMessage } from "../../utils/apiError";
@@ -56,10 +55,11 @@ export function RequestEditPanel({ request, disabled = false, onUpdated }: Reque
     setFeedback(null);
 
     try {
-      const result = await updateDonationRequestDateLimit(request.id, dateLimit);
+      const result = await updateDonationRequest({ requestId: request.id, version: request.version, dateLimit });
       const nextDate = typeof result?.dateLimit === "string" ? result.dateLimit : dateLimit;
       onUpdated({
         dateLimit: nextDate,
+        version: result?.version ?? request.version,
         deadlineLabel: new Intl.DateTimeFormat("pt-BR", {
           day: "2-digit",
           month: "short",
@@ -87,7 +87,7 @@ export function RequestEditPanel({ request, disabled = false, onUpdated }: Reque
     setFeedback(null);
 
     try {
-      const result = await updateDonationRequestGoalBloodBags(request.id, parsedGoal);
+      const result = await updateDonationRequest({ requestId: request.id, version: request.version, goalBloodBags: parsedGoal });
       const nextGoal =
         typeof result?.goalBloodBags === "string" || typeof result?.goalBloodBags === "number"
           ? Number(result.goalBloodBags)
@@ -95,6 +95,7 @@ export function RequestEditPanel({ request, disabled = false, onUpdated }: Reque
 
       onUpdated({
         goalBloodBags: nextGoal,
+        version: result?.version ?? request.version,
         remainingBloodBags: Math.max(nextGoal - request.fulfilledBloodBags, 0),
         goalReached: request.fulfilledBloodBags >= nextGoal,
       });

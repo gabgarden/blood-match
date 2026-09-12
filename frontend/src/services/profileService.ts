@@ -32,15 +32,7 @@ export async function createBloodCenterProfile(organizationId: string) {
   return response.data;
 }
 
-export async function updateDonorProfile(payload: CreateDonorPayload) {
-  const response = await api.patch<{ id: string }>("/donors/profile", payload);
-  return response.data;
-}
-
-export async function updateDonorRecommendationDistance(personId: string, maxDistanceInKm: number) {
-  const response = await api.patch<{ personId: string; maxDistanceInKm: number }>(
-    "/donors/recommendation-distance",
-    { personId, maxDistanceInKm },
-  );
+export async function updateDonor(payload: { personId: string; version: number; bloodType?: string; weight?: number; maxDistanceInKm?: number }) {
+  const response = await api.patch<{ id: string; version: number }>("/donors", payload);
   return response.data;
 }

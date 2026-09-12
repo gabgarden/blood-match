@@ -24,9 +24,11 @@ public class CancelDonationRequestController {
   }
 
   @DeleteMapping("/{requestId}")
-  public ResponseEntity<Void> cancel(@PathVariable String requestId) {
+  public ResponseEntity<Void> cancel(
+      @PathVariable String requestId,
+      @org.springframework.web.bind.annotation.RequestParam Long version) {
     requireNotBlank(requestId, "requestId cannot be blank");
-    useCase.execute(new Input(requestId, actorPartyIdForOwnership()));
+    useCase.execute(new Input(requestId, version, actorPartyIdForOwnership()));
     return ResponseEntity.noContent().build();
   }
 }

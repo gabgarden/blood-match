@@ -14,8 +14,8 @@ import {
   hasRequesterRole,
   resolvePostLoginPath,
 } from "../routes/roleRouting";
-import { fetchDonorHeroSummary, updatePartyName } from "../services/partyService";
-import { updateDonorProfile, updateDonorRecommendationDistance } from "../services/profileService";
+import { fetchDonorHeroSummary, updateParty } from "../services/partyService";
+import { updateDonor, updateDonorRecommendationDistance } from "../services/profileService";
 import { extractApiErrorMessage } from "../utils/apiError";
 import { DonorBadgesSection } from "../components/profile/DonorBadgesSection";
 
@@ -67,6 +67,9 @@ export default function ProfilePage() {
     return localStorage.getItem("bloodmatch_avatar_icon") || "water_drop";
   });
 
+  const [partyVersion, setPartyVersion] = useState<number | null>(null);
+  const [donorVersion, setDonorVersion] = useState<number | null>(null);
+
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSavingDonor, setIsSavingDonor] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -103,6 +106,8 @@ export default function ProfilePage() {
         if (canAccessDonorArea) {
           const summary = await fetchDonorHeroSummary(currentPartyId);
           if (!cancelled && summary) {
+            setPartyVersion(summary.partyVersion);
+            setDonorVersion(summary.donorVersion);
             setDisplayName(summary.donorName?.trim() || "");
             if (summary.bloodType) {
               setBloodType(summary.bloodType);
@@ -144,7 +149,7 @@ export default function ProfilePage() {
   }
 
   async function handleSaveNameValue(newName: string) {
-    if (!partyId) {
+    if (!partyId || partyVersion == null) {
       return;
     }
 
@@ -158,8 +163,9 @@ export default function ProfilePage() {
     setErrorMessage(null);
 
     try {
-      const result = await updatePartyName(partyId, trimmed);
-      setDisplayName(result.name);
+      const result = await updateParty(partyId, partyVersion, { name: trimmed });
+      setDisplayName(result.name || trimmed);
+      setPartyVersion(result.version);
       setFeedback("Nome atualizado com sucesso.");
     } catch (error) {
       setErrorMessage(extractApiErrorMessage(error, "Não foi possível atualizar o nome."));
@@ -168,7 +174,7 @@ export default function ProfilePage() {
 
   async function handleSaveAllPreferences(event: React.FormEvent) {
     event.preventDefault();
-    if (!partyId) {
+    if (!partyId || donorVersion == null) {
       return;
     }
 
@@ -188,19 +194,21 @@ export default function ProfilePage() {
     setErrorMessage(null);
 
     try {
-      await updateDonorProfile({
+      const result = await updateDonor({
         personId: partyId,
+        version: donorVersion,
         bloodType,
         weight: parsedWeight,
+        maxDistanceInKm: parsedDistance,
       });
-      const distanceResult = await updateDonorRecommendationDistance(partyId, parsedDistance);
+      setDonorVersion(result.version);
       setRegisteredWeight(parsedWeight);
       setWeightUpdatedAt(new Date().toISOString().slice(0, 10));
       setWeightDraft(String(parsedWeight));
-      setMaxDistanceInKm(String(distanceResult.maxDistanceInKm));
-      setFeedback("Configurações e preferências atualizadas com sucesso.");
+      setMaxDistanceInKm(String(parsedDistance));
+      setFeedback("Preferências salvas com sucesso.");
     } catch (error) {
-      setErrorMessage(extractApiErrorMessage(error, "Não foi possível salvar as configurações."));
+      setErrorMessage(extractApiErrorMessage(error, "Não foi possível salvar preferências."));
     } finally {
       setIsSavingDonor(false);
     }

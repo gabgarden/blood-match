@@ -52,4 +52,11 @@ public abstract class Party extends DomainObject {
     public void changeAddress(Address newAddress) {
         this.address = newAddress;
     }
+
+    public void changePhoneNumber(PhoneNumber newPhoneNumber) {
+        if (newPhoneNumber == null)
+            throw new IllegalArgumentException("PhoneNumber cannot be empty");
+            
+        this.phoneNumber = newPhoneNumber;
+    }
 }

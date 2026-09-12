@@ -33,6 +33,7 @@ public class ReschedulePendingDonationController {
 
     var output = useCase.execute(new Input(
         payload.donationId(),
+        payload.version(),
         payload.newExpectedDate(),
         actorPartyIdForOwnership()));
 

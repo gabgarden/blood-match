@@ -67,13 +67,14 @@ public class GetDonationRequestsByPartyIdUseCase {
 
     return new OutputItem(
         request.getId().getValue().toString(),
+        request.getVersion(),
         request.getBloodTypeNeeded().getType(),
         request.getDateRequested(),
         request.getDateLimit(),
         request.isActive(),
         request.isExpired(currentDate),
         request.getBloodCenter().getOrganization().getName(),
-        request.getBloodCenter().getOrganization().getPhoneNumber().getValue(),
+        request.getBloodCenter().getOrganization().getPhoneNumber() != null ? request.getBloodCenter().getOrganization().getPhoneNumber().getValue() : null,
         request.getUrgency().name(),
         request.getGoalBloodBags(),
         fulfilledBloodBags,
@@ -86,6 +87,7 @@ public class GetDonationRequestsByPartyIdUseCase {
 
   public record OutputItem(
       String requestId,
+      Long version,
       String bloodTypeNeeded,
       LocalDate dateRequested,
       LocalDate dateLimit,

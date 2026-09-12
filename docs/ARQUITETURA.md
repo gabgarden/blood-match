@@ -94,10 +94,9 @@ Cadastro (`POST /parties/persons` ou `/parties/organizations`) pode exigir confi
 
 | Método | Caminho | Objetivo |
 |---|---|---|
-| PATCH | `/parties/name` | Atualiza nome da party |
+| PATCH | `/parties` | Atualiza party (nome, telefone, endereço) |
 | POST | `/donors` | Registra papel de doador |
-| PATCH | `/donors/profile` | Atualiza perfil do doador |
-| PATCH | `/donors/recommendation-distance` | Distância máxima de recomendação |
+| PATCH | `/donors` | Atualiza perfil do doador e preferências |
 | GET | `/donors/{personId}/summary` | Resumo do doador |
 | GET | `/donors/{personId}/donations` | Histórico de doações |
 | POST | `/requesters` | Registra papel de solicitante |
@@ -121,9 +120,8 @@ Cadastro (`POST /parties/persons` ou `/parties/organizations`) pode exigir confi
 |---|---|---|
 | POST | `/donation-requests` | Cria pedido |
 | GET | `/donation-requests/{partyId}` | Lista pedidos do solicitante |
-| PATCH | `/donation-requests/goal-blood-bags` | Atualiza meta de bolsas |
-| PATCH | `/donation-requests/date-limit` | Atualiza prazo |
-| DELETE | `/donation-requests/{requestId}` | Cancela pedido |
+| PATCH | `/donation-requests` | Atualiza pedido (meta, prazo) |
+| DELETE | `/donation-requests/{requestId}?version={version}` | Cancela pedido |
 | GET | `/donation-requests/recommendations` | Recomenda pedidos ao doador |
 | POST | `/donation-requests/{id}/notify` | Notifica doadores potenciais |
 
@@ -137,7 +135,7 @@ Um único create: `intendedDate` agenda (`PENDING`); `donationDate` registra já
 | PATCH | `/donations/complete` | Conclui doação pendente |
 | PATCH | `/donations/reschedule` | Reagenda doação pendente |
 
-Não existem mais `POST /donations/create-pending` nem `POST /donations/completed`.
+**Nota sobre Concorrência (Optimistic Locking)**: Todos os endpoints de `PATCH` e `DELETE` (que alteram estado) recebem obrigatoriamente a propriedade `version` no corpo (ou query) para garantir consistência em ambientes concorrentes, lançando 409 Conflict em caso de versão divergente.
 
 ## 6. Regras de domínio importantes
 

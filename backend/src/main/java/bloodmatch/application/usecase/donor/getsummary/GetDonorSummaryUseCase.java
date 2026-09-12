@@ -51,10 +51,12 @@ public class GetDonorSummaryUseCase {
 
     return new Output(
         donor.getPerson().getId().getValue().toString(),
+        donor.getPerson().getVersion(),
+        donor.getVersion(),
         donor.getPerson().getName(),
-        donor.getPerson().getPhoneNumber().getValue(),
+        donor.getPerson().getPhoneNumber() != null ? donor.getPerson().getPhoneNumber().getValue() : null,
         donor.getBloodType().getType(),
-        donor.getPerson().getAddress().getFullAddressAsString(),
+        donor.getPerson().getAddress() != null ? donor.getPerson().getAddress().getFullAddressAsString() : null,
         lastDonationDate,
         daysRemaining,
         livesImpacted,
@@ -80,6 +82,8 @@ public class GetDonorSummaryUseCase {
 
   public record Output(
       String personId,
+      Long partyVersion,
+      Long donorVersion,
       String donorName,
       String phoneNumber,
       String bloodType,

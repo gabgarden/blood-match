@@ -44,6 +44,7 @@ class CompletePendingDonationUseCaseTest {
     Output result = useCase.execute(
         new Input(
             donation.getId().getValue().toString(),
+            null,
             currentDate,
             donor.getPerson().getId().getValue().toString()),
         currentDate);

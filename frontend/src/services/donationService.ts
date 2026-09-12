@@ -2,6 +2,7 @@ import { api } from "../api/client";
 
 type DonationHistoryApiItem = {
   donationId: string;
+  version?: number;
   date: string | null;
   location: string;
   status?: string;
@@ -9,6 +10,7 @@ type DonationHistoryApiItem = {
 
 export type DonationHistoryEntry = {
   id: string;
+  version: number;
   location: string;
   donationDate: string | null;
   status: string;
@@ -18,6 +20,7 @@ type RequestUrgency = "Crítica" | "Média" | "Baixa";
 
 type UserDonationRequestApiItem = {
   requestId?: string;
+  version?: number;
   bloodTypeNeeded?: string;
   dateRequested?: string;
   dateLimit?: string | null;
@@ -34,6 +37,7 @@ type UserDonationRequestApiItem = {
 
 export type UserDonationRequestCard = {
   id: string;
+  version: number;
   bloodType: string;
   bloodCenterName: string;
   bloodCenterPhoneNumber: string | null;
@@ -87,6 +91,7 @@ function normalizeDonation(item: DonationHistoryApiItem, index: number): Donatio
   const status = item.status?.trim().toUpperCase();
   return {
     id: item.donationId || `donation-${index}`,
+    version: item.version ?? 0,
     location: item.location || "Local nao informado",
     donationDate: item.date,
     status: status === "PENDING" || status === "COMPLETED" || status === "CANCELLED" ? status : "COMPLETED",
@@ -136,6 +141,7 @@ function normalizeUserDonationRequest(item: UserDonationRequestApiItem, index: n
 
   return {
     id,
+    version: item.version ?? 0,
     bloodType: item.bloodTypeNeeded ?? "-",
     bloodCenterName: item.bloodCenterName ?? "Hemocentro não informado",
     bloodCenterPhoneNumber: item.bloodCenterPhoneNumber?.trim() || null,
@@ -193,31 +199,28 @@ export async function notifyDonationRequest(requestId: string): Promise<string> 
   return response.data?.message ?? "Notificações enviadas aos doadores elegíveis.";
 }
 
-export async function deleteDonationRequest(requestId: string): Promise<void> {
-  await api.delete(`/donation-requests/${requestId}`);
+export async function deleteDonationRequest(requestId: string, version: number): Promise<void> {
+  await api.delete(`/donation-requests/${requestId}?version=${version}`);
 }
 
-export async function updateDonationRequestDateLimit(requestId: string, newDateLimit: string) {
-  const response = await api.patch("/donation-requests/date-limit", { requestId, newDateLimit });
+export async function updateDonationRequest(payload: { requestId: string; version: number; goalBloodBags?: number; dateLimit?: string }) {
+  const response = await api.patch("/donation-requests", payload);
   return response.data;
 }
 
-export async function updateDonationRequestGoalBloodBags(requestId: string, newGoalBloodBags: number) {
-  const response = await api.patch("/donation-requests/goal-blood-bags", { requestId, newGoalBloodBags });
-  return response.data;
-}
-
-export async function completeDonation(donationId: string, completionDate: string) {
+export async function completeDonation(donationId: string, version: number, completionDate: string) {
   const response = await api.patch<{ id: string; completionDate: string; status: string }>("/donations/complete", {
     donationId,
+    version,
     completionDate,
   });
   return response.data;
 }
 
-export async function rescheduleDonation(donationId: string, newExpectedDate: string) {
+export async function rescheduleDonation(donationId: string, version: number, newExpectedDate: string) {
   const response = await api.patch<{ id: string; expectedDate: string; status: string }>("/donations/reschedule", {
     donationId,
+    version,
     newExpectedDate,
   });
   return response.data;

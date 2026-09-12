@@ -33,6 +33,7 @@ public class CompletePendingDonationController {
 
     var output = useCase.execute(new Input(
         payload.donationId(),
+        payload.version(),
         payload.completionDate(),
         actorPartyIdForOwnership()));
 

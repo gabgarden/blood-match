@@ -119,8 +119,14 @@ export default function RequestsPage() {
     setActionError(null);
     setBusyRequestId(requestId);
 
+    const requestToDelete = requestCards.find((r) => r.id === requestId);
+    if (!requestToDelete) {
+      setBusyRequestId(null);
+      return;
+    }
+
     try {
-      await deleteDonationRequest(requestId);
+      await deleteDonationRequest(requestId, requestToDelete.version);
       setRequestCards((current) => current.filter((request) => request.id !== requestId));
       setActionFeedback("Requisição removida.");
     } catch (error) {
