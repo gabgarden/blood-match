@@ -118,7 +118,7 @@ A modelagem de casos de uso, em notação UML, sintetiza as operações disponí
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-A representação gráfica dessas interações é dividida de acordo com o nível de acesso dos atores. A Figura~\ref{fig:uc-access-baseProfiles} apresenta o diagrama de caso de uso do ator (\textit{Guest}).
+A representação gráfica dessas interações é dividida de acordo com o nível de acesso dos atores. A Figura~\ref{fig:uc-access-baseProfiles} apresenta o diagrama de caso de uso de acesso e perfis base (\textit{Guest, Person and Organization}).
 
 \begin{figure}[H]
   \centering
@@ -128,7 +128,7 @@ A representação gráfica dessas interações é dividida de acordo com o níve
   \label{fig:uc-access-baseProfiles}
 \end{figure}
 
-O ator \textit{Guest} representa utilizadores sem cadastro prévio, limitados às operações de criação de contas e autenticação (UC01, UC02 e UC03).
+O ator \textit{Guest} representa utilizadores sem cadastro prévio, limitados às operações de criação de contas e autenticação (UC01, UC02 e UC03). Os atores \textit{Person} e \textit{Organization} representam os usuários recém-cadastrados, permitindo a atualização de dados da conta (UC07) e a definição de seus papéis específicos no sistema de domínio, como Doador (UC04), Requisitante (UC05) ou Banco de Sangue (UC06).
 
 Já a Figura~\ref{fig:uc-requester} representa o diagrama de caso de uso do ator (\textit{Requester}).
 
@@ -140,7 +140,7 @@ Já a Figura~\ref{fig:uc-requester} representa o diagrama de caso de uso do ator
   \label{fig:uc-requester}
 \end{figure}
 
-O ator \textit{Requester} concentra as permissões relacionadas à criação e à gestão de solicitações de sangue (UC09 e UC14), além do disparo de notificações a doadores potenciais quando uma solicitação precisa de maior alcance (UC15).
+O ator \textit{Requester} concentra as permissões relacionadas à criação de solicitações de doação (UC09) e à sua gestão (UC14), além do disparo de notificações a doadores potenciais quando uma solicitação necessita de maior alcance (UC15).
 
 Por fim, a Figura~\ref{fig:uc-donor} representa o diagrama de caso de uso do ator (\textit{Donor}).
 
@@ -152,7 +152,83 @@ Por fim, a Figura~\ref{fig:uc-donor} representa o diagrama de caso de uso do ato
   \label{fig:uc-donor}
 \end{figure}
 
-O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a consulta às solicitações recomendadas, o registro unificado de doações, a conclusão e o reagendamento de pendentes, a edição de seu perfil e preferências de recomendação, a gestão do próprio histórico hemoterápico e a consulta ao seu resumo (UC08, UC10, UC11, UC12, UC13, UC16 e UC17). No UC11, a doação nasce pendente quando o doador informa a data de intenção ou concluída quando informa a data efetiva --- um único caso de uso, sem fábricas concorrentes no domínio.
+O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a atualização de seu perfil clínico (UC08), a consulta às solicitações recomendadas (UC10), o registro unificado de doações (UC11), a conclusão (UC12) e o reagendamento de doações pendentes (UC16), a consulta ao próprio histórico hemoterápico (UC13) e a emissão de seu resumo (UC17). Vale ressaltar que, no UC11, a doação nasce pendente quando o doador informa a data de intenção ou concluída quando informa a data efetiva --- um único caso de uso, sem fábricas concorrentes no domínio.
+
+\subsubsubsection{Detalhamento dos casos de uso}
+
+Devido à abrangência da API e visando manter a concisão documental, optou-se por detalhar textualmente apenas os casos de uso críticos para o núcleo da aplicação, adotando a estrutura formal de especificação textual proposta por Cockburn (2001). Essa abordagem documenta o fluxo de eventos, as restrições operacionais e as pré-condições de segurança exigidas, justificando arquiteturalmente a ausência de relacionamentos visuais de dependência de autenticação nos diagramas UML.
+
+\vspace{0.5cm}
+
+% --- UC09 ---
+\noindent\textbf{UC09: Registrar solicitação de doação}
+\begin{description}
+    \item[Ator Principal:] Requisitante (\textit{Requester})
+    \item[Pré-condição:] O usuário deve estar autenticado, possuir um token JWT válido e estar registrado com o papel de Requisitante.
+    
+    \item[Cenário Principal:] \itemsep0em
+    \begin{enumerate}
+        \item O Requisitante acessa o sistema e solicita a criação de uma nova campanha.
+        \item O Requisitante informa os dados da necessidade: tipo sanguíneo, quantidade de bolsas, data limite, nível de urgência e hemocentro responsável.
+        \item O sistema valida as regras de negócio, assegurando a integridade dos invariantes.
+        \item O sistema persiste a solicitação ativa.
+        \item O sistema retorna a confirmação de criação com o identificador único gerado.
+    \end{enumerate}
+    
+    \item[Cenários Alternativos:] \itemsep0em
+    \begin{itemize}
+        \item \textbf{3a. Falha de validação de domínio} (ex: data limite no passado ou meta nula):
+        \begin{itemize}
+            \item O sistema rejeita a operação.
+            \item O sistema retorna a descrição estruturada do erro, abortando o fluxo.
+        \end{itemize}
+    \end{itemize}
+\end{description}
+
+\vspace{0.5cm}
+
+% --- UC10 ---
+\noindent\textbf{UC10: Consultar recomendações de solicitações}
+\begin{description}
+    \item[Ator Principal:] Doador (\textit{Donor})
+    \item[Pré-condição:] O usuário deve estar autenticado, possuir um token JWT válido e estar registrado com o papel de Doador.
+    
+    \item[Cenário Principal:] \itemsep0em
+    \begin{enumerate}
+        \item O Doador solicita a visualização de campanhas recomendadas.
+        \item O sistema verifica a elegibilidade temporal do doador com base em sua última doação registrada.
+        \item O sistema busca as solicitações ativas e realiza o cruzamento de compatibilidade tipológica.
+        \item O sistema aplica o filtro geoespacial baseado na distância máxima configurada pelo usuário.
+        \item O sistema ordena os resultados priorizando urgência, proximidade e vencimento do prazo, devolvendo a listagem ao Doador.
+    \end{enumerate}
+    
+    \item[Cenários Alternativos:] \itemsep0em
+    \begin{itemize}
+        \item \textbf{2a. Doador inelegível temporariamente:}
+        \begin{itemize}
+            \item O sistema interrompe o processamento heurístico.
+            \item O sistema retorna uma lista vazia ou um indicativo de inaptidão.
+        \end{itemize}
+    \end{itemize}
+\end{description}
+
+\vspace{0.5cm}
+
+% --- UC12 ---
+\noindent\textbf{UC12: Completar doação pendente}
+\begin{description}
+    \item[Ator Principal:] Doador (\textit{Donor})
+    \item[Pré-condição:] O usuário deve estar autenticado, possuir um token JWT válido e estar registrado com o papel de Doador.
+    
+    \item[Cenário Principal:] \itemsep0em
+    \begin{enumerate}
+        \item O Doador submete a data de efetivação para uma intenção de doação previamente registrada.
+        \item O sistema recupera a doação pendente associada ao identificador.
+        \item O sistema valida a consistência cronológica da data informada em relação à data atual.
+        \item O sistema transiciona o estado do agregado para concluído.
+        \item O sistema atualiza o registro do Doador para computar a nova janela de descanso regulamentar.
+    \end{enumerate}
+\end{description}
 
 \subsection{Diagramas de classes}
 
