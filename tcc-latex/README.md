@@ -56,27 +56,29 @@ Apêndices (código-fonte elaborado pelos autores — NBR 14724):
 ## Requisitos
 
 1. [TeX Live](https://tug.org/texlive/) ou [MiKTeX](https://miktex.org/)
-2. Pacotes: `abntex2`, `abntex2cite`, `newtx`, `graphicx`, `booktabs`, `hyperref`, `enumitem`
+2. Pacotes: `abntex2`, `biblatex`, `biblatex-abnt`, `biber`, `newtx`, `graphicx`, `booktabs`, `hyperref`, `enumitem`
 
 No **MiKTeX** (não use `tlmgr`):
 
 ```powershell
-miktex packages install abntex2 abntex2cite newtx
+miktex packages install abntex2 biblatex biblatex-abnt biber newtx
 ```
 
 No **TeX Live**:
 
 ```bash
-tlmgr install abntex2 abntex2cite newtx
+tlmgr install abntex2 biblatex biblatex-abnt biber newtx
 ```
 
 ## Compilação
+
+O projeto utiliza `biblatex` com estilo `abnt` e motor `biber` (em vez de `bibtex`).
 
 Na pasta `tcc-latex/`:
 
 ```powershell
 pdflatex main
-bibtex main
+biber main
 pdflatex main
 pdflatex main
 ```
@@ -84,10 +86,10 @@ pdflatex main
 Ou com `latexmk`:
 
 ```powershell
-latexmk -pdf -bibtex main.tex
+latexmk -pdf main.tex
 ```
 
-No VS Code / Cursor: extensão **LaTeX Workshop**.
+No VS Code / Cursor: extensão **LaTeX Workshop** configurada com a receita `pdflatex -> biber -> pdflatex -> pdflatex`.
 
 ## Figuras e quadros
 

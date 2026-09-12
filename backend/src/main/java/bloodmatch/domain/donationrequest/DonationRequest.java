@@ -226,6 +226,9 @@ public class DonationRequest extends DomainObject {
     if (elapsedDays >= windowDays)
       return goalBloodBags;
 
+
+    // ALTERAR O -1 PARA QUE ELE MANTENHA QUEBRADO E TRABALHEMOS COM BIGDECIMAL. 
+
     // ceil(goal * elapsed / window) em aritmética inteira. Arredonda para cima para
     // que metas pequenas não fiquem travadas em zero durante toda a janela:
     // com floor, uma meta de 1 bolsa só sairia do zero no último dia.

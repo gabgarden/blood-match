@@ -17,6 +17,7 @@ import java.util.List;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+  private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(JwtAuthenticationFilter.class);
   private static final String AUTHORIZATION_HEADER = "Authorization";
   private static final String BEARER_PREFIX = "Bearer ";
 
@@ -31,6 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
 
     String token = extractBearerToken(request);
+    LOGGER.info("JwtFilter: method={} uri={} authHeader={} tokenExtracted={}",
+        request.getMethod(), request.getRequestURI(), request.getHeader(AUTHORIZATION_HEADER), token != null);
 
     if (token != null) {
       if (!jwtTokenProvider.validateToken(token)) {
@@ -49,7 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       UsernamePasswordAuthenticationToken authentication =
           new UsernamePasswordAuthenticationToken(principal, null, authorities);
 
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+      org.springframework.security.core.context.SecurityContext context = SecurityContextHolder.createEmptyContext();
+      context.setAuthentication(authentication);
+      SecurityContextHolder.setContext(context);
     }
 
     filterChain.doFilter(request, response);

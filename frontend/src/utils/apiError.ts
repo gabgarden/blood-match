@@ -107,6 +107,9 @@ export function translateKnownApiMessage(message: string): string {
   }
 
   const normalized = message.toLowerCase();
+  if (normalized === "unauthorized" || normalized.includes("invalid or expired token")) {
+    return "Sessão expirada. Faça login novamente.";
+  }
   if (normalized.includes("email not confirmed")) {
     return "Confirme seu e-mail antes de entrar.";
   }

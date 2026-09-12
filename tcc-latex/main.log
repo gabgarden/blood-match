@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  11 SEP 2026 14:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  11 SEP 2026 15:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2261,12 +2261,7 @@ Cap\'{\i }tulo 7.
 
 
 
-] [57]) [58]
-
-Package biblatex Warning: Month out of range or not an integer
-(biblatex)                at entry 'ceara2021' on input line 265.
-
-[59
+] [57]) [58] [59
 
 
 
@@ -2394,7 +2389,7 @@ grams/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/garde/AppData/Local/P
 rograms/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users/garde/AppData/Local/
 Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/Users/garde/AppData/Local
 /Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on main.pdf (74 pages, 1055858 bytes).
+Output written on main.pdf (74 pages, 1055857 bytes).
 PDF statistics:
  1651 PDF objects out of 1728 (max. 8388607)
  569 named destinations out of 1000 (max. 500000)

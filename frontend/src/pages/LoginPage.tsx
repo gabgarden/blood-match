@@ -22,7 +22,11 @@ export default function LoginPage() {
   useEffect(() => {
     const notice = authService.consumePostLoginNotice();
     if (notice) {
-      setSuccessMessage(notice);
+      if (notice.toLowerCase().includes("expirad") || notice.toLowerCase().includes("erro") || notice.toLowerCase().includes("inválid")) {
+        setErrorMessage(notice);
+      } else {
+        setSuccessMessage(notice);
+      }
     }
   }, []);
 

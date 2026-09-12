@@ -38,6 +38,14 @@ public class SecurityConfig {
   }
 
   @Bean
+  public org.springframework.boot.web.servlet.FilterRegistrationBean<JwtAuthenticationFilter> jwtFilterRegistration(JwtAuthenticationFilter filter) {
+    org.springframework.boot.web.servlet.FilterRegistrationBean<JwtAuthenticationFilter> registration =
+        new org.springframework.boot.web.servlet.FilterRegistrationBean<>(filter);
+    registration.setEnabled(false);
+    return registration;
+  }
+
+  @Bean
   public UserDetailsService userDetailsService() {
     return username -> {
       throw new UsernameNotFoundException("Username/password login is disabled");
@@ -97,9 +105,9 @@ public class SecurityConfig {
             .requestMatchers(PATCH, "/donations/reschedule")
                 .hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
 
-            .requestMatchers(PATCH, "/parties/name").authenticated()
+            .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/parties/name", "PATCH")).authenticated()
             .requestMatchers(POST, "/donors").authenticated()
-            .requestMatchers(PATCH, "/donors/profile").authenticated()
+            .requestMatchers(new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/donors/profile", "PATCH")).authenticated()
             .requestMatchers(PATCH, "/donors/recommendation-distance")
                 .hasAnyAuthority("DONOR", "SYSTEM_ADMIN")
             .requestMatchers(POST, "/requesters").authenticated()

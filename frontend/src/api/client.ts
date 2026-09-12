@@ -29,9 +29,8 @@ function shouldForceLogoutOn401(error: unknown): boolean {
     return false;
   }
 
-  // Backend bug: alguns endpoints (ex.: /donors/{id}/summary) devolvem 401 "Unauthorized"
-  // com JWT válido. Só derruba a sessão quando o token é de fato inválido/expirado.
-  return response.data?.error === "Invalid or expired token";
+  const errStr = typeof response.data?.error === "string" ? response.data.error.trim() : "";
+  return errStr === "Invalid or expired token";
 }
 
 /** Cliente para rotas públicas — nunca envia Bearer nem faz logout global. */

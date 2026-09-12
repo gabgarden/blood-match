@@ -2,11 +2,13 @@ package bloodmatch.interfaces.rest.security;
 
 import bloodmatch.application.usecase.donationrequest.GetDonationRequestsByPartyIdUseCase;
 import bloodmatch.application.usecase.donationrequest.recommendations.GetRecommendedRequestsUseCase;
+import bloodmatch.application.usecase.party.UpdatePartyNameUseCase;
 import bloodmatch.infra.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,6 +20,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +39,9 @@ class SecurityAuthorizationIntegrationTest {
 
   @MockitoBean
   private GetDonationRequestsByPartyIdUseCase getDonationRequestsByPartyIdUseCase;
+
+  @MockitoBean
+  private UpdatePartyNameUseCase updatePartyNameUseCase;
 
   @Test
   void shouldReturn401WhenTokenIsMissing() throws Exception {
@@ -154,5 +160,50 @@ class SecurityAuthorizationIntegrationTest {
         .andExpect(status().isForbidden());
 
     verify(getDonationRequestsByPartyIdUseCase, never()).execute(any(GetDonationRequestsByPartyIdUseCase.Input.class));
+  }
+
+  @Test
+  void shouldReturn401WhenTokenIsMissingForUpdatePartyName() throws Exception {
+    mockMvc.perform(patch("/parties/name")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"partyId\":\"" + UUID.randomUUID() + "\",\"newName\":\"Test\"}"))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void shouldReturn200WhenTokenIsPresentForUpdatePartyName() throws Exception {
+    String token = "valid-token";
+    String partyId = UUID.randomUUID().toString();
+
+    when(jwtTokenProvider.validateToken(token)).thenReturn(true);
+    when(jwtTokenProvider.extractRoles(token)).thenReturn(List.of("DONOR"));
+    when(jwtTokenProvider.extractUserId(token)).thenReturn(UUID.randomUUID().toString());
+    when(jwtTokenProvider.extractPartyId(token)).thenReturn(partyId);
+    when(updatePartyNameUseCase.execute(any(UpdatePartyNameUseCase.Input.class)))
+        .thenReturn(new UpdatePartyNameUseCase.Output(partyId, "New Name"));
+
+    mockMvc.perform(patch("/parties/name")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"partyId\":\"" + partyId + "\",\"newName\":\"New Name\"}"))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  void shouldReturn403WhenPartyIdMismatchForUpdatePartyName() throws Exception {
+    String token = "valid-token";
+    String tokenPartyId = UUID.randomUUID().toString();
+    String otherPartyId = UUID.randomUUID().toString();
+
+    when(jwtTokenProvider.validateToken(token)).thenReturn(true);
+    when(jwtTokenProvider.extractRoles(token)).thenReturn(List.of("DONOR"));
+    when(jwtTokenProvider.extractUserId(token)).thenReturn(UUID.randomUUID().toString());
+    when(jwtTokenProvider.extractPartyId(token)).thenReturn(tokenPartyId);
+
+    mockMvc.perform(patch("/parties/name")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"partyId\":\"" + otherPartyId + "\",\"newName\":\"New Name\"}"))
+        .andExpect(status().isForbidden());
   }
 }
