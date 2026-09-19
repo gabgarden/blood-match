@@ -43,28 +43,45 @@
 \newlabel{lst:create-request-usecase}{{5.2}{48}{Exemplo de Caso de Uso com Padrão Output execute(Input)}{lstlisting.5.2}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {5.2}Exemplo de Caso de Uso com Padrão Output execute(Input)}{48}{lstlisting.5.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.5.3}Camada de Domínio: Agregado, Invariantes no Construtor e \textit  {Static Factory Method}}{49}{subsection.5.5.3}\protected@file@percent }
-\newlabel{lst:donation-request-domain}{{5.3}{50}{Construtor com Invariantes e Método Fabril Estático do Agregado}{lstlisting.5.3}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.3}Construtor com Invariantes e Método Fabril Estático do Agregado}{50}{lstlisting.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.4}Camada de Infraestrutura: Repositório e Controle de Concorrência Otimista}{51}{subsection.5.5.4}\protected@file@percent }
-\newlabel{lst:donation-request-schema}{{5.4}{51}{Mapeamento e Controle de Concorrência Otimista}{lstlisting.5.4}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.4}Mapeamento e Controle de Concorrência Otimista}{51}{lstlisting.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.4.1}Composição versus Herança na Arquitetura do Repositório}{52}{subsubsection.5.5.4.1}\protected@file@percent }
-\newlabel{lst:donation-request-repo-interface}{{5.5}{53}{Interface de Domínio do Repositório (Porta)}{lstlisting.5.5}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.5}Interface de Domínio do Repositório (Porta)}{53}{lstlisting.5.5}\protected@file@percent }
-\newlabel{lst:donation-request-repo-impl}{{5.6}{53}{Implementação do Repositório via Composição e Controle de Concorrência Otimista}{lstlisting.5.6}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.6}Implementação do Repositório via Composição e Controle de Concorrência Otimista}{53}{lstlisting.5.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.5}Segurança e autenticação}{55}{subsection.5.5.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.6}Serviços externos e documentação da API}{55}{subsection.5.5.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.6}Recomendação de solicitações e cumprimento de metas}{55}{section.5.6}\protected@file@percent }
-\newlabel{sec:recomendacao-fulfillment}{{5.6}{55}{Recomendação de solicitações e cumprimento de metas}{section.5.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.1}Recomendação de solicitações para o doador}{55}{subsection.5.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.2}Notificação de doadores potenciais}{56}{subsection.5.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.3}Snapshot do cumprimento de metas}{56}{subsection.5.6.3}\protected@file@percent }
-\newlabel{sec:fulfillment-bags}{{5.6.3}{56}{Snapshot do cumprimento de metas}{subsection.5.6.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Cenário ilustrativo de alocação contínua restrita por teto proporcional}}{58}{figure.5.12}\protected@file@percent }
-\newlabel{fig:exemplo-alocacao-teto}{{12}{58}{Elaborado pelos próprios autores (2026)}{figure.5.12}{}}
+\newlabel{lst:donation-request-domain}{{5.3}{50}{Construtor com Invariantes e \textit {Static Factory Method} do Agregado}{lstlisting.5.3}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.3}Construtor com Invariantes e \textit  {Static Factory Method} do Agregado}{50}{lstlisting.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.4}Camada de Infraestrutura: Mapeamento de Esquemas e Persistência}{51}{subsection.5.5.4}\protected@file@percent }
+\newlabel{sec:infra-persistencia}{{5.5.4}{51}{Camada de Infraestrutura: Mapeamento de Esquemas e Persistência}{subsection.5.5.4}{}}
+\newlabel{lst:donation-request-schema}{{5.4}{51}{Mapeamento do Esquema com Concorrência Otimista e Índice Geoespacial}{lstlisting.5.4}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.4}Mapeamento do Esquema com Concorrência Otimista e Índice Geoespacial}{51}{lstlisting.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.4.1}Indexação Geoespacial no MongoDB e Consultas por Proximidade}{52}{subsubsection.5.5.4.1}\protected@file@percent }
+\newlabel{sec:indice-geoespacial}{{5.5.4.1}{52}{Indexação Geoespacial no MongoDB e Consultas por Proximidade}{subsubsection.5.5.4.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.4.2}Composição versus Herança na Arquitetura do Repositório}{53}{subsubsection.5.5.4.2}\protected@file@percent }
+\newlabel{lst:donation-request-repo-interface}{{5.5}{54}{Interface de Domínio do Repositório (Porta)}{lstlisting.5.5}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.5}Interface de Domínio do Repositório (Porta)}{54}{lstlisting.5.5}\protected@file@percent }
+\newlabel{lst:donation-request-repo-impl}{{5.6}{54}{Implementação do Repositório via Composição e Controle de Concorrência Otimista}{lstlisting.5.6}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.6}Implementação do Repositório via Composição e Controle de Concorrência Otimista}{54}{lstlisting.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.5}Segurança e autenticação}{56}{subsection.5.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.6}Serviços externos e documentação da API}{56}{subsection.5.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.6}Recomendação de solicitações e cumprimento de metas}{57}{section.5.6}\protected@file@percent }
+\newlabel{sec:recomendacao-fulfillment}{{5.6}{57}{Recomendação de solicitações e cumprimento de metas}{section.5.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.1}Recomendação de solicitações para o doador}{57}{subsection.5.6.1}\protected@file@percent }
+\newlabel{lst:get-recommended-requests-usecase}{{5.7}{57}{Caso de Uso de Recomendação de Solicitações ao Doador}{lstlisting.5.7}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.7}Caso de Uso de Recomendação de Solicitações ao Doador}{57}{lstlisting.5.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.2}Notificação de doadores potenciais}{60}{subsection.5.6.2}\protected@file@percent }
+\newlabel{lst:notify-potential-donors-usecase}{{5.8}{60}{Caso de Uso de Notificação Ativa de Doadores Potenciais}{lstlisting.5.8}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.8}Caso de Uso de Notificação Ativa de Doadores Potenciais}{60}{lstlisting.5.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6.3}Snapshot do cumprimento de metas}{62}{subsection.5.6.3}\protected@file@percent }
+\newlabel{sec:fulfillment-bags}{{5.6.3}{62}{Snapshot do cumprimento de metas}{subsection.5.6.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Cenário ilustrativo de alocação contínua restrita por teto proporcional}}{63}{figure.5.12}\protected@file@percent }
+\newlabel{fig:exemplo-alocacao-teto}{{12}{63}{Elaborado pelos próprios autores (2026)}{figure.5.12}{}}
+\newlabel{lst:fulfillment-service}{{5.9}{65}{Serviço de Domínio para Cumprimento de Metas das Solicitações}{lstlisting.5.9}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.9}Serviço de Domínio para Cumprimento de Metas das Solicitações}{65}{lstlisting.5.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.7}Controle Otimista de Concorrência}{70}{section.5.7}\protected@file@percent }
+\newlabel{sec:controle-otimista-concorrencia}{{5.7}{70}{Controle Otimista de Concorrência}{section.5.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.1}Caso de uso de atualização de solicitação}{71}{subsection.5.7.1}\protected@file@percent }
+\newlabel{lst:update-request-usecase}{{5.10}{71}{Caso de Uso de Atualização com Verificação Precoce de Concorrência}{lstlisting.5.10}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.10}Caso de Uso de Atualização com Verificação Precoce de Concorrência}{71}{lstlisting.5.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7.2}Os dois momentos de checagem de versão}{73}{subsection.5.7.2}\protected@file@percent }
+\newlabel{lst:optimistic-concurrency-util}{{5.11}{74}{Isolamento de Concorrência Otimista na Infraestrutura}{lstlisting.5.11}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.11}Isolamento de Concorrência Otimista na Infraestrutura}{74}{lstlisting.5.11}\protected@file@percent }
 \@setckpt{capitulos/05-estudo-de-caso}{
-\setcounter{page}{61}
+\setcounter{page}{76}
 \setcounter{equation}{1}
 \setcounter{enumi}{2}
 \setcounter{enumii}{0}
@@ -77,8 +94,8 @@
 \setcounter{book}{0}
 \setcounter{part}{0}
 \setcounter{chapter}{5}
-\setcounter{section}{6}
-\setcounter{subsection}{3}
+\setcounter{section}{7}
+\setcounter{subsection}{2}
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
@@ -112,14 +129,14 @@
 \setcounter{cmsm@mctr}{0}
 \setcounter{bsm@mctr}{0}
 \setcounter{workm@mctr}{0}
-\setcounter{sheetsequence}{62}
-\setcounter{lastsheet}{84}
-\setcounter{lastpage}{83}
+\setcounter{sheetsequence}{77}
+\setcounter{lastsheet}{87}
+\setcounter{lastpage}{86}
 \setcounter{figure}{12}
 \setcounter{lofdepth}{1}
 \setcounter{table}{9}
 \setcounter{lotdepth}{1}
-\setcounter{Item}{11}
+\setcounter{Item}{13}
 \setcounter{Hfootnote}{0}
 \setcounter{bookmark@seq@number}{0}
 \setcounter{memhycontfloat}{0}
@@ -247,6 +264,6 @@
 \setcounter{LT@tables}{0}
 \setcounter{LT@chunks}{0}
 \setcounter{float@type}{8}
-\setcounter{lstnumber}{71}
-\setcounter{lstlisting}{6}
+\setcounter{lstnumber}{19}
+\setcounter{lstlisting}{11}
 }

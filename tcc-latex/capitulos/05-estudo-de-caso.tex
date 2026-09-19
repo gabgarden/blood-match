@@ -255,7 +255,7 @@ Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementaçã
   \label{fig:impl-donation}
 \end{figure}
 
-Tratada também como uma raiz de agregado autônoma, a classe concentra um único método fabril estático (\textit{static factory method}) \codigo{create} e o ciclo de vida pendente--concluída--cancelada. O estado não é armazenado como flags independentes: deriva das datas de intenção (\codigo{intendedDate}), de efetivação (\codigo{donationDate}) e de cancelamento (\codigo{cancelledAt}). Completar uma doação pendente preenche a data efetiva sem apagar a intenção; reagendar e cancelar permanecem transições sobre o mesmo agregado. A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
+Tratada também como uma raiz de agregado autônoma, a classe concentra um único \textit{static factory method} \codigo{create} e o ciclo de vida pendente--concluída--cancelada. O estado não é armazenado como flags independentes: deriva das datas de intenção (\codigo{intendedDate}), de efetivação (\codigo{donationDate}) e de cancelamento (\codigo{cancelledAt}). Completar uma doação pendente preenche a data efetiva sem apagar a intenção; reagendar e cancelar permanecem transições sobre o mesmo agregado. A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
 
 \section{Domínio e arquitetura}
 
@@ -353,7 +353,7 @@ public class CreateDonationRequestController {
 
 \subsection{Camada de Aplicação: Casos de Uso e o Padrão \textit{execute}}
 
-A camada de aplicação orquestra o fluxo de dados coordenando chamadas aos repositórios e aos serviços de domínio. O \codigo{CreateDonationRequestUseCase} carrega as entidades associadas (\codigo{Requester} e \codigo{BloodCenter}), invoca o método fabril estático da entidade e instrui o repositório a persistir o novo agregado. Esta camada desconhece qualquer dependência de infraestrutura, utilizando exclusivamente portas de interfaces.
+A camada de aplicação orquestra o fluxo de dados coordenando chamadas aos repositórios e aos serviços de domínio. O \codigo{CreateDonationRequestUseCase} carrega as entidades associadas (\codigo{Requester} e \codigo{BloodCenter}), invoca o \textit{static factory method} da entidade e instrui o repositório a persistir o novo agregado. Esta camada desconhece qualquer dependência de infraestrutura, utilizando exclusivamente portas de interfaces.
 
 Para padronizar a orquestração de negócios, todos os casos de uso do sistema adotam o padrão formal estruturado na assinatura:
 \begin{equation}
@@ -363,7 +363,7 @@ Para padronizar a orquestração de negócios, todos os casos de uso do sistema 
 Essa padronização fundamenta-se nos seguintes princípios arquiteturais:
 \begin{itemize}
   \item \textbf{Princípio da Responsabilidade Única (SRP) e \textit{Command Pattern}:} Cada classe de caso de uso representa uma única operação de negócio do sistema. A presença de um único ponto de entrada público (\codigo{execute}) impede que a classe se transforme em um serviço inflado com múltiplos métodos de ciclos de vida distintos, mantendo a responsabilidade estrita e coesa.
-  \item \textbf{Isolamento da Camada Web via DTOs Imutáveis (\textit{Records}):} Os objetos \codigo{Input} e \codigo{Output} são definidos como Java \textit{records}, garantindo imutabilidade e eliminação de efeitos colaterais. O \codigo{Input} não possui acoplamento com anotações de infraestrutura HTTP (como \codigo{@Valid} ou anotações do Jackson), sendo a camada de apresentação responsável por mapear o DTO da requisição para o \codigo{Input}.
+  \item \textbf{Isolamento da Camada de Apresentação via DTOs Imutáveis (\textit{Records}):} Os objetos \codigo{Input} e \codigo{Output} são concebidos como \textit{records} imutáveis puros da linguagem Java, desprovidos de quaisquer dependências ou anotações de frameworks Web e bibliotecas de serialização. Essa separação garante que a lógica de aplicação permaneça agnóstica ao protocolo ou mecanismo de entrega, cabendo aos controladores da camada de apresentação mapear o corpo das requisições HTTP para os registros de entrada do caso de uso.
   \item \textbf{Proteção contra Vazamento de Domínio:} O \codigo{Output} expõe estritamente os atributos necessários para a resposta ao cliente (como identificadores de recursos gerados), impedindo que entidades e agregados ricos de domínio vazem acidentalmente para camadas externas.
   \item \textbf{Determinismo Temporal em Testes:} O método \codigo{execute} admite uma sobrecarga que recebe a data corrente (\codigo{LocalDate currentDate}), viabilizando testes unitários puramente determinísticos sobre regras de expiração e prazos, sem ancoragem rígida ao relógio do sistema operacional.
 \end{itemize}
@@ -427,15 +427,15 @@ public class CreateDonationRequestUseCase {
 
 O coração do \textit{software} reside na camada de domínio. A classe \codigo{DonationRequest} atua como a raiz do agregado, protegendo os seus invariantes e garantindo que nenhuma solicitação seja instanciada em um estado inválido.
 
-Nesse contexto, cabe distinguir com rigor o padrão adotado das fábricas clássicas do GoF (\textit{Factory Method} polimórfico e \textit{Abstract Factory}) ou de serviços de fábrica dedicados do DDD (\textit{Domain Factories}). O modelo implementa o padrão idiomático \textbf{\textit{Static Factory Method}} (Método Fabril Estático), formalizado por Joshua Bloch (2018, Item~1):
+Nesse contexto, cabe distinguir com rigor o padrão adotado das fábricas clássicas do GoF (\textit{Factory Method} polimórfico e \textit{Abstract Factory}) ou de serviços de fábrica dedicados do DDD (\textit{Domain Factories}). O modelo implementa o padrão idiomático \textbf{\textit{Static Factory Method}}, formalizado por Joshua Bloch (2018, Item~1):
 \begin{itemize}
   \item \textbf{Expressividade Semântica:} Diferencia de forma explícita as intenções de criação no ciclo de vida do agregado. O método \codigo{DonationRequest.create(...)} expressa a criação de uma nova solicitação no sistema (gerando um novo \codigo{DomainID} e definindo o estado inicial ativo), enquanto o método \codigo{DonationRequest.reconstitute(...)} expressa a reconstituição de um agregado pré-existente carregado a partir do banco de dados, preservando o identificador e a versão de persistência originais.
-  \item \textbf{Proteção de Invariantes no Construtor:} As invariantes de consistência e regras estruturais essenciais (como proibir metas zeradas, garantir campos obrigatórios não nulos e impedir datas limite anteriores à data de criação) residem obrigatoriamente no \textbf{construtor} da classe. Em Java, o construtor atua como o ponto de estrangulamento obrigatório de instanciação (\textit{chokepoint of integrity}). Se as validações de invariantes permanecessem soltas apenas no método estático \codigo{create}, o construtor ficaria desprotegido contra chamadas que pudessem gerar um objeto inconsistente. Portanto, o construtor impõe as regras de integridade do agregado antes de qualquer atribuição de estado, cabendo ao método fabril estático apenas a orquestração semântica dos parâmetros.
+  \item \textbf{Proteção de Invariantes no Construtor:} As invariantes de consistência e regras estruturais essenciais (como proibir metas zeradas, garantir campos obrigatórios não nulos e impedir datas limite anteriores à data de criação) residem obrigatoriamente no \textbf{construtor} da classe. Em Java, o construtor atua como o ponto de estrangulamento obrigatório de instanciação (\textit{chokepoint of integrity}). Se as validações de invariantes permanecessem soltas apenas no método estático \codigo{create}, o construtor ficaria desprotegido contra chamadas que pudessem gerar um objeto inconsistente. Portanto, o construtor impõe as regras de integridade do agregado antes de qualquer atribuição de estado, cabendo ao \textit{static factory method} apenas a orquestração semântica dos parâmetros.
 \end{itemize}
 
-A Listagem~\ref{lst:donation-request-domain} ilustra a proteção das invariantes no construtor do agregado e sua instanciação coordenada pelo método fabril estático.
+A Listagem~\ref{lst:donation-request-domain} ilustra a proteção das invariantes no construtor do agregado e sua instanciação coordenada pelo \textit{static factory method}.
 
-\begin{lstlisting}[language=Java, caption={Construtor com Invariantes e Método Fabril Estático do Agregado}, label={lst:donation-request-domain}]
+\begin{lstlisting}[language=Java, caption={Construtor com Invariantes e \textit{Static Factory Method} do Agregado}, label={lst:donation-request-domain}]
 public class DonationRequest extends DomainObject {
   private Requester requester;
   private BloodCenter bloodCenter;
@@ -480,7 +480,7 @@ public class DonationRequest extends DomainObject {
     this.directedTo = directedTo;
   }
 
-  // Metodo Fabril Estatico (Static Factory Method)
+  // Static Factory Method
   public static DonationRequest create(
       Requester requester, BloodCenter bloodCenter, BloodType bloodTypeNeeded,
       int goalBloodBags, LocalDate dateLimit, LocalDate currentDate,
@@ -492,33 +492,72 @@ public class DonationRequest extends DomainObject {
 }
 \end{lstlisting}
 
-\subsection{Camada de Infraestrutura: Repositório e Controle de Concorrência Otimista}
+\subsection{Camada de Infraestrutura: Mapeamento de Esquemas e Persistência}
+\label{sec:infra-persistencia}
 
-Na extremidade da arquitetura, a camada de infraestrutura traduz o modelo conceitual de domínio para as estruturas do banco de dados (MongoDB). Para proteger o sistema contra acessos simultâneos concorrentes (como a alteração concorrente da meta e do prazo de uma mesma solicitação), adota-se formalmente o mecanismo de \textbf{Controle de Concorrência Otimista} (\textit{Optimistic Concurrency Control} --- OCC), fundamentado nas proposições clássicas de Kung e Robinson (1981) e Fowler (2002). No esquema de persistência, o OCC é suportado pela anotação \codigo{@Version}, conforme exibido na Listagem~\ref{lst:donation-request-schema}.
+Na extremidade da arquitetura, a camada de infraestrutura traduz o modelo conceitual de domínio para as estruturas de persistência orientadas a documentos do MongoDB. Essa conversão é desempenhada por classes de esquema (\textit{schemas}), que mapeiam agregados ricos em documentos BSON. Destacam-se nesse mapeamento duas responsabilidades essenciais: a proteção contra acessos simultâneos concorrentes via anotação \codigo{@Version} --- suportando o Controle de Concorrência Otimista (OCC), detalhado na Seção~\ref{sec:controle-otimista-concorrencia} --- e a indexação espacial para viabilizar consultas eficientes de proximidade geográfica. A Listagem~\ref{lst:donation-request-schema} apresenta a definição de \codigo{DonationRequestSchema}, evidenciando o mapeamento do agregado, a versão de persistência e o atributo de localização com índice esférico.
 
-\begin{lstlisting}[language=Java, caption={Mapeamento e Controle de Concorrência Otimista}, label={lst:donation-request-schema}]
+\begin{lstlisting}[language=Java, caption={Mapeamento do Esquema com Concorrência Otimista e Índice Geoespacial}, label={lst:donation-request-schema}]
 @Document(collection = "donation_requests")
 public class DonationRequestSchema {
 
   @Id
   private String id;
-  private String requesterId;
-  private String bloodTypeNeeded;
-  private int goalBloodBags;
-
   @Version
   private Long version; // Controle de Concorrencia Otimista (OCC)
+  private String requesterId;
+  private String organizationId;
+  private String bloodTypeNeeded;
+  private int goalBloodBags;
+  private LocalDate dateRequested;
+  private LocalDate dateLimit;
+  private boolean active;
+  private String urgency;
+  private String directedTo;
 
-  public static DonationRequestSchema fromDomain(DonationRequest domain) {
-    DonationRequestSchema schema = new DonationRequestSchema();
-    schema.id = domain.getId().getValue().toString();
-    schema.requesterId = domain.getRequester().getId().getValue().toString();
-    schema.goalBloodBags = domain.getGoalBloodBags();
-    schema.version = domain.getVersion();
-    return schema;
+  @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+  private double[] location; // Coordenadas [longitude, latitude]
+
+  public DonationRequestSchema(DonationRequest donationRequest) {
+    if (donationRequest == null)
+      throw new IllegalArgumentException("DonationRequest cannot be null");
+
+    this.id = donationRequest.getId().getValue().toString();
+    this.version = donationRequest.getVersion();
+    this.requesterId = donationRequest.getRequester().getParty().getId().getValue().toString();
+    this.organizationId = donationRequest.getBloodCenter().getOrganization().getId().getValue().toString();
+    this.bloodTypeNeeded = donationRequest.getBloodTypeNeeded().getType();
+    this.goalBloodBags = donationRequest.getGoalBloodBags();
+    this.dateRequested = donationRequest.getDateRequested();
+    this.dateLimit = donationRequest.getDateLimit();
+    this.active = donationRequest.isActive();
+    this.urgency = donationRequest.getUrgency().name();
+    this.directedTo = donationRequest.getDirectedTo();
+    if (donationRequest.getBloodCenter().getOrganization().getAddress() != null
+        && donationRequest.getBloodCenter().getOrganization().getAddress().hasCoordinates()) {
+      this.location = new double[] {
+          donationRequest.getBloodCenter().getOrganization().getAddress().getLongitude(),
+          donationRequest.getBloodCenter().getOrganization().getAddress().getLatitude()
+      };
+    }
   }
 }
 \end{lstlisting}
+
+\subsubsection{Indexação Geoespacial no MongoDB e Consultas por Proximidade}
+\label{sec:indice-geoespacial}
+
+A captação eficiente de doadores demanda não apenas a verificação biológica de compatibilidade sanguínea, mas também a avaliação da viabilidade logística do deslocamento do voluntário até o hemocentro responsável pela coleta. Para permitir que o sistema filtre rapidamente demandas situadas dentro do raio de interesse do doador sem incorrer na sobrecarga de calcular distâncias euclidianas ou geodésicas em memória sobre toda a base de dados, a arquitetura delega o processamento espacial ao próprio motor de banco de dados por meio da indexação nativa do MongoDB.
+
+O MongoDB disponibiliza índices geoespaciais do tipo \texttt{2dsphere}, projetados especificamente para modelar geometrias sobre uma esfera semelhante à Terra, aderindo ao elipsoide de referência padrão WGS~84. No esquema de persistência \codigo{DonationRequestSchema}, a anotação \texttt{@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO\_2DSPHERE)} instrui o Spring Data a registrar um índice espacial esférico bidimensional na coleção \texttt{donation\_requests}. O atributo \codigo{location} armazena as coordenadas no formato \texttt{[longitude, latitude]}, seguindo a convenção estrita do padrão GeoJSON e da biblioteca geoespacial do MongoDB (na qual a coordenada de longitude precede a latitude).
+
+Essa estrutura viabiliza a execução de consultas geodésicas de alta performance na camada de repositório. Conforme demonstrado no método \codigo{findActiveRequestsForDonor} da classe \codigo{DonationRequestRepositoryImpl} (Listagem~\ref{lst:donation-request-repo-impl}), o sistema projeta o endereço do doador em um ponto geográfico (\codigo{Point}) e instancia um objeto de raio delimitador (\codigo{Distance}) parametrizado pela métrica em quilômetros (\codigo{Metrics.KILOMETERS}). O método derivado da interface Spring Data:
+\begin{lstlisting}[language=Java]
+findByActiveTrueAndDateLimitGreaterThanEqualAndBloodTypeNeededInAndLocationNear(
+    LocalDate currentDate, List<String> bloodTypes,
+    Point location, Distance maxDistance);
+\end{lstlisting}
+é traduzido internamente para uma consulta MongoDB com o operador geoespacial \texttt{\$near}. Dessa forma, o banco de dados executa a triagem espacial e biológica em uma única operação atômica e indexada, retornando à aplicação apenas os esquemas das solicitações geograficamente próximas e tipologicamente compatíveis, otimizando drasticamente o tempo de resposta e o consumo de memória na reconstituição dos agregados.
 
 \subsubsection{Composição versus Herança na Arquitetura do Repositório}
 
@@ -657,20 +696,253 @@ Esta seção detalha o mecanismo central da API: a recomendação de solicitaç�
 
 \subsection{Recomendação de solicitações para o doador}
 
-O caminho de leitura é implementado pelo \codigo{GetRecommendedRequestsUseCase}, acionado pelo \textit{endpoint} \codigo{GET /donation-requests/recommendations}. Dado um doador autenticado, o caso de uso primeiro verifica sua elegibilidade para doar na data corrente --- método \codigo{Donor.isEligibleToDonate(...)} (Listagem~\ref{lst:donor-eligible}) ---, considerando faixa etária e intervalo mínimo desde a última doação. Em seguida, busca no repositório as solicitações ativas compatíveis com o tipo sanguíneo do doador (Listagem~\ref{lst:bloodtype-candonateto}), dentro da distância máxima de recomendação configurada por ele (RF21) e ainda não expiradas, aproveitando o índice geoespacial descrito na Seção anterior.
+O caminho de leitura é implementado pelo \codigo{GetRecommendedRequestsUseCase}, acionado pelo \textit{endpoint} \texttt{GET /donation-requests/recommendations}. Dado um doador autenticado, o caso de uso primeiro verifica sua elegibilidade para doar na data corrente por meio do método \codigo{Donor.isEligibleToDonate(...)}, considerando faixa etária válida e intervalo mínimo desde a última doação. Em seguida, busca no repositório as solicitações ativas compatíveis com o tipo sanguíneo do doador (avaliadas segundo as regras de compatibilidade de \codigo{BloodType.canDonateTo}), dentro da distância máxima de recomendação configurada por ele (RF21) e ainda não expiradas, aproveitando o índice geoespacial \texttt{2dsphere} configurado no esquema de persistência e detalhado na Seção~\ref{sec:indice-geoespacial} e na Listagem~\ref{lst:donation-request-repo-impl}.
 
 As solicitações candidatas cuja meta já foi atingida no \textit{snapshot} de preenchimento são descartadas, e as demais são ordenadas por proximidade geográfica, urgência e proximidade da data-limite, de modo que o doador visualize primeiro as solicitações mais próximas, mais urgentes e mais próximas de expirar. O resultado retornado inclui, para cada solicitação recomendada, a distância estimada, a urgência, a meta de bolsas e o total já cumprido --- este último obtido do \codigo{DonationRequestFulfillmentService} no momento da leitura, sem campo persistido.
 
+A Listagem~\ref{lst:get-recommended-requests-usecase} apresenta a implementação completa do caso de uso, ilustrando a recepção do \codigo{Input}, a verificação de elegibilidade do doador, a consulta espacial ao repositório, o cálculo de preenchimento via \codigo{fulfillmentService.fill} e a ordenação multi-critério em memória.
+
+\begin{lstlisting}[language=Java, caption={Caso de Uso de Recomendação de Solicitações ao Doador}, label={lst:get-recommended-requests-usecase}]
+package bloodmatch.request.application.recommendations;
+
+import bloodmatch.shared.application.exception.NotFoundException;
+import bloodmatch.shared.application.exception.ValidationException;
+import bloodmatch.shared.application.shared.DomainIdParser;
+import bloodmatch.request.domain.DonationRequest;
+import bloodmatch.request.domain.DonationRequestRepositoryInterface;
+import bloodmatch.role.domain.person.donor.DonorRepositoryInterface;
+import bloodmatch.role.domain.person.donor.Donor;
+import bloodmatch.request.domain.DonationRequestFulfillmentService;
+import bloodmatch.request.domain.DonationRequestFulfillmentStatusRecord;
+import bloodmatch.shared.domain.valueObjects.Address;
+import bloodmatch.shared.domain.valueObjects.DomainID;
+import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class GetRecommendedRequestsUseCase {
+
+  private final DonorRepositoryInterface donorRepository;
+  private final DonationRequestRepositoryInterface donationRequestRepository;
+  private final DonationRequestFulfillmentService fulfillmentService;
+
+  public GetRecommendedRequestsUseCase(
+      DonorRepositoryInterface donorRepository,
+      DonationRequestRepositoryInterface donationRequestRepository,
+      DonationRequestFulfillmentService fulfillmentService) {
+    this.donorRepository = donorRepository;
+    this.donationRequestRepository = donationRequestRepository;
+    this.fulfillmentService = fulfillmentService;
+  }
+
+  public List<OutputItem> execute(Input input) {
+    return execute(input, LocalDate.now());
+  }
+
+  public List<OutputItem> execute(Input input, LocalDate currentDate) {
+    if (input == null || currentDate == null)
+      throw new ValidationException("Parameters cannot be null");
+
+    DomainID personId = DomainIdParser.parse(input.personId(), "personId");
+    Donor donor = donorRepository.findByPartyId(personId)
+        .orElseThrow(() -> new NotFoundException("Donor role not found"));
+
+    if (!input.includeNonEligible() && !donor.isEligibleToDonate(currentDate)) {
+      return List.of();
+    }
+
+    List<DonationRequest> candidateRequests = donationRequestRepository.findActiveRequestsForDonor(
+        donor.getBloodType(),
+        donor.getPerson().getAddress(),
+        donor.getMaxRecommendationDistanceKm(),
+        currentDate);
+
+    if (candidateRequests.isEmpty()) {
+      return List.of();
+    }
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot =
+        fulfillmentService.fill(candidateRequests, currentDate);
+
+    return candidateRequests.stream()
+        .filter(request -> !statusOf(snapshot, request).goalReached())
+        .sorted(
+            Comparator
+                .comparing((DonationRequest request) -> distanceKm(donor, request),
+                    Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(DonationRequest::getUrgency, Comparator.reverseOrder())
+                .thenComparing(DonationRequest::getDateLimit))
+        .map(request -> toOutput(request, donor, snapshot))
+        .toList();
+  }
+
+  private OutputItem toOutput(
+      DonationRequest request, Donor donor,
+      Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot) {
+    Double distance = distanceKm(donor, request);
+    Address address = request.getBloodCenter().getOrganization().getAddress();
+    DonationRequestFulfillmentStatusRecord status = statusOf(snapshot, request);
+
+    return new OutputItem(
+        request.getId().getValue().toString(),
+        request.getBloodCenter().getOrganization().getId().getValue().toString(),
+        request.getBloodTypeNeeded().getType(),
+        request.getDateLimit(),
+        request.getBloodCenter().getOrganization().getName(),
+        request.getUrgency().name(),
+        distance != null ? Math.round(distance * 10.0) / 10.0 : null,
+        request.getGoalBloodBags(),
+        status.fulfilledBloodBags(),
+        status.goalReached(),
+        address != null ? address.getLatitude() : null,
+        address != null ? address.getLongitude() : null);
+  }
+
+  private static DonationRequestFulfillmentStatusRecord statusOf(
+      Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot,
+      DonationRequest request) {
+    return snapshot.getOrDefault(
+        request.getId(),
+        new DonationRequestFulfillmentStatusRecord(0, false));
+  }
+
+  private static Double distanceKm(Donor donor, DonationRequest request) {
+    Address addr1 = donor.getPerson().getAddress();
+    Address addr2 = request.getBloodCenter().getOrganization().getAddress();
+    if (addr1 == null || addr2 == null) return null;
+    return addr1.distanceTo(addr2);
+  }
+
+  public record Input(String personId, boolean includeNonEligible) {
+    public Input(String personId) {
+      this(personId, false);
+    }
+  }
+
+  public record OutputItem(
+      String requestId, String organizationId, String bloodTypeNeeded,
+      LocalDate dateLimit, String bloodCenterName, String urgency,
+      Double distanceInKm, int goalBloodBags, BigDecimal fulfilledBloodBags,
+      boolean goalReached, Double latitude, Double longitude) {}
+}
+\end{lstlisting}
+
 \subsection{Notificação de doadores potenciais}
 
-Complementarmente à recomendação, o requisitante pode disparar notificações ativas por meio do \textit{endpoint} \codigo{POST /donation-requests/\{id\}/notify}, implementado pelo \codigo{NotifyPotentialDonorsUseCase}. Esse caso de uso valida que o solicitante autenticado é o dono da solicitação, que a solicitação ainda não expirou e que sua meta ainda não foi atingida; em seguida, delega ao \codigo{FindEligibleDonorsUseCase} (por meio do serviço de domínio \codigo{DonorMatchingService}, Listagem~\ref{lst:matching}) a identificação dos doadores elegíveis --- considerando compatibilidade sanguínea, elegibilidade temporal e proximidade geográfica --- para, então, notificar cada doador elegível com conta ativa através do serviço de notificação descrito na Seção~5.5.3. Esse fluxo materializa, na arquitetura da API, o comportamento observado na literatura (Capítulo~3) de notificar diretamente candidatos compatíveis em vez de aguardar passivamente novas doações.
+Complementarmente à recomendação, o requisitante pode disparar notificações ativas por meio do \textit{endpoint} \texttt{POST /donation-requests/\{id\}/notify}, implementado pelo \codigo{NotifyPotentialDonorsUseCase}. Esse caso de uso valida que o solicitante autenticado é o dono da solicitação, que a solicitação ainda não expirou e que sua meta ainda não foi atingida; em seguida, delega ao \codigo{FindEligibleDonorsUseCase} (por meio do serviço de domínio \codigo{DonorMatchingService}) a identificação dos doadores elegíveis --- considerando compatibilidade sanguínea, elegibilidade temporal e proximidade geográfica --- para, então, notificar cada doador elegível com conta ativa através do serviço de notificação descrito na Seção~5.5.3. Esse fluxo materializa, na arquitetura da API, o comportamento observado na literatura (Capítulo~3) de notificar diretamente candidatos compatíveis em vez de aguardar passivamente novas doações.
+
+A Listagem~\ref{lst:notify-potential-donors-usecase} detalha a implementação de \codigo{NotifyPotentialDonorsUseCase}, ressaltando a verificação de propriedade via \codigo{PartyOwnership}, o bloqueio de envio caso a meta já tenha sido cumprida no \textit{snapshot} de preenchimento e o despacho de notificações aos usuários elegíveis.
+
+\begin{lstlisting}[language=Java, caption={Caso de Uso de Notificação Ativa de Doadores Potenciais}, label={lst:notify-potential-donors-usecase}]
+package bloodmatch.request.application.notification;
+
+import bloodmatch.shared.application.exception.NotFoundException;
+import bloodmatch.shared.application.exception.ValidationException;
+import bloodmatch.shared.application.shared.DomainIdParser;
+import bloodmatch.shared.application.shared.PartyOwnership;
+import bloodmatch.request.domain.DonationRequest;
+import bloodmatch.role.domain.matching.DonorMatchingService;
+import bloodmatch.request.domain.DonationRequestRepositoryInterface;
+import bloodmatch.role.domain.person.donor.DonorRepositoryInterface;
+import bloodmatch.auth.domain.UserAccountRepositoryInterface;
+import bloodmatch.role.domain.person.donor.Donor;
+import bloodmatch.auth.domain.UserAccount;
+import bloodmatch.request.domain.DonationRequestFulfillmentService;
+import bloodmatch.shared.domain.services.NotificationServiceInterface;
+import bloodmatch.request.domain.DonationRequestFulfillmentStatusRecord;
+import bloodmatch.shared.domain.valueObjects.DomainID;
+import org.springframework.stereotype.Service;
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+public class NotifyPotentialDonorsUseCase {
+
+  private final DonationRequestRepositoryInterface requestRepository;
+  private final DonorRepositoryInterface donorRepository;
+  private final UserAccountRepositoryInterface userAccountRepository;
+  private final DonorMatchingService matchingService;
+  private final NotificationServiceInterface notificationService;
+  private final DonationRequestFulfillmentService fulfillmentService;
+
+  public NotifyPotentialDonorsUseCase(
+      DonationRequestRepositoryInterface requestRepository,
+      DonorRepositoryInterface donorRepository,
+      UserAccountRepositoryInterface userAccountRepository,
+      NotificationServiceInterface notificationService,
+      DonationRequestFulfillmentService fulfillmentService) {
+    this.requestRepository = requestRepository;
+    this.donorRepository = donorRepository;
+    this.userAccountRepository = userAccountRepository;
+    this.notificationService = notificationService;
+    this.fulfillmentService = fulfillmentService;
+    this.matchingService = new DonorMatchingService();
+  }
+
+  public Output execute(Input input) {
+    return execute(input, LocalDate.now());
+  }
+
+  public Output execute(Input input, LocalDate currentDate) {
+    if (input == null || currentDate == null)
+      throw new ValidationException("Parameters cannot be null");
+
+    DomainID requestId = DomainIdParser.parse(input.requestId(), "requestId");
+    DonationRequest request = requestRepository.findById(requestId)
+        .orElseThrow(() -> new NotFoundException("Donation request not found"));
+
+    PartyOwnership.requireSameParty(request.getRequester().getParty().getId(), input.actorPartyId());
+
+    if (currentDate.isAfter(request.getDateLimit())) {
+      throw new ValidationException("Cannot notify donors. The donation request has already expired.");
+    }
+
+    DonationRequestFulfillmentStatusRecord status =
+        fulfillmentService.fill(request.getBloodCenter(), currentDate)
+            .getOrDefault(request.getId(), new DonationRequestFulfillmentStatusRecord(0, false));
+    if (status.goalReached()) {
+      throw new ValidationException("Cannot notify donors. The goal for this request has already been reached.");
+    }
+
+    List<Donor> allDonors = donorRepository.findAll();
+    List<Donor> eligibleDonors = matchingService.findEligibleDonors(request, allDonors, currentDate);
+
+    if (eligibleDonors.isEmpty()) {
+      return Output.success();
+    }
+
+    for (Donor donor : eligibleDonors) {
+      DomainID partyId = donor.getPerson().getId();
+      UserAccount account = userAccountRepository.findByPartyId(partyId).orElse(null);
+
+      if (account != null && account.isEnabled()) {
+        notificationService.notifyDonorAboutRequest(donor, account, request);
+      }
+    }
+
+    return Output.success();
+  }
+
+  public record Input(String requestId, String actorPartyId) {}
+
+  public record Output(String message) {
+    public static Output success() {
+      return new Output("Notifications sent to eligible donors successfully.");
+    }
+  }
+}
+\end{lstlisting}
 
 \subsection{Snapshot do cumprimento de metas}
 \label{sec:fulfillment-bags}
 
-Não existe vínculo direto entre uma doação e uma solicitação específica: cada doação concluída em um hemocentro entra em um agrupamento (\textit{pool}) de doações daquela organização e é distribuída entre as solicitações ativas do mesmo hemocentro pelo \codigo{DonationRequestFulfillmentService} (Listagem~\ref{lst:fifo}). Os casos de uso de leitura invocam \codigo{fill} com a data de referência \codigo{asOfDate} --- em geral a data corrente. O serviço recarrega as solicitações ativas e ainda não expiradas dos hemocentros envolvidos (\codigo{findActiveRequestsByOrganizationIds}), de modo que a alocação considere o pool inteiro do centro, e não apenas o recorte da recomendação ou da listagem do requisitante. As doações concluídas são lidas na janela \texttt{[data da solicitação ativa mais antiga, asOfDate]}. A alocação ocorre em memória e isolada por hemocentro, com solicitações ordenadas da mais antiga para a mais nova e doações ordenadas pela data efetiva.
+Não existe vínculo direto entre uma doação e uma solicitação específica: cada doação concluída em um hemocentro entra em um agrupamento (\textit{pool}) de doações daquela organização e é distribuída entre as solicitações ativas do mesmo hemocentro pelo \codigo{DonationRequestFulfillmentService} (Listagem~\ref{lst:fulfillment-service}). Os casos de uso de leitura invocam \codigo{fill} com a data de referência \codigo{asOfDate} --- em geral a data corrente. O serviço recarrega as solicitações ativas e ainda não expiradas dos hemocentros envolvidos (\codigo{findActiveRequestsByOrganizationIds}), de modo que a alocação considere o pool inteiro do centro, e não apenas o recorte da recomendação ou da listagem do requisitante. As doações concluídas são lidas na janela \texttt{[data da solicitação ativa mais antiga, asOfDate]}. A alocação ocorre em memória e isolada por hemocentro, com solicitações ordenadas da mais antiga para a mais nova e doações ordenadas pela data efetiva.
 
-A política de distribuição combina a ordem \textit{First In, First Out} (FIFO) com um teto proporcional ao prazo restante de cada solicitação. O teto, calculado por \codigo{DonationRequest.proportionalGoalAt} (Listagem~\ref{lst:teto-proporcional}), libera a meta no mesmo ritmo em que a janela \codigo{[dateRequested, dateLimit]} é consumida: decorridos 3 de 10 dias, apenas $3/10$ da meta está disponível na data de referência. A distribuição ocorre, então, em duas passagens sobre o mesmo pool. Na primeira passagem, cada doação (com saldo inicial unitário contínuo de $1{,}0$ bolsa) é distribuída fracionariamente entre as solicitações compatíveis (\codigo{acceptsDonation}) até o respectivo teto proporcional; atingido o teto de um pedido, o saldo remanescente da doação avança na fila FIFO para as próximas solicitações compatíveis. Na segunda passagem, as frações de doações que nenhuma solicitação pôde absorver retornam na mesma ordem FIFO, agora alocadas até a meta cheia de cada solicitação.
+A política de distribuição combina a ordem \textit{First In, First Out} (FIFO) com um teto proporcional ao prazo restante de cada solicitação. O teto, calculado pelo método \codigo{DonationRequest.proportionalGoalAt}, libera a meta no mesmo ritmo em que a janela \codigo{[dateRequested, dateLimit]} é consumida: decorridos 3 de 10 dias, apenas $3/10$ da meta está disponível na data de referência. A distribuição ocorre, então, em duas passagens sobre o mesmo pool. Na primeira passagem, cada doação (com saldo inicial unitário contínuo de $1{,}0$ bolsa) é distribuída fracionariamente entre as solicitações compatíveis (\codigo{acceptsDonation}) até o respectivo teto proporcional; atingido o teto de um pedido, o saldo remanescente da doação avança na fila FIFO para as próximas solicitações compatíveis. Na segunda passagem, as frações de doações que nenhuma solicitação pôde absorver retornam na mesma ordem FIFO, agora alocadas até a meta cheia de cada solicitação.
 
 O propósito do teto é redistribuir a escassez em favor de quem tem menos tempo. Sem ele, a solicitação mais antiga do hemocentro consome o pool integralmente, ainda que disponha de semanas de prazo, enquanto uma solicitação prestes a expirar permanece zerada. Como a segunda passagem devolve as sobras, a política não reduz o total de bolsas alocadas --- altera somente qual solicitação recebe cada bolsa quando o pool é insuficiente; havendo doações em quantidade suficiente para todas as metas, o resultado coincide com o da alocação FIFO simples.
 
@@ -716,3 +988,447 @@ O fluxo de distribuição em duas passagens opera, portanto, da seguinte forma:
 Ao término do processo, $R_1$ atinge $1{,}0/1{,}0$ bolsa ($100\%$ da meta) e $R_2$ atinge $1{,}0/2{,}0$ bolsas ($50\%$ da meta), com zero desperdício de doações. Nota-se o benefício dessa abordagem matemática: caso o hemocentro dispusesse de apenas uma doação no \textit{pool} ($D_1$ de $1{,}0$ bolsa), a doação seria partilhada exatamente como $0{,}5$ bolsa para $R_1$ e $0{,}5$ bolsa para $R_2$, impedindo que a solicitação mais antiga monopolizasse a única bolsa disponível e permitindo que ambas avançassem proporcionalmente em direção às suas metas.
 
 O progresso (\codigo{fulfilledBloodBags}) não é persistido. Os casos de uso de leitura que precisam exibir o preenchimento --- listagem de solicitações do requisitante, recomendação ao doador e bloqueio de notificação quando a meta já foi atingida --- invocam o mesmo serviço de domínio e recebem o mapa calculado na hora. Concluir uma doação apenas persiste a doação; a leitura seguinte já vê o \textit{pool} atualizado. Como o cálculo não regrava solicitações, não há condição de corrida entre escritas de contador: cada leitura monta o próprio \textit{snapshot}. Assume-se, como contrapartida, que o progresso exibido de uma solicitação de prazo folgado pode decrescer entre duas leituras: à medida que os tetos das solicitações concorrentes crescem com o tempo, bolsas antes atribuídas a ela na segunda passagem migram para solicitações mais próximas do vencimento.
+
+A Listagem~\ref{lst:fulfillment-service} apresenta a implementação integral do serviço de domínio \codigo{DonationRequestFulfillmentService}.
+
+\begin{lstlisting}[language=Java, caption={Serviço de Domínio para Cumprimento de Metas das Solicitações}, label={lst:fulfillment-service}]
+package bloodmatch.request.domain;
+
+import bloodmatch.donation.domain.Donation;
+import bloodmatch.donation.domain.DonationRepositoryInterface;
+import bloodmatch.request.domain.DonationRequest;
+import bloodmatch.request.domain.DonationRequestRepositoryInterface;
+import bloodmatch.role.domain.organization.bloodcenter.BloodCenter;
+import bloodmatch.request.domain.DonationRequestFulfillmentStatusRecord;
+import bloodmatch.shared.domain.valueObjects.DomainID;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class DonationRequestFulfillmentService {
+
+  private static final Comparator<DonationRequest> OLDEST_REQUEST_FIRST =
+      Comparator.comparing(DonationRequest::getDateRequested)
+          .thenComparing(request -> request.getId().getValue());
+
+  private static final Comparator<Donation> OLDEST_DONATION_FIRST =
+      Comparator.comparing(Donation::getDonationDate)
+          .thenComparing(donation -> donation.getId().getValue());
+
+  private final DonationRequestRepositoryInterface requestRepository;
+  private final DonationRepositoryInterface donationRepository;
+
+  public DonationRequestFulfillmentService(
+      DonationRequestRepositoryInterface requestRepository,
+      DonationRepositoryInterface donationRepository) {
+    this.requestRepository = requestRepository;
+    this.donationRepository = donationRepository;
+  }
+
+  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
+      BloodCenter bloodCenter,
+      LocalDate asOfDate) {
+    if (bloodCenter == null) {
+      throw new IllegalArgumentException("Blood center cannot be null");
+    }
+    if (asOfDate == null) {
+      throw new IllegalArgumentException("As of date cannot be null");
+    }
+
+    DomainID organizationId = bloodCenter.getOrganization().getId();
+    List<DonationRequest> requests = requestRepository.findActiveRequestsByOrganizationIds(
+        List.of(organizationId),
+        asOfDate);
+    if (requests.isEmpty()) {
+      return Map.of();
+    }
+
+    return allocateLoaded(requests, asOfDate);
+  }
+
+  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
+      List<DonationRequest> requests,
+      LocalDate asOfDate) {
+    if (requests == null) {
+      throw new IllegalArgumentException("Requests cannot be null");
+    }
+    if (asOfDate == null) {
+      throw new IllegalArgumentException("As of date cannot be null");
+    }
+
+    List<BloodCenter> bloodCenters = bloodCentersOf(requests);
+    if (bloodCenters.isEmpty()) {
+      return Map.of();
+    }
+
+    List<DonationRequest> activeRequests = requestRepository.findActiveRequestsByOrganizationIds(
+        organizationIdsOf(bloodCenters),
+        asOfDate);
+    if (activeRequests.isEmpty()) {
+      return Map.of();
+    }
+
+    return allocateLoaded(activeRequests, asOfDate);
+  }
+
+  private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateLoaded(
+      List<DonationRequest> requests,
+      LocalDate asOfDate) {
+    List<BloodCenter> bloodCenters = bloodCentersOf(requests);
+    if (bloodCenters.isEmpty()) {
+      return Map.of();
+    }
+
+    List<Donation> allDonations =
+        donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
+            organizationIdsOf(bloodCenters),
+            startOfPool(requests, asOfDate),
+            asOfDate);
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
+    for (BloodCenter bloodCenter : bloodCenters) {
+      snapshot.putAll(allocateProportionalThenFifo(
+          requestsAt(bloodCenter, requests),
+          donationsAt(bloodCenter, allDonations),
+          asOfDate));
+    }
+    return snapshot;
+  }
+
+  private static class DonationPortion {
+    private final Donation donation;
+    private BigDecimal remainingQuantity;
+
+    public DonationPortion(Donation donation, BigDecimal remainingQuantity) {
+      this.donation = donation;
+      this.remainingQuantity = remainingQuantity;
+    }
+
+    public Donation getDonation() {
+      return donation;
+    }
+
+    public BigDecimal getRemainingQuantity() {
+      return remainingQuantity;
+    }
+
+    public void deduct(BigDecimal amount) {
+      this.remainingQuantity = this.remainingQuantity.subtract(amount);
+    }
+  }
+
+  private static Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateProportionalThenFifo(
+      List<DonationRequest> requests,
+      List<Donation> donations,
+      LocalDate asOfDate) {
+    List<DonationRequest> requestsOldestFirst = sorted(requests, OLDEST_REQUEST_FIRST);
+    List<Donation> donationsOldestFirst = sorted(
+        donations.stream().filter(Donation::isCompleted).toList(),
+        OLDEST_DONATION_FIRST);
+
+    Map<DomainID, BigDecimal> bags = new LinkedHashMap<>();
+    for (DonationRequest request : requestsOldestFirst) {
+      bags.put(request.getId(), BigDecimal.ZERO);
+    }
+
+    List<DonationPortion> portions = new ArrayList<>();
+    for (Donation donation : donationsOldestFirst) {
+      portions.add(new DonationPortion(donation, BigDecimal.ONE));
+    }
+
+    List<DonationPortion> leftovers = distribute(
+        requestsOldestFirst,
+        portions,
+        bags,
+        proportionalLimits(requestsOldestFirst, asOfDate),
+        asOfDate);
+
+    distribute(
+        requestsOldestFirst,
+        leftovers,
+        bags,
+        fullGoalLimits(requestsOldestFirst),
+        asOfDate);
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
+    for (DonationRequest request : requestsOldestFirst) {
+      BigDecimal given = bags.get(request.getId());
+      BigDecimal goal = BigDecimal.valueOf(request.getGoalBloodBags());
+      snapshot.put(
+          request.getId(),
+          new DonationRequestFulfillmentStatusRecord(given, given.compareTo(goal) >= 0));
+    }
+    return snapshot;
+  }
+
+  private static Map<DomainID, BigDecimal> proportionalLimits(
+      List<DonationRequest> requests,
+      LocalDate asOfDate) {
+    Map<DomainID, BigDecimal> limits = new LinkedHashMap<>();
+    for (DonationRequest request : requests) {
+      limits.put(request.getId(), request.proportionalGoalAt(asOfDate));
+    }
+    return limits;
+  }
+
+  private static Map<DomainID, BigDecimal> fullGoalLimits(List<DonationRequest> requests) {
+    Map<DomainID, BigDecimal> limits = new LinkedHashMap<>();
+    for (DonationRequest request : requests) {
+      limits.put(request.getId(), BigDecimal.valueOf(request.getGoalBloodBags()));
+    }
+    return limits;
+  }
+
+  private static List<DonationPortion> distribute(
+      List<DonationRequest> requestsOldestFirst,
+      List<DonationPortion> portions,
+      Map<DomainID, BigDecimal> bags,
+      Map<DomainID, BigDecimal> limits,
+      LocalDate asOfDate) {
+    List<DonationPortion> unallocated = new ArrayList<>();
+    for (DonationPortion portion : portions) {
+      for (DonationRequest request : requestsOldestFirst) {
+        if (portion.getRemainingQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+          break;
+        }
+        if (request.acceptsDonation(portion.getDonation(), asOfDate)) {
+          BigDecimal given = bags.get(request.getId());
+          BigDecimal limit = limits.get(request.getId());
+          BigDecimal capacity = limit.subtract(given);
+          if (capacity.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal allocation = portion.getRemainingQuantity().min(capacity);
+            bags.put(request.getId(), given.add(allocation));
+            portion.deduct(allocation);
+          }
+        }
+      }
+      if (portion.getRemainingQuantity().compareTo(BigDecimal.ZERO) > 0) {
+        unallocated.add(portion);
+      }
+    }
+    return unallocated;
+  }
+
+  private static LocalDate startOfPool(List<DonationRequest> requests, LocalDate asOfDate) {
+    return requests.stream()
+        .map(DonationRequest::getDateRequested)
+        .min(Comparator.naturalOrder())
+        .map(minDate -> minDate.isBefore(asOfDate) ? minDate : asOfDate)
+        .orElse(asOfDate);
+  }
+
+  private static List<BloodCenter> bloodCentersOf(List<DonationRequest> requests) {
+    Set<DomainID> seen = new LinkedHashSet<>();
+    List<BloodCenter> bloodCenters = new ArrayList<>();
+    for (DonationRequest request : requests) {
+      BloodCenter bloodCenter = request.getBloodCenter();
+      if (seen.add(bloodCenter.getOrganization().getId())) {
+        bloodCenters.add(bloodCenter);
+      }
+    }
+    return bloodCenters;
+  }
+
+  private static List<DomainID> organizationIdsOf(List<BloodCenter> bloodCenters) {
+    return bloodCenters.stream()
+        .map(bloodCenter -> bloodCenter.getOrganization().getId())
+        .toList();
+  }
+
+  private static List<DonationRequest> requestsAt(
+      BloodCenter bloodCenter,
+      List<DonationRequest> requests) {
+    DomainID organizationId = bloodCenter.getOrganization().getId();
+    return requests.stream()
+        .filter(request -> request.getBloodCenter().getOrganization().getId().equals(organizationId))
+        .toList();
+  }
+
+  private static List<Donation> donationsAt(BloodCenter bloodCenter, List<Donation> donations) {
+    DomainID organizationId = bloodCenter.getOrganization().getId();
+    return donations.stream()
+        .filter(donation -> donation.getBloodCenter().getOrganization().getId().equals(organizationId))
+        .toList();
+  }
+
+  private static <T> List<T> sorted(List<T> values, Comparator<T> order) {
+    List<T> copy = new ArrayList<>(values);
+    copy.sort(order);
+    return copy;
+  }
+}
+\end{lstlisting}
+
+\section{Controle Otimista de Concorrência}
+\label{sec:controle-otimista-concorrencia}
+
+Em sistemas Web distribuídos concebidos segundo o estilo arquitetural RESTful, as comunicações entre cliente e servidor são estritamente desprovidas de estado (\textit{stateless}), não existindo transações de longa duração ou sessões ativas com bloqueio de recursos. No contexto da hemoterapia, as solicitações de doação de sangue configuram recursos dinâmicos e altamente concorrentes: um operador de hemocentro ou requisitante pode atualizar a meta de bolsas necessárias (\codigo{goalBloodBags}), estender a data-limite (\codigo{dateLimit}) ou ajustar a urgência enquanto, paralelamente, outros usuários ou serviços automatizados consultam ou tentam modificar a mesma entidade.
+
+Caso duas requisições de escrita concorrentes operem sobre o mesmo registro sem um mecanismo de coordenação transacional, instala-se o problema clássico da \textbf{perda de atualização} (\textit{lost update problem}). Nessa situação, a requisição que finalizar a gravação por último sobrescreverá cegamente o estado armazenado no banco de dados, eliminando as alterações consolidadas pela requisição precedente sem que qualquer um dos atores seja notificado da anomalia.
+
+A adoção de bloqueios pessimistas (\textit{pessimistic locking}) --- mediante a retenção de travas exclusivas nas linhas ou documentos durante toda a jornada de edição do usuário --- é incompatível com a natureza desconectada da Web. Esse bloqueio gera contenção severa, degrada a vazão (\textit{throughput}) do servidor, eleva o tempo de resposta e introduz risco crítico de impasses (\textit{deadlocks}) enquanto o usuário interage com a interface visual.
+
+Para solucionar esse desafio de forma escalável, o sistema implementa formalmente o \textbf{Controle de Concorrência Otimista} (\textit{Optimistic Concurrency Control} --- OCC), fundamentado nos princípios seminais de Kung e Robinson (1981) e nos padrões de arquitetura corporativa formulados por Fowler (2002). O OCC parte da premissa de que os conflitos entre transações são exceções: as operações de leitura e computação em memória transcorrem de modo livre e não bloqueante, concentrando a checagem de consistência estritamente no momento da persistência.
+
+\subsection{Caso de uso de atualização de solicitação}
+
+Para materializar essa estratégia, o sistema disponibiliza o caso de uso de edição \codigo{UpdateDonationRequestUseCase}, acionado pela rota HTTP \texttt{PATCH /donation-requests/\{id\}}. A Listagem~\ref{lst:update-request-usecase} detalha a implementação completa da classe.
+
+\begin{lstlisting}[language=Java, caption={Caso de Uso de Atualização com Verificação Precoce de Concorrência}, label={lst:update-request-usecase}]
+package bloodmatch.request.application;
+
+import bloodmatch.shared.application.exception.ConcurrencyException;
+import bloodmatch.shared.application.exception.NotFoundException;
+import bloodmatch.shared.application.exception.ValidationException;
+import bloodmatch.shared.application.shared.DomainIdParser;
+import bloodmatch.shared.application.shared.PartyOwnership;
+import bloodmatch.request.domain.DonationRequest;
+import bloodmatch.request.domain.DonationRequestRepositoryInterface;
+import bloodmatch.shared.domain.valueObjects.DomainID;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.util.Objects;
+
+@Service
+public class UpdateDonationRequestUseCase {
+
+  private final DonationRequestRepositoryInterface donationRequestRepository;
+
+  public UpdateDonationRequestUseCase(DonationRequestRepositoryInterface donationRequestRepository) {
+    if (donationRequestRepository == null)
+      throw new IllegalArgumentException("DonationRequestRepository cannot be null");
+    this.donationRequestRepository = donationRequestRepository;
+  }
+
+  @Transactional
+  public Output execute(Input input) {
+    if (input == null)
+      throw new ValidationException("Request body cannot be null");
+    if (input.version() == null)
+      throw new ValidationException("version cannot be null");
+    if (input.goalBloodBags() == null && input.dateLimit() == null)
+      throw new ValidationException("At least one mutable field must be provided");
+
+    DomainID requestId = DomainIdParser.parse(input.requestId(), "requestId");
+    DonationRequest request = donationRequestRepository.findById(requestId)
+        .orElseThrow(() -> new NotFoundException("Donation request not found"));
+
+    // 1o MOMENTO DE CHECAGEM: Nivel de Aplicacao (Pre-condition Fail-Fast)
+    if (!Objects.equals(request.getVersion(), input.version())) {
+      throw new ConcurrencyException(
+          "Resource version conflict: expected " + input.version() + " but found " + request.getVersion());
+    }
+
+    PartyOwnership.requireSameParty(request.getRequester().getParty().getId(), input.actorPartyId());
+
+    if (input.goalBloodBags() != null) {
+      try {
+        request.setGoalBloodBags(input.goalBloodBags());
+      } catch (IllegalArgumentException e) {
+        throw new ValidationException(e.getMessage());
+      }
+    }
+
+    if (input.dateLimit() != null) {
+      try {
+        request.setDateLimit(input.dateLimit());
+      } catch (IllegalArgumentException e) {
+        throw new ValidationException(e.getMessage());
+      }
+    }
+
+    // 2o MOMENTO DE CHECAGEM: Nivel de Persistencia / Banco de Dados
+    donationRequestRepository.save(request);
+    return Output.from(request);
+  }
+
+  public record Input(
+      String requestId, Long version, Integer goalBloodBags,
+      LocalDate dateLimit, String actorPartyId) {}
+
+  public record Output(String id, Long version, Integer goalBloodBags, LocalDate dateLimit) {
+    public static Output from(DonationRequest request) {
+      return new Output(
+          request.getId().getValue().toString(),
+          request.getVersion(),
+          request.getGoalBloodBags(),
+          request.getDateLimit());
+    }
+  }
+}
+\end{lstlisting}
+
+\subsection{Os dois momentos de checagem de versão}
+
+A garantia de integridade transacional na API BloodMatch estrutura-se sobre uma defesa em profundidade dividida em \textbf{dois momentos complementares de checagem de versão}:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Primeiro Momento: Validação Lógica na Camada de Aplicação (\textit{Fail-Fast Check}):}
+  O primeiro momento ocorre explicitamente no corpo do caso de uso (linhas 37--40 da Listagem~\ref{lst:update-request-usecase}), imediatamente após a recuperação do agregado de domínio do repositório (\codigo{findById}). Quando o cliente consome a API (por exemplo, via consulta prévia \texttt{GET /donation-requests/\{id\}}), a resposta serializa o número de versão persistido (\codigo{version}). Ao emitir a instrução de alteração, o cliente é obrigado a devolver esse valor no corpo da requisição (\texttt{Input.version}). 
+  
+  O caso de uso compara a versão enviada pelo cliente com a versão atual carregada do banco de dados:
+  \begin{lstlisting}[language=Java]
+if (!Objects.equals(request.getVersion(), input.version())) {
+  throw new ConcurrencyException("Resource version conflict: expected " + input.version() + " but found " + request.getVersion());
+}
+  \end{lstlisting}
+  Caso haja divergência (por exemplo, o cliente submete \texttt{version = 1}, porém outro usuário já havia atualizado o recurso e gravado \texttt{version = 2}), a operação é abortada instantaneamente, disparando uma \codigo{ConcurrencyException}. Essa barreira lógica antecipada proporciona benefícios cruciais:
+  \begin{itemize}
+    \item \textbf{\textit{Fail-Fast} de Domínio:} evita o processamento computacional inútil de regras de negócio, verificações de propriedade (\codigo{PartyOwnership}) e validações sobre dados sabidamente defasados;
+    \item \textbf{Preservação do Agregado em Memória:} nenhum método mutador de estado (\codigo{setGoalBloodBags}, \codigo{setDateLimit}) chega a ser invocado se a versão recebida for anacrônica;
+    \item \textbf{Resposta Semântica Padronizada:} a exceção é capturada na camada de apresentação pelo manipulador global \codigo{RestExceptionHandler}, que devolve ao cliente a resposta HTTP \codigo{409 Conflict}, informando que o registro foi alterado concorrentemente e orientando o recarregamento dos dados.
+  \end{itemize}
+
+  \item \textbf{Segundo Momento: Validação Atômica na Camada de Persistência (\textit{Atomic Write OCC}):}
+  Embora o primeiro momento proteja com eficácia contra submissões de dados desatualizados, ele é inerentemente incapaz de sanar condições de corrida estritas (\textit{race conditions}), nas quais duas requisições paralelas chegam ao servidor de forma quase simultânea, ambas lendo a mesma versão válida (por exemplo, \texttt{version = 1}). Nesse caso, ambas as requisições ultrapassariam com sucesso a checagem da camada de aplicação.
+  
+  Para neutralizar essa vulnerabilidade física, o segundo momento atua diretamente na instrução de escrita no banco de dados. No esquema documental \codigo{DonationRequestSchema} (Listagem~\ref{lst:donation-request-schema}), o atributo \codigo{version} é decorado com a anotação \codigo{@Version} do Spring Data MongoDB. Ao disparar a operação \codigo{donationRequestRepository.save(request)}, o motor do Spring Data traduz a atualização para uma instrução atômica condicional no MongoDB:
+  \begin{lstlisting}
+db.donation_requests.updateOne(
+  { "_id": "req-123", "version": 1 },
+  { 
+    "$set": { "goalBloodBags": 15, "dateLimit": ISODate("2026-10-01") },
+    "$inc": { "version": 1 }
+  }
+)
+  \end{lstlisting}
+  A primeira requisição a atingir o MongoDB atualiza o documento e incrementa atômica e irreversivelmente o contador de versão para \texttt{2}. No instante seguinte, quando a segunda requisição concorrente executa o seu comando buscando pelo filtro \texttt{"version": 1}, a consulta não encontra nenhum registro correspondente. Zero documentos são afetados, e o Spring Data detecta o conflito físico, disparando a exceção \codigo{OptimisticLockingFailureException}.
+  
+  Para garantir o desacoplamento arquitetural e impedir que tipos de exceção do ecossistema Spring Data vazem para as camadas superiores, o adaptador de persistência utiliza a classe utilitária \codigo{OptimisticConcurrency} (Listagem~\ref{lst:optimistic-concurrency-util}). Esse utilitário intercepta a falha e a converte de forma transparente para a exceção padrão da aplicação (\codigo{ConcurrencyException}):
+
+\begin{lstlisting}[language=Java, caption={Isolamento de Concorrência Otimista na Infraestrutura}, label={lst:optimistic-concurrency-util}]
+package bloodmatch.shared.infrastructure.persistence.repository;
+
+import bloodmatch.shared.application.exception.ConcurrencyException;
+import org.springframework.dao.OptimisticLockingFailureException;
+
+public final class OptimisticConcurrency {
+
+  private OptimisticConcurrency() {}
+
+  public static void save(Runnable action, String entityName) {
+    try {
+      action.run();
+    } catch (OptimisticLockingFailureException e) {
+      throw new ConcurrencyException(
+          entityName + " was changed by another operation. Reload it and try again.", e);
+    }
+  }
+}
+\end{lstlisting}
+\end{enumerate}
+
+Essa abordagem em dois momentos conjuga a agilidade do \textit{fail-fast} preventivo na aplicação com a garantia matemática de isolamento transacional atômico no motor do banco de dados, consolidando uma arquitetura imune a corrupções de estado por concorrência.
+
