@@ -27,14 +27,19 @@ private static Map<DomainID, DonationRequestFulfillmentStatusRecord>
             donations.stream().filter(Donation::isCompleted).toList(),
             OLDEST_DONATION_FIRST);
 
-    Map<DomainID, Integer> bags = new LinkedHashMap<>();
+    Map<DomainID, BigDecimal> bags = new LinkedHashMap<>();
     for (DonationRequest request : requestsOldestFirst) {
-        bags.put(request.getId(), 0);
+        bags.put(request.getId(), BigDecimal.ZERO);
+    }
+
+    List<DonationPortion> portions = new ArrayList<>();
+    for (Donation donation : donationsOldestFirst) {
+        portions.add(new DonationPortion(donation, BigDecimal.ONE));
     }
 
     // 1a passagem: cada solicitacao recebe ate o seu teto proporcional
-    List<Donation> leftovers = distribute(
-            requestsOldestFirst, donationsOldestFirst, bags,
+    List<DonationPortion> leftovers = distribute(
+            requestsOldestFirst, portions, bags,
             proportionalLimits(requestsOldestFirst, asOfDate),
             asOfDate);
 
@@ -46,11 +51,12 @@ private static Map<DomainID, DonationRequestFulfillmentStatusRecord>
 
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
     for (DonationRequest request : requestsOldestFirst) {
-        int given = bags.get(request.getId());
+        BigDecimal given = bags.get(request.getId());
+        BigDecimal goal = BigDecimal.valueOf(request.getGoalBloodBags());
         snapshot.put(
                 request.getId(),
                 new DonationRequestFulfillmentStatusRecord(
-                        given, given >= request.getGoalBloodBags()));
+                        given, given.compareTo(goal) >= 0));
     }
     return snapshot;
 }
@@ -73,26 +79,31 @@ private static Map<DomainID, BigDecimal> fullGoalLimits(List<DonationRequest> re
     return limits;
 }
 
-private static List<Donation> distribute(
+private static List<DonationPortion> distribute(
         List<DonationRequest> requestsOldestFirst,
-        List<Donation> donationsOldestFirst,
-        Map<DomainID, Integer> bags,
+        List<DonationPortion> portions,
+        Map<DomainID, BigDecimal> bags,
         Map<DomainID, BigDecimal> limits,
         LocalDate asOfDate) {
-    List<Donation> unallocated = new ArrayList<>();
-    for (Donation donation : donationsOldestFirst) {
-        boolean allocated = false;
+    List<DonationPortion> unallocated = new ArrayList<>();
+    for (DonationPortion portion : portions) {
         for (DonationRequest request : requestsOldestFirst) {
-            int given = bags.get(request.getId());
-            BigDecimal limit = limits.get(request.getId());
-            if (BigDecimal.valueOf(given).compareTo(limit) < 0 && request.acceptsDonation(donation, asOfDate)) {
-                bags.put(request.getId(), given + 1);
-                allocated = true;
+            if (portion.getRemainingQuantity().compareTo(BigDecimal.ZERO) <= 0) {
                 break;
             }
+            if (request.acceptsDonation(portion.getDonation(), asOfDate)) {
+                BigDecimal given = bags.get(request.getId());
+                BigDecimal limit = limits.get(request.getId());
+                BigDecimal capacity = limit.subtract(given);
+                if (capacity.compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal allocation = portion.getRemainingQuantity().min(capacity);
+                    bags.put(request.getId(), given.add(allocation));
+                    portion.deduct(allocation);
+                }
+            }
         }
-        if (!allocated) {
-            unallocated.add(donation);
+        if (portion.getRemainingQuantity().compareTo(BigDecimal.ZERO) > 0) {
+            unallocated.add(portion);
         }
     }
     return unallocated;

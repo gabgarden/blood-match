@@ -1,0 +1,17 @@
+package bloodmatch.auth.infrastructure.mongo;
+
+import bloodmatch.auth.infrastructure.schema.UserAccountSchema;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface UserAccountMongoRepository extends MongoRepository<UserAccountSchema, String> {
+
+  Optional<UserAccountSchema> findByEmail(String email);
+
+  Optional<UserAccountSchema> findByPartyId(String partyId);
+
+  Optional<UserAccountSchema> findByEmailConfirmationToken(String emailConfirmationToken);
+}

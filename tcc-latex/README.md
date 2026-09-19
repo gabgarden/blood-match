@@ -33,7 +33,7 @@ Ordem dos capítulos (orientação da banca):
 2. Referencial teórico  
 3. Trabalhos relacionados  
 4. Métodos e recursos  
-5. Estudo de caso  
+5. API RESTful proposta: requisitos, análise, design e implementação  
 6. Avaliação  
 7. Considerações finais  
 

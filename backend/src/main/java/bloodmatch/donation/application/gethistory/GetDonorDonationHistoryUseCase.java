@@ -1,0 +1,56 @@
+package bloodmatch.donation.application.gethistory;
+
+import bloodmatch.shared.application.exception.ValidationException;
+import bloodmatch.shared.application.shared.DomainIdParser;
+import bloodmatch.donation.domain.Donation;
+import bloodmatch.donation.domain.DonationRepositoryInterface;
+import bloodmatch.shared.domain.valueObjects.DomainID;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+
+@Service
+public class GetDonorDonationHistoryUseCase {
+
+  private final DonationRepositoryInterface donationRepository;
+
+  public GetDonorDonationHistoryUseCase(DonationRepositoryInterface donationRepository) {
+    this.donationRepository = donationRepository;
+  }
+
+  public List<OutputItem> execute(Input input) {
+    if (input == null) {
+      throw new ValidationException("Input cannot be null");
+    }
+
+    DomainID personId = DomainIdParser.parse(input.personId(), "personId");
+
+    return donationRepository.findByDonorId(personId)
+        .stream()
+        .sorted(Comparator.comparing(Donation::getReferenceDate, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+        .map(OutputItem::from)
+        .toList();
+  }
+
+  public record Input(String personId) {
+  }
+
+  public record OutputItem(
+      String donationId,
+      Long version,
+      LocalDate date,
+      String location,
+      String status) {
+
+    public static OutputItem from(Donation donation) {
+      return new OutputItem(
+          donation.getId().getValue().toString(),
+          donation.getVersion(),
+          donation.getReferenceDate(),
+          donation.getBloodCenter().getOrganization().getName(),
+          donation.status());
+    }
+  }
+}

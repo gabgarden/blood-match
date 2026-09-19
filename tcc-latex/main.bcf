@@ -2469,12 +2469,12 @@
     <bcf:citekey order="2" intorder="1">opas2020</bcf:citekey>
     <bcf:citekey order="3" intorder="1">oms2020</bcf:citekey>
     <bcf:citekey order="4" intorder="1">hemorio2023</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">ceara2021</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">hemoce2022</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">ceara2025</bcf:citekey>
-    <bcf:citekey order="8" intorder="1">onu2015</bcf:citekey>
-    <bcf:citekey order="9" intorder="1">evans2003</bcf:citekey>
-    <bcf:citekey order="10" intorder="1">martin2000</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">evans2003</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">martin2000</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">ceara2021</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">hemoce2022</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">ceara2025</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">onu2015</bcf:citekey>
     <bcf:citekey order="11" intorder="1">sommerville2011</bcf:citekey>
     <bcf:citekey order="12" intorder="1">booch2007</bcf:citekey>
     <bcf:citekey order="13" intorder="1">sommerville2011</bcf:citekey>
@@ -2568,14 +2568,11 @@
     <bcf:citekey order="101" intorder="1">walls2019</bcf:citekey>
     <bcf:citekey order="102" intorder="1">chacon2014</bcf:citekey>
     <bcf:citekey order="103" intorder="1">chacon2014</bcf:citekey>
-    <bcf:citekey order="104" intorder="1">evans2003</bcf:citekey>
+    <bcf:citekey order="104" intorder="1">martin2008</bcf:citekey>
     <bcf:citekey order="105" intorder="1">evans2003</bcf:citekey>
-    <bcf:citekey order="106" intorder="1">martin2008</bcf:citekey>
-    <bcf:citekey order="107" intorder="1">martin2008</bcf:citekey>
-    <bcf:citekey order="108" intorder="1">evans2003</bcf:citekey>
-    <bcf:citekey order="109" intorder="1">evans2003</bcf:citekey>
-    <bcf:citekey order="110" intorder="1">vernon2013</bcf:citekey>
-    <bcf:citekey order="111" intorder="1">vernon2013</bcf:citekey>
+    <bcf:citekey order="106" intorder="1">evans2003</bcf:citekey>
+    <bcf:citekey order="107" intorder="1">vernon2013</bcf:citekey>
+    <bcf:citekey order="108" intorder="1">vernon2013</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">

@@ -1,4 +1,4 @@
-\chapter{Estudo de caso: requisitos, modelagem e implementação}
+\chapter{API RESTful proposta: requisitos, análise, design e implementação}
 
 \section{Visão geral da solução}
 
@@ -156,79 +156,54 @@ O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluind
 
 \subsubsubsection{Detalhamento dos casos de uso}
 
-Devido à abrangência da API e visando manter a concisão documental, optou-se por detalhar textualmente apenas os casos de uso críticos para o núcleo da aplicação, adotando a estrutura formal de especificação textual proposta por Cockburn (2001). Essa abordagem documenta o fluxo de eventos, as restrições operacionais e as pré-condições de segurança exigidas, justificando arquiteturalmente a ausência de relacionamentos visuais de dependência de autenticação nos diagramas UML.
+Devido à abrangência da API e visando manter a concisão documental, optou-se por detalhar apenas os casos de uso críticos para o núcleo da aplicação, adotando a estrutura formal de especificação textual proposta por Cockburn (2001). Essa abordagem documenta o fluxo de eventos, as restrições operacionais e as pré-condições de segurança exigidas, justificando arquiteturalmente a ausência de relacionamentos visuais de dependência de autenticação nos diagramas UML. A Tabela~\ref{tab:detalhamento-uc} sintetiza essas especificações.
 
-\vspace{0.5cm}
-
-% --- UC09 ---
-\noindent\textbf{UC09: Registrar solicitação de doação}
-\begin{description}
-    \item[Ator Principal:] Requisitante (\textit{Requester})
-    \item[Pré-condição:] O usuário deve estar autenticado, possuir um token JWT válido e estar registrado com o papel de Requisitante.
-    
-    \item[Cenário Principal:] \itemsep0em
-    \begin{enumerate}
-        \item O Requisitante acessa o sistema e solicita a criação de uma nova campanha.
-        \item O Requisitante informa os dados da necessidade: tipo sanguíneo, quantidade de bolsas, data limite, nível de urgência e hemocentro responsável.
-        \item O sistema valida as regras de negócio, assegurando a integridade dos invariantes.
-        \item O sistema persiste a solicitação ativa.
-        \item O sistema retorna a confirmação de criação com o identificador único gerado.
-    \end{enumerate}
-    
-    \item[Cenários Alternativos:] \itemsep0em
-    \begin{itemize}
-        \item \textbf{3a. Falha de validação de domínio} (ex: data limite no passado ou meta nula):
-        \begin{itemize}
-            \item O sistema rejeita a operação.
-            \item O sistema retorna a descrição estruturada do erro, abortando o fluxo.
-        \end{itemize}
-    \end{itemize}
-\end{description}
-
-\vspace{0.5cm}
-
-% --- UC10 ---
-\noindent\textbf{UC10: Consultar recomendações de solicitações}
-\begin{description}
-    \item[Ator Principal:] Doador (\textit{Donor})
-    \item[Pré-condição:] O usuário deve estar autenticado, possuir um token JWT válido e estar registrado com o papel de Doador.
-    
-    \item[Cenário Principal:] \itemsep0em
-    \begin{enumerate}
-        \item O Doador solicita a visualização de campanhas recomendadas.
-        \item O sistema verifica a elegibilidade temporal do doador com base em sua última doação registrada.
-        \item O sistema busca as solicitações ativas e realiza o cruzamento de compatibilidade tipológica.
-        \item O sistema aplica o filtro geoespacial baseado na distância máxima configurada pelo usuário.
-        \item O sistema ordena os resultados priorizando urgência, proximidade e vencimento do prazo, devolvendo a listagem ao Doador.
-    \end{enumerate}
-    
-    \item[Cenários Alternativos:] \itemsep0em
-    \begin{itemize}
-        \item \textbf{2a. Doador inelegível temporariamente:}
-        \begin{itemize}
-            \item O sistema interrompe o processamento heurístico.
-            \item O sistema retorna uma lista vazia ou um indicativo de inaptidão.
-        \end{itemize}
-    \end{itemize}
-\end{description}
-
-\vspace{0.5cm}
-
-% --- UC12 ---
-\noindent\textbf{UC12: Completar doação pendente}
-\begin{description}
-    \item[Ator Principal:] Doador (\textit{Donor})
-    \item[Pré-condição:] O usuário deve estar autenticado, possuir um token JWT válido e estar registrado com o papel de Doador.
-    
-    \item[Cenário Principal:] \itemsep0em
-    \begin{enumerate}
-        \item O Doador submete a data de efetivação para uma intenção de doação previamente registrada.
-        \item O sistema recupera a doação pendente associada ao identificador.
-        \item O sistema valida a consistência cronológica da data informada em relação à data atual.
-        \item O sistema transiciona o estado do agregado para concluído.
-        \item O sistema atualiza o registro do Doador para computar a nova janela de descanso regulamentar.
-    \end{enumerate}
-\end{description}
+\begin{table}[H]
+  \centering
+  \caption{Especificação dos casos de uso críticos}
+  \label{tab:detalhamento-uc}
+  \small
+  \begin{tabularx}{\textwidth}{>{\bfseries}p{3.3cm} X}
+    \toprule
+    \multicolumn{2}{l}{\textbf{UC09: Registrar solicitação de doação}} \\
+    \midrule
+    Ator principal & Requisitante (\textit{Requester}) \\
+    Pré-condição & Usuário autenticado com perfil de Requisitante ativo. \\
+    Fluxo principal & 
+    1. O Requisitante solicita a criação de uma nova campanha.\\
+    & 2. Informa dados da necessidade (tipo sanguíneo, bolsas, prazo, urgência e hemocentro).\\
+    & 3. O sistema valida as regras de negócio e os invariantes de domínio.\\
+    & 4. O sistema persiste a solicitação no estado ativo.\\
+    & 5. O sistema retorna a confirmação com o identificador único gerado. \\
+    Cenário alternativo & \textbf{3a.} Falha de validação (prazo retroativo ou meta nula): rejeita a operação e retorna mensagem de erro estruturada. \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{UC10: Consultar recomendações de solicitações}} \\
+    \midrule
+    Ator principal & Doador (\textit{Donor}) \\
+    Pré-condição & Usuário autenticado com perfil de Doador ativo. \\
+    Fluxo principal & 
+    1. O Doador solicita a consulta de campanhas recomendadas.\\
+    & 2. O sistema avalia a elegibilidade temporal com base na última doação.\\
+    & 3. O sistema recupera solicitações ativas e avalia a compatibilidade tipológica.\\
+    & 4. O sistema aplica o filtro geoespacial pela distância máxima configurada.\\
+    & 5. O sistema ordena por urgência, proximidade e prazo, retornando a listagem. \\
+    Cenário alternativo & \textbf{2a.} Doador temporariamente inelegível: encerra o processamento e retorna listagem vazia. \\
+    \midrule
+    \multicolumn{2}{l}{\textbf{UC12: Completar doação pendente}} \\
+    \midrule
+    Ator principal & Doador (\textit{Donor}) \\
+    Pré-condição & Usuário autenticado com perfil de Doador ativo. \\
+    Fluxo principal & 
+    1. O Doador submete a data de efetivação de intenção previamente registrada.\\
+    & 2. O sistema recupera a doação pendente associada ao identificador.\\
+    & 3. O sistema valida a consistência cronológica em relação à data corrente.\\
+    & 4. O sistema transiciona o estado do agregado para concluído.\\
+    & 5. O sistema atualiza o registro do doador, recalculando a janela de descanso regulamentar. \\
+    Cenário alternativo & \textbf{3a.} Data inconsistente (data futura): rejeita a atualização e mantém a doação pendente. \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
 
 \subsection{Diagramas de classes}
 
@@ -288,19 +263,20 @@ A partir das interações mapeadas, estruturou-se o núcleo da aplicação: o mo
 
 \subsection{Linguagem ubíqua e organização em camadas}
 
-Conforme estabelecido nos fundamentos do DDD (Capítulo~2), a modelagem foi construída sobre uma linguagem ubíqua, garantindo que termos como \texttt{DonationRequest}, \texttt{Donor}, \texttt{Requester} e \texttt{BloodCenter} transitem com a mesma semântica tanto nas discussões de projeto quanto no código-fonte final. Essa padronização reduz ambiguidades entre a gestão de perfis de participantes e o ciclo de vida das doações. Cabe ressaltar que essa separação é tratada aqui como uma interpretação de projeto inspirada na noção de contexto delimitado (\textit{Bounded Context}), e não como uma divisão formal em módulos ou serviços independentes: o código-fonte é organizado fisicamente em um único pacote de domínio, sendo a fronteira entre as duas áreas conceituais reforçada por convenção de nomenclatura e coesão de classes, não por isolamento físico.
+Conforme estabelecido nos fundamentos do DDD (Capítulo~2), a modelagem foi construída sobre uma linguagem ubíqua, garantindo que termos como \texttt{DonationRequest}, \texttt{Donor}, \texttt{Requester} e \texttt{BloodCenter} transitem com a mesma semântica tanto nas discussões de projeto quanto no código-fonte final. Essa padronização reduz ambiguidades entre a gestão de perfis de participantes e o ciclo de vida das doações. 
 
-Do ponto de vista estrutural, o código é organizado nos seguintes pacotes, cada um com uma responsabilidade específica:
+A organização estrutural do código adota o padrão orientado a entidades de domínio (\textit{Package-by-Entity} / \textit{Package-by-Feature}), promovendo alta coesão e baixo acoplamento entre os conceitos do sistema. Em vez de uma divisão horizontal global agrupando classes exclusivamente por camada técnica, o sistema é particionado em pacotes de alto nível que representam diretamente os agregados e entidades de domínio (\texttt{request}, \texttt{donation}, \texttt{party}, \texttt{role} e \texttt{auth}), complementados por um pacote compartilhado (\texttt{shared}) para conceitos transversais (\textit{Shared Kernel}).
+
+Internamente, cada pacote de entidade é estruturado nos subpacotes que materializam as camadas arquiteturais clássicas, garantindo a separação estrita de responsabilidades:
 
 \begin{itemize}[leftmargin=*]
-  \item \texttt{domain}: entidades, objetos de valor e regras de negócio, livres de dependências de frameworks;
-  \item \texttt{application/usecase}: orquestração dos casos de uso, coordenando chamadas ao domínio e aos repositórios;
-  \item \texttt{interfaces/rest}: \textit{controllers} e DTOs responsáveis pela exposição HTTP da API;
-  \item \texttt{infra/persistence}: repositórios e \textit{schemas} de persistência em MongoDB;
-  \item \texttt{infra/security}: filtros de autenticação/autorização baseados em JWT.
+  \item \texttt{domain}: entidades, raízes de agregado, objetos de valor, regras de negócio e interfaces de portas de repositórios e serviços de domínio, totalmente livres de acoplamento com frameworks ou tecnologias externas;
+  \item \texttt{application}: orquestração dos casos de uso, coordenando o fluxo de dados entre as portas de repositório e os modelos de domínio;
+  \item \texttt{infrastructure}: implementações concretas dos repositórios (Spring Data MongoDB), esquemas de persistência de banco de dados, filtros de segurança e clientes de serviços externos;
+  \item \texttt{presentation}: controladores REST (\textit{controllers}) e objetos de transferência de dados (DTOs) responsáveis pela exposição HTTP da API, recepção de requisições e validação sintática primária.
 \end{itemize}
 
-O fluxo padrão de uma chamada percorre essas camadas em uma única direção --- \texttt{interfaces/rest} $\rightarrow$ \texttt{application/usecase} $\rightarrow$ \texttt{domain} $\rightarrow$ \texttt{infra/persistence} ---, de modo que a camada de domínio nunca dependa diretamente de detalhes de infraestrutura ou de protocolo HTTP, conforme recomendado por \citeonline{evans2003} e reforçado por \citeonline{martin2008} quanto à inversão de dependência entre módulos de alto e baixo nível.
+O fluxo de dados segue os princípios da arquitetura limpa: a camada de apresentação invoca a camada de aplicação, que opera sobre o domínio (\texttt{presentation} $\rightarrow$ \texttt{application} $\rightarrow$ \texttt{domain}). A camada de infraestrutura, por sua vez, implementa as interfaces definidas no domínio (\texttt{infrastructure} $\rightarrow$ \texttt{domain}), garantindo a aplicação do Princípio da Inversão de Dependência (DIP) entre os módulos de alto e baixo nível \cite{martin2008}.
 
 \subsection{Entidades, agregados e objetos de valor}
 
@@ -327,7 +303,7 @@ A estrutura central do domínio foi modelada de forma hierárquica e orientada a
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-A entidade \texttt{Party} foi adotada como abstração principal da hierarquia, aplicando herança para derivar \texttt{Person} e \texttt{Organization}. A partir dessas bases, o sistema utiliza polimorfismo para permitir que os participantes assumam papéis (\textit{Roles}) específicos, como \texttt{Donor}, \texttt{Requester} ou \texttt{BloodCenter}, dependendo de suas ações no sistema.
+A entidade \texttt{Party} foi adotada como abstração de mais alto nível da hierarquia, aplicando herança para derivar \texttt{Person} e \texttt{Organization}. A partir dessas bases, o sistema utiliza polimorfismo para permitir que os participantes assumam papéis (\textit{Roles}) específicos, como \texttt{Donor}, \texttt{Requester} ou \texttt{BloodCenter}, dependendo de suas ações no sistema.
 
 As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de agregados (\textit{Aggregate Roots}), concentrando regras de negócio --- como a validação de datas-limite e a verificação de compatibilidade sanguínea --- e protegendo o estado interno dos objetos por meio do encapsulamento. Adicionalmente, conceitos imutáveis sem identidade própria, como \texttt{Address} (Endereço), \texttt{BloodType} (Tipo Sanguíneo) e \texttt{DomainID}, foram modelados como objetos de valor, na linha proposta por \citeonline{evans2003} e detalhada por \citeonline{vernon2013}, aumentando a segurança e a previsibilidade do modelo.
 
@@ -335,9 +311,9 @@ As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de
 
 A implementação técnica da API orienta-se pelos princípios da arquitetura em camadas e do \textit{Domain-Driven Design} (DDD). Para fins de exemplificar a aplicação prática desses conceitos, esta seção demonstra o fluxo completo de uma entidade --- o registro de uma \textbf{Solicitação de Doação} (\codigo{DonationRequest}) ---, acompanhando a requisição desde a sua chegada no controlador REST até a sua persistência no banco de dados com controle de concorrência. Esse rastreamento horizontal ilustra o papel de cada camada arquitetural e as transformações sofridas pelos dados.
 
-\subsection{Camada de Interface: REST Controller e DTOs}
+\subsection{Camada de Apresentação: REST Controller e DTOs}
 
-A camada de interface atua como o ponto de entrada da aplicação, isolando o núcleo do sistema dos detalhes do protocolo HTTP. O \codigo{CreateDonationRequestController} é responsável por interceptar as requisições, executar validações sintáticas básicas e converter o \textit{payload} da requisição (DTO) para o modelo de entrada do caso de uso.
+A camada de apresentação atua como o ponto de entrada da aplicação, isolando o núcleo do sistema dos detalhes do protocolo HTTP. O \codigo{CreateDonationRequestController} é responsável por interceptar as requisições, executar validações sintáticas básicas e converter o \textit{payload} da requisição (DTO) para o modelo de entrada do caso de uso.
 
 \begin{lstlisting}[language=Java, caption={Exemplo de REST Controller da Solicitação de Doação}, label={lst:create-request-controller}]
 @RestController
@@ -527,8 +503,49 @@ Complementarmente à recomendação, o requisitante pode disparar notificações
 
 Não existe vínculo direto entre uma doação e uma solicitação específica: cada doação concluída em um hemocentro entra em um agrupamento (\textit{pool}) de doações daquela organização e é distribuída entre as solicitações ativas do mesmo hemocentro pelo \codigo{DonationRequestFulfillmentService} (Listagem~\ref{lst:fifo}). Os casos de uso de leitura invocam \codigo{fill} com a data de referência \codigo{asOfDate} --- em geral a data corrente. O serviço recarrega as solicitações ativas e ainda não expiradas dos hemocentros envolvidos (\codigo{findActiveRequestsByOrganizationIds}), de modo que a alocação considere o pool inteiro do centro, e não apenas o recorte da recomendação ou da listagem do requisitante. As doações concluídas são lidas na janela \texttt{[data da solicitação ativa mais antiga, asOfDate]}. A alocação ocorre em memória e isolada por hemocentro, com solicitações ordenadas da mais antiga para a mais nova e doações ordenadas pela data efetiva.
 
-A política de distribuição combina a ordem \textit{First In, First Out} (FIFO) com um teto proporcional ao prazo restante de cada solicitação. O teto, calculado por \codigo{DonationRequest.proportionalGoalAt} (Listagem~\ref{lst:teto-proporcional}), libera a meta no mesmo ritmo em que a janela \codigo{[dateRequested, dateLimit]} é consumida: decorridos 3 de 10 dias, apenas $3/10$ da meta está disponível na data de referência. A distribuição ocorre, então, em duas passagens sobre o mesmo pool. Na primeira, cada doação é alocada à primeira solicitação que \codigo{acceptsDonation} aceita --- ativa, não expirada na data de referência, doação concluída, data efetiva na janela \codigo{[dateRequested, dateLimit]} e tipo sanguíneo do doador compatível via \codigo{canDonateTo} (Listagem~\ref{lst:accepts-donation}) --- e que ainda esteja abaixo do seu teto; atingido o teto, a solicitação é preterida e a bolsa segue para a próxima candidata. Na segunda passagem, as doações que nenhuma solicitação pôde absorver retornam na mesma ordem FIFO, agora limitadas apenas pela meta cheia. Em ambas, o \texttt{break} garante uma bolsa por doação.
+A política de distribuição combina a ordem \textit{First In, First Out} (FIFO) com um teto proporcional ao prazo restante de cada solicitação. O teto, calculado por \codigo{DonationRequest.proportionalGoalAt} (Listagem~\ref{lst:teto-proporcional}), libera a meta no mesmo ritmo em que a janela \codigo{[dateRequested, dateLimit]} é consumida: decorridos 3 de 10 dias, apenas $3/10$ da meta está disponível na data de referência. A distribuição ocorre, então, em duas passagens sobre o mesmo pool. Na primeira passagem, cada doação (com saldo inicial unitário contínuo de $1{,}0$ bolsa) é distribuída fracionariamente entre as solicitações compatíveis (\codigo{acceptsDonation}) até o respectivo teto proporcional; atingido o teto de um pedido, o saldo remanescente da doação avança na fila FIFO para as próximas solicitações compatíveis. Na segunda passagem, as frações de doações que nenhuma solicitação pôde absorver retornam na mesma ordem FIFO, agora alocadas até a meta cheia de cada solicitação.
 
 O propósito do teto é redistribuir a escassez em favor de quem tem menos tempo. Sem ele, a solicitação mais antiga do hemocentro consome o pool integralmente, ainda que disponha de semanas de prazo, enquanto uma solicitação prestes a expirar permanece zerada. Como a segunda passagem devolve as sobras, a política não reduz o total de bolsas alocadas --- altera somente qual solicitação recebe cada bolsa quando o pool é insuficiente; havendo doações em quantidade suficiente para todas as metas, o resultado coincide com o da alocação FIFO simples.
+
+Para ilustrar o funcionamento prático dessa estratégia sob uma ótica estritamente matemática contínua, a Figura~\ref{fig:exemplo-alocacao-teto} esquematiza um cenário hipotético em um mesmo hemocentro, avaliado na data de referência (\codigo{asOfDate}) de 24/07/2026.
+
+\begin{figure}[H]
+  \centering
+  \caption{Cenário ilustrativo de alocação contínua restrita por teto proporcional}
+  \includegraphics[width=0.98\textwidth]{figura10-exemplo-alocacao-teto}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:exemplo-alocacao-teto}
+\end{figure}
+
+No cenário apresentado, existem duas solicitações ativas concorrendo pelo mesmo \textit{pool} de doações:
+\begin{enumerate}[label=\alph*)]
+  \item \textbf{Solicitação $R_1$ (mais antiga):} registrada em 14/07 com data-limite em 03/08 (janela total de 20 dias) e meta de 1,0 bolsa. Em 24/07, decorreram 10 dias da janela, correspondendo a uma fração decorrida de $10/20 = 0{,}5$ ($50\%$). Seu teto proporcional calculado é de $1{,}0 \times 0{,}5 = \mathbf{0{,}5000\text{ bolsa}}$;
+  \item \textbf{Solicitação $R_2$ (mais recente e mais próxima do limite):} registrada em 21/07 com data-limite em 31/07 (janela total de 10 dias) e meta de 2,0 bolsas. Em 24/07, decorreram 3 dias da janela, correspondendo a uma fração decorrida de $3/10 = 0{,}3$ ($30\%$). Seu teto proporcional calculado é de $2{,}0 \times 0{,}3 = \mathbf{0{,}6000\text{ bolsa}}$.
+\end{enumerate}
+
+O hemocentro dispõe de um \textit{pool} com duas doações concluídas compatíveis: $D_1$ (concluída em 22/07, saldo de $1{,}0$ bolsa) e $D_2$ (concluída em 23/07, saldo de $1{,}0$ bolsa). 
+
+Por se tratar de um \textit{snapshot} de alocação dinâmica calculado em memória para mensuração de desempenho puramente matemática --- sem persistência ou associação física estática prévia entre doações e receptores --- o modelo adota a soberania matemática contínua, deixando a distribuição a cargo da matemática sem arredondamentos artificiais:
+\begin{itemize}
+  \item \textbf{Metas e tetos proporcionais contínuos:} calculados em \codigo{BigDecimal}, permitindo que uma meta liberada temporalmente contenha frações de bolsa (por exemplo, $0{,}5$ ou $1{,}5$ bolsa);
+  \item \textbf{Alocação dinâmica contínua:} o quantitativo alocado de uma doação a uma solicitação (\codigo{fulfilledBloodBags}) também pode conter frações de bolsa (por exemplo, $0{,}5$ ou $0{,}7$ bolsa), refletindo com exatidão a parcela da demanda atendida.
+\end{itemize}
+
+O fluxo de distribuição em duas passagens opera, portanto, da seguinte forma:
+\begin{enumerate}
+  \item \textbf{1ª Passagem (Teto Proporcional Contínuo):}
+  \begin{itemize}
+    \item \textbf{Distribuição de $D_1$ ($1{,}0$ bolsa):} a fila FIFO inicia pela solicitação mais antiga ($R_1$), cuja capacidade restante para atingir o teto é de $0{,}5 - 0{,}0 = 0{,}5$ bolsa. Aloca-se $0{,}5$ bolsa de $D_1$ para $R_1$, que atinge seu teto proporcional ($0{,}5000$). O saldo remanescente de $D_1$ ($1{,}0 - 0{,}5 = 0{,}5$ bolsa) avança na FIFO para $R_2$, que possui capacidade de $0{,}6 - 0{,}0 = 0{,}6$ bolsa. $R_2$ absorve integralmente essa fração restante de $0{,}5$ bolsa, esgotando o saldo de $D_1$ ($0{,}0$);
+    \item \textbf{Distribuição de $D_2$ ($1{,}0$ bolsa):} $R_1$ já se encontra no limite do seu teto proporcional (capacidade zero), sendo represada na 1ª passagem. A busca avança para $R_2$, que possui capacidade restante de $0{,}6 - 0{,}5 = 0{,}1$ bolsa. Aloca-se $0{,}1$ bolsa de $D_2$ para $R_2$, que atinge seu teto proporcional ($0{,}6000$). O saldo não absorvido de $D_2$ ($1{,}0 - 0{,}1 = 0{,}9$ bolsa) não encontra mais capacidades disponíveis na 1ª passagem e é encaminhado à 2ª passagem.
+  \end{itemize}
+  \item \textbf{2ª Passagem (Meta Cheia / FIFO das Sobras):}
+  \begin{itemize}
+    \item Com os tetos temporais suspensos, aplicam-se as metas cheias ($1{,}0$ para $R_1$ e $2{,}0$ para $R_2$). A sobra de $0{,}9$ bolsa de $D_2$ retorna ao início da fila FIFO;
+    \item $R_1$ necessita de $1{,}0 - 0{,}5 = 0{,}5$ bolsa para alcançar sua meta total. Aloca-se $0{,}5$ bolsa da sobra para $R_1$, que conclui integralmente sua meta ($1{,}0/1{,}0$ bolsa, \codigo{goalReached = true});
+    \item O restante da sobra ($0{,}9 - 0{,}5 = 0{,}4$ bolsa) avança para $R_2$, elevando seu quantitativo final para $0{,}6 + 0{,}4 = 1{,}0$ bolsa ($50\%$ da meta cheia solicitada).
+  \end{itemize}
+\end{enumerate}
+
+Ao término do processo, $R_1$ atinge $1{,}0/1{,}0$ bolsa ($100\%$ da meta) e $R_2$ atinge $1{,}0/2{,}0$ bolsas ($50\%$ da meta), com zero desperdício de doações. Nota-se o benefício dessa abordagem matemática: caso o hemocentro dispusesse de apenas uma doação no \textit{pool} ($D_1$ de $1{,}0$ bolsa), a doação seria partilhada exatamente como $0{,}5$ bolsa para $R_1$ e $0{,}5$ bolsa para $R_2$, impedindo que a solicitação mais antiga monopolizasse a única bolsa disponível e permitindo que ambas avançassem proporcionalmente em direção às suas metas.
 
 O progresso (\codigo{fulfilledBloodBags}) não é persistido. Os casos de uso de leitura que precisam exibir o preenchimento --- listagem de solicitações do requisitante, recomendação ao doador e bloqueio de notificação quando a meta já foi atingida --- invocam o mesmo serviço de domínio e recebem o mapa calculado na hora. Concluir uma doação apenas persiste a doação; a leitura seguinte já vê o \textit{pool} atualizado. Como o cálculo não regrava solicitações, não há condição de corrida entre escritas de contador: cada leitura monta o próprio \textit{snapshot}. Assume-se, como contrapartida, que o progresso exibido de uma solicitação de prazo folgado pode decrescer entre duas leituras: à medida que os tetos das solicitações concorrentes crescem com o tempo, bolsas antes atribuídas a ela na segunda passagem migram para solicitações mais próximas do vencimento.

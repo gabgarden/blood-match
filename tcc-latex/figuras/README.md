@@ -15,6 +15,7 @@ Arquivos utilizados no documento:
 | `figura07-classes-doacao.png` | Cap. 5 — classes doação |
 | `figura08-impl-donation-request.png` | Cap. 5 — agregado DonationRequest |
 | `figura09-impl-donation.png` | Cap. 5 — agregado Donation |
+| `figura10-exemplo-alocacao-teto.png` | Cap. 5 — exemplo alocação FIFO + teto proporcional |
 
 Quadros recriados em LaTeX (sem imagem):
 

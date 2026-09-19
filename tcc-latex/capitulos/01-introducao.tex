@@ -2,16 +2,27 @@
 
 \section{Problema e contexto}
 
-De acordo com a Organização Mundial da Saúde \citeyear{oms2020} em colaboração com a Organização Pan-Americana da Saúde \citeyear{opas2020}, a taxa de doação de sangue por mil habitantes é de 32,6 em países de alta renda, 15,1 em países de renda média-alta, 8,1 em países de renda média-baixa e 4,4 em países de baixa renda. Nesse cenário, a transfusão sanguínea permanece essencial à medicina contemporânea: é requerida em emergências oriundas de acidentes, em procedimentos cirúrgicos de grande porte e no tratamento de pacientes com condições patológicas crônicas que necessitam de transfusões regulares. As doações periódicas, portanto, sustentam os estoques e salvam vidas.
+% Contexto
+De acordo com a Organização Mundial da Saúde \citeyear{oms2020} em colaboração com a Organização Pan-Americana da Saúde \citeyear{opas2020}, a taxa de doação de sangue por mil habitantes é de 32,6 em países de alta renda, 15,1 em países de renda média-alta, 8,1 em países de renda média-baixa e 4,4 em países de baixa renda. Ademais, a OMS \citeyear{oms2020} estabelece que qualquer país deve ter no mínimo 1\% da população doando sangue para suprir as necessidades básicas. Nesse cenário, a transfusão sanguínea permanece essencial à medicina contemporânea: é requerida em emergências oriundas de acidentes, em procedimentos cirúrgicos de grande porte e no tratamento de pacientes com condições patológicas crônicas que necessitam de transfusões regulares. As doações periódicas, portanto, sustentam os estoques e salvam vidas.
 
-Ainda assim, verifica-se que o sistema de doação de sangue no território brasileiro sofre com o baixo número de doadores diante de uma alta demanda. É comum observar, nas redes sociais, pessoas requisitando doações extraordinárias em virtude da necessidade de um conhecido --- evidência da escassez nos bancos de sangue.
+% Problema
+Apesar de sua importância, verifica-se que o sistema de doação de sangue no território brasileiro sofre com o baixo número de doadores diante de uma alta demanda. Conforme aponta o diretor do Hemorio, Luiz Amorim \citeyear{hemorio2023}, mesmo o Brasil estando dentro dos índices sugeridos pela OMS, o nível de sangue doado não é suficiente para suprir a demanda real. É comum observar, nas redes sociais, pessoas requisitando doações extraordinárias em virtude da necessidade de um conhecido --- evidência da escassez nos bancos de sangue.
 
-Do ponto de vista tecnológico, as soluções atuais de captação --- pedidos disseminados em redes sociais e ferramentas de divulgação de alcance genérico --- mostram-se extremamente limitadas na conexão entre oferta e demanda. Falta um mecanismo sistemático que aproxime requisitantes e doadores segundo critérios de compatibilidade, o que resulta em tempo excessivo para localizar doadores adequados e em baixa taxa de conversão das solicitações em doações efetivas.
+% Soluções atuais
+Do ponto de vista tecnológico, as soluções atuais de captação --- pedidos disseminados em redes sociais e ferramentas de divulgação de alcance genérico --- mostram-se extremamente limitadas na conexão entre oferta e demanda. 
 
-Diante dessa lacuna, este trabalho propõe uma API RESTful que intermedia as solicitações de unidades de saúde e pacientes e os doadores disponíveis, recomendando correspondências compatíveis. Essa abordagem torna a captação mais efetiva, ao substituir a divulgação genérica por um encontro dirigido entre oferta e demanda, e apoia-se em uma arquitetura robusta, bem estruturada e escalável, de modo a garantir um longo ciclo de vida ao sistema.
+% GAP
+Falta um mecanismo sistemático que aproxime requisitantes e doadores segundo critérios de compatibilidade, o que resulta em tempo excessivo para localizar doadores adequados e em baixa taxa de conversão das solicitações em doações efetivas.
+
+% Sua solução
+Diante dessa lacuna, este trabalho propõe uma API RESTful que intermedia as solicitações de unidades de saúde e pacientes e os doadores disponíveis, recomendando correspondências compatíveis de forma a promover a captação efetiva de possíveis doadores.
+
+% Vantagens
+Essa abordagem apresenta a vantagem de tornar a captação mais efetiva, ao substituir a divulgação genérica por um encontro dirigido entre oferta e demanda. Além disso, o desenvolvimento utilizando as técnicas de \textit{Domain-Driven Design} (DDD) facilita a modelagem das regras de negócio da doação sanguínea \cite{evans2003}, enquanto a adoção dos princípios SOLID \cite{martin2000} garante uma arquitetura robusta e escalável, promovendo futuras expansões e um longo ciclo de vida ao sistema, que estará preparado para receber integrações com facilidade.
 
 \section{Objetivos}
 
+% Objetivo geral
 O objetivo geral deste trabalho é gerenciar as doações de sangue a partir de um sistema de informações via Web, aproximando as solicitações de unidades de saúde e pacientes dos doadores compatíveis. O sistema recomenda solicitações à luz da tipagem sanguínea e da proximidade geográfica e identifica doadores elegíveis para notificação.
 
 Objetivos específicos:
@@ -24,16 +35,11 @@ Objetivos específicos:
 
 \section{Justificativa}
 
-Segundo a Organização Mundial da Saúde \citeyear{oms2020}, qualquer país deve ter no mínimo 1\% da população doando sangue. Porém, de acordo com o diretor do Hemorio, Luiz Amorim \citeyear{hemorio2023}, mesmo estando dentro dos índices sugeridos pela OMS, o nível de sangue doado no Brasil não é suficiente para suprir a demanda real.
+% Justificativa
+A viabilidade e a relevância da proposta baseiam-se em evidências de que a sistematização tecnológica gera resultados expressivos. O estado do Ceará, por exemplo, destaca-se no cenário hemoterápico nacional, possuindo 2,21\% da população doadora de sangue \cite{ceara2021} --- mais que o dobro do mínimo recomendado pela OMS ---, estabelecendo-se como referência nacional. Esse desempenho está diretamente relacionado ao sistema integrado e unificado dos hemocentros do estado, coordenado pelo Centro de Hematologia e Hemoterapia do Ceará (Hemoce), que atende a demanda de transfusão sanguínea dos 184 municípios cearenses por meio da Hemorrede Pública Estadual, abrangendo mais de 480 unidades de saúde \cite{hemoce2022}. Em 2024, o estado alcançou um marco histórico com 110.784 doações, o maior número registrado em 30 anos \cite{ceara2025}, demonstrando que um sistema bem estruturado e integrado pode efetivamente suprir a demanda por sangue e derivados.
 
-Por outro lado, o estado do Ceará se destaca no cenário hemoterápico nacional, possuindo 2,21\% da população doadora de sangue \cite{ceara2021} --- mais que o dobro do mínimo recomendado pela OMS ---, estabelecendo-se como referência nacional. Esse desempenho está diretamente relacionado ao sistema integrado e unificado dos hemocentros do estado, coordenado pelo Centro de Hematologia e Hemoterapia do Ceará (Hemoce), que atende a demanda de transfusão sanguínea dos 184 municípios cearenses por meio da Hemorrede Pública Estadual, abrangendo mais de 480 unidades de saúde \cite{hemoce2022}. Em 2024, o estado alcançou um marco histórico com 110.784 doações, o maior número registrado em 30 anos \cite{ceara2025}, demonstrando que um sistema bem estruturado e integrado pode efetivamente suprir a demanda por sangue e derivados.
-
-No plano social e de saúde coletiva, a proposta alinha-se diretamente ao Objetivo de Desenvolvimento Sustentável~3 (ODS~3 --- Saúde e Bem-Estar) da Agenda 2030 da Organização das Nações Unidas \cite{onu2015}, cujo propósito inclui assegurar o acesso universal a serviços de saúde essenciais e a insumos terapêuticos vitais e seguros. Ao estruturar um canal computacional capaz de aproximar demandas emergenciais ou programadas de voluntários compatíveis, a solução busca reduzir o tempo de resposta e mitigar desabastecimentos nos bancos de sangue, apoiando intervenções cirúrgicas, atendimentos a traumas e o suporte continuado a pacientes crônicos.
-
-Do ponto de vista tecnológico, o desenvolvimento utilizando as técnicas de \textit{Domain-Driven Design} (DDD) é justificado pelas características específicas do domínio, facilitando a modelagem das regras de negócio da doação sanguínea \cite{evans2003}, enquanto os princípios SOLID \cite{martin2000} garantem futuras expansões do sistema, fornecendo uma arquitetura preparada para receber integrações com facilidade.
-
-Diante desse cenário, o presente trabalho contribui com o desenvolvimento de uma API RESTful, aplicando as técnicas e princípios supracitados, de forma a promover a captação efetiva de possíveis doadores de sangue.
+Ademais, no plano social e de saúde coletiva, a proposta alinha-se diretamente ao Objetivo de Desenvolvimento Sustentável~3 (ODS~3 --- Saúde e Bem-Estar) da Agenda 2030 da Organização das Nações Unidas \cite{onu2015}, cujo propósito inclui assegurar o acesso universal a serviços de saúde essenciais e a insumos terapêuticos vitais e seguros. Ao estruturar um canal computacional capaz de aproximar demandas emergenciais ou programadas de voluntários compatíveis, a solução busca reduzir o tempo de resposta e mitigar desabastecimentos nos bancos de sangue, apoiando intervenções cirúrgicas, atendimentos a traumas e o suporte continuado a pacientes crônicos.
 
 \section{Organização da monografia}
 
-A Seção~2 apresenta o referencial teórico (orientação a objetos, SOLID e DDD). A Seção~3 relata o mapeamento sistemático da literatura e os trabalhos relacionados. A Seção~4 descreve métodos, instrumentos e cronograma. A Seção~5 detalha requisitos, modelagem e implementação. A Seção~6 trata da avaliação. A Seção~7 reúne as considerações finais. Os Apêndices~A a~D reúnem trechos do código-fonte das regras e dos fluxos mais relevantes da API.
+A Seção~2 apresenta o referencial teórico (orientação a objetos, SOLID e DDD). A Seção~3 relata o mapeamento sistemático da literatura e os trabalhos relacionados. A Seção~4 descreve métodos, instrumentos e cronograma. A Seção~5 detalha a API RESTful proposta (requisitos, análise, design e implementação). A Seção~6 trata da avaliação. A Seção~7 reúne as considerações finais. Os Apêndices~A a~D reúnem trechos do código-fonte das regras e dos fluxos mais relevantes da API.
