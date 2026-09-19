@@ -152,7 +152,7 @@ Por fim, a Figura~\ref{fig:uc-donor} representa o diagrama de caso de uso do ato
   \label{fig:uc-donor}
 \end{figure}
 
-O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a atualização de seu perfil clínico (UC08), a consulta às solicitações recomendadas (UC10), o registro unificado de doações (UC11), a conclusão (UC12) e o reagendamento de doações pendentes (UC16), a consulta ao próprio histórico hemoterápico (UC13) e a emissão de seu resumo (UC17). Vale ressaltar que, no UC11, a doação nasce pendente quando o doador informa a data de intenção ou concluída quando informa a data efetiva --- um único caso de uso, sem fábricas concorrentes no domínio.
+O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a atualização de seu perfil clínico (UC08), a consulta às solicitações recomendadas (UC10), o registro unificado de doações (UC11), a conclusão (UC12) e o reagendamento de doações pendentes (UC16), a consulta ao próprio histórico hemoterápico (UC13) e a emissão de seu resumo (UC17). Vale ressaltar que, no UC11, a doação nasce pendente quando o doador informa a data de intenção ou concluída quando informa a data efetiva --- um único caso de uso, sem métodos concorrentes de instanciação no domínio.
 
 \subsubsubsection{Detalhamento dos casos de uso}
 
@@ -255,7 +255,7 @@ Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementaçã
   \label{fig:impl-donation}
 \end{figure}
 
-Tratada também como uma raiz de agregado autônoma, a classe concentra uma única fábrica \codigo{create} e o ciclo de vida pendente--concluída--cancelada. O estado não é armazenado como flags independentes: deriva das datas de intenção (\codigo{intendedDate}), de efetivação (\codigo{donationDate}) e de cancelamento (\codigo{cancelledAt}). Completar uma doação pendente preenche a data efetiva sem apagar a intenção; reagendar e cancelar permanecem transições sobre o mesmo agregado. A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
+Tratada também como uma raiz de agregado autônoma, a classe concentra um único método fabril estático (\textit{static factory method}) \codigo{create} e o ciclo de vida pendente--concluída--cancelada. O estado não é armazenado como flags independentes: deriva das datas de intenção (\codigo{intendedDate}), de efetivação (\codigo{donationDate}) e de cancelamento (\codigo{cancelledAt}). Completar uma doação pendente preenche a data efetiva sem apagar a intenção; reagendar e cancelar permanecem transições sobre o mesmo agregado. A navegabilidade unidirecional explícita demonstra que a doação possui a referência imediata do \texttt{Donor} e do \texttt{BloodCenter} envolvidos, assegurando a consistência da operação sem a necessidade de carregar listas e metadados completos de uma solicitação simultaneamente.
 
 \section{Domínio e arquitetura}
 
@@ -351,84 +351,150 @@ public class CreateDonationRequestController {
 }
 \end{lstlisting}
 
-\subsection{Camada de Aplicação: Casos de Uso}
+\subsection{Camada de Aplicação: Casos de Uso e o Padrão \textit{execute}}
 
-A camada de aplicação orquestra o fluxo de dados coordenando chamadas aos repositórios e aos serviços de domínio. O \codigo{CreateDonationRequestUseCase} carrega as entidades associadas (\codigo{Requester} e \codigo{BloodCenter}), invoca a fábrica da entidade e instrui o repositório a persistir o novo agregado. Esta camada desconhece qualquer dependência de infraestrutura, utilizando apenas portas de interfaces.
+A camada de aplicação orquestra o fluxo de dados coordenando chamadas aos repositórios e aos serviços de domínio. O \codigo{CreateDonationRequestUseCase} carrega as entidades associadas (\codigo{Requester} e \codigo{BloodCenter}), invoca o método fabril estático da entidade e instrui o repositório a persistir o novo agregado. Esta camada desconhece qualquer dependência de infraestrutura, utilizando exclusivamente portas de interfaces.
 
-\begin{lstlisting}[language=Java, caption={Exemplo de Caso de Uso de Criação}, label={lst:create-request-usecase}]
+Para padronizar a orquestração de negócios, todos os casos de uso do sistema adotam o padrão formal estruturado na assinatura:
+\begin{equation}
+  \text{Output } \text{execute}(\text{Input } \text{input})
+\end{equation}
+
+Essa padronização fundamenta-se nos seguintes princípios arquiteturais:
+\begin{itemize}
+  \item \textbf{Princípio da Responsabilidade Única (SRP) e \textit{Command Pattern}:} Cada classe de caso de uso representa uma única operação de negócio do sistema. A presença de um único ponto de entrada público (\codigo{execute}) impede que a classe se transforme em um serviço inflado com múltiplos métodos de ciclos de vida distintos, mantendo a responsabilidade estrita e coesa.
+  \item \textbf{Isolamento da Camada Web via DTOs Imutáveis (\textit{Records}):} Os objetos \codigo{Input} e \codigo{Output} são definidos como Java \textit{records}, garantindo imutabilidade e eliminação de efeitos colaterais. O \codigo{Input} não possui acoplamento com anotações de infraestrutura HTTP (como \codigo{@Valid} ou anotações do Jackson), sendo a camada de apresentação responsável por mapear o DTO da requisição para o \codigo{Input}.
+  \item \textbf{Proteção contra Vazamento de Domínio:} O \codigo{Output} expõe estritamente os atributos necessários para a resposta ao cliente (como identificadores de recursos gerados), impedindo que entidades e agregados ricos de domínio vazem acidentalmente para camadas externas.
+  \item \textbf{Determinismo Temporal em Testes:} O método \codigo{execute} admite uma sobrecarga que recebe a data corrente (\codigo{LocalDate currentDate}), viabilizando testes unitários puramente determinísticos sobre regras de expiração e prazos, sem ancoragem rígida ao relógio do sistema operacional.
+\end{itemize}
+
+A Listagem~\ref{lst:create-request-usecase} exemplifica o caso de uso de criação com injeção explícita de dependências via construtor e declaração formal de seus contratos de entrada e saída.
+
+\begin{lstlisting}[language=Java, caption={Exemplo de Caso de Uso com Padrão Output execute(Input)}, label={lst:create-request-usecase}]
 @Service
 public class CreateDonationRequestUseCase {
 
-  private final DonationRequestRepositoryInterface repository;
-  private final RequesterRepositoryInterface requesterRepo;
-  private final BloodCenterRepositoryInterface bloodCenterRepo;
+  private final DonationRequestRepositoryInterface donationRequestRepository;
+  private final RequesterRepositoryInterface requesterRepository;
+  private final BloodCenterRepositoryInterface bloodCenterRepository;
 
-  // Construtor omitido para brevidade...
+  public CreateDonationRequestUseCase(
+      DonationRequestRepositoryInterface donationRequestRepository,
+      RequesterRepositoryInterface requesterRepository,
+      BloodCenterRepositoryInterface bloodCenterRepository) {
+    this.donationRequestRepository = donationRequestRepository;
+    this.requesterRepository = requesterRepository;
+    this.bloodCenterRepository = bloodCenterRepository;
+  }
+
+  public Output execute(Input input) {
+    return execute(input, LocalDate.now());
+  }
 
   public Output execute(Input input, LocalDate currentDate) {
-    // 1. Parse de Identificadores e Value Objects
     DomainID partyId = DomainIdParser.parse(input.partyId(), "partyId");
-    BloodType bloodType = BloodType.of(input.bloodTypeNeeded());
+    DomainID organizationId = DomainIdParser.parse(input.organizationId(), "organizationId");
+    BloodType bloodTypeNeeded = parseBloodType(input.bloodTypeNeeded());
+    Urgency urgency = parseUrgency(input.urgency());
 
-    // 2. Busca das entidades relacionadas nas portas de repositorio
-    Requester requester = requesterRepo.findByPartyId(partyId)
-        .orElseThrow(() -> new NotFoundException("Requester not found"));
-    BloodCenter bloodCenter = bloodCenterRepo.findByPartyId(organizationId)
-        .orElseThrow(() -> new NotFoundException("Blood center not found"));
+    Requester requester = requesterRepository.findByPartyId(partyId)
+        .orElseThrow(() -> new NotFoundException("Requester role not found"));
+    BloodCenter bloodCenter = bloodCenterRepository.findByPartyId(organizationId)
+        .orElseThrow(() -> new NotFoundException("Blood center role not found"));
 
-    // 3. Invocacao da fabrica do Agregado de Dominio
     DonationRequest request = DonationRequest.create(
-        requester,
-        bloodCenter,
-        bloodType,
-        input.goalBloodBags(),
-        input.dateLimit(),
-        currentDate,
-        parseUrgency(input.urgency()),
-        input.directedTo());
+        requester, bloodCenter, bloodTypeNeeded,
+        input.goalBloodBags(), input.dateLimit(),
+        currentDate, urgency, input.directedTo());
 
-    // 4. Persistencia e retorno
-    repository.save(request);
+    donationRequestRepository.save(request);
     return Output.from(request);
+  }
+
+  public record Input(
+      String partyId, String organizationId, String bloodTypeNeeded,
+      Integer goalBloodBags, LocalDate dateLimit, String urgency, String directedTo) {}
+
+  public record Output(String id) {
+    public static Output from(DonationRequest request) {
+      return new Output(request.getId().getValue().toString());
+    }
   }
 }
 \end{lstlisting}
 
-\subsection{Camada de Domínio: Agregado e Regras de Negócio}
+\subsection{Camada de Domínio: Agregado, Invariantes no Construtor e \textit{Static Factory Method}}
 
-O coração do software reside na camada de domínio. A classe \codigo{DonationRequest} atua como a raiz do agregado, protegendo os seus invariantes e garantindo que nenhuma solicitação seja instanciada em um estado inválido. A lógica de negócio essencial (como não permitir metas zeradas ou datas no passado) fica concentrada no método fábrica \codigo{create(...)}.
+O coração do \textit{software} reside na camada de domínio. A classe \codigo{DonationRequest} atua como a raiz do agregado, protegendo os seus invariantes e garantindo que nenhuma solicitação seja instanciada em um estado inválido.
 
-\begin{lstlisting}[language=Java, caption={Fábrica do Agregado de Domínio}, label={lst:donation-request-domain}]
+Nesse contexto, cabe distinguir com rigor o padrão adotado das fábricas clássicas do GoF (\textit{Factory Method} polimórfico e \textit{Abstract Factory}) ou de serviços de fábrica dedicados do DDD (\textit{Domain Factories}). O modelo implementa o padrão idiomático \textbf{\textit{Static Factory Method}} (Método Fabril Estático), formalizado por Joshua Bloch (2018, Item~1):
+\begin{itemize}
+  \item \textbf{Expressividade Semântica:} Diferencia de forma explícita as intenções de criação no ciclo de vida do agregado. O método \codigo{DonationRequest.create(...)} expressa a criação de uma nova solicitação no sistema (gerando um novo \codigo{DomainID} e definindo o estado inicial ativo), enquanto o método \codigo{DonationRequest.reconstitute(...)} expressa a reconstituição de um agregado pré-existente carregado a partir do banco de dados, preservando o identificador e a versão de persistência originais.
+  \item \textbf{Proteção de Invariantes no Construtor:} As invariantes de consistência e regras estruturais essenciais (como proibir metas zeradas, garantir campos obrigatórios não nulos e impedir datas limite anteriores à data de criação) residem obrigatoriamente no \textbf{construtor} da classe. Em Java, o construtor atua como o ponto de estrangulamento obrigatório de instanciação (\textit{chokepoint of integrity}). Se as validações de invariantes permanecessem soltas apenas no método estático \codigo{create}, o construtor ficaria desprotegido contra chamadas que pudessem gerar um objeto inconsistente. Portanto, o construtor impõe as regras de integridade do agregado antes de qualquer atribuição de estado, cabendo ao método fabril estático apenas a orquestração semântica dos parâmetros.
+\end{itemize}
+
+A Listagem~\ref{lst:donation-request-domain} ilustra a proteção das invariantes no construtor do agregado e sua instanciação coordenada pelo método fabril estático.
+
+\begin{lstlisting}[language=Java, caption={Construtor com Invariantes e Método Fabril Estático do Agregado}, label={lst:donation-request-domain}]
 public class DonationRequest extends DomainObject {
   private Requester requester;
   private BloodCenter bloodCenter;
   private BloodType bloodTypeNeeded;
   private int goalBloodBags;
+  private LocalDate dateRequested;
   private LocalDate dateLimit;
+  private boolean active;
+  private Urgency urgency;
+  private String directedTo;
 
+  public DonationRequest(
+      Requester requester, BloodCenter bloodCenter, BloodType bloodTypeNeeded,
+      int goalBloodBags, LocalDate dateLimit, LocalDate currentDate,
+      Urgency urgency, String directedTo) {
+    if (requester == null)
+      throw new IllegalArgumentException("Requester cannot be null");
+    if (bloodCenter == null)
+      throw new IllegalArgumentException("Blood center cannot be null");
+    if (bloodTypeNeeded == null)
+      throw new IllegalArgumentException("Blood type cannot be null");
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
+    if (dateLimit == null)
+      throw new IllegalArgumentException("Limit date cannot be null");
+    if (currentDate == null)
+      throw new IllegalArgumentException("Current date cannot be null");
+    if (urgency == null)
+      throw new IllegalArgumentException("Urgency cannot be null");
+    if (dateLimit.isBefore(currentDate))
+      throw new IllegalArgumentException("Limit date invalid");
+
+    this.id = DomainID.generate();
+    this.requester = requester;
+    this.bloodCenter = bloodCenter;
+    this.bloodTypeNeeded = bloodTypeNeeded;
+    this.goalBloodBags = goalBloodBags;
+    this.dateRequested = currentDate;
+    this.dateLimit = dateLimit;
+    this.active = true;
+    this.urgency = urgency;
+    this.directedTo = directedTo;
+  }
+
+  // Metodo Fabril Estatico (Static Factory Method)
   public static DonationRequest create(
       Requester requester, BloodCenter bloodCenter, BloodType bloodTypeNeeded,
       int goalBloodBags, LocalDate dateLimit, LocalDate currentDate,
       Urgency urgency, String directedTo) {
-      
-    // Protecao de Invariantes Essenciais
-    if (goalBloodBags <= 0)
-      throw new IllegalArgumentException("Goal blood bags must be > zero");
-    if (dateLimit.isBefore(currentDate))
-      throw new IllegalArgumentException("Limit date invalid");
-      
     return new DonationRequest(
-        requester, bloodCenter, bloodTypeNeeded, goalBloodBags,
-        dateLimit, currentDate, urgency, directedTo);
+        requester, bloodCenter, bloodTypeNeeded,
+        goalBloodBags, dateLimit, currentDate, urgency, directedTo);
   }
 }
 \end{lstlisting}
 
-\subsection{Camada de Infraestrutura: Repositório e Controle de Concorrência}
+\subsection{Camada de Infraestrutura: Repositório e Controle de Concorrência Otimista}
 
-Na extremidade da arquitetura, a camada de persistência traduz o modelo conceitual rico do domínio para as estruturas do banco de dados (MongoDB). Os adaptadores implementam as interfaces requeridas pelos casos de uso, mapeando o agregado de domínio para um \textit{Schema} correspondente.
-
-Ademais, para garantir a integridade das transações contra atualizações simultâneas (como alterar simultaneamente o prazo e a meta de uma mesma solicitação), o esquema incorpora um controle de versão otimista suportado pela anotação \codigo{@Version}.
+Na extremidade da arquitetura, a camada de infraestrutura traduz o modelo conceitual de domínio para as estruturas do banco de dados (MongoDB). Para proteger o sistema contra acessos simultâneos concorrentes (como a alteração concorrente da meta e do prazo de uma mesma solicitação), adota-se formalmente o mecanismo de \textbf{Controle de Concorrência Otimista} (\textit{Optimistic Concurrency Control} --- OCC), fundamentado nas proposições clássicas de Kung e Robinson (1981) e Fowler (2002). No esquema de persistência, o OCC é suportado pela anotação \codigo{@Version}, conforme exibido na Listagem~\ref{lst:donation-request-schema}.
 
 \begin{lstlisting}[language=Java, caption={Mapeamento e Controle de Concorrência Otimista}, label={lst:donation-request-schema}]
 @Document(collection = "donation_requests")
@@ -441,9 +507,8 @@ public class DonationRequestSchema {
   private int goalBloodBags;
 
   @Version
-  private Long version; // Controle de Concorrencia Otimista
+  private Long version; // Controle de Concorrencia Otimista (OCC)
 
-  // Metodo de conversao (Dominio -> Infraestrutura)
   public static DonationRequestSchema fromDomain(DonationRequest domain) {
     DonationRequestSchema schema = new DonationRequestSchema();
     schema.id = domain.getId().getValue().toString();
@@ -455,20 +520,122 @@ public class DonationRequestSchema {
 }
 \end{lstlisting}
 
-Para preservar a arquitetura, todas as exceções intrínsecas ao banco de dados são tratadas e convertidas por um utilitário interno (\codigo{OptimisticConcurrency}) dentro do próprio adaptador, impedindo o vazamento de exceções tecnológicas de persistência para as camadas superiores:
+\subsubsection{Composição versus Herança na Arquitetura do Repositório}
 
-\begin{lstlisting}[language=Java, caption={Adaptador de Repositório}, label={lst:donation-request-repo}]
+Um ponto central no desenho da persistência é a decisão entre herança e composição na implementação dos repositórios:
+\begin{itemize}
+  \item \textbf{Princípio de Inversão de Dependência (DIP) e Arquitetura Hexagonal:} O núcleo de domínio deve ser estritamente agnóstico a ferramentas e tecnologias de banco de dados. A interface \codigo{DonationRequestRepositoryInterface} reside puramente no Domínio e expressa um contrato orientado à coleção concebida pela linguagem ubíqua (\codigo{save}, \codigo{findById}, \codigo{findActiveRequestsForDonor}), sem qualquer dependência ou anotação do Spring Data (\codigo{org.springframework.data...}).
+  \item \textbf{O Problema da Herança Direta:} Caso a interface de repositório de domínio utilizasse herança estendendo diretamente as interfaces do Spring Data (por exemplo, \codigo{interface DonationRequestRepositoryInterface extends MongoRepository<...>}), as abstrações do framework de persistência vazariam para o núcleo da aplicação. Isso tornaria o domínio refém do Spring Data e das convenções de consulta específicas do MongoDB.
+  \item \textbf{A Escolha por Composição (\textit{Adapter Pattern}):} Aplicando a máxima clássica do GoF (\textit{``Favor object composition over class inheritance''}), a classe concreta \codigo{DonationRequestRepositoryImpl} implementa a interface do domínio e \textbf{compõe} internamente tanto a interface do Spring Data (\codigo{DonationRequestMongoRepository}) quanto o carregador de entidades (\codigo{PersistenceGraphLoader}). Essa abordagem viabiliza:
+    \begin{enumerate}
+      \item O isolamento completo das regras de negócio contra modificações na tecnologia de persistência;
+      \item A conversão bidirecional controlada entre os agregados de domínio e os esquemas de documentos (\codigo{DonationRequestSchema});
+      \item A interceptação e tratamento centralizado de conflitos de concorrência através do componente utilitário \codigo{OptimisticConcurrency};
+      \item A alta testabilidade da aplicação por meio de testes unitários rápidos utilizando dublês de teste (\textit{mocks}) da interface pura do domínio.
+    \end{enumerate}
+\end{itemize}
+
+A Listagem~\ref{lst:donation-request-repo-interface} apresenta o contrato puro da interface de domínio, enquanto a Listagem~\ref{lst:donation-request-repo-impl} detalha a classe de implementação concreta com composição, demonstrando a operação de escrita com barreira de concorrência otimista e as operações de consulta e reconstituição.
+
+\begin{lstlisting}[language=Java, caption={Interface de Domínio do Repositório (Porta)}, label={lst:donation-request-repo-interface}]
+package bloodmatch.request.domain;
+
+import bloodmatch.shared.domain.valueObjects.Address;
+import bloodmatch.shared.domain.valueObjects.BloodType;
+import bloodmatch.shared.domain.valueObjects.DomainID;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+public interface DonationRequestRepositoryInterface {
+
+  void save(DonationRequest request);
+
+  Optional<DonationRequest> findById(DomainID id);
+
+  List<DonationRequest> findActiveRequests();
+
+  List<DonationRequest> findActiveRequestsForDonor(
+      BloodType donorBloodType,
+      Address donorAddress,
+      double maxDistanceInKm,
+      LocalDate currentDate);
+
+  List<DonationRequest> findByRequesterPartyId(DomainID requesterPartyId);
+
+  void deleteById(DomainID id);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=Java, caption={Implementação do Repositório via Composição e Controle de Concorrência Otimista}, label={lst:donation-request-repo-impl}]
 @Repository
 public class DonationRequestRepositoryImpl implements DonationRequestRepositoryInterface {
 
-  private final DonationRequestMongoRepository mongoRepository;
+  private final DonationRequestMongoRepository mongoRepository; // Composicao
+  private final PersistenceGraphLoader graphLoader;              // Composicao
+
+  public DonationRequestRepositoryImpl(
+      DonationRequestMongoRepository mongoRepository,
+      PersistenceGraphLoader graphLoader) {
+    this.mongoRepository = mongoRepository;
+    this.graphLoader = graphLoader;
+  }
 
   @Override
   public void save(DonationRequest request) {
-    OptimisticConcurrency.execute(() -> {
-      DonationRequestSchema schema = DonationRequestSchema.fromDomain(request);
-      mongoRepository.save(schema);
-    });
+    if (request == null)
+      throw new IllegalArgumentException("DonationRequest cannot be null");
+
+    DonationRequestSchema schema = new DonationRequestSchema(request);
+    OptimisticConcurrency.save(
+        () -> mongoRepository.save(schema),
+        "Donation request");
+  }
+
+  @Override
+  public Optional<DonationRequest> findById(DomainID id) {
+    if (id == null)
+      throw new IllegalArgumentException("Donation request id cannot be null");
+
+    return mongoRepository.findById(id.getValue().toString())
+        .map(schema -> graphLoader.toDonationRequests(List.of(schema)).get(0));
+  }
+
+  @Override
+  public List<DonationRequest> findActiveRequestsForDonor(
+      BloodType donorBloodType, Address donorAddress,
+      double maxDistanceInKm, LocalDate currentDate) {
+    if (donorBloodType == null || currentDate == null)
+      throw new IllegalArgumentException("Parameters cannot be null");
+    if (donorAddress == null || !donorAddress.hasCoordinates())
+      return List.of();
+
+    Point donorLocation = new Point(donorAddress.getLongitude(), donorAddress.getLatitude());
+    Distance maxDistance = new Distance(maxDistanceInKm, Metrics.KILOMETERS);
+
+    List<DonationRequestSchema> schemas = mongoRepository
+        .findByActiveTrueAndDateLimitGreaterThanEqualAndBloodTypeNeededInAndLocationNear(
+            currentDate, donorBloodType.getCompatibleRecipientTypes(),
+            donorLocation, maxDistance);
+
+    return graphLoader.toDonationRequests(schemas);
+  }
+
+  @Override
+  public List<DonationRequest> findByRequesterPartyId(DomainID requesterPartyId) {
+    if (requesterPartyId == null)
+      throw new IllegalArgumentException("Requester party id cannot be null");
+
+    return graphLoader.toDonationRequests(
+        mongoRepository.findByRequesterId(requesterPartyId.getValue().toString()));
+  }
+
+  @Override
+  public void deleteById(DomainID id) {
+    if (id == null)
+      throw new IllegalArgumentException("Donation request id cannot be null");
+
+    mongoRepository.deleteById(id.getValue().toString());
   }
 }
 \end{lstlisting}

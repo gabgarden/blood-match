@@ -58,58 +58,59 @@
 \contentsline {subsection}{\numberline {5.4.2}Entidades, agregados e objetos de valor}{45}{subsection.5.4.2}%
 \contentsline {section}{\numberline {5.5}Implementação e Fluxo de Dados}{46}{section.5.5}%
 \contentsline {subsection}{\numberline {5.5.1}Camada de Apresentação: REST Controller e DTOs}{47}{subsection.5.5.1}%
-\contentsline {subsection}{\numberline {5.5.2}Camada de Aplicação: Casos de Uso}{47}{subsection.5.5.2}%
-\contentsline {subsection}{\numberline {5.5.3}Camada de Domínio: Agregado e Regras de Negócio}{48}{subsection.5.5.3}%
-\contentsline {subsection}{\numberline {5.5.4}Camada de Infraestrutura: Repositório e Controle de Concorrência}{49}{subsection.5.5.4}%
-\contentsline {subsection}{\numberline {5.5.5}Segurança e autenticação}{50}{subsection.5.5.5}%
-\contentsline {subsection}{\numberline {5.5.6}Serviços externos e documentação da API}{50}{subsection.5.5.6}%
-\contentsline {section}{\numberline {5.6}Recomendação de solicitações e cumprimento de metas}{51}{section.5.6}%
-\contentsline {subsection}{\numberline {5.6.1}Recomendação de solicitações para o doador}{51}{subsection.5.6.1}%
-\contentsline {subsection}{\numberline {5.6.2}Notificação de doadores potenciais}{51}{subsection.5.6.2}%
-\contentsline {subsection}{\numberline {5.6.3}Snapshot do cumprimento de metas}{52}{subsection.5.6.3}%
+\contentsline {subsection}{\numberline {5.5.2}Camada de Aplicação: Casos de Uso e o Padrão \textit {execute}}{47}{subsection.5.5.2}%
+\contentsline {subsection}{\numberline {5.5.3}Camada de Domínio: Agregado, Invariantes no Construtor e \textit {Static Factory Method}}{49}{subsection.5.5.3}%
+\contentsline {subsection}{\numberline {5.5.4}Camada de Infraestrutura: Repositório e Controle de Concorrência Otimista}{51}{subsection.5.5.4}%
+\contentsline {subsubsection}{\numberline {5.5.4.1}Composição versus Herança na Arquitetura do Repositório}{52}{subsubsection.5.5.4.1}%
+\contentsline {subsection}{\numberline {5.5.5}Segurança e autenticação}{55}{subsection.5.5.5}%
+\contentsline {subsection}{\numberline {5.5.6}Serviços externos e documentação da API}{55}{subsection.5.5.6}%
+\contentsline {section}{\numberline {5.6}Recomendação de solicitações e cumprimento de metas}{55}{section.5.6}%
+\contentsline {subsection}{\numberline {5.6.1}Recomendação de solicitações para o doador}{55}{subsection.5.6.1}%
+\contentsline {subsection}{\numberline {5.6.2}Notificação de doadores potenciais}{56}{subsection.5.6.2}%
+\contentsline {subsection}{\numberline {5.6.3}Snapshot do cumprimento de metas}{56}{subsection.5.6.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {6}\MakeTextUppercase []{Avaliação da proposta de solução}}{56}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Sistema entregue}{56}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Plano e método de avaliação}{57}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Organização da suíte de testes}{57}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Resultados da execução}{58}{section.6.4}%
-\contentsline {section}{\numberline {6.5}Avaliação de manutenibilidade}{59}{section.6.5}%
-\contentsline {section}{\numberline {6.6}Sugestões de melhorias}{59}{section.6.6}%
-\contentsline {section}{\numberline {6.7}Considerações sobre a avaliação}{60}{section.6.7}%
+\contentsline {chapter}{\chapternumberline {6}\MakeTextUppercase []{Avaliação da proposta de solução}}{61}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Sistema entregue}{61}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Plano e método de avaliação}{62}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Organização da suíte de testes}{62}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Resultados da execução}{63}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Avaliação de manutenibilidade}{64}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Sugestões de melhorias}{64}{section.6.6}%
+\contentsline {section}{\numberline {6.7}Considerações sobre a avaliação}{65}{section.6.7}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {7}\MakeTextUppercase []{Considerações finais}}{61}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Alcance dos objetivos}{61}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Principais contribuições}{61}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Limitações}{62}{section.7.3}%
-\contentsline {section}{\numberline {7.4}Trabalhos futuros}{62}{section.7.4}%
-\contentsline {section}{\numberline {7.5}Considerações finais}{63}{section.7.5}%
+\contentsline {chapter}{\chapternumberline {7}\MakeTextUppercase []{Considerações finais}}{66}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Alcance dos objetivos}{66}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Principais contribuições}{66}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Limitações}{67}{section.7.3}%
+\contentsline {section}{\numberline {7.4}Trabalhos futuros}{67}{section.7.4}%
+\contentsline {section}{\numberline {7.5}Considerações finais}{68}{section.7.5}%
 \vspace {\cftbeforechapterskip }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
-\contentsline {chapter}{Refer\^encias}{64}{section*.14}%
+\contentsline {chapter}{Refer\^encias}{69}{section*.14}%
 \renewcommand *{\cftappendixname }{AP\^ENDICE \space }
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \cftinsert {A}
-\contentsline {appendix}{\chapternumberline {A}\MakeTextUppercase []{Regras de domínio: tipagem sanguínea e elegibilidade}}{67}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Compatibilidade tipológica}{67}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Elegibilidade do doador}{68}{section.A.2}%
+\contentsline {appendix}{\chapternumberline {A}\MakeTextUppercase []{Regras de domínio: tipagem sanguínea e elegibilidade}}{72}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Compatibilidade tipológica}{72}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Elegibilidade do doador}{73}{section.A.2}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \cftinsert {A}
-\contentsline {appendix}{\chapternumberline {B}\MakeTextUppercase []{Agregados: aceitação de doação e ciclo de vida}}{69}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Aceitação de doação pela solicitação}{69}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Criação unificada da doação}{70}{section.B.2}%
-\contentsline {section}{\numberline {B.3}Conclusão de doação pendente}{70}{section.B.3}%
+\contentsline {appendix}{\chapternumberline {B}\MakeTextUppercase []{Agregados: aceitação de doação e ciclo de vida}}{74}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Aceitação de doação pela solicitação}{74}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Criação unificada da doação}{75}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Conclusão de doação pendente}{75}{section.B.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \cftinsert {A}
-\contentsline {appendix}{\chapternumberline {C}\MakeTextUppercase []{Cumprimento de metas e matching de doadores}}{72}{appendix.C}%
-\contentsline {section}{\numberline {C.1}Teto proporcional ao prazo}{72}{section.C.1}%
-\contentsline {section}{\numberline {C.2}Alocação das doações em duas passagens}{73}{section.C.2}%
-\contentsline {section}{\numberline {C.3}Identificação de doadores elegíveis}{76}{section.C.3}%
+\contentsline {appendix}{\chapternumberline {C}\MakeTextUppercase []{Cumprimento de metas e matching de doadores}}{77}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Teto proporcional ao prazo}{77}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Alocação das doações em duas passagens}{78}{section.C.2}%
+\contentsline {section}{\numberline {C.3}Identificação de doadores elegíveis}{81}{section.C.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
 \cftinsert {A}
-\contentsline {appendix}{\chapternumberline {D}\MakeTextUppercase []{Inversão de dependência: repositório e caso de uso}}{77}{appendix.D}%
-\contentsline {section}{\numberline {D.1}Contrato de repositório}{77}{section.D.1}%
-\contentsline {section}{\numberline {D.2}Orquestração no caso de uso}{77}{section.D.2}%
+\contentsline {appendix}{\chapternumberline {D}\MakeTextUppercase []{Inversão de dependência: repositório e caso de uso}}{82}{appendix.D}%
+\contentsline {section}{\numberline {D.1}Contrato de repositório}{82}{section.D.1}%
+\contentsline {section}{\numberline {D.2}Orquestração no caso de uso}{82}{section.D.2}%

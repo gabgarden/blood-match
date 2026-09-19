@@ -27,7 +27,7 @@ public class DonationRequest extends DomainObject {
 
   private Urgency urgency;
 
-  private DonationRequest(
+  public DonationRequest(
       Requester requester,
       BloodCenter bloodCenter,
       BloodType bloodTypeNeeded,
@@ -36,6 +36,23 @@ public class DonationRequest extends DomainObject {
       LocalDate currentDate,
       Urgency urgency,
       String directedTo) {
+    if (requester == null)
+      throw new IllegalArgumentException("Requester cannot be null");
+    if (bloodCenter == null)
+      throw new IllegalArgumentException("Blood center cannot be null");
+    if (bloodTypeNeeded == null)
+      throw new IllegalArgumentException("Blood type cannot be null");
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
+    if (dateLimit == null)
+      throw new IllegalArgumentException("Limit date cannot be null");
+    if (currentDate == null)
+      throw new IllegalArgumentException("Current date cannot be null");
+    if (urgency == null)
+      throw new IllegalArgumentException("Urgency cannot be null");
+    if (dateLimit.isBefore(currentDate))
+      throw new IllegalArgumentException("Limit date invalid");
+
     this.id = DomainID.generate();
     this.requester = requester;
     this.bloodCenter = bloodCenter;
@@ -46,6 +63,48 @@ public class DonationRequest extends DomainObject {
     this.active = true;
     this.urgency = urgency;
     this.directedTo = directedTo;
+  }
+
+  private DonationRequest(
+      DomainID id,
+      Requester requester,
+      BloodCenter bloodCenter,
+      BloodType bloodTypeNeeded,
+      int goalBloodBags,
+      LocalDate dateRequested,
+      LocalDate dateLimit,
+      boolean isActive,
+      Urgency urgency,
+      String directedTo,
+      Long version) {
+    if (id == null)
+      throw new IllegalArgumentException("Id cannot be null");
+    if (requester == null)
+      throw new IllegalArgumentException("Requester cannot be null");
+    if (bloodCenter == null)
+      throw new IllegalArgumentException("Blood center cannot be null");
+    if (bloodTypeNeeded == null)
+      throw new IllegalArgumentException("Blood type cannot be null");
+    if (goalBloodBags <= 0)
+      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
+    if (dateRequested == null)
+      throw new IllegalArgumentException("Requested date cannot be null");
+    if (dateLimit == null)
+      throw new IllegalArgumentException("Limit date cannot be null");
+    if (urgency == null)
+      throw new IllegalArgumentException("Urgency cannot be null");
+
+    this.id = id;
+    this.requester = requester;
+    this.bloodCenter = bloodCenter;
+    this.bloodTypeNeeded = bloodTypeNeeded;
+    this.goalBloodBags = goalBloodBags;
+    this.dateRequested = dateRequested;
+    this.dateLimit = dateLimit;
+    this.active = isActive;
+    this.urgency = urgency;
+    this.directedTo = directedTo;
+    this.version = version;
   }
 
   public static DonationRequest create(
@@ -76,22 +135,6 @@ public class DonationRequest extends DomainObject {
       LocalDate currentDate,
       Urgency urgency,
       String directedTo) {
-    if (requester == null)
-      throw new IllegalArgumentException("Requester cannot be null");
-    if (bloodCenter == null)
-      throw new IllegalArgumentException("Blood center cannot be null");
-    if (bloodTypeNeeded == null)
-      throw new IllegalArgumentException("Blood type cannot be null");
-    if (goalBloodBags <= 0)
-      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
-    if (dateLimit == null)
-      throw new IllegalArgumentException("Limit date cannot be null");
-    if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
-    if (urgency == null)
-      throw new IllegalArgumentException("Urgency cannot be null");
-    if (dateLimit.isBefore(currentDate))
-      throw new IllegalArgumentException("Limit date invalid");
     return new DonationRequest(
         requester,
         bloodCenter,
@@ -140,40 +183,18 @@ public class DonationRequest extends DomainObject {
       Urgency urgency,
       String directedTo,
       Long version) {
-
-    if (id == null)
-      throw new IllegalArgumentException("Id cannot be null");
-    if (requester == null)
-      throw new IllegalArgumentException("Requester cannot be null");
-    if (bloodCenter == null)
-      throw new IllegalArgumentException("Blood center cannot be null");
-    if (bloodTypeNeeded == null)
-      throw new IllegalArgumentException("Blood type cannot be null");
-    if (goalBloodBags <= 0)
-      throw new IllegalArgumentException("Goal blood bags must be greater than zero");
-    if (dateRequested == null)
-      throw new IllegalArgumentException("Requested date cannot be null");
-    if (dateLimit == null)
-      throw new IllegalArgumentException("Limit date cannot be null");
-    if (urgency == null)
-      throw new IllegalArgumentException("Urgency cannot be null");
-
-    DonationRequest request = new DonationRequest(
+    return new DonationRequest(
+        id,
         requester,
         bloodCenter,
         bloodTypeNeeded,
         goalBloodBags,
-        dateLimit,
         dateRequested,
+        dateLimit,
+        isActive,
         urgency,
-        directedTo);
-
-    request.setId(id);
-    request.dateRequested = dateRequested;
-    request.active = isActive;
-    request.setVersion(version);
-
-    return request;
+        directedTo,
+        version);
   }
 
   public void close() {

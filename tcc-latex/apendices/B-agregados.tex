@@ -17,11 +17,11 @@ A Listagem~\ref{lst:accepts-donation} mostra o método \codigo{acceptsDonation},
 
 \section{Criação unificada da doação}
 
-A Listagem~\ref{lst:donation-create} apresenta a fábrica única \codigo{Donation.create}. Não há dois tipos de doação: o mesmo agregado nasce pendente quando recebe apenas a data de intenção (\codigo{intendedDate}) ou concluído quando recebe apenas a data efetiva (\codigo{donationDate}). O estado é consultado por predicados derivados dessas datas, e não por flags independentes.
+A Listagem~\ref{lst:donation-create} apresenta o método fabril estático (\textit{static factory method}) \codigo{Donation.create}. Não há dois tipos de doação: o mesmo agregado nasce pendente quando recebe apenas a data de intenção (\codigo{intendedDate}) ou concluído quando recebe apenas a data efetiva (\codigo{donationDate}). O estado é consultado por predicados derivados dessas datas, e não por flags independentes.
 
 \lstinputlisting[
   language=Java,
-  caption={Fábrica \texttt{Donation.create} e consultas de estado},
+  caption={Método Fabril Estático \texttt{Donation.create} e consultas de estado},
   label={lst:donation-create}
 ]{apendices/codigo/DonationCreate.java}
 \fonte{Elaborado pelos próprios autores (2026).}
