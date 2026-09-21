@@ -11,7 +11,8 @@ Arquivos utilizados no documento:
 | `figura03-uc-visitante.png` | Cap. 5 — UC Guest |
 | `figura04-uc-requisitante.png` | Cap. 5 — UC Requester |
 | `figura05-uc-doador.png` | Cap. 5 — UC Donor |
-| `figura06-classes-participantes.png` | Cap. 5 — classes participantes |
+| `figura06-classes-participantes.png` | Cap. 5 — classes participantes (conceitual / análise) |
+| `DesignClassDiagram_PartyRoles.png` | Cap. 5 — participantes e papéis (design / implementação) |
 | `figura07-classes-doacao.png` | Cap. 5 — classes doação |
 | `figura08-impl-donation-request.png` | Cap. 5 — agregado DonationRequest |
 | `figura09-impl-donation.png` | Cap. 5 — agregado Donation |

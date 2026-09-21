@@ -233,7 +233,30 @@ Dando prosseguimento à representação do negócio, a Figura~\ref{fig:classe-do
 
 Neste nível de abstração, evidencia-se a associação semântica entre a solicitação (\codigo{DonationRequest}) e o ato de doar (\codigo{Donation}). O fluxo natural demonstra que um \codigo{Requester} origina a solicitação, que é vinculada a um \codigo{BloodCenter} e, posteriormente, recebe as doações efetivadas por um \codigo{Donor}.
 
-Elevando o rigor para o design de software, a Figura~\ref{fig:impl-request} detalha a implementação técnica do agregado \texttt{DonationRequest}.
+Elevando o rigor para o design de software orientado a objetos, a modelagem de implementação reflete com fidelidade os limites de encapsulamento, os tipos dos atributos, as visibilidades e os contratos de instanciação e reconstituição. A Figura~\ref{fig:impl-party-roles} detalha o diagrama de classes de design de \texttt{Party} e da respectiva hierarquia de papéis (\texttt{PartyRole}).
+
+\begin{figure}[H]
+  \centering
+  \caption{Diagrama de implementação: participantes, papéis e controle de acesso}
+  \includegraphics[width=0.98\textwidth]{DesignClassDiagram_PartyRoles}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{fig:impl-party-roles}
+\end{figure}
+
+Na perspectiva de implementação de participantes e papéis, destacam-se decisões estruturais essenciais:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Segregação entre Identidade e Acesso:} Os dados cadastrais do participante (\texttt{Party}) são estritamente isolados da sua conta de acesso (\texttt{UserAccount}), associada de forma opcional ($0..1 \leftrightarrow 0..1$). A entidade \texttt{UserAccount} concentra as credenciais, o estado da conta (\codigo{enabled}) e os perfis de segurança (\codigo{SecurityRole}), evitando que regras de autenticação e credenciais poluam as entidades do domínio.
+  \item \textbf{Hierarquia Base com Encapsulamento Protegido:} A superclasse abstrata \texttt{Party} define atributos protegidos para nome, telefone e endereço, sendo estendida pelas classes concretas \texttt{Person} (que introduz CPF, data de nascimento e o cálculo de idade pelo método \codigo{getAge}) e \texttt{Organization} (que introduz o CNPJ).
+  \item \textbf{Parametrização e Tipagem Forte de Papéis (\textit{Party-Role}):} A classe genérica abstrata \texttt{PartyRole<T>} impõe que todo papel mantenha uma referência obrigatória e imutável ao seu participante gerador através do construtor protegido \codigo{\# PartyRole(party: T)}. A partir dessa base, definem-se os limites estritos de cada papel:
+  \begin{itemize}
+    \item \texttt{Requester}: estende \codigo{PartyRole<Party>}, viabilizando polimorficamente que tanto pessoas físicas (\texttt{Person}) quanto jurídicas (\texttt{Organization}) abram solicitações de doação;
+    \item \texttt{BloodCenter}: especializa \codigo{OrganizationRole}, garantindo em tempo de compilação que apenas organizações possam atuar como hemocentros;
+    \item \texttt{Donor}: especializa \codigo{PersonRole}, assegurando que apenas pessoas físicas atuem como doadores voluntários. Essa classe concentra os métodos de negócio fundamentais da hemoterapia, como \codigo{canDonateTo} (compatibilidade sanguínea), \codigo{isEligibleToDonate} (janela temporal de descanso e idade regulamentar) e \codigo{registerDonation}.
+  \end{itemize}
+  \item \textbf{Contratos Explícitos de Reconstituição:} As classes de papéis disponibilizam tanto construtores para novos registros quanto métodos estáticos \codigo{reconstitute(...)} com controle de identificador (\codigo{DomainID}) e versão de concorrência (\codigo{version}), permitindo que o repositório remonte agregados a partir do banco de dados sem acionar validações exclusivas da criação primária.
+\end{itemize}
+
+Dando prosseguimento aos agregados centrais do sistema, a Figura~\ref{fig:impl-request} detalha a implementação técnica do agregado \texttt{DonationRequest}.
 
 \begin{figure}[H]
   \centering
@@ -307,7 +330,8 @@ A entidade \texttt{Party} foi adotada como abstração de mais alto nível da hi
 
 As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de agregados (\textit{Aggregate Roots}), concentrando regras de negócio --- como a validação de datas-limite e a verificação de compatibilidade sanguínea --- e protegendo o estado interno dos objetos por meio do encapsulamento. Adicionalmente, conceitos imutáveis sem identidade própria, como \texttt{Address} (Endereço), \texttt{BloodType} (Tipo Sanguíneo) e \texttt{DomainID}, foram modelados como objetos de valor, na linha proposta por \citeonline{evans2003} e detalhada por \citeonline{vernon2013}, aumentando a segurança e a previsibilidade do modelo.
 
-\section{Endpoints da API RESTful}
+\section{Endpoints e recursos da API RESTful}
+\label{sec:endpoints-api}
 
 A arquitetura da API foi projetada para refletir diretamente os agrupamentos lógicos do domínio (\textit{Package-by-Entity}). Dessa forma, os \textit{endpoints} foram estruturados e organizados em torno dos principais agregados e entidades do sistema, promovendo alta coesão e previsibilidade no consumo dos recursos. Nas tabelas a seguir, apresentam-se as rotas mapeadas para cada módulo da aplicação, detalhando os métodos HTTP e suas respectivas finalidades.
 
@@ -424,7 +448,8 @@ Por fim, a Tabela 14 expõe as rotas encarregadas do registro e da manutenção 
 
 O design destas rotas reflete a máquina de estados interna do agregado \texttt{Donation}. Em vez de um único ponto de atualização genérico para manipulação de dados, a API oferece semânticas declarativas e claras para transicionar a doação de uma intenção agendada (pendente) para uma efetivação (concluída) ou para um reagendamento. Tais rotas alimentam diretamente o histórico clínico dos doadores, afetando dinamicamente o cálculo de suas janelas de inaptidão temporal para doações futuras.
 
-\section{Implementação e Fluxo de Dados}
+\section{Implementação e fluxo de dados}
+\label{sec:implementacao-fluxo}
 
 A implementação técnica da API orienta-se pelos princípios da arquitetura em camadas e do \textit{Domain-Driven Design} (DDD). Para fins de exemplificar a aplicação prática desses conceitos, esta seção demonstra o fluxo completo de uma entidade --- o registro de uma \textbf{Solicitação de Doação} (\codigo{DonationRequest}) ---, acompanhando a requisição desde a sua chegada no controlador REST até a sua persistência no banco de dados com controle de concorrência. Esse rastreamento horizontal ilustra o papel de cada camada arquitetural e as transformações sofridas pelos dados.
 
@@ -441,6 +466,23 @@ Para compreender a orquestração entre as camadas da arquitetura antes da anál
 \end{figure}
 
 O diagrama ilustra a estrita separação de responsabilidades estabelecida pela arquitetura em camadas e pelo \textit{Domain-Driven Design}. O fluxo é iniciado pelo cliente HTTP, que aciona o controlador da camada de apresentação. Este converte os dados de entrada e delega a operação para a camada de aplicação por meio do método \codigo{execute(input)} do caso de uso correspondente. No núcleo da aplicação, o caso de uso coordena a recuperação dos atores envolvidos (\codigo{Requester} e \codigo{BloodCenter}) por meio de suas respectivas interfaces de repositório. Com as dependências estruturais carregadas, o caso de uso invoca o \textit{static factory method} \codigo{create(...)} diretamente na raiz do agregado \codigo{DonationRequest}, responsável por proteger suas invariantes e instanciar o objeto de domínio. Por fim, a nova entidade é persistida na camada de infraestrutura e o fluxo de resposta transita de volta de forma decrescente, culminando no retorno de sucesso (HTTP 201) ao cliente. Essa representação comprova o isolamento do domínio, que permanece alheio aos detalhes do protocolo web e da tecnologia de banco de dados.
+
+\subsection{Visão geral do fluxo de execução}
+\label{sec:visao-geral-fluxo}
+
+Para compreender a orquestração entre as camadas da arquitetura antes da análise direta do código-fonte, a modelagem temporal das requisições faz-se necessária. A Figura~\ref{sequence:donation-request} apresenta o diagrama de sequência UML detalhando o fluxo completo de criação de uma solicitação de doação, mapeando o trajeto da informação desde a interceptação da chamada HTTP até a persistência no banco de dados.
+
+\begin{figure}[H]
+  \centering
+  \caption{Diagrama de sequência: DonationRequest}
+  \includegraphics[width=0.95\textwidth]{sequence-diagram-donation-request}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{sequence:donation-request}
+\end{figure}
+
+O diagrama ilustra a estrita separação de responsabilidades estabelecida pela arquitetura em camadas e pelo \textit{Domain-Driven Design}. O fluxo é iniciado pelo cliente HTTP, que aciona o controlador da camada de apresentação. Este converte os dados de entrada e delega a operação para a camada de aplicação por meio do método \codigo{execute(input)} do caso de uso correspondente. No núcleo da aplicação, o caso de uso coordena a recuperação dos atores envolvidos (\codigo{Requester} e \codigo{BloodCenter}) por meio de suas respectivas interfaces de repositório. Com as dependências estruturais carregadas, o caso de uso invoca o \textit{static factory method} \codigo{create(...)} diretamente na raiz do agregado \codigo{DonationRequest}, responsável por proteger suas invariantes e instanciar o objeto de domínio. Por fim, a nova entidade é persistida na camada de infraestrutura e o fluxo de resposta transita de volta de forma decrescente, culminando no retorno de sucesso (HTTP 201) ao cliente. Essa representação comprova o isolamento do domínio, que permanece alheio aos detalhes do protocolo web e da tecnologia de banco de dados.
+
+As subseções a seguir detalham a implementação técnica e o código de cada componente participante desse fluxo.
 
 \subsection{Camada de Apresentação: REST Controller e DTOs}
 
@@ -500,9 +542,10 @@ A resposta gerada pelo sistema comprova o sucesso da operação, retornando o c�
 A camada de aplicação orquestra o fluxo de dados coordenando chamadas aos repositórios e aos serviços de domínio. O \codigo{CreateDonationRequestUseCase} carrega as entidades associadas (\codigo{Requester} e \codigo{BloodCenter}), invoca o \textit{static factory method} da entidade e instrui o repositório a persistir o novo agregado. Esta camada desconhece qualquer dependência de infraestrutura, utilizando exclusivamente portas de interfaces.
 
 Para padronizar a orquestração de negócios, todos os casos de uso do sistema adotam o padrão formal estruturado na assinatura:
-\begin{equation}
-  \text{Output } \text{execute}(\text{Input } \text{input})
-\end{equation}
+
+\begin{center}
+  \codigo{Output execute(Input input)}
+\end{center}
 
 Essa padronização fundamenta-se nos seguintes princípios arquiteturais:
 \begin{itemize}
@@ -688,20 +731,14 @@ public class DonationRequestSchema {
 }
 \end{lstlisting}
 
-\subsubsection{Indexação Geoespacial no MongoDB e Consultas por Proximidade}
+\subsubsection{Consultas de Proximidade com Indexação Geoespacial}
 \label{sec:indice-geoespacial}
 
-A captação eficiente de doadores demanda não apenas a verificação biológica de compatibilidade sanguínea, mas também a avaliação da viabilidade logística do deslocamento do voluntário até o hemocentro responsável pela coleta. Para permitir que o sistema filtre rapidamente demandas situadas dentro do raio de interesse do doador sem incorrer na sobrecarga de calcular distâncias euclidianas ou geodésicas em memória sobre toda a base de dados, a arquitetura delega o processamento espacial ao próprio motor de banco de dados por meio da indexação nativa do MongoDB.
+A captação eficiente de doadores demanda não apenas a verificação biológica de compatibilidade sanguínea, mas também a avaliação da viabilidade logística do deslocamento do voluntário até o hemocentro responsável pela coleta. Para permitir que o sistema filtre rapidamente demandas situadas dentro do raio de interesse do doador, sem incorrer na sobrecarga de calcular distâncias em memória sobre toda a base de dados, a arquitetura delega o processamento espacial ao próprio motor de banco de dados.
 
-O MongoDB disponibiliza índices geoespaciais do tipo \texttt{2dsphere}, projetados especificamente para modelar geometrias sobre uma esfera semelhante à Terra, aderindo ao elipsoide de referência padrão WGS~84. No esquema de persistência \codigo{DonationRequestSchema}, a anotação \texttt{@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO\_2DSPHERE)} instrui o Spring Data a registrar um índice espacial esférico bidimensional na coleção \texttt{donation\_requests}. O atributo \codigo{location} armazena as coordenadas no formato \texttt{[longitude, latitude]}, seguindo a convenção estrita do padrão GeoJSON e da biblioteca geoespacial do MongoDB (na qual a coordenada de longitude precede a latitude).
+Isso é feito por meio dos índices geoespaciais nativos do MongoDB (do tipo \texttt{2dsphere}), que permitem mapear coordenadas geográficas diretamente nos documentos armazenados. Na aplicação, as coordenadas associadas à solicitação são indexadas para facilitar a busca.
 
-Essa estrutura viabiliza a execução de consultas geodésicas de alta performance na camada de repositório. Conforme demonstrado no método \codigo{findActiveRequestsForDonor} da classe \codigo{DonationRequestRepositoryImpl} (Listagem~\ref{lst:donation-request-repo-impl}), o sistema projeta o endereço do doador em um ponto geográfico (\codigo{Point}) e instancia um objeto de raio delimitador (\codigo{Distance}) parametrizado pela métrica em quilômetros (\codigo{Metrics.KILOMETERS}). O método derivado da interface Spring Data:
-\begin{lstlisting}[language=Java]
-findByActiveTrueAndDateLimitGreaterThanEqualAndBloodTypeNeededInAndLocationNear(
-    LocalDate currentDate, List<String> bloodTypes,
-    Point location, Distance maxDistance);
-\end{lstlisting}
-é traduzido internamente para uma consulta MongoDB com o operador geoespacial \texttt{\$near}. Dessa forma, o banco de dados executa a triagem espacial e biológica em uma única operação atômica e indexada, retornando à aplicação apenas os esquemas das solicitações geograficamente próximas e tipologicamente compatíveis, otimizando drasticamente o tempo de resposta e o consumo de memória na reconstituição dos agregados.
+Assim, a camada de repositório consegue executar consultas geográficas de alta performance. Com o auxílio do Spring Data, a aplicação traduz a busca por proximidade para operadores nativos do banco (como o \texttt{\$near}). O banco de dados realiza, então, a triagem espacial e biológica em uma única operação atômica e indexada, retornando à aplicação apenas as solicitações geograficamente próximas e tipologicamente compatíveis, otimizando drasticamente o tempo de resposta e o consumo de recursos.
 
 \subsubsection{Composição versus Herança na Arquitetura do Repositório}
 
@@ -1100,36 +1137,35 @@ Para ilustrar o funcionamento prático dessa estratégia sob uma ótica estritam
   \label{fig:exemplo-alocacao-teto}
 \end{figure}
 
-No cenário apresentado, existem duas solicitações ativas concorrendo pelo mesmo \textit{pool} de doações:
-\begin{enumerate}[label=\alph*)]
-  \item \textbf{Solicitação $R_1$ (mais antiga):} registrada em 14/07 com data-limite em 03/08 (janela total de 20 dias) e meta de 1,0 bolsa. Em 24/07, decorreram 10 dias da janela, correspondendo a uma fração decorrida de $10/20 = 0{,}5$ ($50\%$). Seu teto proporcional calculado é de $1{,}0 \times 0{,}5 = \mathbf{0{,}5000\text{ bolsa}}$;
-  \item \textbf{Solicitação $R_2$ (mais recente e mais próxima do limite):} registrada em 21/07 com data-limite em 31/07 (janela total de 10 dias) e meta de 2,0 bolsas. Em 24/07, decorreram 3 dias da janela, correspondendo a uma fração decorrida de $3/10 = 0{,}3$ ($30\%$). Seu teto proporcional calculado é de $2{,}0 \times 0{,}3 = \mathbf{0{,}6000\text{ bolsa}}$.
-\end{enumerate}
-
-O hemocentro dispõe de um \textit{pool} com duas doações concluídas compatíveis: $D_1$ (concluída em 22/07, saldo de $1{,}0$ bolsa) e $D_2$ (concluída em 23/07, saldo de $1{,}0$ bolsa). 
-
-Por se tratar de um \textit{snapshot} de alocação dinâmica calculado em memória para mensuração de desempenho puramente matemática --- sem persistência ou associação física estática prévia entre doações e receptores --- o modelo adota a soberania matemática contínua, deixando a distribuição a cargo da matemática sem arredondamentos artificiais:
+No cenário apresentado, duas solicitações ativas concorrem pelo mesmo \textit{pool} de doações do hemocentro:
 \begin{itemize}
-  \item \textbf{Metas e tetos proporcionais contínuos:} calculados em \codigo{BigDecimal}, permitindo que uma meta liberada temporalmente contenha frações de bolsa (por exemplo, $0{,}5$ ou $1{,}5$ bolsa);
-  \item \textbf{Alocação dinâmica contínua:} o quantitativo alocado de uma doação a uma solicitação (\codigo{fulfilledBloodBags}) também pode conter frações de bolsa (por exemplo, $0{,}5$ ou $0{,}7$ bolsa), refletindo com exatidão a parcela da demanda atendida.
+  \item \textbf{Solicitação $R_1$ (mais antiga na FIFO):} registrada em 14/07 com data-limite em 03/08 (janela de 20 dias) e meta cheia de 1,0 bolsa. Em 24/07, decorreram 10 dias da janela (50\% do prazo), resultando em um teto proporcional calculado de $1{,}0 \times 0{,}5 = \mathbf{0{,}5000\text{ bolsa}}$;
+  \item \textbf{Solicitação $R_2$ (mais recente na FIFO):} registrada em 21/07 com data-limite em 31/07 (janela de 10 dias) e meta cheia de 2,0 bolsas. Em 24/07, decorreram 3 dias da janela (30\% do prazo), resultando em um teto proporcional calculado de $2{,}0 \times 0{,}3 = \mathbf{0{,}6000\text{ bolsa}}$.
 \end{itemize}
 
-O fluxo de distribuição em duas passagens opera, portanto, da seguinte forma:
-\begin{enumerate}
-  \item \textbf{1ª Passagem (Teto Proporcional Contínuo):}
+O hemocentro dispõe de duas doações concluídas e compatíveis em seu \textit{pool}: $D_1$ (efetivada em 22/07) e $D_2$ (efetivada em 23/07), cada qual com saldo contínuo unitário de $1{,}0$ bolsa, totalizando $2{,}0$ bolsas a distribuir.
+
+Por se tratar de um cálculo em memória avaliado sob demanda pelo \codigo{DonationRequestFulfillmentService}, o modelo adota métrica contínua em \codigo{BigDecimal}. Tanto os tetos quanto os quantitativos alocados (\codigo{fulfilledBloodBags}) operam com frações exatas de bolsas, eliminando distorções de arredondamento discreto.
+
+A distribuição do \textit{pool} ocorre sequencialmente em duas passagens:
+\begin{enumerate}[label=\textbf{\arabic*ª Passagem:}, leftmargin=*]
+  \item \textbf{Distribuição limitada ao teto proporcional (equidade temporal)} \\
+  As doações fluem pela ordem FIFO das solicitações, com absorção limitada estritamente aos tetos calculados para a data de referência:
   \begin{itemize}
-    \item \textbf{Distribuição de $D_1$ ($1{,}0$ bolsa):} a fila FIFO inicia pela solicitação mais antiga ($R_1$), cuja capacidade restante para atingir o teto é de $0{,}5 - 0{,}0 = 0{,}5$ bolsa. Aloca-se $0{,}5$ bolsa de $D_1$ para $R_1$, que atinge seu teto proporcional ($0{,}5000$). O saldo remanescente de $D_1$ ($1{,}0 - 0{,}5 = 0{,}5$ bolsa) avança na FIFO para $R_2$, que possui capacidade de $0{,}6 - 0{,}0 = 0{,}6$ bolsa. $R_2$ absorve integralmente essa fração restante de $0{,}5$ bolsa, esgotando o saldo de $D_1$ ($0{,}0$);
-    \item \textbf{Distribuição de $D_2$ ($1{,}0$ bolsa):} $R_1$ já se encontra no limite do seu teto proporcional (capacidade zero), sendo represada na 1ª passagem. A busca avança para $R_2$, que possui capacidade restante de $0{,}6 - 0{,}5 = 0{,}1$ bolsa. Aloca-se $0{,}1$ bolsa de $D_2$ para $R_2$, que atinge seu teto proporcional ($0{,}6000$). O saldo não absorvido de $D_2$ ($1{,}0 - 0{,}1 = 0{,}9$ bolsa) não encontra mais capacidades disponíveis na 1ª passagem e é encaminhado à 2ª passagem.
+    \item \textbf{Doação $D_1$ ($1{,}0$ bolsa):} a fila inicia pela solicitação mais antiga ($R_1$). Como seu teto proporcional é de $0{,}5000$ bolsa, $R_1$ absorve $0{,}5$ bolsa e atinge seu limite da primeira fase. O saldo remanescente de $0{,}5$ bolsa avança na FIFO para $R_2$ (cujo teto de $0{,}6000$ comporta a absorção), esgotando integralmente $D_1$;
+    \item \textbf{Doação $D_2$ ($1{,}0$ bolsa):} $R_1$ já atingiu seu teto proporcional, tendo sua absorção temporariamente represada. A busca avança para $R_2$, que necessita de $0{,}1$ bolsa para atingir seu teto ($0{,}6000$) e absorve essa fração. O saldo não absorvido de $D_2$ ($0{,}9$ bolsa) não encontra mais capacidades sob teto na fila e é encaminhado à segunda passagem.
   \end{itemize}
-  \item \textbf{2ª Passagem (Meta Cheia / FIFO das Sobras):}
+  Ao término da primeira passagem, foram alocadas $0{,}5000$ bolsa para $R_1$ e $0{,}6000$ bolsa para $R_2$, restando uma sobra de $0{,}9000$ bolsa.
+
+  \item \textbf{Distribuição das sobras até a meta cheia (FIFO irrestrita)} \\
+  Com os tetos temporais suspensos, a sobra de $0{,}9$ bolsa retorna ao início da fila FIFO visando suprir as metas nominais completas:
   \begin{itemize}
-    \item Com os tetos temporais suspensos, aplicam-se as metas cheias ($1{,}0$ para $R_1$ e $2{,}0$ para $R_2$). A sobra de $0{,}9$ bolsa de $D_2$ retorna ao início da fila FIFO;
-    \item $R_1$ necessita de $1{,}0 - 0{,}5 = 0{,}5$ bolsa para alcançar sua meta total. Aloca-se $0{,}5$ bolsa da sobra para $R_1$, que conclui integralmente sua meta ($1{,}0/1{,}0$ bolsa, \codigo{goalReached = true});
-    \item O restante da sobra ($0{,}9 - 0{,}5 = 0{,}4$ bolsa) avança para $R_2$, elevando seu quantitativo final para $0{,}6 + 0{,}4 = 1{,}0$ bolsa ($50\%$ da meta cheia solicitada).
+    \item $R_1$ necessita de $0{,}5$ bolsa para alcançar sua meta total de $1{,}0$ bolsa. Absorve $0{,}5$ bolsa da sobra e conclui integralmente seu pedido ($1{,}0 / 1{,}0$ bolsa, \codigo{goalReached = true});
+    \item A fração restante da sobra ($0{,}4$ bolsa) avança para $R_2$, elevando seu quantitativo final para $1{,}0$ bolsa ($50\%$ da meta cheia de $2{,}0$ bolsas solicitadas).
   \end{itemize}
 \end{enumerate}
 
-Ao término do processo, $R_1$ atinge $1{,}0/1{,}0$ bolsa ($100\%$ da meta) e $R_2$ atinge $1{,}0/2{,}0$ bolsas ($50\%$ da meta), com zero desperdício de doações. Nota-se o benefício dessa abordagem matemática: caso o hemocentro dispusesse de apenas uma doação no \textit{pool} ($D_1$ de $1{,}0$ bolsa), a doação seria partilhada exatamente como $0{,}5$ bolsa para $R_1$ e $0{,}5$ bolsa para $R_2$, impedindo que a solicitação mais antiga monopolizasse a única bolsa disponível e permitindo que ambas avançassem proporcionalmente em direção às suas metas.
+Ao término do processo, todo o \textit{pool} é aproveitado com zero desperdício: $R_1$ atinge $100\%$ da meta ($1{,}0/1{,}0$ bolsa) e $R_2$ alcança $50\%$ ($1{,}0/2{,}0$ bolsas). O benefício da estratégia reflete-se na garantia de atendimento proporcional: caso houvesse apenas a doação $D_1$ de $1{,}0$ bolsa no hemocentro, ela seria partilhada em $0{,}5$ bolsa para $R_1$ e $0{,}5$ bolsa para $R_2$, impedindo que a solicitação mais antiga monopolizasse a oferta enquanto o pedido mais recente permanecesse totalmente desassistido.
 
 O progresso (\codigo{fulfilledBloodBags}) não é persistido. Os casos de uso de leitura que precisam exibir o preenchimento --- listagem de solicitações do requisitante, recomendação ao doador e bloqueio de notificação quando a meta já foi atingida --- invocam o mesmo serviço de domínio e recebem o mapa calculado na hora. Concluir uma doação apenas persiste a doação; a leitura seguinte já vê o \textit{pool} atualizado. Como o cálculo não regrava solicitações, não há condição de corrida entre escritas de contador: cada leitura monta o próprio \textit{snapshot}. Assume-se, como contrapartida, que o progresso exibido de uma solicitação de prazo folgado pode decrescer entre duas leituras: à medida que os tetos das solicitações concorrentes crescem com o tempo, bolsas antes atribuídas a ela na segunda passagem migram para solicitações mais próximas do vencimento.
 
@@ -1411,6 +1447,118 @@ public class DonationRequestFulfillmentService {
     copy.sort(order);
     return copy;
   }
+}
+\end{lstlisting}
+
+Para orquestrar o consumo desse serviço de domínio pela camada de aplicação, o caso de uso \codigo{GetDonationRequestsByPartyIdUseCase} recupera as solicitações associadas a um determinado requisitante e aciona a computação do preenchimento das metas sob demanda no momento da leitura, sem persistir contadores transitórios no banco de dados. A Listagem~\ref{lst:get-requests-by-party-usecase} detalha a implementação completa da classe, evidenciando a chamada a \codigo{fulfillmentService.fill(userRequests, currentDate)}, a ordenação cronológica das solicitações e a projeção dos dados no registro imutável de saída (\codigo{OutputItem}), o qual computa as bolsas remanescentes (\codigo{remainingBloodBags}) e sinaliza se a meta foi alcançada.
+
+\begin{lstlisting}[language=Java, caption={Caso de Uso de Consulta de Solicitações com Snapshot de Cumprimento de Metas}, label={lst:get-requests-by-party-usecase}]
+package bloodmatch.request.application;
+
+import bloodmatch.shared.application.exception.ValidationException;
+import bloodmatch.shared.application.shared.DomainIdParser;
+import bloodmatch.request.domain.DonationRequest;
+import bloodmatch.request.domain.DonationRequestRepositoryInterface;
+import bloodmatch.request.domain.DonationRequestFulfillmentService;
+import bloodmatch.request.domain.DonationRequestFulfillmentStatusRecord;
+import bloodmatch.shared.domain.valueObjects.DomainID;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class GetDonationRequestsByPartyIdUseCase {
+
+  private final DonationRequestRepositoryInterface donationRequestRepository;
+  private final DonationRequestFulfillmentService fulfillmentService;
+
+  public GetDonationRequestsByPartyIdUseCase(
+      DonationRequestRepositoryInterface donationRequestRepository,
+      DonationRequestFulfillmentService fulfillmentService) {
+    this.donationRequestRepository = donationRequestRepository;
+    this.fulfillmentService = fulfillmentService;
+  }
+
+  public List<OutputItem> execute(Input input) {
+    return execute(input, LocalDate.now());
+  }
+
+  public List<OutputItem> execute(Input input, LocalDate currentDate) {
+    if (input == null) {
+      throw new ValidationException("Input cannot be null");
+    }
+    if (currentDate == null) {
+      throw new ValidationException("Current date cannot be null");
+    }
+
+    DomainID partyId = DomainIdParser.parse(input.partyId(), "partyId");
+
+    List<DonationRequest> userRequests =
+        donationRequestRepository.findByRequesterPartyId(partyId);
+
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot =
+        fulfillmentService.fill(userRequests, currentDate);
+
+    return userRequests.stream()
+        .sorted(
+            Comparator.comparing(DonationRequest::getDateRequested)
+                .reversed()
+                .thenComparing(request -> request.getId().getValue()))
+        .map(request -> toOutput(request, currentDate, snapshot))
+        .toList();
+  }
+
+  private OutputItem toOutput(
+      DonationRequest request,
+      LocalDate currentDate,
+      Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot) {
+    DonationRequestFulfillmentStatusRecord status = snapshot.getOrDefault(
+        request.getId(),
+        new DonationRequestFulfillmentStatusRecord(0, false));
+    BigDecimal fulfilledBloodBags = status.fulfilledBloodBags();
+    BigDecimal goal = BigDecimal.valueOf(request.getGoalBloodBags());
+    BigDecimal remainingBloodBags = goal.subtract(fulfilledBloodBags).max(BigDecimal.ZERO);
+
+    return new OutputItem(
+        request.getId().getValue().toString(),
+        request.getVersion(),
+        request.getBloodTypeNeeded().getType(),
+        request.getDateRequested(),
+        request.getDateLimit(),
+        request.isActive(),
+        request.isExpired(currentDate),
+        request.getBloodCenter().getOrganization().getName(),
+        request.getBloodCenter().getOrganization().getPhoneNumber() != null
+            ? request.getBloodCenter().getOrganization().getPhoneNumber().getValue()
+            : null,
+        request.getUrgency().name(),
+        request.getGoalBloodBags(),
+        fulfilledBloodBags,
+        remainingBloodBags,
+        status.goalReached());
+  }
+
+  public record Input(String partyId) {}
+
+  public record OutputItem(
+      String requestId,
+      Long version,
+      String bloodTypeNeeded,
+      LocalDate dateRequested,
+      LocalDate dateLimit,
+      boolean active,
+      boolean expired,
+      String bloodCenterName,
+      String bloodCenterPhoneNumber,
+      String urgency,
+      int goalBloodBags,
+      BigDecimal fulfilledBloodBags,
+      BigDecimal remainingBloodBags,
+      boolean goalReached) {}
 }
 \end{lstlisting}
 

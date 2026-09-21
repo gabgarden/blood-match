@@ -7,6 +7,11 @@
 \contentsline {table}{\numberline {6}{\ignorespaces Requisitos não funcionais}}{35}{table.5.6}%
 \contentsline {table}{\numberline {7}{\ignorespaces Lista de casos de uso}}{36}{table.5.7}%
 \contentsline {table}{\numberline {8}{\ignorespaces Especificação dos casos de uso críticos}}{40}{table.5.8}%
-\contentsline {table}{\numberline {9}{\ignorespaces Entidades e suas responsabilidades}}{46}{table.5.9}%
-\contentsline {table}{\numberline {10}{\ignorespaces Composição da suíte de testes automatizados}}{77}{table.6.10}%
-\contentsline {table}{\numberline {11}{\ignorespaces Resultado da execução da suíte automatizada}}{78}{table.6.11}%
+\contentsline {table}{\numberline {9}{\ignorespaces Entidades e suas responsabilidades}}{47}{table.5.9}%
+\contentsline {table}{\numberline {10}{\ignorespaces Autenticação e Acesso Público (Auth)}}{48}{table.5.10}%
+\contentsline {table}{\numberline {11}{\ignorespaces Participantes (Party)}}{48}{table.5.11}%
+\contentsline {table}{\numberline {12}{\ignorespaces Papéis e Perfis (Role)}}{49}{table.5.12}%
+\contentsline {table}{\numberline {13}{\ignorespaces Solicitações de Doação (Request)}}{49}{table.5.13}%
+\contentsline {table}{\numberline {14}{\ignorespaces Doações (Donation)}}{50}{table.5.14}%
+\contentsline {table}{\numberline {15}{\ignorespaces Composição da suíte de testes automatizados}}{83}{table.6.15}%
+\contentsline {table}{\numberline {16}{\ignorespaces Resultado da execução da suíte automatizada}}{86}{table.6.16}%
