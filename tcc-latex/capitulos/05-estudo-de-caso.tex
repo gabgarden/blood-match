@@ -10,7 +10,7 @@ O desenvolvimento foi orientado pelos princípios do DDD e pelos princípios SOL
 
 A extração de requisitos ocorreu a partir da análise documental e bibliográfica descrita no Capítulo~4, alinhando as necessidades dos diferentes atores envolvidos no processo de doação de sangue às capacidades técnicas do sistema proposto.
 
-Os requisitos funcionais representam as operações que a API disponibiliza para atender às rotinas de cadastro, gerenciamento de solicitações, recomendação e controle de doações. O Quadro~\ref{tab:rf} sintetiza as funcionalidades identificadas e implementadas, refletindo diretamente os recursos (\textit{endpoints}) expostos pela API.
+Os requisitos funcionais representam as operações que a API disponibiliza para atender às rotinas de cadastro, gerenciamento de solicitações, recomendação e controle de doações. A Tabela~\ref{tab:rf} sintetiza as funcionalidades identificadas e implementadas, refletindo diretamente os recursos (\textit{endpoints}) expostos pela API.
 
 \begin{table}[H]
   \centering
@@ -49,7 +49,7 @@ Os requisitos funcionais representam as operações que a API disponibiliza para
 Ressalta-se que a lista de requisitos funcionais apresentada não tem a pretensão de esgotar todas as rotinas administrativas de um hemocentro ou unidade hospitalar, mas de delimitar um conjunto mínimo e coeso de operações indispensáveis para validar os conceitos teóricos e arquiteturais propostos. Esse escopo abrange o ciclo fundamental da doação de sangue ao contemplar, de maneira integrada, a gestão da demanda (abertura e acompanhamento de solicitações por unidades de saúde e pacientes), a oferta (disponibilidade, elegibilidade e intenções de doação pelos voluntários) e o registro histórico das doações realizadas.
 
 
-Além das funcionalidades diretas, foram definidos requisitos não funcionais para estabelecer os parâmetros de qualidade, segurança e arquitetura esperados. Considerando a adoção do DDD e da arquitetura em camadas, o Quadro~\ref{tab:rnf} apresenta as diretrizes técnicas estabelecidas para a solução.
+Além das funcionalidades diretas, foram definidos requisitos não funcionais para estabelecer os parâmetros de qualidade, segurança e arquitetura esperados. Considerando a adoção do DDD e da arquitetura em camadas, A Tabela~\ref{tab:rnf} apresenta as diretrizes técnicas estabelecidas para a solução.
 
 \begin{table}[H]
   \centering
@@ -69,7 +69,7 @@ Além das funcionalidades diretas, foram definidos requisitos não funcionais pa
     RNF07 & A API deve retornar respostas em formato JSON. \\
     RNF08 & O sistema deve validar os dados recebidos antes do processamento das operações. \\
     RNF09 & O sistema deve controlar o acesso às funcionalidades protegidas por meio de autorização baseada em perfis (\textit{roles}) de usuário. \\
-    RNF10 & O sistema deve preservar a consistência de escritas concorrentes sobre uma mesma solicitação de doação, evitando a perda de atualizações. \\
+    RNF10 & O sistema deve preservar a consistência de escritas concorrentes sobre todas as entidades agregadas, evitando a perda de atualizações. \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
@@ -85,7 +85,7 @@ Após a consolidação dos requisitos, procedeu-se com a modelagem do sistema pa
 
 \subsection{Casos de uso}
 
-A modelagem de casos de uso, em notação UML, sintetiza as operações disponíveis para os diferentes perfis de acesso. O Quadro~\ref{tab:uc} apresenta o mapeamento dos casos de uso e seus respectivos atores, incluindo tanto as operações representadas nos diagramas a seguir quanto operações complementares oferecidas pela API para os mesmos atores.
+A modelagem de casos de uso, em notação UML, sintetiza as operações disponíveis para os diferentes perfis de acesso. A Tabela~\ref{tab:uc} apresenta o mapeamento dos casos de uso e seus respectivos atores, incluindo tanto as operações representadas nos diagramas a seguir quanto operações complementares oferecidas pela API para os mesmos atores.
 
 \begin{table}[H]
   \centering
@@ -154,9 +154,9 @@ Por fim, a Figura~\ref{fig:uc-donor} representa o diagrama de caso de uso do ato
 
 O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluindo a atualização de seu perfil clínico (UC08), a consulta às solicitações recomendadas (UC10), o registro unificado de doações (UC11), a conclusão (UC12) e o reagendamento de doações pendentes (UC16), a consulta ao próprio histórico hemoterápico (UC13) e a emissão de seu resumo (UC17). Vale ressaltar que, no UC11, a doação nasce pendente quando o doador informa a data de intenção ou concluída quando informa a data efetiva --- um único caso de uso, sem métodos concorrentes de instanciação no domínio.
 
-\subsubsubsection{Detalhamento dos casos de uso}
+\subsubsection{Detalhamento dos casos de uso}
 
-Devido à abrangência da API e visando manter a concisão documental, optou-se por detalhar apenas os casos de uso críticos para o núcleo da aplicação, adotando a estrutura formal de especificação textual proposta por Cockburn (2001). Essa abordagem documenta o fluxo de eventos, as restrições operacionais e as pré-condições de segurança exigidas, justificando arquiteturalmente a ausência de relacionamentos visuais de dependência de autenticação nos diagramas UML. O Quadro~\ref{tab:detalhamento-uc} sintetiza essas especificações.
+Devido à abrangência da API e visando manter a concisão documental, optou-se por detalhar apenas os casos de uso críticos para o núcleo da aplicação, adotando a estrutura formal de especificação textual proposta por Cockburn (2001). Essa abordagem documenta o fluxo de eventos, as restrições operacionais e as pré-condições de segurança exigidas, justificando arquiteturalmente a ausência de relacionamentos visuais de dependência de autenticação nos diagramas UML. A Tabela~\ref{tab:detalhamento-uc} sintetiza essas especificações.
 
 \begin{table}[H]
   \centering
@@ -207,13 +207,13 @@ Devido à abrangência da API e visando manter a concisão documental, optou-se 
 
 \subsection{Diagramas de classes}
 
-Para representar a estrutura estática da aplicação e evidenciar a aplicação do DDD na prática --- cujos conceitos de entidade, agregado e objeto de valor já foram apresentados no Capítulo~2 ---, a modelagem de classes foi concebida em duas perspectivas distintas: conceitual e de implementação. A perspectiva conceitual mapeia o vocabulário do negócio e as relações semânticas do mundo real, omitindo métodos e tipos de dados para facilitar a validação com especialistas. Em contrapartida, a perspectiva de implementação atua como uma representação estrutural do código-fonte construído, detalhando os limites transacionais, o encapsulamento e as diretrizes arquiteturais.
+Para representar a estrutura estática da aplicação e evidenciar a aplicação do DDD na prática --- cujos conceitos de entidade, agregado e objeto de valor já foram apresentados no Capítulo~2 ---, a modelagem de classes foi concebida em duas perspectivas distintas: de análise e de design. A perspectiva de análise mapeia o vocabulário do negócio e as relações semânticas do mundo real, omitindo métodos e tipos de dados para facilitar a validação com especialistas. Em contrapartida, a perspectiva de design atua como uma representação estrutural do código-fonte construído, detalhando os limites transacionais, o encapsulamento e as diretrizes arquiteturais.
 
-A Figura~\ref{fig:classe-participantes} apresenta o diagrama de classes conceitual focado nos participantes e em seus papéis (\textit{Roles}).
+A Figura~\ref{fig:classe-participantes} apresenta o diagrama de classes de análise focado nos participantes e em seus papéis (\textit{Roles}).
 
 \begin{figure}[H]
   \centering
-  \caption{Diagrama conceitual dos participantes}
+  \caption{Diagrama de análise dos participantes}
   \includegraphics[width=0.65\textwidth]{figura06-classes-participantes}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:classe-participantes}
@@ -221,11 +221,11 @@ A Figura~\ref{fig:classe-participantes} apresenta o diagrama de classes conceitu
 
 Observa-se a utilização da abstração central \texttt{Party}, que atua como classe base para \texttt{Person} (Pessoa) e \texttt{Organization} (Organização). Essa modelagem reflete a flexibilidade do domínio, permitindo que as entidades assumam múltiplos papéis, como \texttt{Donor} (Doador) e \texttt{Requester} (Requisitante), eliminando a duplicidade de dados no sistema.
 
-Dando prosseguimento à representação do negócio, a Figura~\ref{fig:classe-doacao} ilustra o diagrama de classes conceitual do processo de doação.
+Dando prosseguimento à representação do negócio, a Figura~\ref{fig:classe-doacao} ilustra o diagrama de classes de análise do processo de doação.
 
 \begin{figure}[H]
   \centering
-  \caption{Diagrama conceitual do processo de doação}
+  \caption{Diagrama de análise do processo de doação}
   \includegraphics[width=0.65\textwidth]{figura07-classes-doacao}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:classe-doacao}
@@ -233,17 +233,17 @@ Dando prosseguimento à representação do negócio, a Figura~\ref{fig:classe-do
 
 Neste nível de abstração, evidencia-se a associação semântica entre a solicitação (\codigo{DonationRequest}) e o ato de doar (\codigo{Donation}). O fluxo natural demonstra que um \codigo{Requester} origina a solicitação, que é vinculada a um \codigo{BloodCenter} e, posteriormente, recebe as doações efetivadas por um \codigo{Donor}.
 
-Elevando o rigor para o design de software orientado a objetos, a modelagem de implementação reflete com fidelidade os limites de encapsulamento, os tipos dos atributos, as visibilidades e os contratos de instanciação e reconstituição. A Figura~\ref{fig:impl-party-roles} detalha o diagrama de classes de design de \texttt{Party} e da respectiva hierarquia de papéis (\texttt{PartyRole}).
+Elevando o rigor para o design de software orientado a objetos, a modelagem de design reflete com fidelidade os limites de encapsulamento, os tipos dos atributos, as visibilidades e os contratos de instanciação e reconstituição. A Figura~\ref{fig:impl-party-roles} detalha o diagrama de classes de design de \texttt{Party} e da respectiva hierarquia de papéis (\texttt{PartyRole}).
 
 \begin{figure}[H]
   \centering
-  \caption{Diagrama de implementação: participantes, papéis e controle de acesso}
+  \caption{Diagrama de design: participantes, papéis e controle de acesso}
   \includegraphics[width=0.98\textwidth]{DesignClassDiagram_PartyRoles}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:impl-party-roles}
 \end{figure}
 
-Na perspectiva de implementação de participantes e papéis, destacam-se decisões estruturais essenciais:
+Na perspectiva de design de participantes e papéis, destacam-se decisões estruturais essenciais:
 \begin{itemize}[leftmargin=*]
   \item \textbf{Segregação entre Identidade e Acesso:} Os dados cadastrais do participante (\texttt{Party}) são estritamente isolados da sua conta de acesso (\texttt{UserAccount}), associada de forma opcional ($0..1 \leftrightarrow 0..1$). A entidade \texttt{UserAccount} concentra as credenciais, o estado da conta (\codigo{enabled}) e os perfis de segurança (\codigo{SecurityRole}), evitando que regras de autenticação e credenciais poluam as entidades do domínio.
   \item \textbf{Hierarquia Base com Encapsulamento Protegido:} A superclasse abstrata \texttt{Party} define atributos protegidos para nome, telefone e endereço, sendo estendida pelas classes concretas \texttt{Person} (que introduz CPF, data de nascimento e o cálculo de idade pelo método \codigo{getAge}) e \texttt{Organization} (que introduz o CNPJ).
@@ -256,11 +256,11 @@ Na perspectiva de implementação de participantes e papéis, destacam-se decis�
   \item \textbf{Contratos Explícitos de Reconstituição:} As classes de papéis disponibilizam tanto construtores para novos registros quanto métodos estáticos \codigo{reconstitute(...)} com controle de identificador (\codigo{DomainID}) e versão de concorrência (\codigo{version}), permitindo que o repositório remonte agregados a partir do banco de dados sem acionar validações exclusivas da criação primária.
 \end{itemize}
 
-Dando prosseguimento aos agregados centrais do sistema, a Figura~\ref{fig:impl-request} detalha a implementação técnica do agregado \texttt{DonationRequest}.
+Dando prosseguimento aos agregados centrais do sistema, a Figura~\ref{fig:impl-request} detalha o diagrama de design do agregado \texttt{DonationRequest}.
 
 \begin{figure}[H]
   \centering
-  \caption{Diagrama de implementação: agregado DonationRequest}
+  \caption{Diagrama de design: agregado DonationRequest}
   \includegraphics[width=0.9\textwidth]{figura08-impl-donation-request}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:impl-request}
@@ -268,11 +268,11 @@ Dando prosseguimento aos agregados centrais do sistema, a Figura~\ref{fig:impl-r
 
 A classe é modelada como uma raiz de agregado (\texttt{<<AggregateRoot>>}), atuando como a única porta de entrada para a proteção de invariantes, como as datas-limite e a urgência da solicitação. Observa-se a aplicação da herança por meio da superclasse abstrata \texttt{DomainObject}, responsável por compor os identificadores únicos globais (\texttt{<<ValueObject>> DomainID}). Destaca-se também a dependência tracejada (\texttt{<<use>>}) com a classe \texttt{Donation}, a qual evidencia o baixo acoplamento da arquitetura: a requisição não armazena doações em memória, apenas as avalia de forma transitória por meio de parâmetros no método \texttt{acceptsDonation()}.
 
-Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de implementação do agregado \texttt{Donation}.
+Por fim, a Figura~\ref{fig:impl-donation} apresenta o diagrama de design do agregado \texttt{Donation}.
 
 \begin{figure}[H]
   \centering
-  \caption{Diagrama de implementação: agregado Donation}
+  \caption{Diagrama de design: agregado Donation}
   \includegraphics[width=0.75\textwidth]{figura09-impl-donation}
   \fonte{Elaborado pelos próprios autores (2026).}
   \label{fig:impl-donation}
@@ -303,7 +303,7 @@ O fluxo de dados segue os princípios da arquitetura limpa: a camada de apresent
 
 \subsection{Entidades, agregados e objetos de valor}
 
-A estrutura central do domínio foi modelada de forma hierárquica e orientada a objetos. O Quadro~\ref{tab:entidades} sintetiza as principais entidades e agregados responsáveis por garantir a consistência das transações no sistema.
+A estrutura central do domínio foi modelada de forma hierárquica e orientada a objetos. A Tabela~\ref{tab:entidades} sintetiza as principais entidades e agregados responsáveis por garantir a consistência das transações no sistema.
 
 \begin{table}[H]
   \centering
@@ -333,11 +333,11 @@ As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de
 \section{Endpoints e recursos da API RESTful}
 \label{sec:endpoints-api}
 
-A arquitetura da API foi projetada para refletir diretamente os agrupamentos lógicos do domínio (\textit{Package-by-Entity}). Dessa forma, os \textit{endpoints} foram estruturados e organizados em torno dos principais agregados e entidades do sistema, promovendo alta coesão e previsibilidade no consumo dos recursos. Nos quadros a seguir, apresentam-se as rotas mapeadas para cada módulo da aplicação, detalhando os métodos HTTP e suas respectivas finalidades.
+A arquitetura da API foi projetada para refletir diretamente os agrupamentos lógicos do domínio (\textit{Package-by-Entity}). Dessa forma, os \textit{endpoints} foram estruturados e organizados em torno dos principais agregados e entidades do sistema, promovendo alta coesão e previsibilidade no consumo dos recursos. Nas tabelas a seguir, apresentam-se as rotas mapeadas para cada módulo da aplicação, detalhando os métodos HTTP e suas respectivas finalidades.
 
-O Quadro~\ref{tab:auth-endpoints} consolida os \textit{endpoints} de acesso público e gerenciamento de identidade, responsáveis por garantir a segurança e a entrada no sistema.
+A Tabela~\ref{tab:auth-endpoints} consolida os \textit{endpoints} de acesso público e gerenciamento de identidade, responsáveis por garantir a segurança e a entrada no sistema.
 
-% Quadro 10 (Auth)
+% Tabela 10 (Auth)
 \begin{table}[H]
   \centering
   \caption{Autenticação e Acesso Público (Auth)}
@@ -357,9 +357,9 @@ O Quadro~\ref{tab:auth-endpoints} consolida os \textit{endpoints} de acesso púb
 
 Este módulo atua como a fronteira de segurança da aplicação. A rota de autenticação é encarregada de validar credenciais e emitir o \textit{JSON Web Token} (JWT), exigido para o consumo das rotas privadas. Além disso, as rotas de confirmação de e-mail garantem a verificação em duas etapas, assegurando a validade e a titularidade dos canais de comunicação cadastrados pelos usuários.
 
-Na sequência, o Quadro~\ref{tab:party-endpoints} apresenta as rotas destinadas ao cadastro base dos participantes do sistema, abstraídos conceitualmente na arquitetura como \texttt{Party}.
+Na sequência, A Tabela~\ref{tab:party-endpoints} apresenta as rotas destinadas ao cadastro base dos participantes do sistema, abstraídos conceitualmente na arquitetura como \texttt{Party}.
 
-% Quadro 11 (Party)
+% Tabela 11 (Party)
 \begin{table}[H]
   \centering
   \caption{Participantes (Party)}
@@ -378,9 +378,9 @@ Na sequência, o Quadro~\ref{tab:party-endpoints} apresenta as rotas destinadas 
 
 Esses \textit{endpoints} operam no nível mais fundamental do cadastro, permitindo o registro e a manutenção de atributos comuns a pessoas físicas e organizações, como credenciais de acesso, dados de contato e localização. A separação dessas rotas reflete a modelagem do domínio, em que a identidade básica do participante existe independentemente da função específica que ele virá a desempenhar no processo de doação de sangue.
 
-Para gerenciar essas funções específicas, o Quadro~\ref{tab:role-endpoints} detalha as operações que permitem aos participantes base assumirem papéis (\textit{Roles}) dentro do ecossistema do banco de sangue.
+Para gerenciar essas funções específicas, A Tabela~\ref{tab:role-endpoints} detalha as operações que permitem aos participantes base assumirem papéis (\textit{Roles}) dentro do ecossistema do banco de sangue.
 
-% Quadro 12 (Roles)
+% Tabela 12 (Roles)
 \begin{table}[H]
   \centering
   \caption{Papéis e Perfis (Role)}
@@ -402,9 +402,9 @@ Para gerenciar essas funções específicas, o Quadro~\ref{tab:role-endpoints} d
 
 A estruturação destas requisições evidencia a flexibilidade da modelagem orientada a objetos adotada. Através dessas rotas, uma entidade do tipo \texttt{Person} pode se registrar como um Doador ou Requisitante, enquanto uma \texttt{Organization} pode assumir o papel de Hemocentro ou Requisitante. Adicionalmente, as rotas de consulta exclusivas deste pacote expõem dados sumarizados e públicos atrelados a esses perfis, facilitando a busca por hemocentros e a visualização de resumos clínicos.
 
-O Quadro~\ref{tab:request-endpoints}, por sua vez, mapeia as rotas responsáveis pelo gerenciamento das campanhas de doação, concentrando as regras de negócio mais complexas da aplicação.
+A Tabela~\ref{tab:request-endpoints}, por sua vez, mapeia as rotas responsáveis pelo gerenciamento das campanhas de doação, concentrando as regras de negócio mais complexas da aplicação.
 
-% Quadro 13 (Request)
+% Tabela 13 (Request)
 \begin{table}[H]
   \centering
   \caption{Solicitações de Doação (Request)}
@@ -426,9 +426,9 @@ O Quadro~\ref{tab:request-endpoints}, por sua vez, mapeia as rotas responsáveis
 
 Este agrupamento expõe as operações do agregado central \texttt{DonationRequest}. Ele abrange desde as transações de manutenção do ciclo de vida da solicitação (como criação, atualização de metas e cancelamento) até o acionamento dos motores heurísticos de compatibilidade. Destacam-se a rota de recomendação, desenhada para fornecer ao doador as campanhas mais aderentes ao seu perfil biológico e geográfico, e o \textit{endpoint} de notificação ativa, que delega ao sistema o engajamento de candidatos elegíveis.
 
-Por fim, o Quadro~\ref{tab:donation-endpoints} expõe as rotas encarregadas do registro e da manutenção do histórico do ato hemoterápico propriamente dito.
+Por fim, A Tabela~\ref{tab:donation-endpoints} expõe as rotas encarregadas do registro e da manutenção do histórico do ato hemoterápico propriamente dito.
 
-% Quadro 14 (Donation)
+% Tabela 14 (Donation)
 \begin{table}[H]
   \centering
   \caption{Doações (Donation)}

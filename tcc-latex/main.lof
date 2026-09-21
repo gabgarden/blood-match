@@ -6,11 +6,11 @@
 \contentsline {figure}{\numberline {5}{\ignorespaces Diagrama de caso de uso de acesso e perfis base}}{37}{figure.5.5}%
 \contentsline {figure}{\numberline {6}{\ignorespaces Diagrama de caso de uso de requisitante}}{38}{figure.5.6}%
 \contentsline {figure}{\numberline {7}{\ignorespaces Diagrama de caso de uso de doador}}{39}{figure.5.7}%
-\contentsline {figure}{\numberline {8}{\ignorespaces Diagrama conceitual dos participantes}}{41}{figure.5.8}%
-\contentsline {figure}{\numberline {9}{\ignorespaces Diagrama conceitual do processo de doação}}{42}{figure.5.9}%
-\contentsline {figure}{\numberline {10}{\ignorespaces Diagrama de implementação: participantes, papéis e controle de acesso}}{43}{figure.5.10}%
-\contentsline {figure}{\numberline {11}{\ignorespaces Diagrama de implementação: agregado DonationRequest}}{44}{figure.5.11}%
-\contentsline {figure}{\numberline {12}{\ignorespaces Diagrama de implementação: agregado Donation}}{45}{figure.5.12}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Diagrama de análise dos participantes}}{41}{figure.5.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Diagrama de análise do processo de doação}}{42}{figure.5.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Diagrama de design: participantes, papéis e controle de acesso}}{43}{figure.5.10}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Diagrama de design: agregado DonationRequest}}{44}{figure.5.11}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Diagrama de design: agregado Donation}}{45}{figure.5.12}%
 \contentsline {figure}{\numberline {13}{\ignorespaces Diagrama de sequência: DonationRequest}}{51}{figure.5.13}%
 \contentsline {figure}{\numberline {14}{\ignorespaces Execução do fluxo de criação de solicitação de doação via cliente HTTP Insomnia}}{53}{figure.5.14}%
 \contentsline {figure}{\numberline {15}{\ignorespaces Cenário ilustrativo de alocação contínua restrita por teto proporcional}}{68}{figure.5.15}%
