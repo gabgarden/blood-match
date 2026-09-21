@@ -428,6 +428,20 @@ O design destas rotas reflete a máquina de estados interna do agregado \texttt{
 
 A implementação técnica da API orienta-se pelos princípios da arquitetura em camadas e do \textit{Domain-Driven Design} (DDD). Para fins de exemplificar a aplicação prática desses conceitos, esta seção demonstra o fluxo completo de uma entidade --- o registro de uma \textbf{Solicitação de Doação} (\codigo{DonationRequest}) ---, acompanhando a requisição desde a sua chegada no controlador REST até a sua persistência no banco de dados com controle de concorrência. Esse rastreamento horizontal ilustra o papel de cada camada arquitetural e as transformações sofridas pelos dados.
 
+\subsection{Diagrama de sequência do fluxo de criação}
+
+Para compreender a orquestração entre as camadas da arquitetura antes da análise direta do código-fonte, a modelagem temporal das requisições faz-se necessária. A Figura~\ref{sequence:donation-request} apresenta o diagrama de sequência UML detalhando o fluxo completo de criação de uma solicitação de doação, mapeando o trajeto da informação desde a interceptação da chamada HTTP até a persistência no banco de dados.
+
+\begin{figure}[H]
+  \centering
+  \caption{Diagrama de sequência: DonationRequest}
+  \includegraphics[width=0.95\textwidth]{sequence-diagram-donation-request}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{sequence:donation-request}
+\end{figure}
+
+O diagrama ilustra a estrita separação de responsabilidades estabelecida pela arquitetura em camadas e pelo \textit{Domain-Driven Design}. O fluxo é iniciado pelo cliente HTTP, que aciona o controlador da camada de apresentação. Este converte os dados de entrada e delega a operação para a camada de aplicação por meio do método \codigo{execute(input)} do caso de uso correspondente. No núcleo da aplicação, o caso de uso coordena a recuperação dos atores envolvidos (\codigo{Requester} e \codigo{BloodCenter}) por meio de suas respectivas interfaces de repositório. Com as dependências estruturais carregadas, o caso de uso invoca o \textit{static factory method} \codigo{create(...)} diretamente na raiz do agregado \codigo{DonationRequest}, responsável por proteger suas invariantes e instanciar o objeto de domínio. Por fim, a nova entidade é persistida na camada de infraestrutura e o fluxo de resposta transita de volta de forma decrescente, culminando no retorno de sucesso (HTTP 201) ao cliente. Essa representação comprova o isolamento do domínio, que permanece alheio aos detalhes do protocolo web e da tecnologia de banco de dados.
+
 \subsection{Camada de Apresentação: REST Controller e DTOs}
 
 A camada de apresentação atua como o ponto de entrada da aplicação, isolando o núcleo do sistema dos detalhes do protocolo HTTP. O \codigo{CreateDonationRequestController} é responsável por interceptar as requisições, executar validações sintáticas básicas e converter o \textit{payload} da requisição (DTO) para o modelo de entrada do caso de uso.
