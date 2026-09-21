@@ -307,10 +307,6 @@ A entidade \texttt{Party} foi adotada como abstração de mais alto nível da hi
 
 As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de agregados (\textit{Aggregate Roots}), concentrando regras de negócio --- como a validação de datas-limite e a verificação de compatibilidade sanguínea --- e protegendo o estado interno dos objetos por meio do encapsulamento. Adicionalmente, conceitos imutáveis sem identidade própria, como \texttt{Address} (Endereço), \texttt{BloodType} (Tipo Sanguíneo) e \texttt{DomainID}, foram modelados como objetos de valor, na linha proposta por \citeonline{evans2003} e detalhada por \citeonline{vernon2013}, aumentando a segurança e a previsibilidade do modelo.
 
-\section{Implementação e Fluxo de Dados}
-
-A implementação técnica da API orienta-se pelos princípios da arquitetura em camadas e do \textit{Domain-Driven Design} (DDD). Para fins de exemplificar a aplicação prática desses conceitos, esta seção demonstra o fluxo completo de uma entidade --- o registro de uma \textbf{Solicitação de Doação} (\codigo{DonationRequest}) ---, acompanhando a requisição desde a sua chegada no controlador REST até a sua persistência no banco de dados com controle de concorrência. Esse rastreamento horizontal ilustra o papel de cada camada arquitetural e as transformações sofridas pelos dados.
-
 \section{Endpoints da API RESTful}
 
 A arquitetura da API foi projetada para refletir diretamente os agrupamentos lógicos do domínio (\textit{Package-by-Entity}). Dessa forma, os \textit{endpoints} foram estruturados e organizados em torno dos principais agregados e entidades do sistema, promovendo alta coesão e previsibilidade no consumo dos recursos. Nas tabelas a seguir, apresentam-se as rotas mapeadas para cada módulo da aplicação, detalhando os métodos HTTP e suas respectivas finalidades.
@@ -427,6 +423,10 @@ Por fim, a Tabela 14 expõe as rotas encarregadas do registro e da manutenção 
 \end{table}
 
 O design destas rotas reflete a máquina de estados interna do agregado \texttt{Donation}. Em vez de um único ponto de atualização genérico para manipulação de dados, a API oferece semânticas declarativas e claras para transicionar a doação de uma intenção agendada (pendente) para uma efetivação (concluída) ou para um reagendamento. Tais rotas alimentam diretamente o histórico clínico dos doadores, afetando dinamicamente o cálculo de suas janelas de inaptidão temporal para doações futuras.
+
+\section{Implementação e Fluxo de Dados}
+
+A implementação técnica da API orienta-se pelos princípios da arquitetura em camadas e do \textit{Domain-Driven Design} (DDD). Para fins de exemplificar a aplicação prática desses conceitos, esta seção demonstra o fluxo completo de uma entidade --- o registro de uma \textbf{Solicitação de Doação} (\codigo{DonationRequest}) ---, acompanhando a requisição desde a sua chegada no controlador REST até a sua persistência no banco de dados com controle de concorrência. Esse rastreamento horizontal ilustra o papel de cada camada arquitetural e as transformações sofridas pelos dados.
 
 \subsection{Camada de Apresentação: REST Controller e DTOs}
 
