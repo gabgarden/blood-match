@@ -10,7 +10,7 @@ O desenvolvimento foi orientado pelos princípios do DDD e pelos princípios SOL
 
 A extração de requisitos ocorreu a partir da análise documental e bibliográfica descrita no Capítulo~4, alinhando as necessidades dos diferentes atores envolvidos no processo de doação de sangue às capacidades técnicas do sistema proposto.
 
-Os requisitos funcionais representam as operações que a API disponibiliza para atender às rotinas de cadastro, gerenciamento de solicitações, recomendação e controle de doações. A tabela~\ref{tab:rf} sintetiza as funcionalidades identificadas e implementadas, refletindo diretamente os recursos (\textit{endpoints}) expostos pela API.
+Os requisitos funcionais representam as operações que a API disponibiliza para atender às rotinas de cadastro, gerenciamento de solicitações, recomendação e controle de doações. O Quadro~\ref{tab:rf} sintetiza as funcionalidades identificadas e implementadas, refletindo diretamente os recursos (\textit{endpoints}) expostos pela API.
 
 \begin{table}[H]
   \centering
@@ -49,7 +49,7 @@ Os requisitos funcionais representam as operações que a API disponibiliza para
 Ressalta-se que a lista de requisitos funcionais apresentada não tem a pretensão de esgotar todas as rotinas administrativas de um hemocentro ou unidade hospitalar, mas de delimitar um conjunto mínimo e coeso de operações indispensáveis para validar os conceitos teóricos e arquiteturais propostos. Esse escopo abrange o ciclo fundamental da doação de sangue ao contemplar, de maneira integrada, a gestão da demanda (abertura e acompanhamento de solicitações por unidades de saúde e pacientes), a oferta (disponibilidade, elegibilidade e intenções de doação pelos voluntários) e o registro histórico das doações realizadas.
 
 
-Além das funcionalidades diretas, foram definidos requisitos não funcionais para estabelecer os parâmetros de qualidade, segurança e arquitetura esperados. Considerando a adoção do DDD e da arquitetura em camadas, a Tabela~\ref{tab:rnf} apresenta as diretrizes técnicas estabelecidas para a solução.
+Além das funcionalidades diretas, foram definidos requisitos não funcionais para estabelecer os parâmetros de qualidade, segurança e arquitetura esperados. Considerando a adoção do DDD e da arquitetura em camadas, o Quadro~\ref{tab:rnf} apresenta as diretrizes técnicas estabelecidas para a solução.
 
 \begin{table}[H]
   \centering
@@ -85,7 +85,7 @@ Após a consolidação dos requisitos, procedeu-se com a modelagem do sistema pa
 
 \subsection{Casos de uso}
 
-A modelagem de casos de uso, em notação UML, sintetiza as operações disponíveis para os diferentes perfis de acesso. A Tabela~\ref{tab:uc} apresenta o mapeamento dos casos de uso e seus respectivos atores, incluindo tanto as operações representadas nos diagramas a seguir quanto operações complementares oferecidas pela API para os mesmos atores.
+A modelagem de casos de uso, em notação UML, sintetiza as operações disponíveis para os diferentes perfis de acesso. O Quadro~\ref{tab:uc} apresenta o mapeamento dos casos de uso e seus respectivos atores, incluindo tanto as operações representadas nos diagramas a seguir quanto operações complementares oferecidas pela API para os mesmos atores.
 
 \begin{table}[H]
   \centering
@@ -156,7 +156,7 @@ O ator \textit{Donor} possui acesso ao núcleo do processo de doação, incluind
 
 \subsubsubsection{Detalhamento dos casos de uso}
 
-Devido à abrangência da API e visando manter a concisão documental, optou-se por detalhar apenas os casos de uso críticos para o núcleo da aplicação, adotando a estrutura formal de especificação textual proposta por Cockburn (2001). Essa abordagem documenta o fluxo de eventos, as restrições operacionais e as pré-condições de segurança exigidas, justificando arquiteturalmente a ausência de relacionamentos visuais de dependência de autenticação nos diagramas UML. A Tabela~\ref{tab:detalhamento-uc} sintetiza essas especificações.
+Devido à abrangência da API e visando manter a concisão documental, optou-se por detalhar apenas os casos de uso críticos para o núcleo da aplicação, adotando a estrutura formal de especificação textual proposta por Cockburn (2001). Essa abordagem documenta o fluxo de eventos, as restrições operacionais e as pré-condições de segurança exigidas, justificando arquiteturalmente a ausência de relacionamentos visuais de dependência de autenticação nos diagramas UML. O Quadro~\ref{tab:detalhamento-uc} sintetiza essas especificações.
 
 \begin{table}[H]
   \centering
@@ -303,7 +303,7 @@ O fluxo de dados segue os princípios da arquitetura limpa: a camada de apresent
 
 \subsection{Entidades, agregados e objetos de valor}
 
-A estrutura central do domínio foi modelada de forma hierárquica e orientada a objetos. A Tabela~\ref{tab:entidades} sintetiza as principais entidades e agregados responsáveis por garantir a consistência das transações no sistema.
+A estrutura central do domínio foi modelada de forma hierárquica e orientada a objetos. O Quadro~\ref{tab:entidades} sintetiza as principais entidades e agregados responsáveis por garantir a consistência das transações no sistema.
 
 \begin{table}[H]
   \centering
@@ -333,11 +333,11 @@ As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de
 \section{Endpoints e recursos da API RESTful}
 \label{sec:endpoints-api}
 
-A arquitetura da API foi projetada para refletir diretamente os agrupamentos lógicos do domínio (\textit{Package-by-Entity}). Dessa forma, os \textit{endpoints} foram estruturados e organizados em torno dos principais agregados e entidades do sistema, promovendo alta coesão e previsibilidade no consumo dos recursos. Nas tabelas a seguir, apresentam-se as rotas mapeadas para cada módulo da aplicação, detalhando os métodos HTTP e suas respectivas finalidades.
+A arquitetura da API foi projetada para refletir diretamente os agrupamentos lógicos do domínio (\textit{Package-by-Entity}). Dessa forma, os \textit{endpoints} foram estruturados e organizados em torno dos principais agregados e entidades do sistema, promovendo alta coesão e previsibilidade no consumo dos recursos. Nos quadros a seguir, apresentam-se as rotas mapeadas para cada módulo da aplicação, detalhando os métodos HTTP e suas respectivas finalidades.
 
-A Tabela 10 consolida os \textit{endpoints} de acesso público e gerenciamento de identidade, responsáveis por garantir a segurança e a entrada no sistema.
+O Quadro~\ref{tab:auth-endpoints} consolida os \textit{endpoints} de acesso público e gerenciamento de identidade, responsáveis por garantir a segurança e a entrada no sistema.
 
-% Tabela 10 (Auth)
+% Quadro 10 (Auth)
 \begin{table}[H]
   \centering
   \caption{Autenticação e Acesso Público (Auth)}
@@ -357,9 +357,9 @@ A Tabela 10 consolida os \textit{endpoints} de acesso público e gerenciamento d
 
 Este módulo atua como a fronteira de segurança da aplicação. A rota de autenticação é encarregada de validar credenciais e emitir o \textit{JSON Web Token} (JWT), exigido para o consumo das rotas privadas. Além disso, as rotas de confirmação de e-mail garantem a verificação em duas etapas, assegurando a validade e a titularidade dos canais de comunicação cadastrados pelos usuários.
 
-Na sequência, a Tabela 11 apresenta as rotas destinadas ao cadastro base dos participantes do sistema, abstraídos conceitualmente na arquitetura como \texttt{Party}.
+Na sequência, o Quadro~\ref{tab:party-endpoints} apresenta as rotas destinadas ao cadastro base dos participantes do sistema, abstraídos conceitualmente na arquitetura como \texttt{Party}.
 
-% Tabela 11 (Party)
+% Quadro 11 (Party)
 \begin{table}[H]
   \centering
   \caption{Participantes (Party)}
@@ -378,9 +378,9 @@ Na sequência, a Tabela 11 apresenta as rotas destinadas ao cadastro base dos pa
 
 Esses \textit{endpoints} operam no nível mais fundamental do cadastro, permitindo o registro e a manutenção de atributos comuns a pessoas físicas e organizações, como credenciais de acesso, dados de contato e localização. A separação dessas rotas reflete a modelagem do domínio, em que a identidade básica do participante existe independentemente da função específica que ele virá a desempenhar no processo de doação de sangue.
 
-Para gerenciar essas funções específicas, a Tabela 12 detalha as operações que permitem aos participantes base assumirem papéis (\textit{Roles}) dentro do ecossistema do banco de sangue.
+Para gerenciar essas funções específicas, o Quadro~\ref{tab:role-endpoints} detalha as operações que permitem aos participantes base assumirem papéis (\textit{Roles}) dentro do ecossistema do banco de sangue.
 
-% Tabela 12 (Roles)
+% Quadro 12 (Roles)
 \begin{table}[H]
   \centering
   \caption{Papéis e Perfis (Role)}
@@ -402,9 +402,9 @@ Para gerenciar essas funções específicas, a Tabela 12 detalha as operações 
 
 A estruturação destas requisições evidencia a flexibilidade da modelagem orientada a objetos adotada. Através dessas rotas, uma entidade do tipo \texttt{Person} pode se registrar como um Doador ou Requisitante, enquanto uma \texttt{Organization} pode assumir o papel de Hemocentro ou Requisitante. Adicionalmente, as rotas de consulta exclusivas deste pacote expõem dados sumarizados e públicos atrelados a esses perfis, facilitando a busca por hemocentros e a visualização de resumos clínicos.
 
-A Tabela 13, por sua vez, mapeia as rotas responsáveis pelo gerenciamento das campanhas de doação, concentrando as regras de negócio mais complexas da aplicação.
+O Quadro~\ref{tab:request-endpoints}, por sua vez, mapeia as rotas responsáveis pelo gerenciamento das campanhas de doação, concentrando as regras de negócio mais complexas da aplicação.
 
-% Tabela 13 (Request)
+% Quadro 13 (Request)
 \begin{table}[H]
   \centering
   \caption{Solicitações de Doação (Request)}
@@ -426,9 +426,9 @@ A Tabela 13, por sua vez, mapeia as rotas responsáveis pelo gerenciamento das c
 
 Este agrupamento expõe as operações do agregado central \texttt{DonationRequest}. Ele abrange desde as transações de manutenção do ciclo de vida da solicitação (como criação, atualização de metas e cancelamento) até o acionamento dos motores heurísticos de compatibilidade. Destacam-se a rota de recomendação, desenhada para fornecer ao doador as campanhas mais aderentes ao seu perfil biológico e geográfico, e o \textit{endpoint} de notificação ativa, que delega ao sistema o engajamento de candidatos elegíveis.
 
-Por fim, a Tabela 14 expõe as rotas encarregadas do registro e da manutenção do histórico do ato hemoterápico propriamente dito.
+Por fim, o Quadro~\ref{tab:donation-endpoints} expõe as rotas encarregadas do registro e da manutenção do histórico do ato hemoterápico propriamente dito.
 
-% Tabela 14 (Donation)
+% Quadro 14 (Donation)
 \begin{table}[H]
   \centering
   \caption{Doações (Donation)}
@@ -510,7 +510,19 @@ public class CreateDonationRequestController {
 }
 \end{lstlisting}
 
-A Figura~\ref{insomnia:create-donation-request} ilustra na prática a execução deste controlador por meio do cliente HTTP Insomnia. Observa-se a requisição enviada para a URI \codigo{/donation-requests} utilizando o verbo POST, contendo no corpo da requisição (\textit{Request Body}) o JSON com os dados preenchidos pelo requisitante.
+A Figura~\ref{insomnia:create-donation-request} ilustra na prática a execução deste controlador por meio do cliente HTTP Insomnia. Observa-se a requisição enviada para a URI \codigo{/donation-requests} utilizando o verbo POST, contendo no corpo da requisição (\textit{Request Body}) o JSON de entrada com os dados preenchidos pelo requisitante. Para ilustrar o formato trafegado, a Listagem~\ref{lst:json-input} apresenta o JSON enviado na requisição HTTP POST.
+
+\begin{lstlisting}[caption={JSON de entrada na requisição HTTP POST}, label={lst:json-input}]
+{
+  "partyId": "party-12345",
+  "organizationId": "org-67890",
+  "bloodTypeNeeded": "A_POSITIVE",
+  "goalBloodBags": 10,
+  "dateLimit": "2026-12-31",
+  "urgency": "HIGH",
+  "directedTo": "Joao Silva"
+}
+\end{lstlisting}
 
 % print endpoint \donation-requests
 \begin{figure}[H]
@@ -530,7 +542,7 @@ A camada de aplicação orquestra o fluxo de dados coordenando chamadas aos repo
 Para padronizar a orquestração de negócios, todos os casos de uso do sistema adotam o padrão formal estruturado na assinatura:
 
 \begin{center}
-  \codigo{Output execute(Input input)}
+  \texttt{Output execute(Input input)}
 \end{center}
 
 Essa padronização fundamenta-se nos seguintes princípios arquiteturais:

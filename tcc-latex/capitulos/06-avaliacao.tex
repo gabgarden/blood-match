@@ -4,7 +4,7 @@ Este capítulo apresenta a avaliação da solução desenvolvida, tratada como p
 
 \section{Sistema entregue}
 
-A solução implementada materializa-se em uma API RESTful em Java~17 com Spring Boot, persistência em MongoDB e autenticação e autorização baseadas em JWT, organizada por entidades de domínio (\codigo{request}, \codigo{donation}, \codigo{party}, \codigo{role}, \codigo{auth} e \codigo{shared}) com subpacotes em camadas inspiradas no DDD --- \codigo{domain}, \codigo{application}, \codigo{infrastructure} e \codigo{presentation} ---, conforme detalhado no Capítulo~5. Do ponto de vista funcional, a API cobre integralmente o conjunto de requisitos da Tabela~\ref{tab:rf}. Essa cobertura inicia-se pelo cadastro estruturado de pessoas e organizações e a respectiva atribuição de papéis de doador, requisitante e hemocentro. A partir dessa base, o sistema contempla o gerenciamento completo do ciclo de vida das solicitações de doação de sangue, permitindo a abertura de demandas, o acompanhamento de seu estado, a atualização dinâmica de metas e prazos, o cancelamento justificado e o disparo de notificações a voluntários elegíveis.
+A solução implementada materializa-se em uma API RESTful em Java~17 com Spring Boot, persistência em MongoDB e autenticação e autorização baseadas em JWT, organizada por entidades de domínio (\codigo{request}, \codigo{donation}, \codigo{party}, \codigo{role}, \codigo{auth} e \codigo{shared}) com subpacotes em camadas inspiradas no DDD --- \codigo{domain}, \codigo{application}, \codigo{infrastructure} e \codigo{presentation} ---, conforme detalhado no Capítulo~5. Do ponto de vista funcional, a API cobre integralmente o conjunto de requisitos do Quadro~\ref{tab:rf}. Essa cobertura inicia-se pelo cadastro estruturado de pessoas e organizações e a respectiva atribuição de papéis de doador, requisitante e hemocentro. A partir dessa base, o sistema contempla o gerenciamento completo do ciclo de vida das solicitações de doação de sangue, permitindo a abertura de demandas, o acompanhamento de seu estado, a atualização dinâmica de metas e prazos, o cancelamento justificado e o disparo de notificações a voluntários elegíveis.
 
 O fluxo de doações é estruturado por um registro unificado, capaz de diferenciar a intenção de doar --- que gera um agendamento pendente --- da doação já efetivada, viabilizando ainda o reagendamento, a confirmação de conclusão e a recuperação do histórico hemoterápico individual. No núcleo de inteligência da aplicação, destaca-se o mecanismo de recomendação de solicitações compatíveis, o qual pondera tipagem sanguínea, elegibilidade temporal e proximidade geográfica. O acompanhamento dessas demandas ocorre por meio de um algoritmo de cumprimento de metas calculado por \textit{snapshot} em memória: as doações concluídas são alocadas às solicitações do mesmo hemocentro segundo uma ordenação FIFO modulada por um teto proporcional ao prazo restante, dispensando contadores persistidos no banco de dados. Complementarmente, o sistema fornece recursos autenticados para a busca de hemocentros por nome, recuperando os identificadores necessários às operações de escrita.
 
@@ -22,7 +22,7 @@ O critério de sucesso funcional adotado foi a execução integral da suíte sem
 
 \section{Organização da suíte de testes}
 
-A suíte reside em \codigo{src/test/java} e está agrupada por camada, espelhando a arquitetura da API. A Tabela~\ref{tab:suite-testes} sintetiza as classes de teste e o número de casos executados em cada uma.
+A suíte reside em \codigo{src/test/java} e está agrupada por camada, espelhando a arquitetura da API. O Quadro~\ref{tab:suite-testes} sintetiza as classes de teste e o número de casos executados em cada uma.
 
 \begin{table}[H]
   \centering
@@ -140,7 +140,7 @@ class BloodTypeTest {
 
 \section{Resultados da execução}
 
-A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução concluída em 26 de agosto de 2026 obteve o resultado sintetizado na Tabela~\ref{tab:resultado-testes}.
+A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução concluída em 26 de agosto de 2026 obteve o resultado sintetizado no Quadro~\ref{tab:resultado-testes}.
 
 \begin{table}[H]
   \centering
@@ -162,7 +162,7 @@ A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-Como pode ser observado na Tabela~\ref{tab:resultado-testes}, a ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e papéis.
+Como pode ser observado no Quadro~\ref{tab:resultado-testes}, a ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e papéis.
 
 Ressalta-se que a maior parte dos testes de domínio e de aplicação não depende de uma instância MongoDB ativa: repositórios e serviços externos são substituídos por \textit{mocks}, o que favorece a repetibilidade e reduz o custo de execução. Os testes que sobem o contexto Spring Boot (\textit{smoke} e autorização HTTP) validam a montagem da aplicação e a barreira de segurança sem exigir, nos cenários cobertos, a persistência real de documentos.
 

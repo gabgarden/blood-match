@@ -11,5 +11,6 @@
 \contentsline {figure}{\numberline {10}{\ignorespaces Diagrama de implementação: participantes, papéis e controle de acesso}}{43}{figure.5.10}%
 \contentsline {figure}{\numberline {11}{\ignorespaces Diagrama de implementação: agregado DonationRequest}}{44}{figure.5.11}%
 \contentsline {figure}{\numberline {12}{\ignorespaces Diagrama de implementação: agregado Donation}}{45}{figure.5.12}%
-\contentsline {figure}{\numberline {13}{\ignorespaces Execução do fluxo de criação de solicitação de doação via cliente HTTP Insomnia}}{52}{figure.5.13}%
-\contentsline {figure}{\numberline {14}{\ignorespaces Cenário ilustrativo de alocação contínua restrita por teto proporcional}}{67}{figure.5.14}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Diagrama de sequência: DonationRequest}}{51}{figure.5.13}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Execução do fluxo de criação de solicitação de doação via cliente HTTP Insomnia}}{53}{figure.5.14}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Cenário ilustrativo de alocação contínua restrita por teto proporcional}}{68}{figure.5.15}%
