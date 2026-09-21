@@ -53,41 +53,43 @@
 \contentsline {subsection}{\numberline {5.3.1}Casos de uso}{35}{subsection.5.3.1}%
 \contentsline {paragraph}{\numberline {5.3.1.0.1}Detalhamento dos casos de uso}{39}{paragraph.5.3.1.0.1}%
 \contentsline {subsection}{\numberline {5.3.2}Diagramas de classes}{40}{subsection.5.3.2}%
-\contentsline {section}{\numberline {5.4}Domínio e arquitetura}{44}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}Linguagem ubíqua e organização em camadas}{44}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}Entidades, agregados e objetos de valor}{45}{subsection.5.4.2}%
-\contentsline {section}{\numberline {5.5}Implementação e Fluxo de Dados}{46}{section.5.5}%
-\contentsline {subsection}{\numberline {5.5.1}Camada de Apresentação: REST Controller e DTOs}{47}{subsection.5.5.1}%
-\contentsline {subsection}{\numberline {5.5.2}Camada de Aplicação: Casos de Uso e o Padrão \textit {execute}}{47}{subsection.5.5.2}%
-\contentsline {subsection}{\numberline {5.5.3}Camada de Domínio: Agregado, Invariantes no Construtor e \textit {Static Factory Method}}{49}{subsection.5.5.3}%
-\contentsline {subsection}{\numberline {5.5.4}Camada de Infraestrutura: Mapeamento de Esquemas e Persistência}{51}{subsection.5.5.4}%
-\contentsline {subsubsection}{\numberline {5.5.4.1}Indexação Geoespacial no MongoDB e Consultas por Proximidade}{52}{subsubsection.5.5.4.1}%
-\contentsline {subsubsection}{\numberline {5.5.4.2}Composição versus Herança na Arquitetura do Repositório}{53}{subsubsection.5.5.4.2}%
-\contentsline {subsection}{\numberline {5.5.5}Segurança e autenticação}{56}{subsection.5.5.5}%
-\contentsline {subsection}{\numberline {5.5.6}Serviços externos e documentação da API}{56}{subsection.5.5.6}%
-\contentsline {section}{\numberline {5.6}Recomendação de solicitações e cumprimento de metas}{57}{section.5.6}%
-\contentsline {subsection}{\numberline {5.6.1}Recomendação de solicitações para o doador}{57}{subsection.5.6.1}%
-\contentsline {subsection}{\numberline {5.6.2}Notificação de doadores potenciais}{60}{subsection.5.6.2}%
-\contentsline {subsection}{\numberline {5.6.3}Snapshot do cumprimento de metas}{62}{subsection.5.6.3}%
-\contentsline {section}{\numberline {5.7}Controle Otimista de Concorrência}{70}{section.5.7}%
-\contentsline {subsection}{\numberline {5.7.1}Caso de uso de atualização de solicitação}{71}{subsection.5.7.1}%
-\contentsline {subsection}{\numberline {5.7.2}Os dois momentos de checagem de versão}{73}{subsection.5.7.2}%
+\contentsline {section}{\numberline {5.4}Domínio e arquitetura}{45}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Linguagem ubíqua e organização em camadas}{45}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Entidades, agregados e objetos de valor}{46}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Endpoints e recursos da API RESTful}{47}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Implementação e fluxo de dados}{50}{section.5.6}%
+\contentsline {subsection}{\numberline {5.6.1}Visão geral do fluxo de execução}{50}{subsection.5.6.1}%
+\contentsline {subsection}{\numberline {5.6.2}Camada de Apresentação: REST Controller e DTOs}{51}{subsection.5.6.2}%
+\contentsline {subsection}{\numberline {5.6.3}Camada de Aplicação: Casos de Uso e o Padrão \textit {execute}}{52}{subsection.5.6.3}%
+\contentsline {subsection}{\numberline {5.6.4}Camada de Domínio: Agregado, Invariantes no Construtor e \textit {Static Factory Method}}{54}{subsection.5.6.4}%
+\contentsline {subsection}{\numberline {5.6.5}Camada de Infraestrutura: Mapeamento de Esquemas e Persistência}{56}{subsection.5.6.5}%
+\contentsline {subsubsection}{\numberline {5.6.5.1}Consultas de Proximidade com Indexação Geoespacial}{57}{subsubsection.5.6.5.1}%
+\contentsline {subsubsection}{\numberline {5.6.5.2}Composição versus Herança na Arquitetura do Repositório}{57}{subsubsection.5.6.5.2}%
+\contentsline {subsection}{\numberline {5.6.6}Segurança e autenticação}{60}{subsection.5.6.6}%
+\contentsline {subsection}{\numberline {5.6.7}Serviços externos e documentação da API}{60}{subsection.5.6.7}%
+\contentsline {section}{\numberline {5.7}Recomendação de solicitações e cumprimento de metas}{61}{section.5.7}%
+\contentsline {subsection}{\numberline {5.7.1}Recomendação de solicitações para o doador}{61}{subsection.5.7.1}%
+\contentsline {subsection}{\numberline {5.7.2}Notificação de doadores potenciais}{64}{subsection.5.7.2}%
+\contentsline {subsection}{\numberline {5.7.3}Snapshot do cumprimento de metas}{66}{subsection.5.7.3}%
+\contentsline {section}{\numberline {5.8}Controle Otimista de Concorrência}{76}{section.5.8}%
+\contentsline {subsection}{\numberline {5.8.1}Caso de uso de atualização de solicitação}{77}{subsection.5.8.1}%
+\contentsline {subsection}{\numberline {5.8.2}Os dois momentos de checagem de versão}{79}{subsection.5.8.2}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {6}\MakeTextUppercase []{Avaliação da proposta de solução}}{76}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Sistema entregue}{76}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Plano e método de avaliação}{77}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Organização da suíte de testes}{77}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Resultados da execução}{78}{section.6.4}%
-\contentsline {section}{\numberline {6.5}Avaliação de manutenibilidade}{79}{section.6.5}%
-\contentsline {section}{\numberline {6.6}Sugestões de melhorias}{79}{section.6.6}%
-\contentsline {section}{\numberline {6.7}Considerações sobre a avaliação}{80}{section.6.7}%
+\contentsline {chapter}{\chapternumberline {6}\MakeTextUppercase []{Avaliação da proposta de solução}}{82}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Sistema entregue}{82}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Plano e método de avaliação}{83}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Organização da suíte de testes}{83}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Resultados da execução}{86}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Avaliação de manutenibilidade}{86}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Sugestões de melhorias}{87}{section.6.6}%
+\contentsline {section}{\numberline {6.7}Considerações sobre a avaliação}{87}{section.6.7}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
-\contentsline {chapter}{\chapternumberline {7}\MakeTextUppercase []{Considerações finais}}{81}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Alcance dos objetivos}{81}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Principais contribuições}{81}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Limitações}{82}{section.7.3}%
-\contentsline {section}{\numberline {7.4}Trabalhos futuros}{82}{section.7.4}%
-\contentsline {section}{\numberline {7.5}Considerações finais}{83}{section.7.5}%
+\contentsline {chapter}{\chapternumberline {7}\MakeTextUppercase []{Considerações finais}}{89}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Alcance dos objetivos}{89}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Principais contribuições}{89}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Limitações}{90}{section.7.3}%
+\contentsline {section}{\numberline {7.4}Trabalhos futuros}{90}{section.7.4}%
+\contentsline {section}{\numberline {7.5}Considerações finais}{91}{section.7.5}%
 \vspace {\cftbeforechapterskip }
 \setlength {\cftchapterindent }{\cftlastnumwidth } \setlength {\cftchapternumwidth }{2em}
-\contentsline {chapter}{Refer\^encias}{84}{section*.14}%
+\contentsline {chapter}{Refer\^encias}{92}{section*.14}%

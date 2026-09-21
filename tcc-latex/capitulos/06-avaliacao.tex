@@ -46,6 +46,98 @@ A suíte reside em \codigo{src/test/java} e está agrupada por camada, espelhand
 
 Entre os testes de domínio, destaca-se a cobertura do algoritmo de cumprimento de metas, distribuída em três classes. O \codigo{DonationRequestFulfillmentFifoTest} (26 casos) valida a ordem FIFO por hemocentro --- incluindo ordenação temporal, compatibilidade tipológica, janela entre data de solicitação e data-limite, e esgotamento de meta. O \codigo{DonationRequestFulfillmentProportionalTest} (5 casos) cobre o teto proporcional: represamento da solicitação de prazo folgado em favor da que está próxima do vencimento, ausência de teto no dia da data-limite, retorno das sobras em segunda passagem FIFO e preservação do total de bolsas alocadas. O \codigo{DonationRequestTest} (14 casos) exercita a fórmula do teto isoladamente no agregado, incluindo a precisão decimal via \texttt{BigDecimal} e o caso de contorno de janela de um único dia. Nos testes de aplicação, o \codigo{GetRecommendedRequestsUseCaseTest} verifica elegibilidade do doador, descarte de solicitações com meta atingida e ordenação por distância/urgência/prazo. Nos testes de integração, o \codigo{SecurityAuthorizationIntegrationTest} confirma que recomendações e listagens respeitam autenticação, papéis (\texttt{DONOR}/\texttt{REQUESTER}) e regras de \textit{ownership} do participante autenticado.
 
+Para ilustrar a abordagem adotada nos testes unitários de domínio e evidenciar a verificação rigorosa das regras biológicas sem qualquer dependência de infraestrutura ou banco de dados, a Listagem~\ref{lst:blood-type-test} apresenta a classe \codigo{BloodTypeTest}. Observa-se a validação das invariantes de integridade do objeto de valor (rejeição de tipos inválidos ou nulos) e a verificação exaustiva da matriz de compatibilidade transfusional pelo método \codigo{canDonateTo} --- atestando, por exemplo, o comportamento do tipo $O^-$ como doador universal, a restrição de doadores $O^+$ apenas para receptores de fator Rh positivo e a recepção estrita de $AB^+$.
+
+\begin{lstlisting}[language=Java, caption={Teste Unitário de Compatibilidade Sanguínea e Invariantes do Objeto de Valor}, label={lst:blood-type-test}]
+package bloodmatch.shared.domain.valueObjects;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class BloodTypeTest {
+
+  @Test
+  void shouldCreateValidBloodType() {
+    BloodType type = BloodType.of("A+");
+    assertEquals("A+", type.getType());
+  }
+
+  @Test
+  void shouldIgnoreCaseWhenCreatingBloodType() {
+    BloodType type = BloodType.of("o-");
+    assertEquals("O-", type.getType());
+  }
+
+  @Test
+  void shouldThrowExceptionWhenBloodTypeIsNull() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> BloodType.of(null));
+  }
+
+  @Test
+  void shouldThrowExceptionForInvalidBloodType() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> BloodType.of("X"));
+  }
+
+  @Test
+  void shouldThrowExceptionWhenReceiverBloodTypeIsNull() {
+    BloodType donor = BloodType.of("O-");
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> donor.canDonateTo(null));
+  }
+
+  @Test
+  void oNegativeShouldDonateToEveryone() {
+    BloodType donor = BloodType.of("O-");
+
+    assertTrue(donor.canDonateTo(BloodType.of("O-")));
+    assertTrue(donor.canDonateTo(BloodType.of("O+")));
+    assertTrue(donor.canDonateTo(BloodType.of("A-")));
+    assertTrue(donor.canDonateTo(BloodType.of("A+")));
+    assertTrue(donor.canDonateTo(BloodType.of("B-")));
+    assertTrue(donor.canDonateTo(BloodType.of("B+")));
+    assertTrue(donor.canDonateTo(BloodType.of("AB-")));
+    assertTrue(donor.canDonateTo(BloodType.of("AB+")));
+  }
+
+  @Test
+  void oPositiveShouldDonateOnlyToPositiveTypes() {
+    BloodType donor = BloodType.of("O+");
+
+    assertTrue(donor.canDonateTo(BloodType.of("O+")));
+    assertTrue(donor.canDonateTo(BloodType.of("A+")));
+    assertTrue(donor.canDonateTo(BloodType.of("B+")));
+    assertTrue(donor.canDonateTo(BloodType.of("AB+")));
+
+    assertFalse(donor.canDonateTo(BloodType.of("A-")));
+  }
+
+  @Test
+  void aPositiveShouldDonateOnlyToAPositiveAndABPositive() {
+    BloodType donor = BloodType.of("A+");
+
+    assertTrue(donor.canDonateTo(BloodType.of("A+")));
+    assertTrue(donor.canDonateTo(BloodType.of("AB+")));
+
+    assertFalse(donor.canDonateTo(BloodType.of("B+")));
+  }
+
+  @Test
+  void abPositiveShouldDonateOnlyToAbPositive() {
+    BloodType donor = BloodType.of("AB+");
+
+    assertTrue(donor.canDonateTo(BloodType.of("AB+")));
+
+    assertFalse(donor.canDonateTo(BloodType.of("A+")));
+    assertFalse(donor.canDonateTo(BloodType.of("O+")));
+  }
+}
+\end{lstlisting}
+
 \section{Resultados da execução}
 
 A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução concluída em 26 de agosto de 2026 obteve o resultado sintetizado na Tabela~\ref{tab:resultado-testes}.
