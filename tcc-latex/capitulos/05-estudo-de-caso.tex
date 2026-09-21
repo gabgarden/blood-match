@@ -409,16 +409,20 @@ A Tabela~\ref{tab:request-endpoints}, por sua vez, mapeia as rotas responsáveis
   \centering
   \caption{Solicitações de Doação (Request)}
   \label{tab:request-endpoints}
-  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\ttfamily\raggedright\arraybackslash}p{6cm}}
+  \begin{tabularx}{\textwidth}{
+      >{\raggedright\arraybackslash}p{2.5cm}
+      >{\raggedright\arraybackslash}p{5cm}
+      >{\ttfamily\raggedright\arraybackslash}X
+  }
     \toprule
     \textbf{Método HTTP} & \textbf{Descrição} & \textbf{URI} \\
     \midrule
-    POST & Criar Solicitação de Doação & /donation-requests \\
-    PATCH & Atualizar Solicitação de Doação & /donation-requests \\
-    GET & Buscar Solicitações por PartyId & /donation-requests/\{party\_id\} \\
+    POST   & Criar Solicitação de Doação & /donation-requests \\
+    PATCH  & Atualizar Solicitação de Doação & /donation-requests \\
+    GET    & Buscar Solicitações por PartyId & /donation-requests/\{party\_id\} \\
     DELETE & Cancelar Solicitação de Doação & /donation-requests/\{request\_id\} \\
-    GET & Obter Solicitações Recomendadas & /donation-requests/recommendations \\
-    POST & Enviar notificação para doadores elegíveis & /donation-requests/\{request\_id\}/notify \\
+    GET    & Obter Solicitações Recomendadas & /donation-requests/recommendations \\
+    POST   & Enviar notificação para doadores elegíveis & /donation-requests/\{request\_id\}/notify \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
