@@ -468,6 +468,19 @@ public class CreateDonationRequestController {
 }
 \end{lstlisting}
 
+A Figura~\ref{insomnia:create-donation-request} ilustra na prática a execução deste controlador por meio do cliente HTTP Insomnia. Observa-se a requisição enviada para a URI \codigo{/donation-requests} utilizando o verbo POST, contendo no corpo da requisição (\textit{Request Body}) o JSON com os dados preenchidos pelo requisitante.
+
+% print endpoint \donation-requests
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{insomnia-create-donation-request}
+  \caption{}
+  \fonte{Elaborado pelos próprios autores (2026).}
+  \label{insomnia:create-donation-request}
+\end{figure}
+
+A resposta gerada pelo sistema comprova o sucesso da operação, retornando o código de estado HTTP \codigo{201 Created}. O corpo da resposta (\textit{Response Body}) devolve ao cliente um novo JSON contendo o identificador único (\codigo{id}) gerado pelo domínio para a nova solicitação, atestando que a requisição transpassou as camadas de validação e foi persistida com sucesso.
+
 \subsection{Camada de Aplicação: Casos de Uso e o Padrão \textit{execute}}
 
 A camada de aplicação orquestra o fluxo de dados coordenando chamadas aos repositórios e aos serviços de domínio. O \codigo{CreateDonationRequestUseCase} carrega as entidades associadas (\codigo{Requester} e \codigo{BloodCenter}), invoca o \textit{static factory method} da entidade e instrui o repositório a persistir o novo agregado. Esta camada desconhece qualquer dependência de infraestrutura, utilizando exclusivamente portas de interfaces.
