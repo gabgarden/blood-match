@@ -311,6 +311,123 @@ As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de
 
 A implementação técnica da API orienta-se pelos princípios da arquitetura em camadas e do \textit{Domain-Driven Design} (DDD). Para fins de exemplificar a aplicação prática desses conceitos, esta seção demonstra o fluxo completo de uma entidade --- o registro de uma \textbf{Solicitação de Doação} (\codigo{DonationRequest}) ---, acompanhando a requisição desde a sua chegada no controlador REST até a sua persistência no banco de dados com controle de concorrência. Esse rastreamento horizontal ilustra o papel de cada camada arquitetural e as transformações sofridas pelos dados.
 
+\section{Endpoints da API RESTful}
+
+A arquitetura da API foi projetada para refletir diretamente os agrupamentos lógicos do domínio (\textit{Package-by-Entity}). Dessa forma, os \textit{endpoints} foram estruturados e organizados em torno dos principais agregados e entidades do sistema, promovendo alta coesão e previsibilidade no consumo dos recursos. Nas tabelas a seguir, apresentam-se as rotas mapeadas para cada módulo da aplicação, detalhando os métodos HTTP e suas respectivas finalidades.
+
+A Tabela 10 consolida os \textit{endpoints} de acesso público e gerenciamento de identidade, responsáveis por garantir a segurança e a entrada no sistema.
+
+% Tabela 10 (Auth)
+\begin{table}[H]
+  \centering
+  \caption{Autenticação e Acesso Público (Auth)}
+  \label{tab:auth-endpoints}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\ttfamily\raggedright\arraybackslash}p{6cm}}
+    \toprule
+    \textbf{Método HTTP} & \textbf{Descrição} & \textbf{URI} \\
+    \midrule
+    POST & Autenticar Usuário (Login) & /auth/login \\
+    GET & Confirmar E-mail (via link) & /auth/confirm-email?token= \\
+    POST & Confirmar E-mail (via payload) & /auth/confirm-email \\
+    POST & Reenviar Confirmação de E-mail & /auth/resend-confirmation \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+Este módulo atua como a fronteira de segurança da aplicação. A rota de autenticação é encarregada de validar credenciais e emitir o \textit{JSON Web Token} (JWT), exigido para o consumo das rotas privadas. Além disso, as rotas de confirmação de e-mail garantem a verificação em duas etapas, assegurando a validade e a titularidade dos canais de comunicação cadastrados pelos usuários.
+
+Na sequência, a Tabela 11 apresenta as rotas destinadas ao cadastro base dos participantes do sistema, abstraídos conceitualmente na arquitetura como \texttt{Party}.
+
+% Tabela 11 (Party)
+\begin{table}[H]
+  \centering
+  \caption{Participantes (Party)}
+  \label{tab:party-endpoints}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\ttfamily\raggedright\arraybackslash}p{6cm}}
+    \toprule
+    \textbf{Método HTTP} & \textbf{Descrição} & \textbf{URI} \\
+    \midrule
+    POST & Registrar Pessoa & /parties/persons \\
+    POST & Registrar Organização & /parties/organizations \\
+    PATCH & Atualizar Dados Cadastrais da Parte & /parties \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+Esses \textit{endpoints} operam no nível mais fundamental do cadastro, permitindo o registro e a manutenção de atributos comuns a pessoas físicas e organizações, como credenciais de acesso, dados de contato e localização. A separação dessas rotas reflete a modelagem do domínio, em que a identidade básica do participante existe independentemente da função específica que ele virá a desempenhar no processo de doação de sangue.
+
+Para gerenciar essas funções específicas, a Tabela 12 detalha as operações que permitem aos participantes base assumirem papéis (\textit{Roles}) dentro do ecossistema do banco de sangue.
+
+% Tabela 12 (Roles)
+\begin{table}[H]
+  \centering
+  \caption{Papéis e Perfis (Role)}
+  \label{tab:role-endpoints}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\ttfamily\raggedright\arraybackslash}p{6cm}}
+    \toprule
+    \textbf{Método HTTP} & \textbf{Descrição} & \textbf{URI} \\
+    \midrule
+    POST & Registrar perfil de Doador & /donors \\
+    PATCH & Atualizar perfil de Doador & /donors \\
+    GET & Acessar informações (Resumo) do Doador & /donors/\{person\_id\}/summary \\
+    POST & Registrar perfil de Requisitante & /requesters \\
+    POST & Registrar perfil de Hemocentro & /blood-centers \\
+    GET & Buscar Hemocentro(s) & /blood-centers/search \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+A estruturação destas requisições evidencia a flexibilidade da modelagem orientada a objetos adotada. Através dessas rotas, uma entidade do tipo \texttt{Person} pode se registrar como um Doador ou Requisitante, enquanto uma \texttt{Organization} pode assumir o papel de Hemocentro ou Requisitante. Adicionalmente, as rotas de consulta exclusivas deste pacote expõem dados sumarizados e públicos atrelados a esses perfis, facilitando a busca por hemocentros e a visualização de resumos clínicos.
+
+A Tabela 13, por sua vez, mapeia as rotas responsáveis pelo gerenciamento das campanhas de doação, concentrando as regras de negócio mais complexas da aplicação.
+
+% Tabela 13 (Request)
+\begin{table}[H]
+  \centering
+  \caption{Solicitações de Doação (Request)}
+  \label{tab:request-endpoints}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\ttfamily\raggedright\arraybackslash}p{6cm}}
+    \toprule
+    \textbf{Método HTTP} & \textbf{Descrição} & \textbf{URI} \\
+    \midrule
+    POST & Criar Solicitação de Doação & /donation-requests \\
+    PATCH & Atualizar Solicitação de Doação & /donation-requests \\
+    GET & Buscar Solicitações por PartyId & /donation-requests/\{party\_id\} \\
+    DELETE & Cancelar Solicitação de Doação & /donation-requests/\{request\_id\} \\
+    GET & Obter Solicitações Recomendadas & /donation-requests/recommendations \\
+    POST & Enviar notificação para doadores elegíveis & /donation-requests/\{request\_id\}/notify \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+Este agrupamento expõe as operações do agregado central \texttt{DonationRequest}. Ele abrange desde as transações de manutenção do ciclo de vida da solicitação (como criação, atualização de metas e cancelamento) até o acionamento dos motores heurísticos de compatibilidade. Destacam-se a rota de recomendação, desenhada para fornecer ao doador as campanhas mais aderentes ao seu perfil biológico e geográfico, e o \textit{endpoint} de notificação ativa, que delega ao sistema o engajamento de candidatos elegíveis.
+
+Por fim, a Tabela 14 expõe as rotas encarregadas do registro e da manutenção do histórico do ato hemoterápico propriamente dito.
+
+% Tabela 14 (Donation)
+\begin{table}[H]
+  \centering
+  \caption{Doações (Donation)}
+  \label{tab:donation-endpoints}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\ttfamily\raggedright\arraybackslash}p{6cm}}
+    \toprule
+    \textbf{Método HTTP} & \textbf{Descrição} & \textbf{URI} \\
+    \midrule
+    POST & Criar Doação (Pendente/Concluída) & /donations \\
+    PATCH & Completar Doação Pendente & /donations/complete \\
+    PATCH & Reagendar Doação Pendente & /donations/reschedule \\
+    GET & Acessar histórico de doações do doador & /donors/\{person\_id\}/donations \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026).}
+\end{table}
+
+O design destas rotas reflete a máquina de estados interna do agregado \texttt{Donation}. Em vez de um único ponto de atualização genérico para manipulação de dados, a API oferece semânticas declarativas e claras para transicionar a doação de uma intenção agendada (pendente) para uma efetivação (concluída) ou para um reagendamento. Tais rotas alimentam diretamente o histórico clínico dos doadores, afetando dinamicamente o cálculo de suas janelas de inaptidão temporal para doações futuras.
+
 \subsection{Camada de Apresentação: REST Controller e DTOs}
 
 A camada de apresentação atua como o ponto de entrada da aplicação, isolando o núcleo do sistema dos detalhes do protocolo HTTP. O \codigo{CreateDonationRequestController} é responsável por interceptar as requisições, executar validações sintáticas básicas e converter o \textit{payload} da requisição (DTO) para o modelo de entrada do caso de uso.
