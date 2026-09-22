@@ -39,10 +39,10 @@
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
 \contentsline {chapter}{\chapternumberline {4}\MakeTextUppercase []{Métodos e recursos}}{28}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Visão geral}{28}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Instrumentos e ferramentas}{31}{section.4.2}%
+\contentsline {section}{\numberline {4.2}Instrumentos e ferramentas}{30}{section.4.2}%
 \contentsline {subsection}{\numberline {4.2.1}Pesquisa exploratória-descritiva}{31}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Desenvolvimento da API}{32}{subsection.4.2.2}%
-\contentsline {subsubsection}{\numberline {4.2.2.1}Linguagem de programação (Java)}{32}{subsubsection.4.2.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Desenvolvimento da API}{31}{subsection.4.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.2.1}Linguagem de programação (Java)}{31}{subsubsection.4.2.2.1}%
 \contentsline {subsubsection}{\numberline {4.2.2.2}\textit {Framework} de desenvolvimento (Spring Boot)}{32}{subsubsection.4.2.2.2}%
 \contentsline {subsubsection}{\numberline {4.2.2.3}Ambiente de desenvolvimento e versionamento (Visual Studio Code e Git)}{32}{subsubsection.4.2.2.3}%
 \setlength {\cftchapterindent }{0em} \setlength {\cftchapternumwidth }{\cftlastnumwidth }
