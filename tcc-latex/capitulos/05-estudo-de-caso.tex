@@ -410,19 +410,19 @@ A Tabela~\ref{tab:request-endpoints}, por sua vez, mapeia as rotas responsáveis
   \caption{Solicitações de Doação (Request)}
   \label{tab:request-endpoints}
   \begin{tabularx}{\textwidth}{
-      >{\raggedright\arraybackslash}p{2.5cm}
-      >{\raggedright\arraybackslash}p{5cm}
-      >{\ttfamily\raggedright\arraybackslash}X
+      >{\raggedright\arraybackslash}p{2.3cm}
+      >{\raggedright\arraybackslash}p{4.7cm}
+      X
   }
     \toprule
     \textbf{Método HTTP} & \textbf{Descrição} & \textbf{URI} \\
     \midrule
-    POST   & Criar Solicitação de Doação & /donation-requests \\
-    PATCH  & Atualizar Solicitação de Doação & /donation-requests \\
-    GET    & Buscar Solicitações por PartyId & /donation-requests/\{party\_id\} \\
-    DELETE & Cancelar Solicitação de Doação & /donation-requests/\{request\_id\} \\
-    GET    & Obter Solicitações Recomendadas & /donation-requests/recommendations \\
-    POST   & Enviar notificação para doadores elegíveis & /donation-requests/\{request\_id\}/notify \\
+    POST   & Criar Solicitação de Doação & \path{/donation-requests} \\
+    PATCH  & Atualizar Solicitação de Doação & \path{/donation-requests} \\
+    GET    & Buscar Solicitações por PartyId & \path{/donation-requests/{party_id}} \\
+    DELETE & Cancelar Solicitação de Doação & \path{/donation-requests/{request_id}} \\
+    GET    & Obter Solicitações Recomendadas & \path{/donation-requests/recommendations} \\
+    POST   & Enviar notificação para doadores elegíveis & \path{/donation-requests/{request_id}/notify} \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
