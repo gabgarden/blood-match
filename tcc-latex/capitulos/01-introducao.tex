@@ -18,7 +18,7 @@ Falta um mecanismo sistemático que aproxime requisitantes e doadores segundo cr
 Diante dessa lacuna, este trabalho propõe uma API RESTful que intermedia as solicitações de unidades de saúde e pacientes e os doadores disponíveis, recomendando correspondências compatíveis de forma a promover a captação efetiva de possíveis doadores.
 
 % Vantagens
-Essa abordagem apresenta a vantagem de tornar a captação mais efetiva, ao substituir a divulgação genérica por um encontro dirigido entre oferta e demanda. Além disso, o desenvolvimento utilizando as técnicas de \textit{Domain-Driven Design} (DDD) facilita a modelagem das regras de negócio da doação sanguínea \cite{evans2003}, enquanto a adoção dos princípios SOLID \cite{martin2000} garante uma arquitetura robusta e escalável, promovendo futuras expansões e um longo ciclo de vida ao sistema, que estará preparado para receber integrações com facilidade.
+Essa abordagem apresenta a vantagem de tornar a captação mais efetiva, ao substituir a divulgação genérica por um encontro dirigido entre oferta e demanda. Do ponto de vista arquitetural, é fundamental reconhecer que sistemas de saúde e de doação de sangue operam sobre regras de negócio densas, mutáveis e de extrema criticidade. Diante dessa complexidade, o desenvolvimento pautado no \textit{Domain-Driven Design} (DDD) \cite{evans2003} entra como a resposta técnica ideal para evitar a construção de um modelo de domínio anêmico. A abordagem aproxima, de forma orgânica, o \textit{software} da realidade clínica dos hemocentros através da Linguagem Ubíqua, garantindo que os termos do negócio e as restrições sanitárias sejam traduzidos fielmente para o código. Além disso, a adoção dos princípios SOLID \cite{martin2000} garante uma arquitetura robusta e escalável, promovendo futuras expansões e um longo ciclo de vida ao sistema, que estará preparado para receber integrações com facilidade.
 
 \section{Objetivos}
 
@@ -42,4 +42,4 @@ Ademais, no plano social e de saúde coletiva, a proposta alinha-se diretamente 
 
 \section{Organização da monografia}
 
-O Capítulo~2 apresenta o referencial teórico (orientação a objetos, SOLID e DDD). O Capítulo~3 relata o mapeamento sistemático da literatura e os trabalhos relacionados. O Capítulo~4 descreve métodos, instrumentos e cronograma. O Capítulo~5 detalha a API RESTful proposta (requisitos, análise, design e implementação). O Capítulo~6 trata da avaliação. O Capítulo~7 reúne as considerações finais.
+O Capítulo~2 apresenta o referencial teórico (orientação a objetos, SOLID, DDD, lógica de recomendação e controle de concorrência otimista). O Capítulo~3 relata o mapeamento sistemático da literatura e os trabalhos relacionados. O Capítulo~4 descreve métodos, instrumentos e cronograma. O Capítulo~5 detalha a API RESTful proposta (requisitos, análise, design e implementação). O Capítulo~6 trata da avaliação. O Capítulo~7 reúne as considerações finais.
