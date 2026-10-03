@@ -1,6 +1,6 @@
 ﻿\chapter{Métodos e recursos}
 
-Neste capítulo são descritos os procedimentos metodológicos adotados para o alcance dos objetivos propostos, abordando a abordagem de pesquisa escolhida, os instrumentos utilizados na coleta e análise de informações e as ferramentas empregadas no desenvolvimento da API.
+Neste capítulo são descritos os procedimentos metodológicos adotados para o alcance dos objetivos propostos, abordando a abordagem de pesquisa escolhida, os instrumentos utilizados na coleta e análise de informações, o inventário das ferramentas tecnológicas empregadas e a aplicação prática dessas tecnologias no desenvolvimento da API.
 
 \section{Visão geral}
 
@@ -32,13 +32,11 @@ Inicialmente, definiu-se o escopo da pesquisa, o problema, as justificativas e o
 
 Paralelamente, realizou-se o mapeamento do processo de um hemocentro por meio de pesquisa documental e bibliográfica, buscando compreender o fluxo de trabalho, as regras de negócio e as necessidades do domínio da doação de sangue. Elaborou-se também um protocolo de mapeamento sistemático da literatura, cujos resultados são discutidos no Capítulo~3.
 
-Com base no conhecimento adquirido nessas etapas, realizou-se a análise do domínio sob a ótica do DDD e a definição dos requisitos funcionais e não funcionais. Na sequência, elaborou-se o projeto da solução (casos de uso e diagramas de classes) e desenvolveu-se a API aplicando SOLID, com vistas à escalabilidade, manutenibilidade e testabilidade.
+Com base no conhecimento adquirido nessas etapas, realizou-se a análise do domínio sob a ótica do DDD e a definição dos requisitos funcionais e não funcionais. Na sequência, elaborou-se o projeto da solução e desenvolveu-se a API, culminando na avaliação estrutural e funcional validada por testes automatizados.
 
-Por fim, os resultados foram avaliados por meio de testes unitários e de integração, seguidos da elaboração das conclusões do trabalho.
+\section{Instrumentos metodológicos da pesquisa}
 
-\section{Instrumentos e ferramentas}
-
-Para a coleta e análise dos dados, foram utilizados instrumentos compatíveis com os objetivos e a abordagem metodológica da pesquisa, orientados pela necessidade de obter informações confiáveis e contextualizadas sobre o cenário da doação de sangue e sobre as tecnologias empregadas no desenvolvimento da API.
+Para a coleta e análise dos dados, foram utilizados instrumentos compatíveis com os objetivos e a abordagem metodológica da pesquisa, orientados pela necessidade de obter informações confiáveis e contextualizadas sobre o cenário da doação de sangue.
 
 \subsection{Pesquisa exploratória-descritiva}
 
@@ -48,22 +46,38 @@ O contexto de análise adotado foi o das normativas e do cenário de atuação d
 
 Segundo \citeonline{pressman2016}, o esforço inicial de compreensão do domínio e das necessidades reais dos \textit{stakeholders} é indispensável para criar uma base sólida de requisitos e evitar o desenvolvimento de sistemas inadequados à realidade operacional. Nesse sentido, utilizou-se a análise documental e bibliográfica como técnica de coleta de dados, por permitir profundidade na obtenção de informações normativas e procedimentais a partir de manuais do Ministério da Saúde, portarias vigentes e literatura acadêmica.
 
-Segundo \citeonline{marconi2003}, a pesquisa documental é composta por etapas fundamentais --- como a seleção, leitura crítica e categorização dos dados --- que garantem a sistematização e a confiabilidade das informações obtidas. \citeonline{sommerville2011} reforça que a análise de documentos atua como instrumento de captura e construção do conhecimento, sendo essencial para a engenharia de requisitos em sistemas críticos, como os voltados à saúde pública.
+Segundo \citeonline{marconi2003}, a pesquisa documental é composta por etapas fundamentais --- como a seleção, leitura crítica e categorização dos dados --- que garantem a sistematização e a confiabilidade das informações obtidas. \citeonline{sommerville2011} reforça que a análise de documentos atua como instrumento de captura e construção do conhecimento, sendo essencial para a engenharia de requisitos em sistemas críticos, como os voltados à saúde pública. O levantamento realizado a partir de documentos oficiais e estudos de caso teve como objetivo compreender os fatores que influenciam a decisão de doar sangue e subsidiar os requisitos da API proposta.
 
-O levantamento realizado a partir de documentos oficiais e estudos de caso sobre triagem, captação e gestão em hemocentros teve como objetivo compreender os fatores que influenciam a decisão de doar sangue, identificar barreiras e motivações entre potenciais doadores descritos na literatura, e subsidiar os requisitos da API proposta.
+\section{Recursos e Ferramentas Tecnológicas}
+\label{sec:recursos-tecnologicos}
 
-\subsection{Desenvolvimento da API}
+Para o desenvolvimento da API RESTful, estabeleceu-se um ecossistema tecnológico fundamentado em ferramentas consolidadas no mercado corporativo, selecionadas por sua robustez, suporte a padrões arquiteturais e vasta documentação comunitária. A linguagem base adotada foi o Java, em sua versão 21 (\textit{Long Term Support} --- LTS), escolhida por sua forte tipagem estática e pelo suporte a recursos modernos como \textit{Records}, ideais para a construção de Objetos de Valor e DTOs imutáveis \cite{deitel2017}. Em conjunto com a linguagem, empregou-se o \textit{framework} Spring Boot 3, que atuou como o contêiner de inversão de controle, simplificando significativamente a configuração de servidores \textit{web} embutidos e a orquestração de dependências do projeto \cite{walls2019}.
 
-O desenvolvimento da API foi orientado por boas práticas de engenharia de \textit{software}, com foco na escalabilidade, na manutenibilidade e na clareza estrutural do código. Adotou-se DDD e SOLID como diretrizes arquiteturais (Seções~\ref{sec:ddd} e~\ref{sec:solid}). A camada de segurança contempla autenticação baseada em \textit{JSON Web Token} (JWT), padrão amplamente adotado em APIs RESTful para autenticação sem estado (\textit{stateless}).
+No que tange ao armazenamento, o mecanismo de persistência selecionado foi o banco de dados não relacional (NoSQL) orientado a documentos MongoDB, justificado por sua flexibilidade na representação estrutural de agregados complexos, suporte nativo a índices geoespaciais e controle de concorrência otimista. Dada a flexibilidade do MongoDB em não exigir um esquema rígido (\textit{schema-less}), a evolução estrutural e o mapeamento dos documentos foram gerenciados de forma declarativa pela própria camada de aplicação, utilizando os recursos do Spring Data MongoDB.
 
-\subsubsection{Linguagem de programação (Java)}
+Para assegurar a qualidade do \textit{software}, adotaram-se as bibliotecas JUnit 5 e Mockito como peças fundamentais. O JUnit 5 forneceu o motor principal de execução para a suíte de testes, enquanto o Mockito viabilizou a criação de objetos simulados (\textit{mocks}), permitindo testar as regras de domínio em total isolamento da infraestrutura externa. A interface de comunicação da aplicação, por sua vez, foi mapeada e descrita utilizando as especificações OpenAPI associadas ao Swagger, ferramentas que expuseram os contratos (\textit{endpoints}) da API RESTful de forma padronizada e visual. Por fim, o processo de codificação foi conduzido no Ambiente de Desenvolvimento Integrado (IDE) Visual Studio Code, operando em sincronia com o Git, que gerenciou o histórico e o controle distribuído do código-fonte, mitigando perdas e viabilizando a paralelização do trabalho \cite{chacon2014}.
 
-A linguagem escolhida para a implementação foi o Java, em sua versão 17 (\textit{Long Term Support} --- LTS). Java é uma linguagem orientada a objetos, fortemente tipada e amplamente documentada na literatura \cite{deitel2017}. A tipagem estática do Java favorece a implementação de \textit{Value Objects} e \textit{Entities}, garantindo que erros de domínio sejam capturados em tempo de compilação. Em contrapartida, uma crítica comum ao Java é a sua verbosidade e o consumo de memória da \textit{Java Virtual Machine} (JVM), se comparado a linguagens como Go ou Python, conforme discutido por \citeonline{bloch2018}. Ainda assim, a robustez da linguagem compensa essas restrições para o contexto corporativo.
+\section{Procedimentos Metodológicos e Aplicação Prática}
+\label{sec:procedimentos-praticos}
 
-\subsubsection{\textit{Framework} de desenvolvimento (Spring Boot)}
+Esta seção descreve os processos operacionais estabelecidos para traduzir os requisitos teóricos em código funcional, conectando as ferramentas elencadas na Seção~\ref{sec:recursos-tecnologicos} às diretrizes metodológicas do projeto.
 
-Para agilizar o desenvolvimento e a configuração da infraestrutura, utilizou-se o \textit{framework} Spring Boot. Segundo \citeonline{walls2019}, o Spring Boot aplica o conceito de ``convenção sobre configuração'', permitindo que o desenvolvedor foque na lógica de negócio enquanto o \textit{framework} gerencia a injeção de dependência e a conexão com o banco de dados. Por outro lado, a facilidade do Spring pode esconder a complexidade subjacente, dificultando o \textit{debug} (depuração) caso o desenvolvedor não entenda o ciclo de vida dos \textit{beans} gerenciados pelo \textit{container}.
+\subsection{Modelagem guiada pelo \textit{Domain-Driven Design} (DDD)}
 
-\subsubsection{Ambiente de desenvolvimento e versionamento (Visual Studio Code e Git)}
+O desenvolvimento não teve início direto na codificação de banco de dados ou de telas, mas sim na destilação do conhecimento do domínio hemoterápico. Sob a ótica do \textit{design} estratégico do DDD, as discussões iniciais de levantamento de requisitos conduziram ao mapeamento dos contextos delimitados (\textit{Bounded Contexts}). Identificou-se a separação funcional entre o núcleo de captação e ranqueamento das doações e as fronteiras auxiliares de perfis e autenticação.
 
-Para a codificação, utilizou-se o editor de código Visual Studio Code (VS Code), devido ao seu vasto ecossistema de extensões para Java e suporte nativo a terminais leves. Para o controle de versão, adotou-se o Git, hospedando o repositório na plataforma GitHub. Segundo \citeonline{chacon2014}, o versionamento distribuído é essencial para manter o histórico de alterações seguro e permitir ramificações (\textit{branches}) para testes de novas funcionalidades sem comprometer o código estável (\textit{main}).
+No aspecto do \textit{design} tático, o mapeamento de agregados foi o procedimento central. As regras biológicas extraídas dos manuais da área da saúde guiaram a criação de classes de Domínio (\textit{Entities} e \textit{Value Objects}). O fluxo de vida de uma solicitação de doação foi estritamente encapsulado sob a Raiz do Agregado \texttt{DonationRequest}. Para assegurar a Linguagem Ubíqua, todos os pacotes, classes e métodos foram nomeados utilizando termos diretamente mapeados do domínio (ex: \texttt{BloodType}, \texttt{Requester}, \texttt{EligibilityRule}).
+
+\subsection{Evolução estrutural e persistência de dados}
+
+Com o domínio estabelecido, a persistência foi aplicada respeitando as características de um banco de dados orientado a documentos. Diferentemente de bancos relacionais que exigem ferramentas de versionamento de esquema estrito, o processo operacional de evolução do banco no MongoDB ocorreu de forma fluida por meio do mapeamento objeto-documento (\textit{Object-Document Mapping} --- ODM) provido pelo Spring Data MongoDB. As coleções e os índices de performance --- com destaque para o índice geoespacial \texttt{2dsphere}, crítico para o cálculo de proximidade dos doadores --- foram declarados via código e validados na inicialização da aplicação, assegurando que as regras de persistência refletissem o estado dos agregados de forma ágil e alinhada ao paradigma NoSQL.
+
+\subsection{Integração de testes automatizados e isolamento de regras}
+
+A cultura de qualidade foi incorporada ao método de trabalho desde as etapas primárias. A estratégia operacional consistiu em validar exaustivamente a camada de domínio por meio do JUnit 5, isolando os testes das camadas de entrada (controladores REST) e de saída (bancos de dados). 
+
+Para validar fluxos de serviços (Casos de Uso) sem acessar a infraestrutura real, o Mockito foi empregado no procedimento de injetar dependências simuladas, mimetizando repositórios de banco de dados. Esse isolamento permitiu que a equipe refatorasse lógicas complexas --- como a validação de compatibilidade sanguínea e o cálculo do teto proporcional de bolsas --- com a garantia de que regressões seriam detectadas em milissegundos pela suíte de testes.
+
+\subsection{Prototipação visual e documentação de \textit{endpoints}}
+
+Por se tratar de uma API de \textit{backend}, sem interface de usuário final desenvolvida na pesquisa, o procedimento de documentação das rotas assumiu um papel crítico. Operacionalmente, as classes controladoras da aplicação foram decoradas com anotações do padrão OpenAPI. Conforme as rotas eram desenvolvidas (ex: rotas \texttt{POST} para criação de solicitações e \texttt{GET} para matching de doadores), a biblioteca do Swagger operava a leitura destas assinaturas. O resultado prático foi a disponibilização automática de uma interface gráfica interativa (Swagger UI), capaz de atuar simultaneamente como contrato documentado para futuras aplicações cliente (\textit{front-end}) e como ambiente de testes ad hoc durante o ciclo de desenvolvimento.
