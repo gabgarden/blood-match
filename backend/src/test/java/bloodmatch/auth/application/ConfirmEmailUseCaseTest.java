@@ -57,6 +57,24 @@ class ConfirmEmailUseCaseTest {
   }
 
   @Test
+  void shouldRejectNullConstructorArgsAndNullToken() {
+    assertThrows(IllegalArgumentException.class, () -> new ConfirmEmailUseCase(null));
+    assertThrows(ValidationException.class, () -> useCase.execute(null));
+  }
+
+  @Test
+  void shouldCatchIllegalArgumentExceptionAndRethrowValidationException() {
+    UserAccount mockAccount = mock(UserAccount.class);
+    when(userAccountRepository.findByEmailConfirmationToken("bad-token"))
+        .thenReturn(Optional.of(mockAccount));
+    org.mockito.Mockito.doThrow(new IllegalArgumentException("Token mismatch"))
+        .when(mockAccount).confirmEmail("bad-token");
+
+    ValidationException ex = assertThrows(ValidationException.class, () -> useCase.execute("bad-token"));
+    assertEquals("Token mismatch", ex.getMessage());
+  }
+
+  @Test
   void shouldRejectExpiredToken() {
     UserAccount userAccount = pendingAccount("expired-token", LocalDateTime.now().minusMinutes(1));
     when(userAccountRepository.findByEmailConfirmationToken("expired-token"))

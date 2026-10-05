@@ -24,6 +24,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -93,6 +94,68 @@ class RegisterDonorUseCaseTest {
     ArgumentCaptor<Donor> captor = ArgumentCaptor.forClass(Donor.class);
     verify(donorRepository).save(captor.capture());
     assertNull(captor.getValue().getLastDonationDate());
+  }
+
+  @Test
+  void shouldRejectNullConstructorArgs() {
+    assertThrows(IllegalArgumentException.class, () -> new RegisterDonorUseCase(null, personRepository, userAccountRepository, geocodingService));
+    assertThrows(IllegalArgumentException.class, () -> new RegisterDonorUseCase(donorRepository, null, userAccountRepository, geocodingService));
+    assertThrows(IllegalArgumentException.class, () -> new RegisterDonorUseCase(donorRepository, personRepository, null, geocodingService));
+    assertThrows(IllegalArgumentException.class, () -> new RegisterDonorUseCase(donorRepository, personRepository, userAccountRepository, null));
+  }
+
+  @Test
+  void shouldGeocodePersonAddressWhenNoCoordinates() {
+    Person person = newPerson();
+    person.changeAddress(new bloodmatch.shared.domain.valueObjects.Address("Rua A", "SP", "SP", "01001-000"));
+    stubSuccessfulLookup(person);
+
+    when(geocodingService.getCoordinatesFromAddress(any())).thenReturn(
+        new bloodmatch.shared.domain.valueObjects.Address("Rua A", "SP", "SP", "01001-000", -23.5, -46.6));
+
+    useCase.execute(new Input(person.getId().getValue().toString(), "A+", 70.0, null));
+    verify(geocodingService).getCoordinatesFromAddress(any());
+    verify(personRepository).save(person);
+  }
+
+  @Test
+  void shouldValidateInputAndExceptions() {
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(null));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input("id", null, 70.0, null)));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input("id", "", 70.0, null)));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(DomainID.generate().getValue().toString(), "INVALID", 70.0, null)));
+  }
+
+  @Test
+  void shouldThrowWhenPersonNotFoundOrAlreadyRegisteredOrUserAccountMissing() {
+    DomainID personId = DomainID.generate();
+    when(personRepository.findById(personId)).thenReturn(Optional.empty());
+    assertThrows(bloodmatch.shared.application.exception.NotFoundException.class, () -> useCase.execute(
+        new Input(personId.getValue().toString(), "A+", 70.0, null)));
+
+    Person person = newPerson();
+    when(personRepository.findById(person.getId())).thenReturn(Optional.of(person));
+    when(donorRepository.findByPartyId(person.getId())).thenReturn(Optional.of(mock(Donor.class)));
+    assertThrows(bloodmatch.shared.application.exception.ConflictException.class, () -> useCase.execute(
+        new Input(person.getId().getValue().toString(), "A+", 70.0, null)));
+
+    when(donorRepository.findByPartyId(person.getId())).thenReturn(Optional.empty());
+    when(userAccountRepository.findByPartyId(person.getId())).thenReturn(Optional.empty());
+    assertThrows(bloodmatch.shared.application.exception.NotFoundException.class, () -> useCase.execute(
+        new Input(person.getId().getValue().toString(), "A+", 70.0, null)));
+  }
+
+  @Test
+  void shouldThrowValidationExceptionWhenDonorDomainThrows() {
+    Person person = newPerson();
+    stubSuccessfulLookup(person);
+
+    // Negative weight causes domain exception
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(person.getId().getValue().toString(), "A+", -10.0, null)));
   }
 
   private Person newPerson() {

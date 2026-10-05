@@ -4,6 +4,7 @@ import bloodmatch.role.application.RegisterRequesterUseCase.Input;
 import bloodmatch.role.application.RegisterRequesterUseCase.Output;
 import bloodmatch.party.domain.Person;
 import bloodmatch.party.domain.PartyRepositoryInterface;
+import bloodmatch.role.domain.requester.Requester;
 import bloodmatch.role.domain.requester.RequesterRepositoryInterface;
 import bloodmatch.auth.domain.UserAccountRepositoryInterface;
 import bloodmatch.auth.domain.SecurityRole;
@@ -61,5 +62,36 @@ class RegisterRequesterUseCaseTest {
     assertTrue(userAccount.getRoles().contains(SecurityRole.REQUESTER));
     verify(requesterRepository).save(any());
     verify(userAccountRepository).save(userAccount);
+  }
+
+  @Test
+  void shouldRejectNullConstructorArgs() {
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new RegisterRequesterUseCase(null, partyRepository, userAccountRepository));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new RegisterRequesterUseCase(requesterRepository, null, userAccountRepository));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new RegisterRequesterUseCase(requesterRepository, partyRepository, null));
+  }
+
+  @Test
+  void shouldValidateInputAndNullChecks() {
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(null));
+  }
+
+  @Test
+  void shouldThrowWhenPartyNotFoundOrAlreadyRegisteredOrAccountMissing() {
+    DomainID partyId = DomainID.generate();
+    when(partyRepository.findById(partyId)).thenReturn(Optional.empty());
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.NotFoundException.class,
+        () -> useCase.execute(new Input(partyId.getValue().toString())));
+
+    Person party = new Person("P", new PhoneNumber("11999990000"), new CPF("98765432100"), LocalDate.of(1992, 2, 2));
+    when(partyRepository.findById(partyId)).thenReturn(Optional.of(party));
+    when(requesterRepository.findByPartyId(partyId)).thenReturn(Optional.of(mock(Requester.class)));
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ConflictException.class,
+        () -> useCase.execute(new Input(partyId.getValue().toString())));
+
+    when(requesterRepository.findByPartyId(partyId)).thenReturn(Optional.empty());
+    when(userAccountRepository.findByPartyId(partyId)).thenReturn(Optional.empty());
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.NotFoundException.class,
+        () -> useCase.execute(new Input(partyId.getValue().toString())));
   }
 }

@@ -92,6 +92,24 @@ class CancelDonationRequestUseCaseTest {
     verify(donationRequestRepository).save(request);
   }
 
+  @Test
+  void shouldRejectNullConstructorAndNullInput() {
+    assertThrows(IllegalArgumentException.class, () -> new CancelDonationRequestUseCase(null));
+    assertThrows(ValidationException.class, () -> useCase.execute(null));
+  }
+
+  @Test
+  void shouldThrowConcurrencyExceptionOnVersionMismatch() {
+    DonationRequest request = createRequest();
+    request.setVersion(2L);
+    DomainID requestId = request.getId();
+
+    when(donationRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
+
+    assertThrows(bloodmatch.shared.application.exception.ConcurrencyException.class,
+        () -> useCase.execute(new Input(requestId.getValue().toString(), 1L, requesterPartyId(request))));
+  }
+
   private static String requesterPartyId(DonationRequest request) {
     return request.getRequester().getParty().getId().getValue().toString();
   }

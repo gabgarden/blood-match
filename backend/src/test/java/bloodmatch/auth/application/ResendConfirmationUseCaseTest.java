@@ -89,9 +89,50 @@ class ResendConfirmationUseCaseTest {
   @Test
   void shouldNotRevealInvalidEmailFormat() {
     ResendConfirmationUseCase.Output output = useCase.execute("not-an-email");
-
     assertEquals(MESSAGE, output.message());
     verify(emailConfirmationMailer, never()).sendConfirmationEmail(any(), any(), any());
+  }
+
+  @Test
+  void shouldRejectNullConstructorArgs() {
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new ResendConfirmationUseCase(null, partyRepository, emailConfirmationMailer, "url"));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new ResendConfirmationUseCase(userAccountRepository, null, emailConfirmationMailer, "url"));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new ResendConfirmationUseCase(userAccountRepository, partyRepository, null, "url"));
+  }
+
+  @Test
+  void shouldNotSendEmailWhenAccountHasNoConfirmationToken() {
+    UserAccount userAccount = new UserAccount(
+        DomainID.generate(),
+        new Email("notoken@bloodmatch.com"),
+        "hash",
+        Set.of());
+    userAccount.disable();
+
+    when(userAccountRepository.findByEmail(new Email("notoken@bloodmatch.com")))
+        .thenReturn(Optional.of(userAccount));
+
+    ResendConfirmationUseCase.Output output = useCase.execute("notoken@bloodmatch.com");
+    assertEquals(MESSAGE, output.message());
+    verify(emailConfirmationMailer, never()).sendConfirmationEmail(any(), any(), any());
+  }
+
+  @Test
+  void shouldIncludeRecipientNameWhenPartyExists() {
+    UserAccount userAccount = pendingAccount("token123");
+    bloodmatch.party.domain.Person person = new bloodmatch.party.domain.Person(
+        "Maria", new bloodmatch.shared.domain.valueObjects.PhoneNumber("11988887777"),
+        new bloodmatch.shared.domain.valueObjects.CPF("12345678901"), java.time.LocalDate.of(1990, 1, 1));
+
+    when(userAccountRepository.findByEmail(new Email("pending@bloodmatch.com")))
+        .thenReturn(Optional.of(userAccount));
+    when(partyRepository.findById(userAccount.getPartyId())).thenReturn(Optional.of(person));
+
+    useCase.execute("pending@bloodmatch.com");
+    verify(emailConfirmationMailer).sendConfirmationEmail(
+        eq("pending@bloodmatch.com"),
+        eq("Maria"),
+        contains("/confirm-email?token="));
   }
 
   private static UserAccount pendingAccount(String token) {

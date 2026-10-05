@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -139,6 +140,132 @@ class DonationRequestTest {
     DonationRequest request = requestWith(2, 5);
 
     assertThrows(IllegalArgumentException.class, () -> request.proportionalGoalAt(null));
+  }
+
+  // --- Validações de Construtor e Reconstituição ---
+
+  @Test
+  void shouldRejectNullOrInvalidConstructorArguments() {
+    Requester requester = new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1)));
+    BloodType bloodType = BloodType.of("A+");
+
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(null, bloodCenter, bloodType, 5, dateLimit, requestedAt, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(requester, null, bloodType, 5, dateLimit, requestedAt, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(requester, bloodCenter, null, 5, dateLimit, requestedAt, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(requester, bloodCenter, bloodType, 0, dateLimit, requestedAt, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(requester, bloodCenter, bloodType, -1, dateLimit, requestedAt, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(requester, bloodCenter, bloodType, 5, null, requestedAt, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(requester, bloodCenter, bloodType, 5, dateLimit, null, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(requester, bloodCenter, bloodType, 5, dateLimit, requestedAt, null, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.create(requester, bloodCenter, bloodType, 5, requestedAt.minusDays(1), requestedAt, Urgency.MEDIUM, null));
+  }
+
+  @Test
+  void shouldRejectNullOrInvalidReconstituteArguments() {
+    Requester requester = new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1)));
+    BloodType bloodType = BloodType.of("A+");
+    DomainID id = nextId();
+
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.reconstitute(null, requester, bloodCenter, bloodType, 5, requestedAt, dateLimit, true, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.reconstitute(id, null, bloodCenter, bloodType, 5, requestedAt, dateLimit, true, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.reconstitute(id, requester, null, bloodType, 5, requestedAt, dateLimit, true, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.reconstitute(id, requester, bloodCenter, null, 5, requestedAt, dateLimit, true, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.reconstitute(id, requester, bloodCenter, bloodType, 0, requestedAt, dateLimit, true, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.reconstitute(id, requester, bloodCenter, bloodType, 5, null, dateLimit, true, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.reconstitute(id, requester, bloodCenter, bloodType, 5, requestedAt, null, true, Urgency.MEDIUM, null));
+    assertThrows(IllegalArgumentException.class, () -> DonationRequest.reconstitute(id, requester, bloodCenter, bloodType, 5, requestedAt, dateLimit, true, null, null));
+  }
+
+  @Test
+  void shouldSupportReconstituteWithVersionAndGetters() {
+    Requester requester = new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1)));
+    BloodType bloodType = BloodType.of("A+");
+    DomainID id = nextId();
+
+    DonationRequest reconstituted = DonationRequest.reconstitute(id, requester, bloodCenter, bloodType, 10, requestedAt, dateLimit, true, Urgency.CRITICAL, "Patient John", 3L);
+
+    assertEquals(id, reconstituted.getId());
+    assertEquals(requester, reconstituted.getRequester());
+    assertEquals(bloodCenter, reconstituted.getBloodCenter());
+    assertEquals(bloodType, reconstituted.getBloodTypeNeeded());
+    assertEquals(10, reconstituted.getGoalBloodBags());
+    assertEquals(requestedAt, reconstituted.getDateRequested());
+    assertEquals(dateLimit, reconstituted.getDateLimit());
+    assertEquals(Urgency.CRITICAL, reconstituted.getUrgency());
+    assertEquals("Patient John", reconstituted.getDirectedTo());
+    assertEquals(3L, reconstituted.getVersion());
+    assertTrue(reconstituted.isActive());
+
+    // Reconstitute without version overload
+    DonationRequest withoutVersion = DonationRequest.reconstitute(id, requester, bloodCenter, bloodType, 10, requestedAt, dateLimit, true, Urgency.CRITICAL, "Patient John");
+    assertEquals(id, withoutVersion.getId());
+    assertNull(withoutVersion.getVersion());
+  }
+
+  @Test
+  void shouldThrowWhenClosingAlreadyClosedRequest() {
+    DonationRequest request = request(BloodType.of("A+"));
+    request.close();
+    assertFalse(request.isActive());
+    assertThrows(IllegalStateException.class, request::close);
+  }
+
+  @Test
+  void shouldSupportDefaultCreateAndIsExpired() {
+    Requester requester = new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1)));
+    DonationRequest req = DonationRequest.create(requester, bloodCenter, BloodType.of("O+"), 3, LocalDate.now().plusDays(2), Urgency.LOW, "Patient");
+    assertFalse(req.isExpired());
+    assertThrows(IllegalArgumentException.class, () -> req.isExpired(null));
+  }
+
+  @Test
+  void shouldVerifyCanBeFulfilledBy() {
+    DonationRequest request = request(BloodType.of("A+"));
+
+    assertThrows(IllegalArgumentException.class, () -> request.canBeFulfilledBy(null, requestedAt));
+    assertThrows(IllegalArgumentException.class, () -> request.canBeFulfilledBy(BloodType.of("A+"), null));
+
+    assertTrue(request.canBeFulfilledBy(BloodType.of("O-"), requestedAt));
+    assertTrue(request.canBeFulfilledBy(BloodType.of("A+"), requestedAt));
+    assertFalse(request.canBeFulfilledBy(BloodType.of("B+"), requestedAt));
+
+    // Inactive request cannot be fulfilled
+    request.close();
+    assertFalse(request.canBeFulfilledBy(BloodType.of("O-"), requestedAt));
+
+    // Expired request cannot be fulfilled
+    DonationRequest activeReq = request(BloodType.of("A+"));
+    assertFalse(activeReq.canBeFulfilledBy(BloodType.of("O-"), dateLimit.plusDays(1)));
+
+    // Default canBeFulfilledBy overload
+    DonationRequest futureReq = DonationRequest.create(
+        new Requester(new Person("Requester", new PhoneNumber("11999990000"), new CPF("12345678901"), LocalDate.of(1990, 1, 1))),
+        bloodCenter, BloodType.of("A+"), 2, LocalDate.now().plusDays(5), Urgency.MEDIUM, null);
+    assertTrue(futureReq.canBeFulfilledBy(BloodType.of("A+")));
+
+    // proportionalGoalAt when elapsedDays > windowDays
+    assertEquals(0, BigDecimal.valueOf(2).compareTo(futureReq.proportionalGoalAt(LocalDate.now().plusDays(10))));
+  }
+
+  @Test
+  void shouldUpdateGoalBloodBags() {
+    DonationRequest request = request(BloodType.of("A+"));
+    request.setGoalBloodBags(15);
+    assertEquals(15, request.getGoalBloodBags());
+
+    assertThrows(IllegalArgumentException.class, () -> request.setGoalBloodBags(0));
+    assertThrows(IllegalArgumentException.class, () -> request.setGoalBloodBags(-5));
+  }
+
+  @Test
+  void shouldUpdateDateLimit() {
+    DonationRequest request = request(BloodType.of("A+"));
+    LocalDate newLimit = LocalDate.now().plusDays(10);
+    request.setDateLimit(newLimit);
+    assertEquals(newLimit, request.getDateLimit());
+
+    assertThrows(IllegalArgumentException.class, () -> request.setDateLimit(null));
+    assertThrows(IllegalArgumentException.class, () -> request.setDateLimit(LocalDate.now().minusDays(1)));
   }
 
   private DonationRequest requestWith(int goal, int windowDays) {

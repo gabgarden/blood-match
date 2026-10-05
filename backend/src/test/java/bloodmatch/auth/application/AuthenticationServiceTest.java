@@ -97,6 +97,22 @@ class AuthenticationServiceTest {
         () -> authenticationService.authenticate("missing@bloodmatch.com", "plain-password"));
   }
 
+  @Test
+  void shouldRejectNullConstructorArgs() {
+    assertThrows(IllegalArgumentException.class, () -> new AuthenticationService(null, passwordEncoder, jwtTokenProvider, jwtProperties));
+    assertThrows(IllegalArgumentException.class, () -> new AuthenticationService(userAccountRepository, null, jwtTokenProvider, jwtProperties));
+    assertThrows(IllegalArgumentException.class, () -> new AuthenticationService(userAccountRepository, passwordEncoder, null, jwtProperties));
+    assertThrows(IllegalArgumentException.class, () -> new AuthenticationService(userAccountRepository, passwordEncoder, jwtTokenProvider, null));
+  }
+
+  @Test
+  void shouldValidateBlankEmailAndPassword() {
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> authenticationService.authenticate(null, "pass"));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> authenticationService.authenticate("", "pass"));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> authenticationService.authenticate("a@b.com", null));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> authenticationService.authenticate("a@b.com", ""));
+  }
+
   private static UserAccount createUserAccount() {
     DomainID partyId = DomainID.generate();
     return new UserAccount(

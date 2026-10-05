@@ -115,6 +115,33 @@
       \field{title}{Object-oriented analysis and design with applications}
       \field{year}{2007}
     \endentry
+    \entry{brasil2017}{misc}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=03cd123deb248ddc10a23a476d6f0975}{%
+           family={{Brasil. Ministério da Saúde}},
+           familyi={B\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Brasília}%
+      }
+      \strng{namehash}{03cd123deb248ddc10a23a476d6f0975}
+      \strng{fullhash}{03cd123deb248ddc10a23a476d6f0975}
+      \strng{fullhashraw}{03cd123deb248ddc10a23a476d6f0975}
+      \strng{bibnamehash}{03cd123deb248ddc10a23a476d6f0975}
+      \strng{authorbibnamehash}{03cd123deb248ddc10a23a476d6f0975}
+      \strng{authornamehash}{03cd123deb248ddc10a23a476d6f0975}
+      \strng{authorfullhash}{03cd123deb248ddc10a23a476d6f0975}
+      \strng{authorfullhashraw}{03cd123deb248ddc10a23a476d6f0975}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{Diário Oficial da União}
+      \field{title}{Portaria de Consolidação nº 5, de 28 de setembro de 2017. Consolidação das normas sobre as ações e os serviços de saúde do Sistema Único de Saúde}
+      \field{year}{2017}
+    \endentry
     \entry{ceara2025}{misc}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=0cf6a3da3bffb444a600bc2b867b8732}{%
@@ -598,6 +625,38 @@
       \field{type}{techreport}
       \field{year}{2023}
     \endentry
+    \entry{kleppmann2017}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=34b8d5b1d29d175527a6642f3ec8a76d}{%
+           family={Kleppmann},
+           familyi={K\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Sebastopol}%
+      }
+      \list{publisher}{1}{%
+        {O'Reilly Media}%
+      }
+      \strng{namehash}{34b8d5b1d29d175527a6642f3ec8a76d}
+      \strng{fullhash}{34b8d5b1d29d175527a6642f3ec8a76d}
+      \strng{fullhashraw}{34b8d5b1d29d175527a6642f3ec8a76d}
+      \strng{bibnamehash}{34b8d5b1d29d175527a6642f3ec8a76d}
+      \strng{authorbibnamehash}{34b8d5b1d29d175527a6642f3ec8a76d}
+      \strng{authornamehash}{34b8d5b1d29d175527a6642f3ec8a76d}
+      \strng{authorfullhash}{34b8d5b1d29d175527a6642f3ec8a76d}
+      \strng{authorfullhashraw}{34b8d5b1d29d175527a6642f3ec8a76d}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems}
+      \field{year}{2017}
+    \endentry
     \entry{li2023}{article}{}{}
       \name{author}{5}{}{%
         {{un=0,uniquepart=base,hash=4c305f909afd2192eedb6f46f0883d14}{%
@@ -1063,6 +1122,51 @@
       \field{edition}{2}
       \field{title}{Metodologia do trabalho científico}
       \field{year}{2013}
+    \endentry
+    \entry{ricci2015}{book}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=5abb1d77d80f46918651a5bbc5ee8371}{%
+           family={Ricci},
+           familyi={R\bibinitperiod},
+           given={Francesco},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e583bae19511d6aca7ecc9e44953ed07}{%
+           family={Rokach},
+           familyi={R\bibinitperiod},
+           given={Lior},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4610f4e9c8ec107e9ad7dfe04a1d7c30}{%
+           family={Shapira},
+           familyi={S\bibinitperiod},
+           given={Bracha},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{525613e36e598515af20951b79d373e1}
+      \strng{fullhash}{525613e36e598515af20951b79d373e1}
+      \strng{fullhashraw}{525613e36e598515af20951b79d373e1}
+      \strng{bibnamehash}{525613e36e598515af20951b79d373e1}
+      \strng{authorbibnamehash}{525613e36e598515af20951b79d373e1}
+      \strng{authornamehash}{525613e36e598515af20951b79d373e1}
+      \strng{authorfullhash}{525613e36e598515af20951b79d373e1}
+      \strng{authorfullhashraw}{525613e36e598515af20951b79d373e1}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{2}
+      \field{title}{Recommender Systems Handbook}
+      \field{year}{2015}
     \endentry
     \entry{sommerville2011}{book}{}{}
       \name{author}{1}{}{%

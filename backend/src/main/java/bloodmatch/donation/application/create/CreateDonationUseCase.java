@@ -3,10 +3,6 @@ package bloodmatch.donation.application.create;
 import bloodmatch.shared.application.exception.NotFoundException;
 import bloodmatch.shared.application.exception.ValidationException;
 import bloodmatch.shared.application.shared.DomainIdParser;
-import bloodmatch.role.domain.bloodcenter.schedule.AppointmentSlot;
-import bloodmatch.role.domain.bloodcenter.schedule.AppointmentSlotCalculator;
-import bloodmatch.role.domain.bloodcenter.schedule.BloodCenterSchedule;
-import bloodmatch.role.domain.bloodcenter.schedule.BloodCenterScheduleRepositoryInterface;
 import bloodmatch.donation.domain.Donation;
 import bloodmatch.donation.domain.DonationRepositoryInterface;
 import bloodmatch.role.domain.organization.bloodcenter.BloodCenter;
@@ -21,14 +17,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Service
 public class CreateDonationUseCase {
   private final BloodCenterRepositoryInterface bloodCenterRepository;
   private final DonorRepositoryInterface donorRepository;
   private final DonationRepositoryInterface donationRepository;
-  private final BloodCenterScheduleRepositoryInterface scheduleRepository;
   private final UserAccountRepositoryInterface userAccountRepository;
   private final NotificationServiceInterface notificationService;
 
@@ -36,7 +30,6 @@ public class CreateDonationUseCase {
       DonorRepositoryInterface donorRepository,
       BloodCenterRepositoryInterface bloodCenterRepository,
       DonationRepositoryInterface donationRepository,
-      BloodCenterScheduleRepositoryInterface scheduleRepository,
       UserAccountRepositoryInterface userAccountRepository,
       NotificationServiceInterface notificationService) {
     if (donorRepository == null)
@@ -45,8 +38,6 @@ public class CreateDonationUseCase {
       throw new IllegalArgumentException("BloodCenterRepository cannot be null");
     if (donationRepository == null)
       throw new IllegalArgumentException("DonationRepository cannot be null");
-    if (scheduleRepository == null)
-      throw new IllegalArgumentException("ScheduleRepository cannot be null");
     if (userAccountRepository == null)
       throw new IllegalArgumentException("UserAccountRepository cannot be null");
     if (notificationService == null)
@@ -54,7 +45,6 @@ public class CreateDonationUseCase {
     this.donorRepository = donorRepository;
     this.bloodCenterRepository = bloodCenterRepository;
     this.donationRepository = donationRepository;
-    this.scheduleRepository = scheduleRepository;
     this.userAccountRepository = userAccountRepository;
     this.notificationService = notificationService;
   }
@@ -86,7 +76,7 @@ public class CreateDonationUseCase {
         .orElseThrow(() -> new NotFoundException("Blood center role not found"));
 
     if (hasIntendedDate) {
-      return schedule(input, donor, bloodCenter, organizationId, currentDate);
+      return schedule(input, donor, bloodCenter, currentDate);
     }
     return recordCompleted(input, donor, bloodCenter, currentDate);
   }
@@ -95,31 +85,9 @@ public class CreateDonationUseCase {
       Input input,
       Donor donor,
       BloodCenter bloodCenter,
-      DomainID organizationId,
       LocalDate currentDate) {
-    BloodCenterSchedule schedule = scheduleRepository.findByOrganizationId(organizationId).orElse(null);
-    LocalTime expectedTime = input.expectedTime();
-    if (schedule != null && schedule.requiresTimeSlot(input.intendedDate())) {
-      if (expectedTime == null) {
-        throw new ValidationException("expectedTime is required for this blood center");
-      }
-      List<Donation> pending = donationRepository.findPendingByOrganizationIdAndDate(
-          organizationId, input.intendedDate());
-      List<AppointmentSlot> slots = AppointmentSlotCalculator.calculate(schedule, input.intendedDate(), pending);
-      AppointmentSlot selected = slots.stream()
-          .filter(slot -> expectedTime.equals(slot.startTime()))
-          .findFirst()
-          .orElse(null);
-      if (selected == null) {
-        throw new ValidationException("expectedTime does not match a valid slot");
-      }
-      if (selected.available() == 0) {
-        throw new ValidationException("Time slot is fully booked");
-      }
-    }
-
     Donation donation = Donation.create(
-        donor, bloodCenter, input.intendedDate(), null, expectedTime, currentDate);
+        donor, bloodCenter, input.intendedDate(), null, input.expectedTime(), currentDate);
     donationRepository.save(donation);
     notifyBloodCenter(bloodCenter, donor, donation);
     return Output.from(donation);

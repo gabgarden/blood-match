@@ -119,6 +119,71 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <configuration>
+                    <!-- Exclui classes que não precisam de cobertura unitária -->
+                    <excludes>
+                        <!-- Ponto de entrada Spring Boot -->
+                        <exclude>bloodmatch/BloodmatchApplication.class</exclude>
+                        <!-- Camada de apresentação (controllers, DTOs de request/response) -->
+                        <exclude>bloodmatch/*/presentation/**/*</exclude>
+                        <!-- Camada de infraestrutura (adapters MongoDB, config Spring) -->
+                        <exclude>bloodmatch/*/infrastructure/**/*</exclude>
+                        <exclude>bloodmatch/shared/infrastructure/**/*</exclude>
+                        <!-- Configurações de segurança e beans Spring -->
+                        <exclude>bloodmatch/*/config/**/*</exclude>
+                        <exclude>bloodmatch/shared/config/**/*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <!-- Inicializa o agente JaCoCo antes dos testes -->
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- Gera relatório HTML após os testes -->
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <!-- Valida cobertura mínima (ajuste o value conforme for subindo) -->
+                    <execution>
+                        <id>check</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <!-- Comece com 0.50 e suba após ver o relatório -->
+                                            <minimum>0.50</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.50</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

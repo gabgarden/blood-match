@@ -245,4 +245,37 @@ class GetRecommendedRequestsUseCaseTest {
         null,
         center);
   }
+
+  @Test
+  void shouldValidateInputAndNullChecksAndOverload() {
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(null));
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(new bloodmatch.request.application.recommendations.GetRecommendedRequestsUseCase.Input("id"), null));
+
+    DomainID personId = DomainID.generate();
+    when(donorRepository.findByPartyId(personId)).thenReturn(Optional.empty());
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.NotFoundException.class,
+        () -> useCase.execute(new bloodmatch.request.application.recommendations.GetRecommendedRequestsUseCase.Input(personId.getValue().toString()), LocalDate.now()));
+  }
+
+  @Test
+  void shouldHandleNullAddressInDistanceCalculation() {
+    LocalDate now = LocalDate.now();
+    Donor donor = createDonor(now);
+    DonationRequest request = createRequest(now);
+
+    when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
+    when(donationRequestRepository.findActiveRequestsForDonor(any(), any(), org.mockito.ArgumentMatchers.anyDouble(), any())).thenReturn(List.of(request));
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(Map.of());
+
+    var result = useCase.execute(new bloodmatch.request.application.recommendations.GetRecommendedRequestsUseCase.Input(donor.getPerson().getId().getValue().toString(), true), now);
+    assertEquals(1, result.size());
+    org.junit.jupiter.api.Assertions.assertNull(result.get(0).distanceInKm());
+    org.junit.jupiter.api.Assertions.assertNull(result.get(0).latitude());
+    org.junit.jupiter.api.Assertions.assertNull(result.get(0).longitude());
+
+    // Also test single-argument Input constructor and execute(Input) overload
+    var singleArgInput = new bloodmatch.request.application.recommendations.GetRecommendedRequestsUseCase.Input(donor.getPerson().getId().getValue().toString());
+    org.junit.jupiter.api.Assertions.assertNotNull(singleArgInput);
+    org.junit.jupiter.api.Assertions.assertNotNull(useCase.execute(singleArgInput));
+  }
 }

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,5 +46,43 @@ class GetDonorSummaryUseCaseTest {
     assertEquals("Ana Silva", output.donorName());
     assertEquals("O+", output.bloodType());
     assertEquals(8L, output.livesImpacted());
+  }
+
+  @Test
+  void shouldValidateInputAndNullChecks() {
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(null));
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(new Input("id"), null));
+  }
+
+  @Test
+  void shouldThrowNotFoundWhenDonorMissing() {
+    when(donorRepository.findByPartyId(any())).thenReturn(Optional.empty());
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.NotFoundException.class, () -> useCase.execute(
+        new Input(bloodmatch.shared.domain.valueObjects.DomainID.generate().getValue().toString()), LocalDate.now()));
+  }
+
+  @Test
+  void shouldCalculateRemainingDaysCorrectlyAndSupportOverload() {
+    LocalDate today = LocalDate.now();
+    Person person = new Person(
+        "Carlos",
+        new PhoneNumber("11988887777"),
+        new CPF("12345678901"),
+        LocalDate.of(1990, 1, 1));
+    Donor donor = new Donor(person, BloodType.of("A+"), 65.0);
+
+    // 30 days ago -> 60 days remaining
+    donor.registerDonation(today.minusDays(30), today.minusDays(30));
+
+    when(donorRepository.findByPartyId(person.getId())).thenReturn(Optional.of(donor));
+    when(donationRepository.countByDonorId(person.getId())).thenReturn(1L);
+
+    Output output1 = useCase.execute(new Input(person.getId().getValue().toString()), today);
+    assertEquals(60, output1.daysRemaining());
+
+    // 100 days ago -> 0 days remaining
+    donor.registerDonation(today.minusDays(100), today.minusDays(100));
+    Output output2 = useCase.execute(new Input(person.getId().getValue().toString()));
+    assertEquals(0, output2.daysRemaining());
   }
 }

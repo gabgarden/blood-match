@@ -1,12 +1,10 @@
 package bloodmatch.donation.application;
 
+import bloodmatch.shared.application.exception.NotFoundException;
 import bloodmatch.shared.application.exception.ValidationException;
 import bloodmatch.donation.application.create.CreateDonationUseCase;
 import bloodmatch.donation.application.create.CreateDonationUseCase.Input;
 import bloodmatch.donation.application.create.CreateDonationUseCase.Output;
-import bloodmatch.role.domain.bloodcenter.schedule.BloodCenterSchedule;
-import bloodmatch.role.domain.bloodcenter.schedule.BloodCenterScheduleRepositoryInterface;
-import bloodmatch.role.domain.bloodcenter.schedule.WeeklyWindow;
 import bloodmatch.donation.domain.Donation;
 import bloodmatch.donation.domain.DonationRepositoryInterface;
 import bloodmatch.party.domain.Organization;
@@ -15,6 +13,7 @@ import bloodmatch.role.domain.organization.bloodcenter.BloodCenter;
 import bloodmatch.role.domain.organization.bloodcenter.BloodCenterRepositoryInterface;
 import bloodmatch.role.domain.person.donor.Donor;
 import bloodmatch.role.domain.person.donor.DonorRepositoryInterface;
+import bloodmatch.auth.domain.UserAccount;
 import bloodmatch.auth.domain.UserAccountRepositoryInterface;
 import bloodmatch.shared.domain.services.NotificationServiceInterface;
 import bloodmatch.shared.domain.valueObjects.BloodType;
@@ -23,13 +22,12 @@ import bloodmatch.shared.domain.valueObjects.CPF;
 import bloodmatch.shared.domain.valueObjects.PhoneNumber;
 import org.junit.jupiter.api.Test;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,15 +41,12 @@ class CreateDonationUseCaseTest {
   private final DonorRepositoryInterface donorRepository = mock(DonorRepositoryInterface.class);
   private final BloodCenterRepositoryInterface bloodCenterRepository = mock(BloodCenterRepositoryInterface.class);
   private final DonationRepositoryInterface donationRepository = mock(DonationRepositoryInterface.class);
-  private final BloodCenterScheduleRepositoryInterface scheduleRepository =
-      mock(BloodCenterScheduleRepositoryInterface.class);
   private final UserAccountRepositoryInterface userAccountRepository = mock(UserAccountRepositoryInterface.class);
   private final NotificationServiceInterface notificationService = mock(NotificationServiceInterface.class);
   private final CreateDonationUseCase useCase = new CreateDonationUseCase(
       donorRepository,
       bloodCenterRepository,
       donationRepository,
-      scheduleRepository,
       userAccountRepository,
       notificationService);
 
@@ -64,8 +59,6 @@ class CreateDonationUseCaseTest {
     when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
     when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId()))
         .thenReturn(Optional.of(bloodCenter));
-    when(scheduleRepository.findByOrganizationId(bloodCenter.getOrganization().getId()))
-        .thenReturn(Optional.empty());
     when(userAccountRepository.findByPartyId(bloodCenter.getOrganization().getId()))
         .thenReturn(Optional.empty());
 
@@ -114,40 +107,95 @@ class CreateDonationUseCaseTest {
   }
 
   @Test
-  void rejectsBookingWhenTimeSlotIsFullyBooked() {
+  void shouldRejectNullConstructorArgs() {
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationUseCase(null, bloodCenterRepository, donationRepository, userAccountRepository, notificationService));
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationUseCase(donorRepository, null, donationRepository, userAccountRepository, notificationService));
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationUseCase(donorRepository, bloodCenterRepository, null, userAccountRepository, notificationService));
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationUseCase(donorRepository, bloodCenterRepository, donationRepository, null, notificationService));
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationUseCase(donorRepository, bloodCenterRepository, donationRepository, userAccountRepository, null));
+  }
+
+  @Test
+  void shouldValidateInputAndDates() {
+    assertThrows(ValidationException.class, () -> useCase.execute(null));
+    assertThrows(ValidationException.class, () -> useCase.execute(new Input("id", "id", MONDAY, null, null), null));
+  }
+
+  @Test
+  void shouldThrowWhenDonorOrBloodCenterNotFound() {
     Donor donor = donor();
     BloodCenter bloodCenter = bloodCenter();
-    BloodCenterSchedule schedule = BloodCenterSchedule.create(
-        bloodCenter.getOrganization().getId(),
-        List.of(new WeeklyWindow(
-            DayOfWeek.MONDAY,
-            LocalTime.of(8, 0),
-            LocalTime.of(9, 0),
-            30,
-            1)),
-        List.of());
-    Donation alreadyBooked = Donation.create(
-        donor, bloodCenter, MONDAY, null, LocalTime.of(8, 0), MONDAY.minusDays(1));
+
+    when(donorRepository.findByPartyId(any())).thenReturn(Optional.empty());
+    assertThrows(NotFoundException.class, () -> useCase.execute(
+        new Input(donor.getPerson().getId().getValue().toString(), bloodCenter.getOrganization().getId().getValue().toString(), MONDAY, null, null),
+        MONDAY.minusDays(1)));
+
+    when(donorRepository.findByPartyId(any())).thenReturn(Optional.of(donor));
+    when(bloodCenterRepository.findByPartyId(any())).thenReturn(Optional.empty());
+    assertThrows(NotFoundException.class, () -> useCase.execute(
+        new Input(donor.getPerson().getId().getValue().toString(), bloodCenter.getOrganization().getId().getValue().toString(), MONDAY, null, null),
+        MONDAY.minusDays(1)));
+  }
+
+  @Test
+  void shouldHandleNotificationsWhenSchedulingPendingDonation() {
+    Donor donor = donor();
+    BloodCenter bloodCenter = bloodCenter();
 
     when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
-    when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId()))
-        .thenReturn(Optional.of(bloodCenter));
-    when(scheduleRepository.findByOrganizationId(bloodCenter.getOrganization().getId()))
-        .thenReturn(Optional.of(schedule));
-    when(donationRepository.findPendingByOrganizationIdAndDate(bloodCenter.getOrganization().getId(), MONDAY))
-        .thenReturn(List.of(alreadyBooked));
+    when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId())).thenReturn(Optional.of(bloodCenter));
 
-    ValidationException exception = assertThrows(ValidationException.class, () -> useCase.execute(
+    UserAccount account = new UserAccount(
+        bloodCenter.getOrganization().getId(),
+        new bloodmatch.shared.domain.valueObjects.Email("center@example.com"),
+        "hash123",
+        java.util.Set.of(bloodmatch.auth.domain.SecurityRole.BLOOD_CENTER));
+    when(userAccountRepository.findByPartyId(bloodCenter.getOrganization().getId())).thenReturn(Optional.of(account));
+
+    Output output = useCase.execute(
+        new Input(donor.getPerson().getId().getValue().toString(), bloodCenter.getOrganization().getId().getValue().toString(), MONDAY, null, LocalTime.of(8, 0)),
+        MONDAY.minusDays(1));
+    assertEquals("PENDING", output.status());
+    verify(notificationService).notifyBloodCenterAboutAppointment(any(), any(), any(), any());
+
+    // When account is null
+    when(userAccountRepository.findByPartyId(bloodCenter.getOrganization().getId())).thenReturn(Optional.empty());
+    Output outputNoAccount = useCase.execute(
+        new Input(donor.getPerson().getId().getValue().toString(), bloodCenter.getOrganization().getId().getValue().toString(), MONDAY, null, LocalTime.of(8, 0)),
+        MONDAY.minusDays(1));
+    assertNotNull(outputNoAccount);
+
+    // When notificationService throws RuntimeException
+    when(userAccountRepository.findByPartyId(bloodCenter.getOrganization().getId())).thenReturn(Optional.of(account));
+    org.mockito.Mockito.doThrow(new RuntimeException("mail failed")).when(notificationService).notifyBloodCenterAboutAppointment(any(), any(), any(), any());
+    Output outputNotificationFail = useCase.execute(
+        new Input(donor.getPerson().getId().getValue().toString(), bloodCenter.getOrganization().getId().getValue().toString(), MONDAY, null, LocalTime.of(8, 0)),
+        MONDAY.minusDays(1));
+    assertNotNull(outputNotificationFail);
+
+    // Overload execute(Input)
+    Output outputOverload = useCase.execute(
+        new Input(donor.getPerson().getId().getValue().toString(), bloodCenter.getOrganization().getId().getValue().toString(), LocalDate.now().plusDays(7), null, null));
+    assertNotNull(outputOverload);
+  }
+
+  @Test
+  void shouldRejectExpectedTimeWhenDonationDateProvided() {
+    Donor donor = donor();
+    BloodCenter bloodCenter = bloodCenter();
+
+    when(donorRepository.findByPartyId(donor.getPerson().getId())).thenReturn(Optional.of(donor));
+    when(bloodCenterRepository.findByPartyId(bloodCenter.getOrganization().getId())).thenReturn(Optional.of(bloodCenter));
+
+    assertThrows(ValidationException.class, () -> useCase.execute(
         new Input(
             donor.getPerson().getId().getValue().toString(),
             bloodCenter.getOrganization().getId().getValue().toString(),
-            MONDAY,
             null,
-            LocalTime.of(8, 0)),
-        MONDAY.minusDays(1)));
-
-    assertEquals("Time slot is fully booked", exception.getMessage());
-    verify(donationRepository, never()).save(any(Donation.class));
+            LocalDate.now(),
+            LocalTime.of(10, 0)),
+        LocalDate.now()));
   }
 
   @Test

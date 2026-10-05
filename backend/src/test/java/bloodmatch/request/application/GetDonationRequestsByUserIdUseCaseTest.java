@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -143,6 +145,32 @@ class GetDonationRequestsByPartyIdUseCaseTest {
     assertEquals(older.getId().getValue().toString(), result.get(1).requestId());
     assertBags("0.9000", result.get(1).fulfilledBloodBags());
     assertEquals(false, result.get(1).goalReached());
+  }
+
+  @Test
+  void shouldValidateInputAndNullChecksAndOverload() {
+    assertThrows(ValidationException.class, () -> useCase.execute(null));
+    assertThrows(ValidationException.class, () -> useCase.execute(new Input("id"), null));
+
+    DomainID userId = DomainID.generate();
+    when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of());
+    var result = useCase.execute(new Input(userId.getValue().toString()));
+    assertNotNull(result);
+  }
+
+  @Test
+  void shouldMapPhoneNumberInBloodCenter() {
+    LocalDate now = LocalDate.now();
+    DomainID userId = DomainID.generate();
+    BloodCenter center = new BloodCenter(new Organization("Centro Tel", new PhoneNumber("1133334444"), new CNPJ("12345678000100")));
+    DonationRequest request = createRequest(now.minusDays(1), center);
+
+    when(donationRequestRepository.findByRequesterPartyId(userId)).thenReturn(List.of(request));
+    when(fulfillmentService.fill(anyList(), any())).thenReturn(Map.of());
+
+    var result = useCase.execute(new Input(userId.getValue().toString()), now);
+    assertNotNull(result);
+    assertEquals("1133334444", result.get(0).bloodCenterPhoneNumber());
   }
 
   private static void assertBags(Object expected, BigDecimal actual) {

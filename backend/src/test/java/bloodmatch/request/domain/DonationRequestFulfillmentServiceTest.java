@@ -65,6 +65,22 @@ class DonationRequestFulfillmentServiceTest {
     BloodCenter center = bloodCenter();
 
     assertThrows(IllegalArgumentException.class, () -> service.fill(center, null));
+    assertThrows(IllegalArgumentException.class, () -> service.fill((BloodCenter) null, currentDate));
+    assertThrows(IllegalArgumentException.class, () -> service.fill((List<DonationRequest>) null, currentDate));
+    assertThrows(IllegalArgumentException.class, () -> service.fill(List.of(), null));
+  }
+
+  @Test
+  void fillReturnsEmptyMapWhenRequestsListIsEmptyOrCentersEmpty() {
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result = service.fill(List.of(), currentDate);
+    assertTrue(result.isEmpty());
+
+    BloodCenter center = bloodCenter();
+    DonationRequest req = request(1, center, currentDate.minusDays(2), currentDate.plusDays(5), 1);
+    when(requestRepository.findActiveRequestsByOrganizationIds(anyList(), eq(currentDate)))
+        .thenReturn(List.of());
+    Map<DomainID, DonationRequestFulfillmentStatusRecord> result2 = service.fill(List.of(req), currentDate);
+    assertTrue(result2.isEmpty());
   }
 
   @Test

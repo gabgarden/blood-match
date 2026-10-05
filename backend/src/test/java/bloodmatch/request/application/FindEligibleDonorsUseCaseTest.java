@@ -94,6 +94,47 @@ class FindEligibleDonorsUseCaseTest {
     assertSame(donor1, result.get(0));
   }
 
+  @Test
+  void shouldRejectNullConstructorArgs() {
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new FindEligibleDonorsUseCase(null, donorRepository, donorMatchingService));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new FindEligibleDonorsUseCase(donationRequestRepository, null, donorMatchingService));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new FindEligibleDonorsUseCase(donationRequestRepository, donorRepository, null));
+  }
+
+  @Test
+  void shouldValidateExecutionArgs() {
+    FindEligibleDonorsUseCase useCase = new FindEligibleDonorsUseCase(donationRequestRepository, donorRepository, donorMatchingService);
+    LocalDate today = LocalDate.now();
+    DomainID validId = DomainID.generate();
+
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> useCase.execute(null, List.of(), today));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> useCase.execute(validId, null, today));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> useCase.execute(validId, List.of(), null));
+  }
+
+  @Test
+  void shouldThrowWhenRequestOrDonorMissingOrNullIdInList() {
+    FindEligibleDonorsUseCase useCase = new FindEligibleDonorsUseCase(donationRequestRepository, donorRepository, donorMatchingService);
+    LocalDate today = LocalDate.now();
+    DomainID reqId = DomainID.generate();
+    DomainID donorId = DomainID.generate();
+
+    when(donationRequestRepository.findById(reqId)).thenReturn(Optional.empty());
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> useCase.execute(reqId, List.of(donorId), today));
+
+    DonationRequest request = createDonationRequest(today);
+    when(donationRequestRepository.findById(reqId)).thenReturn(Optional.of(request));
+
+    // null donor id in list
+    List<DomainID> listWithNull = new java.util.ArrayList<>();
+    listWithNull.add(null);
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> useCase.execute(reqId, listWithNull, today));
+
+    // donor not found
+    when(donorRepository.findByPartyId(donorId)).thenReturn(Optional.empty());
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> useCase.execute(reqId, List.of(donorId), today));
+  }
+
   private DonationRequest createDonationRequest(LocalDate currentDate) {
     Person requesterParty = new Person(
         "Requester Person",

@@ -1,4 +1,4 @@
-﻿\chapter{Avaliação da proposta de solução}
+\chapter{Avaliação da proposta de solução}
 
 Este capítulo apresenta a avaliação da solução desenvolvida, tratada como passo metodológico --- e não como objetivo de entrega ---, conforme o Capítulo~4. A avaliação combina a consolidação do sistema entregue --- descrito no Capítulo~5 --- com a execução de uma suíte de testes automatizados unitários e de integração, seguida de uma análise qualitativa da arquitetura quanto à manutenibilidade.
 
@@ -20,33 +20,74 @@ A segunda frente, estrutural, avalia qualitativamente a manutenibilidade à luz 
 
 O critério de sucesso funcional adotado foi a execução integral da suíte sem falhas (\textit{failures}) nem erros (\textit{errors}). O critério de manutenibilidade foi a evidência de que as regras centrais permanecem testáveis no domínio/aplicação, sem necessidade de acoplar cada cenário a um banco de dados real.
 
-\section{Organização da suíte de testes}
+\section{Organização e estratégia da suíte de testes}
 
-A suíte reside em \codigo{src/test/java} e está agrupada por camada, espelhando a arquitetura da API. A Tabela~\ref{tab:suite-testes} sintetiza as classes de teste e o número de casos executados em cada uma.
+A suíte de testes reside em \codigo{src/test/java} e foi concebida sob os princípios da pirâmide de testes, priorizando testes unitários rápidos, determinísticos e isolados na base arquitetural, complementados por testes de integração focados na camada de segurança HTTP. Ao todo, a suíte conta com 50 classes de teste e 323 casos de teste automatizados, espelhando a modularidade dos contextos delimitados (\textit{bounded contexts}) do DDD.
+
+A Tabela~\ref{tab:suite-testes} sintetiza a distribuição da suíte pelas camadas arquiteturais. Evidencia-se uma concentração preponderante na base (camadas de Domínio e Aplicação, totalizando 308 dos 323 casos), viabilizando tempos de execução da ordem de 15 segundos para a suíte integral, sem a necessidade de acoplamento a bancos de dados externos.
 
 \begin{table}[H]
   \centering
-  \caption{Composição da suíte de testes automatizados}
+  \caption{Composição consolidada da suíte por camada arquitetural}
   \label{tab:suite-testes}
   \small
-  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.8cm} >{\raggedright\arraybackslash}X c}
+  \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm} >{\raggedright\arraybackslash}X c}
     \toprule
     \textbf{Camada} & \textbf{Classes de teste (exemplos de foco)} & \textbf{Casos} \\
     \midrule
-    Domínio & Compatibilidade sanguínea (\codigo{BloodTypeTest}); agregados de doação e solicitação, incluindo o teto proporcional; matching de doadores; alocação FIFO e serviço de \textit{fulfillment} & 84 \\
-    Aplicação & Autenticação; criação/cancelamento/listagem de solicitações; recomendação; registro e conclusão de doações; agenda e estoque de hemocentro; cadastro de papéis; busca de hemocentros; distância de recomendação & 60 \\
-    Infraestrutura / segurança & Emissão e validação de JWT; autorização HTTP (\codigo{SecurityAuthorizationIntegrationTest}) & 11 \\
-    \textit{Smoke} & Carregamento do contexto Spring Boot (\codigo{BloodmatchApplicationTests}) & 1 \\
+    Domínio & Compatibilidade sanguínea; agregados de doação e solicitação; teto proporcional de metas; \textit{matching} de doadores; alocação FIFO; invariantes de conta de usuário; objetos de valor e entidades básicas & 154 \\
+    Aplicação & Autenticação e confirmação de e-mail; criação, cancelamento e listagem de solicitações; recomendação; registro, reagendamento e conclusão de doações; cadastro e atualização de papéis e participantes; busca de hemocentros; elegibilidade de doadores; notificação & 154 \\
+    Infraestrutura / segurança & Emissão e validação de JWT; autorização HTTP com \codigo{MockMvc} & 14 \\
+    \textit{Smoke} & Carregamento integral do contexto Spring Boot & 1 \\
     \midrule
-    \textbf{Total} & 33 classes de teste & \textbf{156} \\
+    \textbf{Total} & 50 classes de teste & \textbf{323} \\
     \bottomrule
   \end{tabularx}
-  \fonte{Elaborado pelos próprios autores (2026), a partir da execução Maven Surefire.}
+  \fonte{Elaborado pelos próprios autores (2026), a partir da execução Maven Surefire e JaCoCo.}
 \end{table}
 
-Entre os testes de domínio, destaca-se a cobertura do algoritmo de cumprimento de metas, distribuída em três classes. O \codigo{DonationRequestFulfillmentFifoTest} (26 casos) valida a ordem FIFO por hemocentro --- incluindo ordenação temporal, compatibilidade tipológica, janela entre data de solicitação e data-limite, e esgotamento de meta. O \codigo{DonationRequestFulfillmentProportionalTest} (5 casos) cobre o teto proporcional: represamento da solicitação de prazo folgado em favor da que está próxima do vencimento, ausência de teto no dia da data-limite, retorno das sobras em segunda passagem FIFO e preservação do total de bolsas alocadas. O \codigo{DonationRequestTest} (14 casos) exercita a fórmula do teto isoladamente no agregado, incluindo a precisão decimal via \texttt{BigDecimal} e o caso de contorno de janela de um único dia. Nos testes de aplicação, o \codigo{GetRecommendedRequestsUseCaseTest} verifica elegibilidade do doador, descarte de solicitações com meta atingida e ordenação por distância/urgência/prazo. Nos testes de integração, o \codigo{SecurityAuthorizationIntegrationTest} confirma que recomendações e listagens respeitam autenticação, papéis (\texttt{DONOR}/\texttt{REQUESTER}) e regras de \textit{ownership} do participante autenticado.
+A distribuição da suíte pelos contextos delimitados e seus respectivos níveis de cobertura são detalhados na Tabela~\ref{tab:resumo-contextos-testes}. A relação exaustiva de todas as 50 classes de teste, acompanhada dos cenários e comportamentos específicos verificados em cada uma, encontra-se documentada no Apêndice~\ref{apendice:matriz-testes}.
 
-Para ilustrar a abordagem adotada nos testes unitários de domínio e evidenciar a verificação rigorosa das regras biológicas sem qualquer dependência de infraestrutura ou banco de dados, a Listagem~\ref{lst:blood-type-test} apresenta a classe \codigo{BloodTypeTest}. Observa-se a validação das invariantes de integridade do objeto de valor (rejeição de tipos inválidos ou nulos) e a verificação exaustiva da matriz de compatibilidade transfusional pelo método \codigo{canDonateTo} --- atestando, por exemplo, o comportamento do tipo $O^-$ como doador universal, a restrição de doadores $O^+$ apenas para receptores de fator Rh positivo e a recepção estrita de $AB^+$.
+\begin{table}[H]
+  \centering
+  \caption{Distribuição e cobertura da suíte por contexto delimitado}
+  \label{tab:resumo-contextos-testes}
+  \small
+  \begin{tabularx}{\textwidth}{l c c c c >{\raggedright\arraybackslash}X}
+    \toprule
+    \textbf{Contexto} & \textbf{Classes} & \textbf{Casos} & \textbf{Linhas} & \textbf{Branches} & \textbf{Principais comportamentos validados} \\
+    \midrule
+    \codigo{request} & 12 & 123 & 99,83\% & 96,98\% & Teto proporcional, alocação FIFO, descarte por meta atingida, geolocalização e cancelamento justificado. \\
+    \codigo{shared} & 14 & 62 & 99,60\% & 94,59\% & Matriz de compatibilidade ABO/Rh, CPF, CNPJ, políticas de intervalo de doação e objetos de valor. \\
+    \codigo{role} & 9 & 48 & 100,0\% & 96,88\% & Aptidão física e peso do doador, \textit{matching} euclidiano, busca de hemocentros e hierarquia de papéis. \\
+    \codigo{auth} & 6 & 45 & 100,0\% & 98,63\% & Confirmação de e-mail por token, autenticação, emissão de JWT e autorização HTTP via \codigo{MockMvc}. \\
+    \codigo{donation} & 5 & 38 & 100,0\% & 100,0\% & Registro de intenção e efetivação, reagendamento, transições de estado da doação e histórico. \\
+    \codigo{party} & 3 & 16 & 100,0\% & 82,14\% & Integridade cadastral de pessoas e organizações e controle de posse (\textit{party ownership}). \\
+    \textit{Smoke} & 1 & 1 & 100,0\% & n/a & Inicialização correta de beans e injeção de dependências no contexto Spring Boot. \\
+    \midrule
+    \textbf{Total} & \textbf{50} & \textbf{323} & \textbf{99,89\%} & \textbf{95,80\%} & \textbf{100\% de sucesso em todos os cenários} \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos próprios autores (2026), com base em relatórios do Maven Surefire e JaCoCo.}
+\end{table}
+
+\subsection{Verificação formal das regras críticas de negócio}
+
+Para assegurar que o sistema atenda aos requisitos funcionais com confiabilidade e sem risco de regressão, a elaboração da suíte concentrou-se na formalização de casos de teste sobre quatro eixos críticos do domínio:
+
+\subsubsection{Cumprimento dinâmico de metas: teto proporcional e ordenação FIFO}
+
+O mecanismo de alocação de doações às solicitações abertas constitui o algoritmo mais sofisticado do sistema, distribuído em quatro classes de teste no pacote \codigo{request}:
+\begin{itemize}[noitemsep,topsep=2pt]
+  \item O \codigo{DonationRequestFulfillmentFifoTest} (26 casos) valida a ordenação temporal das demandas de um mesmo hemocentro, a restrição de compatibilidade tipológica entre doador e solicitação, o respeito à janela entre abertura e data-limite e o esgotamento progressivo das metas;
+  \item O \codigo{DonationRequestFulfillmentProportionalTest} (5 casos) cobre o teto proporcional: o represamento de solicitações de prazo folgado em favor daquelas prestes a vencer, a liberação total do teto no dia limite, o retorno das bolsas excedentes em segunda passagem FIFO e a invariante de conservação do total de bolsas alocadas;
+  \item O \codigo{DonationRequestTest} (22 casos) exercita o cálculo isolado da fórmula do teto no agregado, o uso de precisão com \codigo{BigDecimal} e o contorno de janela de um único dia;
+  \item O \codigo{DonationRequestFulfillmentServiceTest} (9 casos) orquestra a obtenção de solicitações ativas e a consolidação do \textit{snapshot} em memória.
+\end{itemize}
+
+\subsubsection{Compatibilidade sanguínea e invariantes biológicas}
+
+A compatibilidade transfusional é modelada no objeto de valor \codigo{BloodType} (\codigo{shared}), desacoplada de persistência ou bibliotecas de infraestrutura. A Listagem~\ref{lst:blood-type-test} ilustra a abordagem adotada nos testes unitários de domínio, evidenciando a verificação exaustiva da matriz ABO/Rh pelo método \codigo{canDonateTo} --- atestando o comportamento do tipo $O^-$ como doador universal, a restrição de doadores $O^+$ apenas para receptores Rh positivo e a recepção estrita de $AB^+$.
 
 \begin{lstlisting}[language=Java, caption={Teste Unitário de Compatibilidade Sanguínea e Invariantes do Objeto de Valor}, label={lst:blood-type-test}]
 package bloodmatch.shared.domain.valueObjects;
@@ -138,44 +179,64 @@ class BloodTypeTest {
 }
 \end{lstlisting}
 
-\section{Resultados da execução}
+\subsubsection{Elegibilidade temporal, sanitária e motor de recomendação}
 
-A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução concluída em 26 de agosto de 2026 obteve o resultado sintetizado nA Tabela~\ref{tab:resultado-testes}.
+As regras regulamentares de aptidão para doação sanguínea e o motor de recomendação dirigida são verificados nas camadas de domínio e aplicação:
+\begin{itemize}[noitemsep,topsep=2pt]
+  \item \textbf{Aptidão sanitária e intervalos mínimos:} No agregado \codigo{Donor} e na política \codigo{DonationPolicy}, valida-se a restrição de peso corporal ($\ge 50$~kg) e o intervalo temporal regulamentar entre doações consecutivas (60 dias para homens e 90 dias para mulheres). Os testes unitários comprovam que doações recentes bloqueiam a efetivação de novos agendamentos e excluem automaticamente o voluntário das listas de doadores elegíveis a notificação;
+  \item \textbf{Recomendação ponderada de solicitações:} A classe \codigo{GetRecommendedRequestsUseCaseTest} (9 casos) e o serviço \codigo{DonorMatchingServiceTest} (3 casos) exercitam os critérios de ordenação e descarte: solicitações cuja meta de bolsas já foi atingida são sumariamente eliminadas, tipos sanguíneos incompatíveis são filtrados e as demandas restantes são ordenadas de forma decrescente combinando proximidade física (distância euclidiana entre geocoordenadas), criticidade de urgência e tempo restante até a data-limite.
+\end{itemize}
+
+\subsubsection{Segurança, isolamento de participantes e autorização HTTP}
+
+A proteção dos recursos da API contra acessos indevidos e privilégios cruzados é formalizada em duas frentes:
+\begin{itemize}[noitemsep,topsep=2pt]
+  \item \textbf{Emissão e integridade de credenciais JWT:} A classe \codigo{JwtTokenProviderTest} valida a geração do token assinado via HMAC, a correta extração dos \textit{claims} de identificação (\codigo{sub}), papéis atribuídos e prazos de validade, atestando a rejeição mandatória de assinaturas adulteradas ou tokens expirados;
+  \item \textbf{Cadeia de filtros de autorização com \codigo{MockMvc}:} O teste de integração \codigo{SecurityAuthorizationIntegrationTest} (11 casos) submete requisições simuladas à cadeia completa de segurança do Spring Security. A suíte comprova que requisições anônimas a \textit{endpoints} protegidos retornam invariavelmente \texttt{401 Unauthorized}, requisições com papéis discordantes da operação pretendida retornam \texttt{403 Forbidden}, e requisições autenticadas com os papéis devidos (\codigo{DONOR} ou \codigo{REQUESTER}) obtêm \texttt{200 OK} ou \texttt{201 Created}, garantindo o isolamento entre participantes.
+\end{itemize}
+
+\section{Resultados da execução e análise de cobertura}
+
+A suíte completa foi executada em ambiente local via Maven (\codigo{./mvnw test}), utilizando Java~17.0.12 e Spring Boot~3.5.11. A execução obteve o resultado sintetizado na Tabela~\ref{tab:resultado-testes}.
 
 \begin{table}[H]
   \centering
-  \caption{Resultado da execução da suíte automatizada}
+  \caption{Resultado consolidado da execução da suíte automatizada}
   \label{tab:resultado-testes}
   \begin{tabularx}{\textwidth}{X c}
     \toprule
     \textbf{Indicador} & \textbf{Valor} \\
     \midrule
-    Casos de teste executados & 156 \\
+    Casos de teste executados & 323 \\
     Falhas (\textit{Failures}) & 0 \\
     Erros (\textit{Errors}) & 0 \\
     Casos ignorados (\textit{Skipped}) & 0 \\
     Taxa de sucesso & 100\% \\
-    Tempo total de build (aprox.) & 27,9~s \\
+    Cobertura de instruções / linhas (JaCoCo) & 99,89\% (1.769 / 1.771) \\
+    Cobertura de ramificações / \textit{branches} (JaCoCo) & 95,80\% (798 / 833) \\
+    Tempo total de execução (aprox.) & 15,2~s \\
     Resultado Maven & \texttt{BUILD SUCCESS} \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos próprios autores (2026).}
 \end{table}
 
-Como pode ser observado nA Tabela~\ref{tab:resultado-testes}, a ausência de falhas indica que, para o conjunto de cenários formalizados na suíte, o comportamento observado coincide com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e papéis.
+Como pode ser observado na Tabela~\ref{tab:resultado-testes}, a ausência de falhas aliada à expressiva cobertura de 99,89\% de linhas e 95,80\% de ramificações atesta que, para o conjunto abrangente de cenários formalizados na suíte, o comportamento observado coincide rigorosamente com o comportamento esperado das regras modeladas no Capítulo~5. Em particular, os resultados sustentam a corretude da estratégia de recomendação e da alocação de \codigo{fulfilledBloodBags} por \textit{snapshot} --- FIFO restrita pelo teto proporcional ---, bem como o controle de acesso baseado em JWT e a proteção dos agregados de negócio.
 
-Ressalta-se que a maior parte dos testes de domínio e de aplicação não depende de uma instância MongoDB ativa: repositórios e serviços externos são substituídos por \textit{mocks}, o que favorece a repetibilidade e reduz o custo de execução. Os testes que sobem o contexto Spring Boot (\textit{smoke} e autorização HTTP) validam a montagem da aplicação e a barreira de segurança sem exigir, nos cenários cobertos, a persistência real de documentos.
+No âmbito da engenharia de software, a distinção entre a cobertura de linhas (99,89\%) e a cobertura de ramificações (95,80\%) oferece uma leitura qualitativa relevante. Enquanto a cobertura de linhas atesta que praticamente todas as instruções executáveis foram percorridas, a cobertura de ramificações (\textit{branch coverage}) avalia se cada estrutura condicional (\codigo{if}, \codigo{switch}, operadores ternários e filtros booleanos) foi testada tanto em seu desfecho verdadeiro quanto no falso. A retenção de 95,80\% reflete um nível excepcional de rigor, sendo os 4,20\% residuais correspondentes exclusivamente a salvaguardas defensivas de código (como checagens nulas redundantes exigidas por contratos de persistência ou métodos gerados de comparação estrutural).
+
+Ressalta-se que a totalidade dos testes de domínio e de aplicação não depende de uma instância MongoDB ativa: repositórios e serviços externos são substituídos por \textit{mocks}, o que favorece o determinismo, a repetibilidade e reduz o custo de execução para meros 15,2 segundos. Os testes que sobem o contexto Spring Boot (\textit{smoke} e autorização HTTP) validam a montagem da aplicação e a barreira de segurança sem exigir, nos cenários cobertos, a persistência real de documentos.
 
 \section{Avaliação de manutenibilidade}
 
 Do ponto de vista estrutural, a avaliação qualitativa confirma que a arquitetura em camadas favorece a manutenibilidade e a sustentabilidade técnica da solução (RNF04--RNF06). Essa constatação apoia-se, em primeiro lugar, no rigoroso isolamento da camada de domínio, na qual as regras de tipagem sanguínea, cálculo de elegibilidade, verificação de aceitação (\codigo{acceptsDonation}), aplicação do teto proporcional e alocação de bolsas estão estritamente encapsuladas em entidades e serviços de domínio, operando sem qualquer acoplamento a bibliotecas do Spring MVC ou do MongoDB. A introdução do algoritmo de teto proporcional exemplifica essa flexibilidade, tendo sido incorporada como regra pura do agregado e de seu serviço de domínio sem provocar alterações em casos de uso, controladores ou esquemas de persistência.
 
-Em consonância com esse isolamento, os casos de uso assumem exclusivamente o papel de orquestradores de fluxo, o que permite que a suíte de testes exercite cenários complexos de aplicação --- como a conclusão de uma doação e a subsequente visualização do progresso recalculado --- sem a interferência de detalhes de serialização HTTP. Adicionalmente, a aplicação do princípio de inversão de dependência por meio de dez interfaces de repositório e da interface de notificação permite desacoplar o núcleo de qualquer tecnologia concreta de infraestrutura, viabilizando o uso intensivo de objetos simulados (\textit{mocks}) que garantem testes determinísticos e rápidos sem a necessidade de um banco de dados ativo. Por fim, a verificação de segurança é concentrada na borda da aplicação, assegurando que o controle de acesso e autorização seja validado nos pontos de entrada sem poluir as regras de negócio de alocação e recomendação. Em conjunto, esses elementos demonstram que a manutenibilidade é amplamente favorecida pela separação de responsabilidades e pela elevada testabilidade das regras críticas.
+Em consonância com esse isolamento, os casos de uso assumem exclusivamente o papel de orquestradores de fluxo, o que permite que a suíte de testes exercite cenários complexos de aplicação --- como a conclusão de uma doação e a subsequente visualização do progresso recalculado --- sem a interferência de detalhes de serialização HTTP. Adicionalmente, a aplicação do princípio de inversão de dependência por meio de oito interfaces de repositório e da interface de notificação permite desacoplar o núcleo de qualquer tecnologia concreta de infraestrutura, viabilizando o uso intensivo de objetos simulados (\textit{mocks}) que garantem testes determinísticos e rápidos sem a necessidade de um banco de dados ativo. Por fim, a verificação de segurança é concentrada na borda da aplicação, assegurando que o controle de acesso e autorização seja validado nos pontos de entrada sem poluir as regras de negócio de alocação e recomendação. Em conjunto, esses elementos demonstram que a manutenibilidade é amplamente favorecida pela separação de responsabilidades e pela elevada testabilidade das regras críticas.
 
 \section{Sugestões de melhorias}
 
-A partir dos resultados obtidos na avaliação, delineiam-se aprimoramentos pertinentes para a evolução da API e de seus mecanismos de validação. No âmbito dos testes de integração, mostra-se recomendável expandir os cenários com persistência real em contêineres gerenciados (como Testcontainers com MongoDB), assegurando a validação automatizada de aspectos de infraestrutura como o controle de concorrência otimista (\codigo{@Version}) e consultas de agregação complexas na busca de hemocentros. Como complemento métrico à taxa de sucesso dos testes, sugere-se a incorporação contínua de ferramentas de cobertura de código, a exemplo do JaCoCo, mapeando ramificações não cobertas. No nível das interfaces externas, mostra-se oportuno formalizar testes automatizados de contrato a partir da especificação OpenAPI, bem como conduzir ensaios de carga e estresse dedicados a avaliar o desempenho das consultas geoespaciais e da reconstituição de agregados sob volumes elevados de dados e requisições concorrentes.
+A partir dos resultados obtidos na avaliação, delineiam-se aprimoramentos pertinentes para a evolução da API e de seus mecanismos de validação. No âmbito dos testes de integração, mostra-se recomendável expandir os cenários com persistência real em contêineres gerenciados (como Testcontainers com MongoDB), assegurando a validação automatizada de aspectos de infraestrutura como o controle de concorrência otimista (\codigo{@Version}) e consultas de agregação complexas na busca de hemocentros. No nível das interfaces externas, mostra-se oportuno formalizar testes automatizados de contrato a partir da especificação OpenAPI, bem como conduzir ensaios de carga e estresse dedicados a avaliar o desempenho das consultas geoespaciais e da reconstituição de agregados sob volumes elevados de dados e requisições concorrentes.
 
 \section{Considerações sobre a avaliação}
 
-Os resultados obtidos permitem concluir que o sistema implementado --- verificado pela suíte de 156 testes automatizados com 100\% de sucesso --- materializa o estudo de caso do Capítulo~5 e evidencia o atendimento ao objetivo O3 (recomendação de solicitações compatíveis e notificação de candidatos elegíveis, cobertos por testes de matching, recomendação e notificação indireta via casos de uso). A análise de manutenibilidade, igualmente metodológica, aponta uma arquitetura testável em camadas. A Seção~7 retoma esses achados à luz da problemática apresentada na Introdução.
+Os resultados obtidos permitem concluir que o sistema implementado --- verificado pela ampla suíte de 323 testes automatizados com 100\% de sucesso e cobertura superior a 99\% --- materializa o estudo de caso do Capítulo~5 e evidencia o atendimento ao objetivo O3 (recomendação de solicitações compatíveis e notificação de candidatos elegíveis, cobertos por testes de matching, recomendação e notificação indireta via casos de uso). A análise de manutenibilidade, igualmente metodológica, aponta uma arquitetura testável em camadas. A Seção~7 retoma esses achados à luz da problemática apresentada na Introdução.

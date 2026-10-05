@@ -159,4 +159,114 @@ class CreateDonationRequestUseCaseTest {
                 null),
             currentDate));
   }
+
+  @Test
+  void shouldRejectNullConstructorArgs() {
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationRequestUseCase(null, requesterRepository, bloodCenterRepository, partyRepository, geocodingService));
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationRequestUseCase(donationRequestRepository, null, bloodCenterRepository, partyRepository, geocodingService));
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationRequestUseCase(donationRequestRepository, requesterRepository, null, partyRepository, geocodingService));
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationRequestUseCase(donationRequestRepository, requesterRepository, bloodCenterRepository, null, geocodingService));
+    assertThrows(IllegalArgumentException.class, () -> new CreateDonationRequestUseCase(donationRequestRepository, requesterRepository, bloodCenterRepository, partyRepository, null));
+  }
+
+  @Test
+  void shouldValidateInputFields() {
+    LocalDate today = LocalDate.now();
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(null));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(new Input("id", "id", "A+", 3, today.plusDays(1), "MEDIUM", null), null));
+
+    String pId = DomainID.generate().getValue().toString();
+    String oId = DomainID.generate().getValue().toString();
+
+    // Goal bags null or invalid
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "A+", null, today.plusDays(1), "MEDIUM", null), today));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "A+", 0, today.plusDays(1), "MEDIUM", null), today));
+
+    // Date limit null or in past
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "A+", 5, null, "MEDIUM", null), today));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "A+", 5, today.minusDays(1), "MEDIUM", null), today));
+
+    // Blood type null, blank or invalid
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, null, 5, today.plusDays(1), "MEDIUM", null), today));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "", 5, today.plusDays(1), "MEDIUM", null), today));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "INVALID", 5, today.plusDays(1), "MEDIUM", null), today));
+
+    // Urgency null, blank or invalid
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "A+", 5, today.plusDays(1), null, null), today));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "A+", 5, today.plusDays(1), "", null), today));
+    assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(
+        new Input(pId, oId, "A+", 5, today.plusDays(1), "SUPER_URGENT", null), today));
+  }
+
+  @Test
+  void shouldThrowWhenBloodCenterRoleIsMissing() {
+    LocalDate currentDate = LocalDate.of(2026, 3, 16);
+    DomainID requesterId = DomainID.generate();
+    DomainID bloodCenterId = DomainID.generate();
+
+    Person requesterParty = new Person(
+        "Requester Person",
+        new PhoneNumber("11999990000"),
+        new CPF("12345678901"),
+        LocalDate.of(1995, 1, 1));
+    Requester requester = new Requester(requesterParty);
+
+    when(requesterRepository.findByPartyId(requesterId)).thenReturn(Optional.of(requester));
+    when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class,
+        () -> useCase.execute(
+            new Input(
+                requesterId.getValue().toString(),
+                bloodCenterId.getValue().toString(),
+                "A+",
+                3,
+                currentDate.plusDays(10),
+                "MEDIUM",
+                null),
+            currentDate));
+  }
+
+  @Test
+  void shouldExecuteWithDefaultCurrentDate() {
+    Person requesterParty = new Person(
+        "Requester Person",
+        new PhoneNumber("11999990000"),
+        new CPF("12345678901"),
+        LocalDate.of(1995, 1, 1));
+    Requester requester = new Requester(requesterParty);
+
+    Organization bloodCenterParty = new Organization(
+        "Main Blood Center",
+        new PhoneNumber("1133334444"),
+        new CNPJ("12345678000100"));
+    DomainID requesterId = DomainID.generate();
+    DomainID bloodCenterId = DomainID.generate();
+
+    when(requesterRepository.findByPartyId(requesterId)).thenReturn(Optional.of(requester));
+    when(bloodCenterRepository.findByPartyId(bloodCenterId)).thenReturn(
+        Optional.of(new bloodmatch.role.domain.organization.bloodcenter.BloodCenter(bloodCenterParty)));
+
+    var output = useCase.execute(
+        new Input(
+            requesterId.getValue().toString(),
+            bloodCenterId.getValue().toString(),
+            "A+",
+            3,
+            LocalDate.now().plusDays(10),
+            "MEDIUM",
+            null));
+
+    assertNotNull(output);
+  }
 }

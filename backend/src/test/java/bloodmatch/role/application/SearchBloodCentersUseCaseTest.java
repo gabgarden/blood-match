@@ -21,6 +21,14 @@ class SearchBloodCentersUseCaseTest {
   private final SearchBloodCentersUseCase useCase = new SearchBloodCentersUseCase(bloodCenterRepository);
 
   @Test
+  void shouldRejectNullInputOrQueryOrLimitLessThanOne() {
+    assertThrows(ValidationException.class, () -> useCase.execute(null));
+    assertThrows(ValidationException.class, () -> useCase.execute(new SearchBloodCentersUseCase.Input(null, 10)));
+    assertThrows(ValidationException.class, () -> useCase.execute(new SearchBloodCentersUseCase.Input("Hemo", 0)));
+    assertThrows(ValidationException.class, () -> useCase.execute(new SearchBloodCentersUseCase.Input("Hemo", -1)));
+  }
+
+  @Test
   void shouldRejectBlankOrShortQuery() {
     assertThrows(ValidationException.class,
         () -> useCase.execute(new SearchBloodCentersUseCase.Input(" ", 10)));

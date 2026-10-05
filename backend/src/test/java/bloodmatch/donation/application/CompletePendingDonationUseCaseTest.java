@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,6 +52,64 @@ class CompletePendingDonationUseCaseTest {
 
     verify(donorRepository).save(donor);
     verify(donationRepository).save(donation);
+    assertEquals("COMPLETED", result.status());
+  }
+
+  @Test
+  void shouldRejectNullConstructorArgs() {
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new CompletePendingDonationUseCase(null, donorRepository));
+    org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> new CompletePendingDonationUseCase(donationRepository, null));
+  }
+
+  @Test
+  void shouldValidateInputAndNullChecks() {
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(null));
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(new Input("id", 1L, LocalDate.now(), "actor"), null));
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ValidationException.class, () -> useCase.execute(new Input(bloodmatch.shared.domain.valueObjects.DomainID.generate().getValue().toString(), 1L, null, "actor"), LocalDate.now()));
+  }
+
+  @Test
+  void shouldThrowNotFoundWhenDonationMissing() {
+    when(donationRepository.findById(any())).thenReturn(Optional.empty());
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.NotFoundException.class, () -> useCase.execute(
+        new Input(bloodmatch.shared.domain.valueObjects.DomainID.generate().getValue().toString(), 1L, LocalDate.now(), "actor"), LocalDate.now()));
+  }
+
+  @Test
+  void shouldThrowConcurrencyExceptionOnVersionMismatch() {
+    Donor donor = donor();
+    BloodCenter bloodCenter = bloodCenter();
+    Donation donation = Donation.create(donor, bloodCenter, LocalDate.now(), null, LocalDate.now().minusDays(1));
+    donation.setVersion(2L);
+    when(donationRepository.findById(donation.getId())).thenReturn(Optional.of(donation));
+
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ConcurrencyException.class, () -> useCase.execute(
+        new Input(donation.getId().getValue().toString(), 1L, LocalDate.now(), donor.getPerson().getId().getValue().toString()), LocalDate.now()));
+  }
+
+  @Test
+  void shouldThrowForbiddenWhenActorMismatch() {
+    Donor donor = donor();
+    BloodCenter bloodCenter = bloodCenter();
+    Donation donation = Donation.create(donor, bloodCenter, LocalDate.now(), null, LocalDate.now().minusDays(1));
+    donation.setVersion(1L);
+    when(donationRepository.findById(donation.getId())).thenReturn(Optional.of(donation));
+
+    org.junit.jupiter.api.Assertions.assertThrows(bloodmatch.shared.application.exception.ForbiddenException.class, () -> useCase.execute(
+        new Input(donation.getId().getValue().toString(), 1L, LocalDate.now(), bloodmatch.shared.domain.valueObjects.DomainID.generate().getValue().toString()), LocalDate.now()));
+  }
+
+  @Test
+  void shouldExecuteWithDefaultCurrentDate() {
+    LocalDate today = LocalDate.now();
+    Donor donor = donor();
+    BloodCenter bloodCenter = bloodCenter();
+    Donation donation = Donation.create(donor, bloodCenter, today, null, today.minusDays(1));
+
+    when(donationRepository.findById(donation.getId())).thenReturn(Optional.of(donation));
+
+    Output result = useCase.execute(
+        new Input(donation.getId().getValue().toString(), null, today, donor.getPerson().getId().getValue().toString()));
     assertEquals("COMPLETED", result.status());
   }
 

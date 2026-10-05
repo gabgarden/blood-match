@@ -1,0 +1,82 @@
+\chapter{Matriz de Cobertura da Suíte de Testes Automatizados}
+\label{apendice:matriz-testes}
+
+Este apêndice apresenta a relação exaustiva das 50 classes de teste que compõem a suíte automatizada da API RESTful do \textit{Blood Match}. Ao todo, são 323 casos de teste que protegem o núcleo de regras de domínio, a orquestração de casos de uso na camada de aplicação, os componentes de segurança e os pontos de entrada HTTP.
+
+A Tabela~\ref{tab:matriz-completa-testes} detalha cada classe de teste, seu respectivo contexto delimitado (\textit{bounded context}), a camada arquitetural correspondente, os cenários e comportamentos formais verificados e o número de casos de teste implementados.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{3.4cm} p{1.6cm} p{1.9cm} >{\raggedright\arraybackslash}p{5.4cm} c}
+  \caption{Matriz exaustiva de testes automatizados da API Blood Match}
+  \label{tab:matriz-completa-testes}\\
+  \toprule
+  \textbf{Classe de teste} & \textbf{Contexto} & \textbf{Camada} & \textbf{Comportamentos verificados} & \textbf{Casos} \\
+  \midrule
+  \endfirsthead
+  \multicolumn{5}{c}{\tablename~\thetable{} -- continuação} \\
+  \toprule
+  \textbf{Classe de teste} & \textbf{Contexto} & \textbf{Camada} & \textbf{Comportamentos verificados} & \textbf{Casos} \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  % --- Contexto: shared (14 classes / 62 casos) ---
+  \codigo{BloodTypeTest} & shared & Domínio & Criação de tipo válido; normalização de caixa; rejeição de tipo nulo ou inválido; rejeição de receptor nulo; O\textsuperscript{-} como doador universal; compatibilidade completa da matriz ABO/Rh; igualdade e hash & 16 \\
+  \codigo{AddressTest} & shared & Domínio & Criação de endereço completo; geocodificação com coordenadas válidas; validação de campos obrigatórios e invariantes de localização & 7 \\
+  \codigo{CPFTest} & shared & Domínio & Validação de formato e cálculo dos dígitos verificadores de CPF; rejeição de nulos, tamanho incorreto e sequências repetidas & 4 \\
+  \codigo{CNPJTest} & shared & Domínio & Validação de formato e cálculo algorítmico de CNPJ; rejeição de documento inválido ou nulo & 4 \\
+  \codigo{PhoneNumberTest} & shared & Domínio & Formatação de número telefônico; rejeição de caracteres não numéricos e comprimento fora do padrão & 4 \\
+  \codigo{EmailTest} & shared & Domínio & Validação de formato RFC de e-mail; normalização para caracteres minúsculos; rejeição de strings malformadas & 4 \\
+  \codigo{DomainIDTest} & shared & Domínio & Geração aleatória de UUIDv4; conversão para string e validação de formato de identificador universal & 4 \\
+  \codigo{DomainObjectTest} & shared & Domínio & Atribuição de ID e controle de versão concorrente (\codigo{version}); rejeição de ID nulo & 2 \\
+  \codigo{DonationPolicyTest} & shared & Domínio & Políticas de doação e intervalos mínimos exigidos por gênero (60 dias homens, 90 dias mulheres) & 1 \\
+  \codigo{DomainIdParserTest} & shared & Aplicação & Conversão segura de UUID a partir de parâmetros de entrada; tratamento de erros de formatação & 3 \\
+  \codigo{EmailConfirmationTokensTest} & shared & Aplicação & Geração criptográfica de tokens e cálculo de janelas temporais de expiração & 3 \\
+  \codigo{PartyOwnershipTest} & shared & Aplicação & Verificação de posse de recurso por participante autenticado; bloqueio de acessos indevidos & 3 \\
+  \codigo{TimeFormatsTest} & shared & Aplicação & Formatação e \textit{parsing} padronizado de horários no formato HH:mm & 4 \\
+  \codigo{ExceptionsTest} & shared & Aplicação & Hierarquia de exceções de aplicação; mensagens de erro e causas encadeadas & 3 \\
+  % --- Contexto: auth (6 classes / 45 casos) ---
+  \codigo{UserAccountTest} & auth & Domínio & Criação de conta; fluxo de confirmação por token; bloqueio de conta inativa; expiração de token; regras de login & 12 \\
+  \codigo{AuthenticationServiceTest} & auth & Aplicação & Login com credenciais válidas; rejeição de senha incorreta; rejeição de conta desabilitada; geração e validação de JWT na resposta & 6 \\
+  \codigo{ConfirmEmailUseCaseTest} & auth & Aplicação & Confirmação bem-sucedida; token não encontrado; token expirado; reenvio antes da expiração; tratamento de exceções de domínio & 6 \\
+  \codigo{ResendConfirmationUseCaseTest} & auth & Aplicação & Reenvio de e-mail com novo token; rejeição de conta já confirmada; rejeição de token ainda válido; invalidação do token anterior & 7 \\
+  \codigo{JwtTokenProviderTest} & auth & Infraestr. & Geração de token com claims corretos (\codigo{sub}, papéis, expiração); validação de token legítimo; rejeição de assinatura adulterada & 3 \\
+  \codigo{SecurityAuthorizationIntegrationTest} & auth & Apresent. & Acesso anônimo retorna HTTP 401; token inválido retorna 401; papel incompatível retorna 403; papel autorizado retorna 200/2xx para \textit{endpoints} protegidos & 11 \\
+  % --- Contexto: party (3 classes / 16 casos) ---
+  \codigo{PartyTest} & party & Domínio & Criação de pessoa física e jurídica; integridade cadastral; atualização de endereço e telefone & 2 \\
+  \codigo{RegisterPartyUseCaseTest} & party & Aplicação & Cadastro de pessoa física e jurídica; validações cadastrais completas; rejeição de e-mail duplicado & 8 \\
+  \codigo{UpdatePartyUseCaseTest} & party & Aplicação & Atualização cadastral de dados do participante; restrições de permissão e consistência & 6 \\
+  % --- Contexto: role (9 classes / 48 casos) ---
+  \codigo{DonorTest} & role & Domínio & Definição de \textit{weightUpdatedAt}; atualização apenas sob variação de peso; histórico de doações; aptidão sanitária ($\ge 50$~kg) & 11 \\
+  \codigo{DonorMatchingServiceTest} & role & Domínio & \textit{Matching} de doadores compatíveis por tipo sanguíneo, elegibilidade temporal e proximidade física & 3 \\
+  \codigo{RoleHierarchyTest} & role & Domínio & Hierarquia de papéis (\codigo{PartyRole}); agregação com participantes e entidades base & 3 \\
+  \codigo{RegisterDonorUseCaseTest} & role & Aplicação & Registro de doador com dados válidos; validação de peso e tipo sanguíneo; rejeição de participante sem conta; detecção de duplicidade & 8 \\
+  \codigo{UpdateDonorUseCaseTest} & role & Aplicação & Atualização de peso e dados do doador; recálculo imediato de aptidão & 6 \\
+  \codigo{GetDonorSummaryUseCaseTest} & role & Aplicação & Retorno de resumo consolidado contendo elegibilidade e histórico do doador autenticado & 4 \\
+  \codigo{RegisterRequesterUseCaseTest} & role & Aplicação & Registro de requisitante com dados válidos; rejeição de participante sem conta; consistência de papéis & 4 \\
+  \codigo{RegisterBloodCenterUseCaseTest} & role & Aplicação & Cadastro de hemocentro vinculado à organização; validação de CNPJ e dados operacionais & 5 \\
+  \codigo{SearchBloodCentersUseCaseTest} & role & Aplicação & Busca por nome de hemocentros; delimitação de paginação; busca parcial insensível a maiúsculas; validação de argumentos & 4 \\
+  % --- Contexto: request (12 classes / 123 casos) ---
+  \codigo{DonationRequestTest} & request & Domínio & Regras do agregado; fórmula de teto proporcional; contorno de janela de um único dia; precisão via \codigo{BigDecimal}; cálculo de \codigo{acceptsDonation}; expiração & 22 \\
+  \codigo{DonationRequestFulfillmentFifoTest} & request & Domínio & Ordenação FIFO temporal por hemocentro; compatibilidade tipológica ABO/Rh; janela temporal válida; esgotamento de meta; isolamento entre hemocentros & 26 \\
+  \codigo{DonationRequestFulfillmentProportionalTest} & request & Domínio & Represamento de solicitação com prazo folgado; ausência de teto no dia da data-limite; devolução de sobras em segunda passagem FIFO; preservação do total de bolsas & 5 \\
+  \codigo{DonationRequestFulfillmentServiceTest} & request & Domínio & Alocação de doação compatível à solicitação; rejeição de data nula; carregamento de solicitações ativas; tratamento de listas vazias & 9 \\
+  \codigo{CreateDonationRequestUseCaseTest} & request & Aplicação & Criação de solicitação com dados válidos; validação de urgência e metas; geocodificação sob demanda; rejeição de entidades inexistentes & 7 \\
+  \codigo{CancelDonationRequestUseCaseTest} & request & Aplicação & Cancelamento pelo proprietário; rejeição de cancelamento por terceiro; rejeição de solicitação inexistente; registro obrigatório de justificativa & 7 \\
+  \codigo{CloseDonationRequestUseCaseTest} & request & Aplicação & Encerramento formal de solicitações de doação atendidas ou expiradas & 3 \\
+  \codigo{UpdateDonationRequestUseCaseTest} & request & Aplicação & Alteração de meta de bolsas e prorrogação de prazo; validações de datas futuras & 7 \\
+  \codigo{GetDonationRequestsByPartyIdUseCaseTest} & request & Aplicação & Listagem de pedidos por participante; enriquecimento com status de cumprimento em tempo real & 7 \\
+  \codigo{FindEligibleDonorsUseCaseTest} & request & Aplicação & Retorno de doadores elegíveis; exclusão de inaptos por intervalo sanitário ou peso insuficiente & 5 \\
+  \codigo{GetRecommendedRequestsUseCaseTest} & request & Aplicação & Elegibilidade do doador; descarte de solicitação com meta atingida; ordenação ponderada por distância, urgência e prazo; filtro de compatibilidade & 9 \\
+  \codigo{NotifyPotentialDonorsUseCaseTest} & request & Aplicação & Disparo de notificações assíncronas para candidatos elegíveis; idempotência e consistência & 6 \\
+  % --- Contexto: donation (5 classes / 38 casos) ---
+  \codigo{DonationTest} & donation & Domínio & Registro de intenção e doação realizada; conclusão de doação pendente; reagendamento com novas datas; cancelamento; validação de concorrência & 15 \\
+  \codigo{CreateDonationUseCaseTest} & donation & Aplicação & Criação de registro de doação com dados válidos; validações de autorização e notificação & 8 \\
+  \codigo{CompletePendingDonationUseCaseTest} & donation & Aplicação & Conclusão de doação pendente pelo hemocentro; atualização imediata do histórico sanitário do doador & 7 \\
+  \codigo{ReschedulePendingDonationUseCaseTest} & donation & Aplicação & Reagendamento de doação pendente para nova data válida & 6 \\
+  \codigo{GetDonorDonationHistoryUseCaseTest} & donation & Aplicação & Consulta de histórico individual de doações realizadas pelo participante autenticado & 2 \\
+  % --- Smoke (1 classe / 1 caso) ---
+  \codigo{BloodmatchApplicationTests} & -- & \textit{Smoke} & Carregamento completo do contexto de inicialização Spring Boot sem erros de configuração & 1 \\
+  \midrule
+  \textbf{Total} & \textbf{6 contextos} & \textbf{4 camadas} & \textbf{50 classes de teste} & \textbf{323} \\
+  \bottomrule
+\end{longtable}

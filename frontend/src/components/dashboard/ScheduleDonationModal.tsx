@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { Recommendation } from "../../hooks/useDonorDashboard";
-import { fetchDonationSlots, type DonationSlot } from "../../services/bloodCenterService";
 
 type ScheduleDonationModalProps = {
   isOpen: boolean;
@@ -52,11 +51,6 @@ export function ScheduleDonationModal({
 }: ScheduleDonationModalProps) {
   const minDate = daysRemaining > 0 ? addDaysIsoDate(daysRemaining) : todayIsoDate();
   const [expectedDate, setExpectedDate] = useState(minDate);
-  const [expectedTime, setExpectedTime] = useState<string>("");
-  const [slots, setSlots] = useState<DonationSlot[]>([]);
-  const [hasSchedule, setHasSchedule] = useState(false);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  const [slotsError, setSlotsError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
@@ -65,66 +59,12 @@ export function ScheduleDonationModal({
     }
 
     setExpectedDate(minDate);
-    setExpectedTime("");
-    setSlots([]);
-    setHasSchedule(false);
-    setSlotsError(null);
     setIsSuccess(false);
   }, [isOpen, recommendation?.id, minDate]);
-
-  useEffect(() => {
-    if (!isOpen || !recommendation?.organizationId || !expectedDate) {
-      return;
-    }
-
-    const organizationId = recommendation.organizationId;
-    let cancelled = false;
-
-    async function loadSlots() {
-      setIsLoadingSlots(true);
-      setSlotsError(null);
-      setExpectedTime("");
-
-      try {
-        const response = await fetchDonationSlots(organizationId, expectedDate);
-        if (cancelled) {
-          return;
-        }
-        setHasSchedule(response.hasSchedule);
-        setSlots(response.slots);
-      } catch {
-        if (cancelled) {
-          return;
-        }
-        setHasSchedule(false);
-        setSlots([]);
-        setSlotsError("Não foi possível carregar os horários. A data será enviada como intenção.");
-      } finally {
-        if (!cancelled) {
-          setIsLoadingSlots(false);
-        }
-      }
-    }
-
-    loadSlots();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isOpen, recommendation?.organizationId, expectedDate]);
 
   if (!isOpen || !recommendation) {
     return null;
   }
-
-  const showTimePicker = hasSchedule && slots.length > 0;
-  const dateOnlyNote =
-    slotsError ||
-    (!isLoadingSlots && !hasSchedule
-      ? "Este hemocentro ainda confirma o horário no local. Enviaremos só a data por enquanto."
-      : !isLoadingSlots && hasSchedule && slots.length === 0
-        ? "Não há horários disponíveis nesta data."
-        : null);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -132,15 +72,7 @@ export function ScheduleDonationModal({
       return;
     }
 
-    if (showTimePicker && !expectedTime) {
-      return;
-    }
-
-    const ok = await onConfirm(
-      recommendation.id,
-      expectedDate,
-      showTimePicker ? expectedTime : undefined,
-    );
+    const ok = await onConfirm(recommendation.id, expectedDate);
 
     if (ok !== false) {
       setIsSuccess(true);
@@ -169,7 +101,7 @@ export function ScheduleDonationModal({
             </div>
             <div>
               <h3 className="font-headline text-xl font-extrabold text-on-surface">
-                {isSuccess ? "Doação Agendada!" : "Agendar Doação Pendente"}
+                {isSuccess ? "Doação Agendada!" : "Registrar Intenção de Doação"}
               </h3>
               <p className="text-xs text-text-secondary">
                 {isSuccess
@@ -182,22 +114,20 @@ export function ScheduleDonationModal({
           <button
             type="button"
             onClick={handleCloseModal}
-            disabled={isSubmitting}
-            className="rounded-xl p-2 text-text-secondary hover:bg-surface-container-low transition-colors"
+            className="rounded-full p-2 text-text-secondary hover:bg-surface-container-high transition-colors"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-xl">close</span>
           </button>
         </div>
 
         {isSuccess ? (
-          <div className="mt-6 space-y-5">
-            <div className="rounded-2xl bg-emerald-50/70 border border-emerald-100 p-4 space-y-2">
-              <p className="text-sm font-bold text-emerald-800">
-                Tudo pronto! Lembre-se de beber bastante água e levar documento original com foto.
+          <div className="mt-6 space-y-5 animate-in fade-in">
+            <div className="rounded-2xl bg-emerald-50/60 border border-emerald-100 p-4 text-center">
+              <p className="text-sm font-bold text-emerald-900">
+                Agendamento pendente registrado!
               </p>
-              <p className="text-xs text-emerald-700">
-                Data marcada: <strong className="font-extrabold">{expectedDate.split("-").reverse().join("/")}</strong>
-                {expectedTime ? ` às ${expectedTime}` : ""} no {recommendation.bloodCenterName}.
+              <p className="mt-1 text-xs text-emerald-700">
+                Data prevista: <span className="font-extrabold">{expectedDate.split("-").reverse().join("/")}</span> no {recommendation.bloodCenterName}.
               </p>
             </div>
 
@@ -259,79 +189,33 @@ export function ScheduleDonationModal({
                 )}
               </div>
 
-              {isLoadingSlots && (
-                <p className="text-xs text-text-secondary inline-flex items-center gap-1.5">
-                  <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
-                  Buscando horários disponíveis...
-                </p>
-              )}
-
-              {showTimePicker && (
-                <div>
-                  <p className="block text-xs font-bold uppercase tracking-wider text-secondary mb-1.5">Horário</p>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {slots.map((slot) => {
-                      const disabled = slot.available === 0;
-                      const selected = expectedTime === slot.startTime;
-                      return (
-                        <button
-                          key={`${slot.startTime}-${slot.endTime}`}
-                          type="button"
-                          disabled={disabled}
-                          onClick={() => setExpectedTime(slot.startTime)}
-                          className={`rounded-xl px-2 py-2 text-xs font-bold transition-all ${
-                            selected
-                              ? "bg-primary text-white shadow-sm"
-                              : disabled
-                                ? "bg-surface-container-low text-gray-400 cursor-not-allowed"
-                                : "bg-white border border-surface-container-high text-on-surface hover:border-primary"
-                          }`}
-                        >
-                          {slot.startTime}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {!expectedTime && (
-                    <p className="mt-2 text-xs text-amber-700">Selecione um horário disponível.</p>
-                  )}
-                </div>
-              )}
-
-              {dateOnlyNote && !showTimePicker && !isLoadingSlots && (
-                <p className="text-xs text-text-secondary leading-relaxed rounded-xl bg-surface-container-low p-3">
-                  {dateOnlyNote}
-                </p>
-              )}
-
               <p className="text-xs text-text-secondary leading-relaxed">
-                Ao agendar, sua intenção de doação é registrada. Após realizar a doação no local, o hemocentro ou você
-                poderão confirmar a conclusão.
+                Ao registrar, sua intenção de doação é salva como pendente. Após realizar a doação presencialmente, ela
+                poderá ser marcada como concluída para atualizar seu histórico e intervalo.
               </p>
 
-              <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={onClose}
-                  disabled={isSubmitting}
-                  className="rounded-xl px-5 py-3 text-sm font-bold text-text-secondary hover:bg-surface-container-low transition-colors"
+                  onClick={handleCloseModal}
+                  className="rounded-xl px-4 py-2.5 text-sm font-bold text-text-secondary hover:bg-surface-container-high transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting || isLoadingSlots || (showTimePicker && !expectedTime)}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-[#920f16] transition-colors disabled:opacity-50"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary-hover disabled:opacity-60 transition-all"
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="material-symbols-outlined animate-spin text-base">progress_activity</span>
-                      Agendando...
+                      <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                      Salvando...
                     </>
                   ) : (
                     <>
-                      <span className="material-symbols-outlined text-base">check</span>
-                      Confirmar Agendamento
+                      <span className="material-symbols-outlined text-lg">check_circle</span>
+                      Confirmar Intenção
                     </>
                   )}
                 </button>

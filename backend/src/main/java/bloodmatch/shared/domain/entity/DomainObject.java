@@ -21,7 +21,7 @@ public abstract class DomainObject {
         return version;
     }
 
-    protected void setVersion(Long version) {
+    public void setVersion(Long version) {
         this.version = version;
     }
 
