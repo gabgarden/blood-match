@@ -1,8 +1,8 @@
-\chapter{API RESTful proposta: requisitos, análise, design e implementação}
+\chapter{RESTful API proposta: requisitos, análise, design e implementação}
 
 \section{Visão geral da solução}
 
-Este capítulo apresenta a solução tecnológica desenvolvida para apoiar o processo de captação e gerenciamento de solicitações de doação de sangue. A proposta materializa-se na construção de uma API RESTful focada exclusivamente na camada de \textit{backend}, responsável pelo gerenciamento de participantes (pessoas e organizações), solicitações de doação, registro do histórico de doadores e recomendação de solicitações compatíveis.
+Este capítulo apresenta a solução tecnológica desenvolvida para apoiar o processo de captação e gerenciamento de solicitações de doação de sangue. A proposta materializa-se na construção de uma RESTful API focada exclusivamente na camada de \textit{backend}, responsável pelo gerenciamento de participantes (pessoas e organizações), solicitações de doação, registro do histórico de doadores e recomendação de solicitações compatíveis.
 
 O desenvolvimento foi orientado pelos princípios do DDD e pelos princípios SOLID, já fundamentados no Capítulo~2. Essa abordagem permitiu que a estrutura do software refletisse a realidade do domínio da hemoterapia, reduzindo o acoplamento entre os componentes e facilitando a evolução contínua do sistema. As seções seguintes detalham o levantamento de requisitos, a modelagem do sistema, a organização do domínio e da arquitetura, a implementação técnica e, por fim, a estratégia de recomendação e de cumprimento de metas, que constitui o núcleo funcional da API.
 
@@ -60,7 +60,7 @@ Além das funcionalidades diretas, foram definidos requisitos não funcionais pa
     \toprule
     \textbf{Código} & \textbf{Descrição} \\
     \midrule
-    RNF01 & O sistema deve disponibilizar seus serviços por meio de uma API RESTful utilizando o protocolo HTTP. \\
+    RNF01 & O sistema deve disponibilizar seus serviços por meio de uma RESTful API utilizando o protocolo HTTP. \\
     RNF02 & O sistema deve autenticar usuários por meio de JWT. \\
     RNF03 & O sistema deve persistir os dados em banco de dados NoSQL (MongoDB). \\
     RNF04 & O sistema deve permitir evolução e manutenção sem impacto significativo nas demais camadas da aplicação. \\
@@ -76,7 +76,7 @@ Além das funcionalidades diretas, foram definidos requisitos não funcionais pa
 \end{table}
 
 
-Diferentemente dos requisitos funcionais, que especificam os serviços e as ações que o sistema deve executar, os requisitos não funcionais definem as qualidades, restrições e propriedades estruturais do \textit{software}. Nesse sentido, os itens elencados estabelecem parâmetros de segurança (como autenticação sem estado e autorização por papéis), manutenibilidade e baixo acoplamento (assegurados pela divisão em camadas orientada ao DDD e ao SOLID), integridade de dados (por meio do controle de concorrência otimista) e padronização das comunicações (via API RESTful e formato JSON), sustentando a robustez técnica da solução desenvolvida.
+Diferentemente dos requisitos funcionais, que especificam os serviços e as ações que o sistema deve executar, os requisitos não funcionais definem as qualidades, restrições e propriedades estruturais do \textit{software}. Nesse sentido, os itens elencados estabelecem parâmetros de segurança (como autenticação sem estado e autorização por papéis), manutenibilidade e baixo acoplamento (assegurados pela divisão em camadas orientada ao DDD e ao SOLID), integridade de dados (por meio do controle de concorrência otimista) e padronização das comunicações (via RESTful API e formato JSON), sustentando a robustez técnica da solução desenvolvida.
 
 
 \section{Modelagem do sistema}
@@ -330,7 +330,7 @@ A entidade \texttt{Party} foi adotada como abstração de mais alto nível da hi
 
 As entidades \texttt{DonationRequest} e \texttt{Donation} operam como raízes de agregados (\textit{Aggregate Roots}), concentrando regras de negócio --- como a validação de datas-limite e a verificação de compatibilidade sanguínea --- e protegendo o estado interno dos objetos por meio do encapsulamento. Adicionalmente, conceitos imutáveis sem identidade própria, como \texttt{Address} (Endereço), \texttt{BloodType} (Tipo Sanguíneo) e \texttt{DomainID}, foram modelados como objetos de valor, na linha proposta por \citeonline{evans2003} e detalhada por \citeonline{vernon2013}, aumentando a segurança e a previsibilidade do modelo.
 
-\section{Endpoints e recursos da API RESTful}
+\section{Endpoints e recursos da RESTful API}
 \label{sec:endpoints-api}
 
 A arquitetura da API foi projetada para refletir diretamente os agrupamentos lógicos do domínio (\textit{Package-by-Entity}). Dessa forma, os \textit{endpoints} foram estruturados e organizados em torno dos principais agregados e entidades do sistema, promovendo alta coesão e previsibilidade no consumo dos recursos. Nas tabelas a seguir, apresentam-se as rotas mapeadas para cada módulo da aplicação, detalhando os métodos HTTP e suas respectivas finalidades.
