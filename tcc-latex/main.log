@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  5 OCT 2026 14:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.8.11)  9 OCT 2026 00:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1857,17 +1857,7 @@ LaTeX Font Info:    Font shape `T1/qhv/b/it' will be
 LaTeX Font Info:    Font shape `T1/qhv/m/n' will be
 (Font)              scaled to size 10.29301pt on input line 58.
 
-[9]
-Overfull \hbox (1.33098pt too wide) detected at line 104
- \T1/qhv/b/n/12 100
- []
-
-
-Overfull \hbox (1.33098pt too wide) detected at line 112
- \T1/qhv/b/n/12 104
- []
-
-) [10]
+[9]) [10]
 \openout2 = `capitulos/01-introducao.aux'.
 
  (capitulos/01-introducao.tex
@@ -2341,84 +2331,83 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.14})
 l.556   \item \textbf
                      {Proteção contra Vazamento de Domínio:} O \codigo{Ou...
  <./figuras/insomnia-create-donation-request.png>] [57] [58] [59] [60] [61]
-[62] [63] [64] [65] [66] [67] [68] [69] [70]
-<figuras/figura10-exemplo-alocacao-teto.png, id=1396, 903.375pt x 572.1375pt>
+[62] [63] [64] [65] [66]
+<figuras/figura10-exemplo-alocacao-teto.png, id=1178, 903.375pt x 572.1375pt>
 File: figuras/figura10-exemplo-alocacao-teto.png Graphic file (type png)
 <use figuras/figura10-exemplo-alocacao-teto.png>
 Package pdftex.def Info: figuras/figura10-exemplo-alocacao-teto.png  used on in
-put line 1137.
+put line 936.
 (pdftex.def)             Requested size: 446.13727pt x 282.55853pt.
+ [67]
 LaTeX Font Info:    Font shape `OT1/minntx/b/n' will be
-(Font)              scaled to size 12.0pt on input line 1144.
+(Font)              scaled to size 12.0pt on input line 943.
 LaTeX Font Info:    Font shape `OT1/minntx/b/n' will be
-(Font)              scaled to size 8.8pt on input line 1144.
+(Font)              scaled to size 8.8pt on input line 943.
 LaTeX Font Info:    Font shape `OT1/minntx/b/n' will be
-(Font)              scaled to size 6.6pt on input line 1144.
+(Font)              scaled to size 6.6pt on input line 943.
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 8.8pt on input line 1144.
+(Font)              scaled to size 8.8pt on input line 943.
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 6.6pt on input line 1144.
- [71
+(Font)              scaled to size 6.6pt on input line 943.
+LaTeX Font Info:    Font shape `TS1/ntxtlf/b/n' will be
+(Font)              scaled to size 12.0pt on input line 952.
+ [68
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.15})
  has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1145   \item \textbf
-                      {Solicitação $R_2$ (mais recente na FIFO):} registra...
- <./figuras/figura10-exemplo-alocacao-teto.png (PNG copy)>]
-LaTeX Font Info:    Font shape `TS1/ntxtlf/b/n' will be
-(Font)              scaled to size 12.0pt on input line 1153.
- [72] [73] [74]
-[75] [76] [77] [78] [79] [80] [81] [82] [83] [84]) [85]
+l.956     \item \textbf
+                       {Doação $D_1$ ($1{,}0$ bolsa):} a fila inicia pela ...
+ <./figuras/figura10-exemplo-alocacao-teto.png (PNG copy)>] [69] [70] [71]
+[72] [73] [74] [75]) [76]
 \openout2 = `capitulos/06-avaliacao.aux'.
 
-
-(capitulos/06-avaliacao.tex
+ (capitulos/06-avaliacao.tex
 Cap\'{\i }tulo 6.
-[86
+[77
 
 
 
 
-] [87] [88
+] [78] [79
 pdfTeX warning (ext4): destination with the same identifier (name{table.6.15}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.73 
-     ] [89
+     ] [80
 pdfTeX warning (ext4): destination with the same identifier (name{table.6.16}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.85   \item O
                \codigo{DonationRequestFulfillmentServiceTest} (9 casos) orqu...
-] [90] [91] [92] [93
+] [81] [82] [83
 pdfTeX warning (ext4): destination with the same identifier (name{table.6.17}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.233 
-      ]) [94] [95]
+l.187 
+      ]) [84] [85]
 \openout2 = `capitulos/07-consideracoes.aux'.
 
  (capitulos/07-consideracoes.tex
 Cap\'{\i }tulo 7.
-[96
+[86
 
 
 
 
-] [97]) [98] [99] [100
+] [87]) [88] [89] [90
 
 
 
-] [101] [102]
+] [91] [92]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\uppercase' on input line 269.
 
-[103
+[93
 
 
 ]
@@ -2436,15 +2425,15 @@ Overfull \hbox (0.89142pt too wide) in paragraph at lines 17--17
 []|\T1/ntxtlf/b/n/12 Contexto| 
  []
 
-ignored error: Infinite glue shrinkage found in box being split [104
+ignored error: Infinite glue shrinkage found in box being split [94
 
 
 ]
-ignored error: Infinite glue shrinkage found in box being split [105]
-ignored error: Infinite glue shrinkage found in box being split [106]
-ignored error: Infinite glue shrinkage found in box being split [107]
-ignored error: Infinite glue shrinkage found in box being split [108]
-ignored error: Infinite glue shrinkage found in box being split [109]) [110]
+ignored error: Infinite glue shrinkage found in box being split [95]
+ignored error: Infinite glue shrinkage found in box being split [96]
+ignored error: Infinite glue shrinkage found in box being split [97]
+ignored error: Infinite glue shrinkage found in box being split [98]
+ignored error: Infinite glue shrinkage found in box being split [99]) [100]
 
 Class memoir Warning: The material used in the footer is too large
 (10.14995pt) for the given foot skip (0.0pt), it is recommended to
@@ -2473,10 +2462,10 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35013 strings out of 467871
- 600457 string characters out of 5418376
- 2063593 words of memory out of 5000000
- 61939 multiletter control sequences out of 15000+600000
+ 34380 strings out of 467871
+ 589716 string characters out of 5418376
+ 1936551 words of memory out of 5000000
+ 61876 multiletter control sequences out of 15000+600000
  754035 words of font info for 168 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,13n,117p,1356b,4447s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -2497,9 +2486,9 @@ rograms/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Users/garde/AppData/Local
 l/Programs/MiKTeX/fonts/type1/public/newtx/ztmbi.pfb><C:/Users/garde/AppData/Lo
 cal/Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/Users/garde/AppData/L
 ocal/Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on main.pdf (111 pages, 1772340 bytes).
+Output written on main.pdf (101 pages, 1674811 bytes).
 PDF statistics:
- 2839 PDF objects out of 2984 (max. 8388607)
- 1413 named destinations out of 1440 (max. 500000)
+ 2120 PDF objects out of 2487 (max. 8388607)
+ 843 named destinations out of 1000 (max. 500000)
  25956 words of extra memory for PDF output out of 29859 (max. 10000000)
 

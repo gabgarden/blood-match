@@ -576,15 +576,9 @@ public class CreateDonationRequestUseCase {
     this.bloodCenterRepository = bloodCenterRepository;
   }
 
-  public Output execute(Input input) {
-    return execute(input, LocalDate.now());
-  }
-
   public Output execute(Input input, LocalDate currentDate) {
     DomainID partyId = DomainIdParser.parse(input.partyId(), "partyId");
     DomainID organizationId = DomainIdParser.parse(input.organizationId(), "organizationId");
-    BloodType bloodTypeNeeded = parseBloodType(input.bloodTypeNeeded());
-    Urgency urgency = parseUrgency(input.urgency());
 
     Requester requester = requesterRepository.findByPartyId(partyId)
         .orElseThrow(() -> new NotFoundException("Requester role not found"));
@@ -592,9 +586,9 @@ public class CreateDonationRequestUseCase {
         .orElseThrow(() -> new NotFoundException("Blood center role not found"));
 
     DonationRequest request = DonationRequest.create(
-        requester, bloodCenter, bloodTypeNeeded,
+        requester, bloodCenter, parseBloodType(input.bloodTypeNeeded()),
         input.goalBloodBags(), input.dateLimit(),
-        currentDate, urgency, input.directedTo());
+        currentDate, parseUrgency(input.urgency()), input.directedTo());
 
     donationRequestRepository.save(request);
     return Output.from(request);
@@ -640,22 +634,12 @@ public class DonationRequest extends DomainObject {
       Requester requester, BloodCenter bloodCenter, BloodType bloodTypeNeeded,
       int goalBloodBags, LocalDate dateLimit, LocalDate currentDate,
       Urgency urgency, String directedTo) {
-    if (requester == null)
-      throw new IllegalArgumentException("Requester cannot be null");
-    if (bloodCenter == null)
-      throw new IllegalArgumentException("Blood center cannot be null");
-    if (bloodTypeNeeded == null)
-      throw new IllegalArgumentException("Blood type cannot be null");
+    // Validacoes de integridade e invariantes de negocio
     if (goalBloodBags <= 0)
       throw new IllegalArgumentException("Goal blood bags must be greater than zero");
-    if (dateLimit == null)
-      throw new IllegalArgumentException("Limit date cannot be null");
-    if (currentDate == null)
-      throw new IllegalArgumentException("Current date cannot be null");
-    if (urgency == null)
-      throw new IllegalArgumentException("Urgency cannot be null");
-    if (dateLimit.isBefore(currentDate))
+    if (dateLimit == null || currentDate == null || dateLimit.isBefore(currentDate))
       throw new IllegalArgumentException("Limit date invalid");
+    // ... validacoes complementares de nulidade (requester, bloodCenter, bloodType) ...
 
     this.id = DomainID.generate();
     this.requester = requester;
@@ -669,7 +653,7 @@ public class DonationRequest extends DomainObject {
     this.directedTo = directedTo;
   }
 
-  // Static Factory Method
+  // Static Factory Method idiomatico (Bloch, 2018)
   public static DonationRequest create(
       Requester requester, BloodCenter bloodCenter, BloodType bloodTypeNeeded,
       int goalBloodBags, LocalDate dateLimit, LocalDate currentDate,
@@ -696,38 +680,19 @@ public class DonationRequestSchema {
   private Long version; // Controle de Concorrencia Otimista (OCC)
   private String requesterId;
   private String organizationId;
-  private String bloodTypeNeeded;
-  private int goalBloodBags;
-  private LocalDate dateRequested;
-  private LocalDate dateLimit;
-  private boolean active;
-  private String urgency;
-  private String directedTo;
+  // ... atributos de negocio (bloodTypeNeeded, goalBloodBags, datas, active, urgency) ...
 
   @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
-  private double[] location; // Coordenadas [longitude, latitude]
+  private double[] location; // Coordenadas [longitude, latitude] para busca espacial
 
   public DonationRequestSchema(DonationRequest donationRequest) {
-    if (donationRequest == null)
-      throw new IllegalArgumentException("DonationRequest cannot be null");
-
     this.id = donationRequest.getId().getValue().toString();
     this.version = donationRequest.getVersion();
-    this.requesterId = donationRequest.getRequester().getParty().getId().getValue().toString();
-    this.organizationId = donationRequest.getBloodCenter().getOrganization().getId().getValue().toString();
-    this.bloodTypeNeeded = donationRequest.getBloodTypeNeeded().getType();
-    this.goalBloodBags = donationRequest.getGoalBloodBags();
-    this.dateRequested = donationRequest.getDateRequested();
-    this.dateLimit = donationRequest.getDateLimit();
-    this.active = donationRequest.isActive();
-    this.urgency = donationRequest.getUrgency().name();
-    this.directedTo = donationRequest.getDirectedTo();
-    if (donationRequest.getBloodCenter().getOrganization().getAddress() != null
-        && donationRequest.getBloodCenter().getOrganization().getAddress().hasCoordinates()) {
-      this.location = new double[] {
-          donationRequest.getBloodCenter().getOrganization().getAddress().getLongitude(),
-          donationRequest.getBloodCenter().getOrganization().getAddress().getLatitude()
-      };
+    // ... mapeamento dos atributos do agregado ...
+
+    var address = donationRequest.getBloodCenter().getOrganization().getAddress();
+    if (address != null && address.hasCoordinates()) {
+      this.location = new double[] { address.getLongitude(), address.getLatitude() };
     }
   }
 }
@@ -805,9 +770,6 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
 
   @Override
   public void save(DonationRequest request) {
-    if (request == null)
-      throw new IllegalArgumentException("DonationRequest cannot be null");
-
     DonationRequestSchema schema = new DonationRequestSchema(request);
     OptimisticConcurrency.save(
         () -> mongoRepository.save(schema),
@@ -815,20 +777,9 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
   }
 
   @Override
-  public Optional<DonationRequest> findById(DomainID id) {
-    if (id == null)
-      throw new IllegalArgumentException("Donation request id cannot be null");
-
-    return mongoRepository.findById(id.getValue().toString())
-        .map(schema -> graphLoader.toDonationRequests(List.of(schema)).get(0));
-  }
-
-  @Override
   public List<DonationRequest> findActiveRequestsForDonor(
       BloodType donorBloodType, Address donorAddress,
       double maxDistanceInKm, LocalDate currentDate) {
-    if (donorBloodType == null || currentDate == null)
-      throw new IllegalArgumentException("Parameters cannot be null");
     if (donorAddress == null || !donorAddress.hasCoordinates())
       return List.of();
 
@@ -843,22 +794,7 @@ public class DonationRequestRepositoryImpl implements DonationRequestRepositoryI
     return graphLoader.toDonationRequests(schemas);
   }
 
-  @Override
-  public List<DonationRequest> findByRequesterPartyId(DomainID requesterPartyId) {
-    if (requesterPartyId == null)
-      throw new IllegalArgumentException("Requester party id cannot be null");
-
-    return graphLoader.toDonationRequests(
-        mongoRepository.findByRequesterId(requesterPartyId.getValue().toString()));
-  }
-
-  @Override
-  public void deleteById(DomainID id) {
-    if (id == null)
-      throw new IllegalArgumentException("Donation request id cannot be null");
-
-    mongoRepository.deleteById(id.getValue().toString());
-  }
+  // ... operacoes complementares findById, findByRequesterPartyId e deleteById delegadas via composicao
 }
 \end{lstlisting}
 
@@ -886,26 +822,6 @@ As solicitações candidatas cuja meta já foi atingida no \textit{snapshot} de 
 A Listagem~\ref{lst:get-recommended-requests-usecase} apresenta a implementação completa do caso de uso, ilustrando a recepção do \codigo{Input}, a verificação de elegibilidade do doador, a consulta espacial ao repositório, o cálculo de preenchimento via \codigo{fulfillmentService.fill} e a ordenação multi-critério em memória.
 
 \begin{lstlisting}[language=Java, caption={Caso de Uso de Recomendação de Solicitações ao Doador}, label={lst:get-recommended-requests-usecase}]
-package bloodmatch.request.application.recommendations;
-
-import bloodmatch.shared.application.exception.NotFoundException;
-import bloodmatch.shared.application.exception.ValidationException;
-import bloodmatch.shared.application.shared.DomainIdParser;
-import bloodmatch.request.domain.DonationRequest;
-import bloodmatch.request.domain.DonationRequestRepositoryInterface;
-import bloodmatch.role.domain.person.donor.DonorRepositoryInterface;
-import bloodmatch.role.domain.person.donor.Donor;
-import bloodmatch.request.domain.DonationRequestFulfillmentService;
-import bloodmatch.request.domain.DonationRequestFulfillmentStatusRecord;
-import bloodmatch.shared.domain.valueObjects.Address;
-import bloodmatch.shared.domain.valueObjects.DomainID;
-import org.springframework.stereotype.Service;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
 @Service
 public class GetRecommendedRequestsUseCase {
 
@@ -922,14 +838,7 @@ public class GetRecommendedRequestsUseCase {
     this.fulfillmentService = fulfillmentService;
   }
 
-  public List<OutputItem> execute(Input input) {
-    return execute(input, LocalDate.now());
-  }
-
   public List<OutputItem> execute(Input input, LocalDate currentDate) {
-    if (input == null || currentDate == null)
-      throw new ValidationException("Parameters cannot be null");
-
     DomainID personId = DomainIdParser.parse(input.personId(), "personId");
     Donor donor = donorRepository.findByPartyId(personId)
         .orElseThrow(() -> new NotFoundException("Donor role not found"));
@@ -938,79 +847,28 @@ public class GetRecommendedRequestsUseCase {
       return List.of();
     }
 
+    // Consulta espacial com indice 2dsphere filtrando raio e compatibilidade
     List<DonationRequest> candidateRequests = donationRequestRepository.findActiveRequestsForDonor(
-        donor.getBloodType(),
-        donor.getPerson().getAddress(),
-        donor.getMaxRecommendationDistanceKm(),
-        currentDate);
+        donor.getBloodType(), donor.getPerson().getAddress(),
+        donor.getMaxRecommendationDistanceKm(), currentDate);
 
-    if (candidateRequests.isEmpty()) {
-      return List.of();
-    }
-
+    // Snapshot em memoria de preenchimento de metas sob demanda
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot =
         fulfillmentService.fill(candidateRequests, currentDate);
 
+    // Descarte de metas atingidas e ordenacao multi-criterio
     return candidateRequests.stream()
         .filter(request -> !statusOf(snapshot, request).goalReached())
-        .sorted(
-            Comparator
-                .comparing((DonationRequest request) -> distanceKm(donor, request),
-                    Comparator.nullsLast(Comparator.naturalOrder()))
-                .thenComparing(DonationRequest::getUrgency, Comparator.reverseOrder())
-                .thenComparing(DonationRequest::getDateLimit))
+        .sorted(Comparator
+            .comparing((DonationRequest request) -> distanceKm(donor, request),
+                Comparator.nullsLast(Comparator.naturalOrder()))
+            .thenComparing(DonationRequest::getUrgency, Comparator.reverseOrder())
+            .thenComparing(DonationRequest::getDateLimit))
         .map(request -> toOutput(request, donor, snapshot))
         .toList();
   }
 
-  private OutputItem toOutput(
-      DonationRequest request, Donor donor,
-      Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot) {
-    Double distance = distanceKm(donor, request);
-    Address address = request.getBloodCenter().getOrganization().getAddress();
-    DonationRequestFulfillmentStatusRecord status = statusOf(snapshot, request);
-
-    return new OutputItem(
-        request.getId().getValue().toString(),
-        request.getBloodCenter().getOrganization().getId().getValue().toString(),
-        request.getBloodTypeNeeded().getType(),
-        request.getDateLimit(),
-        request.getBloodCenter().getOrganization().getName(),
-        request.getUrgency().name(),
-        distance != null ? Math.round(distance * 10.0) / 10.0 : null,
-        request.getGoalBloodBags(),
-        status.fulfilledBloodBags(),
-        status.goalReached(),
-        address != null ? address.getLatitude() : null,
-        address != null ? address.getLongitude() : null);
-  }
-
-  private static DonationRequestFulfillmentStatusRecord statusOf(
-      Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot,
-      DonationRequest request) {
-    return snapshot.getOrDefault(
-        request.getId(),
-        new DonationRequestFulfillmentStatusRecord(0, false));
-  }
-
-  private static Double distanceKm(Donor donor, DonationRequest request) {
-    Address addr1 = donor.getPerson().getAddress();
-    Address addr2 = request.getBloodCenter().getOrganization().getAddress();
-    if (addr1 == null || addr2 == null) return null;
-    return addr1.distanceTo(addr2);
-  }
-
-  public record Input(String personId, boolean includeNonEligible) {
-    public Input(String personId) {
-      this(personId, false);
-    }
-  }
-
-  public record OutputItem(
-      String requestId, String organizationId, String bloodTypeNeeded,
-      LocalDate dateLimit, String bloodCenterName, String urgency,
-      Double distanceInKm, int goalBloodBags, BigDecimal fulfilledBloodBags,
-      boolean goalReached, Double latitude, Double longitude) {}
+  // ... metodos auxiliares toOutput, distanceKm e declaracao dos records Input e OutputItem
 }
 \end{lstlisting}
 
@@ -1021,102 +879,43 @@ Complementarmente à recomendação, o requisitante pode disparar notificações
 A Listagem~\ref{lst:notify-potential-donors-usecase} detalha a implementação de \codigo{NotifyPotentialDonorsUseCase}, ressaltando a verificação de propriedade via \codigo{PartyOwnership}, o bloqueio de envio caso a meta já tenha sido cumprida no \textit{snapshot} de preenchimento e o despacho de notificações aos usuários elegíveis.
 
 \begin{lstlisting}[language=Java, caption={Caso de Uso de Notificação Ativa de Doadores Potenciais}, label={lst:notify-potential-donors-usecase}]
-package bloodmatch.request.application.notification;
-
-import bloodmatch.shared.application.exception.NotFoundException;
-import bloodmatch.shared.application.exception.ValidationException;
-import bloodmatch.shared.application.shared.DomainIdParser;
-import bloodmatch.shared.application.shared.PartyOwnership;
-import bloodmatch.request.domain.DonationRequest;
-import bloodmatch.role.domain.matching.DonorMatchingService;
-import bloodmatch.request.domain.DonationRequestRepositoryInterface;
-import bloodmatch.role.domain.person.donor.DonorRepositoryInterface;
-import bloodmatch.auth.domain.UserAccountRepositoryInterface;
-import bloodmatch.role.domain.person.donor.Donor;
-import bloodmatch.auth.domain.UserAccount;
-import bloodmatch.request.domain.DonationRequestFulfillmentService;
-import bloodmatch.shared.domain.services.NotificationServiceInterface;
-import bloodmatch.request.domain.DonationRequestFulfillmentStatusRecord;
-import bloodmatch.shared.domain.valueObjects.DomainID;
-import org.springframework.stereotype.Service;
-import java.time.LocalDate;
-import java.util.List;
-
 @Service
 public class NotifyPotentialDonorsUseCase {
 
-  private final DonationRequestRepositoryInterface requestRepository;
-  private final DonorRepositoryInterface donorRepository;
-  private final UserAccountRepositoryInterface userAccountRepository;
-  private final DonorMatchingService matchingService;
-  private final NotificationServiceInterface notificationService;
-  private final DonationRequestFulfillmentService fulfillmentService;
-
-  public NotifyPotentialDonorsUseCase(
-      DonationRequestRepositoryInterface requestRepository,
-      DonorRepositoryInterface donorRepository,
-      UserAccountRepositoryInterface userAccountRepository,
-      NotificationServiceInterface notificationService,
-      DonationRequestFulfillmentService fulfillmentService) {
-    this.requestRepository = requestRepository;
-    this.donorRepository = donorRepository;
-    this.userAccountRepository = userAccountRepository;
-    this.notificationService = notificationService;
-    this.fulfillmentService = fulfillmentService;
-    this.matchingService = new DonorMatchingService();
-  }
-
-  public Output execute(Input input) {
-    return execute(input, LocalDate.now());
-  }
+  // Dependencias: repositorios, matchingService, notificationService e fulfillmentService
+  public NotifyPotentialDonorsUseCase(...) { /* injecao via construtor */ }
 
   public Output execute(Input input, LocalDate currentDate) {
-    if (input == null || currentDate == null)
-      throw new ValidationException("Parameters cannot be null");
-
     DomainID requestId = DomainIdParser.parse(input.requestId(), "requestId");
     DonationRequest request = requestRepository.findById(requestId)
         .orElseThrow(() -> new NotFoundException("Donation request not found"));
 
+    // Validacao de propriedade e expiracao
     PartyOwnership.requireSameParty(request.getRequester().getParty().getId(), input.actorPartyId());
-
     if (currentDate.isAfter(request.getDateLimit())) {
       throw new ValidationException("Cannot notify donors. The donation request has already expired.");
     }
 
-    DonationRequestFulfillmentStatusRecord status =
-        fulfillmentService.fill(request.getBloodCenter(), currentDate)
-            .getOrDefault(request.getId(), new DonationRequestFulfillmentStatusRecord(0, false));
+    // Bloqueio de notificacao caso a meta ja tenha sido alcancada no snapshot
+    DonationRequestFulfillmentStatusRecord status = fulfillmentService.fill(request.getBloodCenter(), currentDate)
+        .getOrDefault(request.getId(), new DonationRequestFulfillmentStatusRecord(0, false));
     if (status.goalReached()) {
       throw new ValidationException("Cannot notify donors. The goal for this request has already been reached.");
     }
 
-    List<Donor> allDonors = donorRepository.findAll();
-    List<Donor> eligibleDonors = matchingService.findEligibleDonors(request, allDonors, currentDate);
-
-    if (eligibleDonors.isEmpty()) {
-      return Output.success();
-    }
-
+    // Identificacao de doadores compativeis e despacho de notificacoes ativas
+    List<Donor> eligibleDonors = matchingService.findEligibleDonors(request, donorRepository.findAll(), currentDate);
     for (Donor donor : eligibleDonors) {
-      DomainID partyId = donor.getPerson().getId();
-      UserAccount account = userAccountRepository.findByPartyId(partyId).orElse(null);
-
-      if (account != null && account.isEnabled()) {
-        notificationService.notifyDonorAboutRequest(donor, account, request);
-      }
+      userAccountRepository.findByPartyId(donor.getPerson().getId())
+          .filter(UserAccount::isEnabled)
+          .ifPresent(account -> notificationService.notifyDonorAboutRequest(donor, account, request));
     }
 
     return Output.success();
   }
 
   public record Input(String requestId, String actorPartyId) {}
-
-  public record Output(String message) {
-    public static Output success() {
-      return new Output("Notifications sent to eligible donors successfully.");
-    }
-  }
+  public record Output(String message) { /* ... */ }
 }
 \end{lstlisting}
 
@@ -1171,219 +970,59 @@ Ao término do processo, todo o \textit{pool} é aproveitado com zero desperdíc
 
 O progresso (\codigo{fulfilledBloodBags}) não é persistido. Os casos de uso de leitura que precisam exibir o preenchimento --- listagem de solicitações do requisitante, recomendação ao doador e bloqueio de notificação quando a meta já foi atingida --- invocam o mesmo serviço de domínio e recebem o mapa calculado na hora. Concluir uma doação apenas persiste a doação; a leitura seguinte já vê o \textit{pool} atualizado. Como o cálculo não regrava solicitações, não há condição de corrida entre escritas de contador: cada leitura monta o próprio \textit{snapshot}. Assume-se, como contrapartida, que o progresso exibido de uma solicitação de prazo folgado pode decrescer entre duas leituras: à medida que os tetos das solicitações concorrentes crescem com o tempo, bolsas antes atribuídas a ela na segunda passagem migram para solicitações mais próximas do vencimento.
 
-A Listagem~\ref{lst:fulfillment-service} apresenta a implementação integral do serviço de domínio \codigo{DonationRequestFulfillmentService}.
+A Listagem~\ref{lst:fulfillment-service} apresenta o algoritmo central do serviço de domínio \codigo{DonationRequestFulfillmentService}, evidenciando a distribuição do \textit{pool} em duas passagens.
 
 \begin{lstlisting}[language=Java, caption={Serviço de Domínio para Cumprimento de Metas das Solicitações}, label={lst:fulfillment-service}]
-package bloodmatch.request.domain;
-
-import bloodmatch.donation.domain.Donation;
-import bloodmatch.donation.domain.DonationRepositoryInterface;
-import bloodmatch.request.domain.DonationRequest;
-import bloodmatch.request.domain.DonationRequestRepositoryInterface;
-import bloodmatch.role.domain.organization.bloodcenter.BloodCenter;
-import bloodmatch.request.domain.DonationRequestFulfillmentStatusRecord;
-import bloodmatch.shared.domain.valueObjects.DomainID;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.stereotype.Service;
-
 @Service
 public class DonationRequestFulfillmentService {
 
-  private static final Comparator<DonationRequest> OLDEST_REQUEST_FIRST =
-      Comparator.comparing(DonationRequest::getDateRequested)
-          .thenComparing(request -> request.getId().getValue());
-
-  private static final Comparator<Donation> OLDEST_DONATION_FIRST =
-      Comparator.comparing(Donation::getDonationDate)
-          .thenComparing(donation -> donation.getId().getValue());
-
-  private final DonationRequestRepositoryInterface requestRepository;
-  private final DonationRepositoryInterface donationRepository;
-
+  // Dependencias e ordenadores (OLDEST_REQUEST_FIRST, OLDEST_DONATION_FIRST)
   public DonationRequestFulfillmentService(
-      DonationRequestRepositoryInterface requestRepository,
-      DonationRepositoryInterface donationRepository) {
-    this.requestRepository = requestRepository;
-    this.donationRepository = donationRepository;
-  }
+      DonationRequestRepositoryInterface requestRepo,
+      DonationRepositoryInterface donationRepo) { /* ... */ }
 
   public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
-      BloodCenter bloodCenter,
-      LocalDate asOfDate) {
-    if (bloodCenter == null) {
-      throw new IllegalArgumentException("Blood center cannot be null");
-    }
-    if (asOfDate == null) {
-      throw new IllegalArgumentException("As of date cannot be null");
-    }
-
-    DomainID organizationId = bloodCenter.getOrganization().getId();
+      BloodCenter bloodCenter, LocalDate asOfDate) {
+    // Carrega solicitacoes ativas e doacoes concluidas do hemocentro na janela temporal
     List<DonationRequest> requests = requestRepository.findActiveRequestsByOrganizationIds(
-        List.of(organizationId),
-        asOfDate);
-    if (requests.isEmpty()) {
-      return Map.of();
-    }
+        List.of(bloodCenter.getOrganization().getId()), asOfDate);
+    if (requests.isEmpty()) return Map.of();
 
     return allocateLoaded(requests, asOfDate);
   }
 
-  public Map<DomainID, DonationRequestFulfillmentStatusRecord> fill(
-      List<DonationRequest> requests,
-      LocalDate asOfDate) {
-    if (requests == null) {
-      throw new IllegalArgumentException("Requests cannot be null");
-    }
-    if (asOfDate == null) {
-      throw new IllegalArgumentException("As of date cannot be null");
-    }
-
-    List<BloodCenter> bloodCenters = bloodCentersOf(requests);
-    if (bloodCenters.isEmpty()) {
-      return Map.of();
-    }
-
-    List<DonationRequest> activeRequests = requestRepository.findActiveRequestsByOrganizationIds(
-        organizationIdsOf(bloodCenters),
-        asOfDate);
-    if (activeRequests.isEmpty()) {
-      return Map.of();
-    }
-
-    return allocateLoaded(activeRequests, asOfDate);
-  }
-
-  private Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateLoaded(
-      List<DonationRequest> requests,
-      LocalDate asOfDate) {
-    List<BloodCenter> bloodCenters = bloodCentersOf(requests);
-    if (bloodCenters.isEmpty()) {
-      return Map.of();
-    }
-
-    List<Donation> allDonations =
-        donationRepository.findCompletedDonationsByOrganizationIdsAndDateRange(
-            organizationIdsOf(bloodCenters),
-            startOfPool(requests, asOfDate),
-            asOfDate);
-
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
-    for (BloodCenter bloodCenter : bloodCenters) {
-      snapshot.putAll(allocateProportionalThenFifo(
-          requestsAt(bloodCenter, requests),
-          donationsAt(bloodCenter, allDonations),
-          asOfDate));
-    }
-    return snapshot;
-  }
-
-  private static class DonationPortion {
-    private final Donation donation;
-    private BigDecimal remainingQuantity;
-
-    public DonationPortion(Donation donation, BigDecimal remainingQuantity) {
-      this.donation = donation;
-      this.remainingQuantity = remainingQuantity;
-    }
-
-    public Donation getDonation() {
-      return donation;
-    }
-
-    public BigDecimal getRemainingQuantity() {
-      return remainingQuantity;
-    }
-
-    public void deduct(BigDecimal amount) {
-      this.remainingQuantity = this.remainingQuantity.subtract(amount);
-    }
-  }
-
+  // Algoritmo em duas passagens: 1a proporcional (equidade), 2a FIFO das sobras (meta cheia)
   private static Map<DomainID, DonationRequestFulfillmentStatusRecord> allocateProportionalThenFifo(
-      List<DonationRequest> requests,
-      List<Donation> donations,
-      LocalDate asOfDate) {
+      List<DonationRequest> requests, List<Donation> donations, LocalDate asOfDate) {
     List<DonationRequest> requestsOldestFirst = sorted(requests, OLDEST_REQUEST_FIRST);
     List<Donation> donationsOldestFirst = sorted(
-        donations.stream().filter(Donation::isCompleted).toList(),
-        OLDEST_DONATION_FIRST);
+        donations.stream().filter(Donation::isCompleted).toList(), OLDEST_DONATION_FIRST);
 
-    Map<DomainID, BigDecimal> bags = new LinkedHashMap<>();
-    for (DonationRequest request : requestsOldestFirst) {
-      bags.put(request.getId(), BigDecimal.ZERO);
-    }
+    Map<DomainID, BigDecimal> bags = initBagsMap(requestsOldestFirst);
+    List<DonationPortion> portions = donationsOldestFirst.stream()
+        .map(d -> new DonationPortion(d, BigDecimal.ONE)).toList();
 
-    List<DonationPortion> portions = new ArrayList<>();
-    for (Donation donation : donationsOldestFirst) {
-      portions.add(new DonationPortion(donation, BigDecimal.ONE));
-    }
-
+    // 1a PASSAGEM: distribuicao limitada ao teto proporcional (equidade temporal)
     List<DonationPortion> leftovers = distribute(
-        requestsOldestFirst,
-        portions,
-        bags,
-        proportionalLimits(requestsOldestFirst, asOfDate),
-        asOfDate);
+        requestsOldestFirst, portions, bags,
+        proportionalLimits(requestsOldestFirst, asOfDate), asOfDate);
 
+    // 2a PASSAGEM: distribuicao das sobras ate a meta cheia (FIFO irrestrita)
     distribute(
-        requestsOldestFirst,
-        leftovers,
-        bags,
-        fullGoalLimits(requestsOldestFirst),
-        asOfDate);
+        requestsOldestFirst, leftovers, bags,
+        fullGoalLimits(requestsOldestFirst), asOfDate);
 
-    Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot = new HashMap<>();
-    for (DonationRequest request : requestsOldestFirst) {
-      BigDecimal given = bags.get(request.getId());
-      BigDecimal goal = BigDecimal.valueOf(request.getGoalBloodBags());
-      snapshot.put(
-          request.getId(),
-          new DonationRequestFulfillmentStatusRecord(given, given.compareTo(goal) >= 0));
-    }
-    return snapshot;
-  }
-
-  private static Map<DomainID, BigDecimal> proportionalLimits(
-      List<DonationRequest> requests,
-      LocalDate asOfDate) {
-    Map<DomainID, BigDecimal> limits = new LinkedHashMap<>();
-    for (DonationRequest request : requests) {
-      limits.put(request.getId(), request.proportionalGoalAt(asOfDate));
-    }
-    return limits;
-  }
-
-  private static Map<DomainID, BigDecimal> fullGoalLimits(List<DonationRequest> requests) {
-    Map<DomainID, BigDecimal> limits = new LinkedHashMap<>();
-    for (DonationRequest request : requests) {
-      limits.put(request.getId(), BigDecimal.valueOf(request.getGoalBloodBags()));
-    }
-    return limits;
+    return buildSnapshot(requestsOldestFirst, bags);
   }
 
   private static List<DonationPortion> distribute(
-      List<DonationRequest> requestsOldestFirst,
-      List<DonationPortion> portions,
-      Map<DomainID, BigDecimal> bags,
-      Map<DomainID, BigDecimal> limits,
-      LocalDate asOfDate) {
+      List<DonationRequest> requestsOldestFirst, List<DonationPortion> portions,
+      Map<DomainID, BigDecimal> bags, Map<DomainID, BigDecimal> limits, LocalDate asOfDate) {
     List<DonationPortion> unallocated = new ArrayList<>();
     for (DonationPortion portion : portions) {
       for (DonationRequest request : requestsOldestFirst) {
-        if (portion.getRemainingQuantity().compareTo(BigDecimal.ZERO) <= 0) {
-          break;
-        }
+        if (portion.getRemainingQuantity().compareTo(BigDecimal.ZERO) <= 0) break;
+
         if (request.acceptsDonation(portion.getDonation(), asOfDate)) {
           BigDecimal given = bags.get(request.getId());
           BigDecimal limit = limits.get(request.getId());
@@ -1402,76 +1041,13 @@ public class DonationRequestFulfillmentService {
     return unallocated;
   }
 
-  private static LocalDate startOfPool(List<DonationRequest> requests, LocalDate asOfDate) {
-    return requests.stream()
-        .map(DonationRequest::getDateRequested)
-        .min(Comparator.naturalOrder())
-        .map(minDate -> minDate.isBefore(asOfDate) ? minDate : asOfDate)
-        .orElse(asOfDate);
-  }
-
-  private static List<BloodCenter> bloodCentersOf(List<DonationRequest> requests) {
-    Set<DomainID> seen = new LinkedHashSet<>();
-    List<BloodCenter> bloodCenters = new ArrayList<>();
-    for (DonationRequest request : requests) {
-      BloodCenter bloodCenter = request.getBloodCenter();
-      if (seen.add(bloodCenter.getOrganization().getId())) {
-        bloodCenters.add(bloodCenter);
-      }
-    }
-    return bloodCenters;
-  }
-
-  private static List<DomainID> organizationIdsOf(List<BloodCenter> bloodCenters) {
-    return bloodCenters.stream()
-        .map(bloodCenter -> bloodCenter.getOrganization().getId())
-        .toList();
-  }
-
-  private static List<DonationRequest> requestsAt(
-      BloodCenter bloodCenter,
-      List<DonationRequest> requests) {
-    DomainID organizationId = bloodCenter.getOrganization().getId();
-    return requests.stream()
-        .filter(request -> request.getBloodCenter().getOrganization().getId().equals(organizationId))
-        .toList();
-  }
-
-  private static List<Donation> donationsAt(BloodCenter bloodCenter, List<Donation> donations) {
-    DomainID organizationId = bloodCenter.getOrganization().getId();
-    return donations.stream()
-        .filter(donation -> donation.getBloodCenter().getOrganization().getId().equals(organizationId))
-        .toList();
-  }
-
-  private static <T> List<T> sorted(List<T> values, Comparator<T> order) {
-    List<T> copy = new ArrayList<>(values);
-    copy.sort(order);
-    return copy;
-  }
+  // ... metodos auxiliares de agrupamento, limites (proportionalLimits, fullGoalLimits) e DonationPortion
 }
 \end{lstlisting}
 
 Para orquestrar o consumo desse serviço de domínio pela camada de aplicação, o caso de uso \codigo{GetDonationRequestsByPartyIdUseCase} recupera as solicitações associadas a um determinado requisitante e aciona a computação do preenchimento das metas sob demanda no momento da leitura, sem persistir contadores transitórios no banco de dados. A Listagem~\ref{lst:get-requests-by-party-usecase} detalha a implementação completa da classe, evidenciando a chamada a \codigo{fulfillmentService.fill(userRequests, currentDate)}, a ordenação cronológica das solicitações e a projeção dos dados no registro imutável de saída (\codigo{OutputItem}), o qual computa as bolsas remanescentes (\codigo{remainingBloodBags}) e sinaliza se a meta foi alcançada.
 
 \begin{lstlisting}[language=Java, caption={Caso de Uso de Consulta de Solicitações com Snapshot de Cumprimento de Metas}, label={lst:get-requests-by-party-usecase}]
-package bloodmatch.request.application;
-
-import bloodmatch.shared.application.exception.ValidationException;
-import bloodmatch.shared.application.shared.DomainIdParser;
-import bloodmatch.request.domain.DonationRequest;
-import bloodmatch.request.domain.DonationRequestRepositoryInterface;
-import bloodmatch.request.domain.DonationRequestFulfillmentService;
-import bloodmatch.request.domain.DonationRequestFulfillmentStatusRecord;
-import bloodmatch.shared.domain.valueObjects.DomainID;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
 @Service
 public class GetDonationRequestsByPartyIdUseCase {
 
@@ -1485,82 +1061,37 @@ public class GetDonationRequestsByPartyIdUseCase {
     this.fulfillmentService = fulfillmentService;
   }
 
-  public List<OutputItem> execute(Input input) {
-    return execute(input, LocalDate.now());
-  }
-
   public List<OutputItem> execute(Input input, LocalDate currentDate) {
-    if (input == null) {
-      throw new ValidationException("Input cannot be null");
-    }
-    if (currentDate == null) {
-      throw new ValidationException("Current date cannot be null");
-    }
-
     DomainID partyId = DomainIdParser.parse(input.partyId(), "partyId");
+    List<DonationRequest> userRequests = donationRequestRepository.findByRequesterPartyId(partyId);
 
-    List<DonationRequest> userRequests =
-        donationRequestRepository.findByRequesterPartyId(partyId);
-
+    // Calculo do snapshot de metas em memoria para as solicitacoes do participante
     Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot =
         fulfillmentService.fill(userRequests, currentDate);
 
     return userRequests.stream()
-        .sorted(
-            Comparator.comparing(DonationRequest::getDateRequested)
-                .reversed()
-                .thenComparing(request -> request.getId().getValue()))
+        .sorted(Comparator.comparing(DonationRequest::getDateRequested).reversed()
+            .thenComparing(request -> request.getId().getValue()))
         .map(request -> toOutput(request, currentDate, snapshot))
         .toList();
   }
 
   private OutputItem toOutput(
-      DonationRequest request,
-      LocalDate currentDate,
+      DonationRequest request, LocalDate currentDate,
       Map<DomainID, DonationRequestFulfillmentStatusRecord> snapshot) {
-    DonationRequestFulfillmentStatusRecord status = snapshot.getOrDefault(
-        request.getId(),
-        new DonationRequestFulfillmentStatusRecord(0, false));
-    BigDecimal fulfilledBloodBags = status.fulfilledBloodBags();
-    BigDecimal goal = BigDecimal.valueOf(request.getGoalBloodBags());
-    BigDecimal remainingBloodBags = goal.subtract(fulfilledBloodBags).max(BigDecimal.ZERO);
+    var status = snapshot.getOrDefault(request.getId(), new DonationRequestFulfillmentStatusRecord(0, false));
+    BigDecimal fulfilled = status.fulfilledBloodBags();
+    BigDecimal remaining = BigDecimal.valueOf(request.getGoalBloodBags()).subtract(fulfilled).max(BigDecimal.ZERO);
 
     return new OutputItem(
-        request.getId().getValue().toString(),
-        request.getVersion(),
-        request.getBloodTypeNeeded().getType(),
-        request.getDateRequested(),
-        request.getDateLimit(),
-        request.isActive(),
-        request.isExpired(currentDate),
-        request.getBloodCenter().getOrganization().getName(),
-        request.getBloodCenter().getOrganization().getPhoneNumber() != null
-            ? request.getBloodCenter().getOrganization().getPhoneNumber().getValue()
-            : null,
-        request.getUrgency().name(),
-        request.getGoalBloodBags(),
-        fulfilledBloodBags,
-        remainingBloodBags,
-        status.goalReached());
+        request.getId().getValue().toString(), request.getVersion(),
+        request.getBloodTypeNeeded().getType(), request.getDateRequested(), request.getDateLimit(),
+        request.isActive(), request.isExpired(currentDate), request.getBloodCenter().getOrganization().getName(),
+        request.getUrgency().name(), request.getGoalBloodBags(), fulfilled, remaining, status.goalReached());
   }
 
   public record Input(String partyId) {}
-
-  public record OutputItem(
-      String requestId,
-      Long version,
-      String bloodTypeNeeded,
-      LocalDate dateRequested,
-      LocalDate dateLimit,
-      boolean active,
-      boolean expired,
-      String bloodCenterName,
-      String bloodCenterPhoneNumber,
-      String urgency,
-      int goalBloodBags,
-      BigDecimal fulfilledBloodBags,
-      BigDecimal remainingBloodBags,
-      boolean goalReached) {}
+  public record OutputItem(...) { /* projecao imutavel dos dados da solicitacao */ }
 }
 \end{lstlisting}
 
@@ -1580,41 +1111,17 @@ Para solucionar esse desafio de forma escalável, o sistema implementa formalmen
 Para materializar essa estratégia, o sistema disponibiliza o caso de uso de edição \codigo{UpdateDonationRequestUseCase}, acionado pela rota HTTP \texttt{PATCH /donation-requests/\{id\}}. A Listagem~\ref{lst:update-request-usecase} detalha a implementação completa da classe.
 
 \begin{lstlisting}[language=Java, caption={Caso de Uso de Atualização com Verificação Precoce de Concorrência}, label={lst:update-request-usecase}]
-package bloodmatch.request.application;
-
-import bloodmatch.shared.application.exception.ConcurrencyException;
-import bloodmatch.shared.application.exception.NotFoundException;
-import bloodmatch.shared.application.exception.ValidationException;
-import bloodmatch.shared.application.shared.DomainIdParser;
-import bloodmatch.shared.application.shared.PartyOwnership;
-import bloodmatch.request.domain.DonationRequest;
-import bloodmatch.request.domain.DonationRequestRepositoryInterface;
-import bloodmatch.shared.domain.valueObjects.DomainID;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate;
-import java.util.Objects;
-
 @Service
 public class UpdateDonationRequestUseCase {
 
   private final DonationRequestRepositoryInterface donationRequestRepository;
 
-  public UpdateDonationRequestUseCase(DonationRequestRepositoryInterface donationRequestRepository) {
-    if (donationRequestRepository == null)
-      throw new IllegalArgumentException("DonationRequestRepository cannot be null");
-    this.donationRequestRepository = donationRequestRepository;
+  public UpdateDonationRequestUseCase(DonationRequestRepositoryInterface repo) {
+    this.donationRequestRepository = repo;
   }
 
   @Transactional
   public Output execute(Input input) {
-    if (input == null)
-      throw new ValidationException("Request body cannot be null");
-    if (input.version() == null)
-      throw new ValidationException("version cannot be null");
-    if (input.goalBloodBags() == null && input.dateLimit() == null)
-      throw new ValidationException("At least one mutable field must be provided");
-
     DomainID requestId = DomainIdParser.parse(input.requestId(), "requestId");
     DonationRequest request = donationRequestRepository.findById(requestId)
         .orElseThrow(() -> new NotFoundException("Donation request not found"));
@@ -1627,21 +1134,8 @@ public class UpdateDonationRequestUseCase {
 
     PartyOwnership.requireSameParty(request.getRequester().getParty().getId(), input.actorPartyId());
 
-    if (input.goalBloodBags() != null) {
-      try {
-        request.setGoalBloodBags(input.goalBloodBags());
-      } catch (IllegalArgumentException e) {
-        throw new ValidationException(e.getMessage());
-      }
-    }
-
-    if (input.dateLimit() != null) {
-      try {
-        request.setDateLimit(input.dateLimit());
-      } catch (IllegalArgumentException e) {
-        throw new ValidationException(e.getMessage());
-      }
-    }
+    if (input.goalBloodBags() != null) request.setGoalBloodBags(input.goalBloodBags());
+    if (input.dateLimit() != null) request.setDateLimit(input.dateLimit());
 
     // 2o MOMENTO DE CHECAGEM: Nivel de Persistencia / Banco de Dados
     donationRequestRepository.save(request);
@@ -1652,15 +1146,7 @@ public class UpdateDonationRequestUseCase {
       String requestId, Long version, Integer goalBloodBags,
       LocalDate dateLimit, String actorPartyId) {}
 
-  public record Output(String id, Long version, Integer goalBloodBags, LocalDate dateLimit) {
-    public static Output from(DonationRequest request) {
-      return new Output(
-          request.getId().getValue().toString(),
-          request.getVersion(),
-          request.getGoalBloodBags(),
-          request.getDateLimit());
-    }
-  }
+  public record Output(String id, Long version, Integer goalBloodBags, LocalDate dateLimit) { /* ... */ }
 }
 \end{lstlisting}
 
@@ -1670,7 +1156,7 @@ A garantia de integridade transacional na API BloodMatch estrutura-se sobre uma 
 
 \begin{enumerate}[leftmargin=*]
   \item \textbf{Primeiro Momento: Validação Lógica na Camada de Aplicação (\textit{Fail-Fast Check}):}
-  O primeiro momento ocorre explicitamente no corpo do caso de uso (linhas 37--40 da Listagem~\ref{lst:update-request-usecase}), imediatamente após a recuperação do agregado de domínio do repositório (\codigo{findById}). Quando o cliente consome a API (por exemplo, via consulta prévia \texttt{GET /donation-requests/\{id\}}), a resposta serializa o número de versão persistido (\codigo{version}). Ao emitir a instrução de alteração, o cliente é obrigado a devolver esse valor no corpo da requisição (\texttt{Input.version}). 
+  O primeiro momento ocorre explicitamente no corpo do caso de uso (na validação de versão da Listagem~\ref{lst:update-request-usecase}), imediatamente após a recuperação do agregado de domínio do repositório (\codigo{findById}). Quando o cliente consome a API (por exemplo, via consulta prévia \texttt{GET /donation-requests/\{id\}}), a resposta serializa o número de versão persistido (\codigo{version}). Ao emitir a instrução de alteração, o cliente é obrigado a devolver esse valor no corpo da requisição (\texttt{Input.version}). 
   
   O caso de uso compara a versão enviada pelo cliente com a versão atual carregada do banco de dados:
   \begin{lstlisting}[language=Java]
