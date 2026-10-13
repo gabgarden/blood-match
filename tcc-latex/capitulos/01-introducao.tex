@@ -18,19 +18,22 @@ Falta um mecanismo sistemático que aproxime requisitantes e doadores segundo cr
 Diante dessa lacuna, este trabalho propõe uma RESTful API que intermedia as solicitações de unidades de saúde e pacientes e os doadores disponíveis, recomendando correspondências compatíveis de forma a promover a captação efetiva de possíveis doadores.
 
 % Vantagens
-Essa abordagem apresenta a vantagem de tornar a captação mais efetiva, ao substituir a divulgação genérica por um encontro dirigido entre oferta e demanda. Do ponto de vista arquitetural, é fundamental reconhecer que sistemas de saúde e de doação de sangue operam sobre regras de negócio densas, mutáveis e de extrema criticidade. Diante dessa complexidade, o desenvolvimento pautado no \textit{Domain-Driven Design} (DDD) \cite{evans2003} entra como a resposta técnica ideal para evitar a construção de um modelo de domínio anêmico. A abordagem aproxima, de forma orgânica, o \textit{software} da realidade clínica dos hemocentros através da Linguagem Ubíqua, garantindo que os termos do negócio e as restrições sanitárias sejam traduzidos fielmente para o código. Além disso, a adoção dos princípios SOLID \cite{martin2000} garante uma arquitetura robusta e escalável, promovendo futuras expansões e um longo ciclo de vida ao sistema, que estará preparado para receber integrações com facilidade.
+Essa abordagem apresenta a vantagem de tornar a captação mais efetiva, ao substituir a divulgação genérica por um encontro dirigido entre oferta e demanda. Do ponto de vista arquitetural, é fundamental reconhecer que sistemas de saúde e de doação de sangue operam sobre regras de negócio densas, mutáveis e de extrema criticidade. Diante dessa complexidade, o desenvolvimento pautado no \textit{Domain-Driven Design} (DDD) \cite{evans2003} entra como a resposta técnica ideal para evitar a construção de um modelo de domínio anêmico\footnote{Modelo de domínio anêmico é um antipadrão no qual as classes de domínio contêm apenas dados (atributos e \textit{getters}/\textit{setters}), sem comportamento ou regras de negócio, delegando toda a lógica a serviços externos e, assim, contrariando os princípios da orientação a objetos e do \textit{Domain-Driven Design}.}. A abordagem aproxima, de forma orgânica, o \textit{software} da realidade clínica dos hemocentros através da Linguagem Ubíqua, garantindo que os termos do negócio e as restrições sanitárias sejam traduzidos fielmente para o código. Além disso, a adoção dos princípios SOLID \cite{martin2000} garante uma arquitetura robusta e escalável, promovendo futuras expansões e um longo ciclo de vida ao sistema, que estará preparado para receber integrações com facilidade.
 
 \section{Objetivos}
 
 % Objetivo geral
-O objetivo geral deste trabalho é gerenciar as doações de sangue a partir de um sistema de informações via Web, aproximando as solicitações de unidades de saúde e pacientes dos doadores compatíveis. O sistema recomenda solicitações à luz da tipagem sanguínea e da proximidade geográfica e identifica doadores elegíveis para notificação.
+O objetivo geral deste trabalho é desenvolver um sistema de informação para gerenciamento de doações de sangue, permitindo o registro de solicitações de unidade de saúde e pacientes e, posterior, captação e recomendação de potenciais doadores de sangue. O sistema deve recomendar solicitações a potenciais doadores à luz dos critérios de tipagem sanguínea e de proximidade geográfica, bem como notificar os doadores elegíveis.
 
 Objetivos específicos:
 
 \begin{itemize}[leftmargin=*]
-  \item[\textbf{O1}] Mapear o processo da doação sanguínea, identificando participantes, papéis, solicitações e regras de negócio.
+  \item[\textbf{O1}] Definir a linguagem ubíqua do projeto estritamente alinhada ao processo de doação sanguínea, identificando participantes, papéis, solicitações e regras de negócio.
   \item[\textbf{O2}] Identificar sistemas com funcionalidades similares.
-  \item[\textbf{O3}] Recomendar solicitações compatíveis a doadores e notificar candidatos elegíveis.
+  \item[\textbf{O3}] Projetar e desenvolver o sistema com base nos padrões e preceitos do paradigma \textit{Domain-Driven Design} (DDD) e dos princípios SOLID.
+  \item[\textbf{O4}] Utilizar uma arquitetura de software que promova a clara separação das camadas do sistema (domínio, aplicação, REST, infraestrutura), bem como minimize o acoplamento dos componentes do sistema.
+  \item[\textbf{O5}] Prover a interface de acesso ao \textit{backend} do sistema seguindo o estilo arquitetural REST com o protocolo HTTP, disponibilizando, portanto, uma RESTful API de acesso.
+  \item[\textbf{O6}] Recomendar solicitações compatíveis a doadores e notificar candidatos elegíveis.
 \end{itemize}
 
 \section{Justificativa}
